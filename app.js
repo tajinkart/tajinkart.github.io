@@ -613,7 +613,6 @@ window.switchAdminTab = function(tabKey, btn) {
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
   if (tabKey === 'orders') renderAdminLists();
-  if (tabKey === 'settings') renderAdminEyeControls();
 };
 
 function renderAdminSketch1() {
@@ -896,7 +895,6 @@ window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
 window.updateArtField = function(idx, field, value) {
   showcaseArtworks[idx][field] = value;
   localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-  applySectionVisibility();
   renderShowcaseGrid();
   showToast('اثر با موفقیت ویرایش شد.', 'success');
 };
@@ -922,7 +920,6 @@ window.adminAddNewArtwork = function() {
   localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   currentSelectedArtIdx = 0;
   renderAdminSketch2();
-  applySectionVisibility();
   renderShowcaseGrid();
   showToast('آرت‌ورک جدید به گالری اضافه شد.', 'success');
 };
@@ -932,7 +929,6 @@ window.adminDeleteArtwork = function(idx) {
   localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   currentSelectedArtIdx = Math.max(0, currentSelectedArtIdx - 1);
   renderAdminSketch2();
-  applySectionVisibility();
   renderShowcaseGrid();
   showToast('اثر حذف شد.', 'info');
 };
@@ -1245,7 +1241,6 @@ window.exportFullSelfContainedHTML = function() {
 
 // راه‌اندازی اولیه در زمان لود صفحه
 document.addEventListener('DOMContentLoaded', () => {
-  applySectionVisibility();
   renderShowcaseGrid();
   selectPipeline('sketch1', document.querySelector('#atelierServiceCards .service-nav-card.active'), false);
   renderProducts();
@@ -1411,194 +1406,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-
-// ===================================================
-// سیستم کنترل چشم و پنهان/آشکارسازی بخش‌ها و آیکون‌ها (Eye Dropper / Visibility Manager)
-// ===================================================
-
-function applySectionVisibility() {
-  const vis = siteSettings.sectionVisibility || {
-    showcase: true,
-    store: true,
-    genesis: true,
-    academy: true,
-    society: true
-  };
-
-  const sections = {
-    showcase: document.getElementById('view-showcase'),
-    store: document.getElementById('view-store'),
-    genesis: document.getElementById('view-genesis'),
-    academy: document.getElementById('view-academy'),
-    society: document.getElementById('view-society')
-  };
-
-  for (const [key, el] of Object.entries(sections)) {
-    if (el) {
-      if (vis[key] === false && currentView !== 'admin') {
-        el.setAttribute('data-hidden-by-admin', 'true');
-        el.classList.add('hidden');
-        if (currentView === key) {
-          const firstOpen = Object.keys(vis).find(k => vis[k] === true) || 'showcase';
-          switchView(firstOpen);
-        }
-      } else {
-        el.removeAttribute('data-hidden-by-admin');
-      }
-    }
-  }
-
-  renderRightNavItems();
-  renderMobileNavItems();
-}
-
-function renderRightNavItems() {
-  const container = document.getElementById('rightNavItemsContainer');
-  if (!container) return;
-
-  const items = siteSettings.navItems || [];
-  container.innerHTML = items.map(function(item, idx) {
-    if (!item.visible) return '';
-    return '<button onclick="' + item.action + '" class="right-exp-btn ' + (item.theme || 'gold-theme') + '" title="' + item.label + '">' +
-      '<span class="right-exp-icon">' +
-        '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
-          '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />' +
-        '</svg>' +
-      '</span>' +
-      '<span class="right-exp-text">' +
-        '<span class="right-exp-title" style="color:' + (item.color || 'var(--gold)') + ';">' + item.label + '</span>' +
-        '<span class="right-exp-sub">' + (item.sub || '') + '</span>' +
-      '</span>' +
-    '</button>';
-  }).join('');
-}
-
-function renderMobileNavItems() {
-  const container = document.getElementById('mobileBottomNav');
-  if (!container) return;
-
-  const vis = siteSettings.sectionVisibility || {};
-  const buttons = container.querySelectorAll('.mob-nav-btn');
-  const mapping = ['showcase', 'store', 'genesis', 'academy', 'members'];
-
-  buttons.forEach(function(btn, idx) {
-    const key = mapping[idx];
-    if (key && vis[key] === false) {
-      btn.style.display = 'none';
-    } else {
-      btn.style.display = 'flex';
-    }
-  });
-}
-
-function renderAdminEyeControls() {
-  const container = document.getElementById('adminSectionEyeControls');
-  if (!container) return;
-
-  const vis = siteSettings.sectionVisibility || {
-    showcase: true,
-    store: true,
-    genesis: true,
-    academy: true,
-    society: true
-  };
-
-  const labels = {
-    showcase: '۱. گالری آثار و صفحه اصلی',
-    store: '۲. فروشگاه و آتلیه سفارش کانسپت',
-    genesis: '۳. جهان جنسیس و کمیک‌خوان',
-    academy: '۴. آکادمی طراحی و مسترکلاس‌ها',
-    society: '۵. جامعه هنری و شبکه‌ها'
-  };
-
-  container.innerHTML = Object.keys(labels).map(function(key) {
-    const isVisible = vis[key] !== false;
-    return '<div style="padding:10px 14px; background:#070a10; border-radius:10px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">' +
-      '<span style="font-size:12.5px; font-weight:700;">' + labels[key] + '</span>' +
-      '<button type="button" onclick="toggleSectionVisibility(' + JSON.stringify(key) + ')" class="btn-secondary" style="padding:5px 12px; font-size:11px; display:flex; align-items:center; gap:6px; border-color:' + (isVisible ? 'var(--emerald)' : 'var(--crimson)') + '; color:' + (isVisible ? '#6ee7b7' : '#fca5a5') + ';">' +
-        '<span>' + (isVisible ? '👁️ فعال و نمایان' : '🚫 مخفی از اعضا') + '</span>' +
-      '</button>' +
-    '</div>';
-  }).join('');
-
-  renderAdminNavItemsManager();
-}
-
-window.toggleSectionVisibility = function(key) {
-  if (!siteSettings.sectionVisibility) siteSettings.sectionVisibility = {};
-  siteSettings.sectionVisibility[key] = !siteSettings.sectionVisibility[key];
-  localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  applySectionVisibility();
-  renderAdminEyeControls();
-  const stateText = siteSettings.sectionVisibility[key] ? 'نمایان' : 'مخفی';
-  showToast('وضعیت بخش «' + key + '» به حالت ' + stateText + ' تغییر یافت.', 'info');
-};
-
-function renderAdminNavItemsManager() {
-  const container = document.getElementById('adminNavItemsManager');
-  if (!container) return;
-
-  const items = siteSettings.navItems || [];
-  container.innerHTML = items.map(function(item, idx) {
-    return '<div style="padding:10px 12px; background:#070a10; border-radius:10px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
-      '<div style="display:flex; flex-direction:column; gap:2px;">' +
-        '<span style="font-size:12px; font-weight:800; color:' + (item.color || '#fff') + ';">' + item.label + '</span>' +
-        '<span style="font-size:10px; color:var(--text-muted);">' + (item.sub || '') + '</span>' +
-      '</div>' +
-      '<div style="display:flex; align-items:center; gap:6px;">' +
-        '<button type="button" onclick="toggleNavItemEye(' + idx + ')" class="btn-secondary" style="padding:4px 8px; font-size:11px; border-color:' + (item.visible ? 'var(--emerald)' : 'var(--crimson)') + '; color:' + (item.visible ? '#6ee7b7' : '#fca5a5') + ';">' +
-          (item.visible ? '👁️' : '🚫') +
-        '</button>' +
-        '<button type="button" onclick="editNavItemPrompt(' + idx + ')" class="btn-secondary" style="padding:4px 8px; font-size:10px;">ویرایش متن</button>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-window.toggleNavItemEye = function(idx) {
-  if (siteSettings.navItems && siteSettings.navItems[idx]) {
-    siteSettings.navItems[idx].visible = !siteSettings.navItems[idx].visible;
-    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
-    applySectionVisibility();
-    renderAdminNavItemsManager();
-    showToast('وضعیت آیکون داک ناوبری به‌روزرسانی شد.', 'info');
-  }
-};
-
-window.editNavItemPrompt = function(idx) {
-  const item = siteSettings.navItems[idx];
-  if (!item) return;
-  const newLabel = prompt('عنوان اصلی آیکون را وارد کنید:', item.label);
-  if (newLabel && newLabel.trim()) {
-    const newSub = prompt('زیرعنوان یا توضیحات کوچک را وارد کنید:', item.sub || '');
-    item.label = newLabel.trim();
-    if (newSub !== null) item.sub = newSub.trim();
-    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
-    applySectionVisibility();
-    renderAdminNavItemsManager();
-    showToast('عنوان آیکون تغییر یافت.', 'success');
-  }
-};
-
-window.adminAddNewNavItem = function() {
-  const label = prompt('عنوان گزینه ناوبری جدید:');
-  if (!label || !label.trim()) return;
-  const sub = prompt('توضیح کوتاه زیرعنوان:') || '';
-  const newAction = prompt("دستور اجرا در زمان کلیک (مثلاً switchView('store')):", "switchView('store')") || "switchView('store')";
-
-  if (!siteSettings.navItems) siteSettings.navItems = [];
-  siteSettings.navItems.push({
-    id: 'nav_' + Date.now(),
-    label: label.trim(),
-    sub: sub.trim(),
-    color: 'var(--gold)',
-    theme: 'gold-theme',
-    visible: true,
-    action: newAction
-  });
-  localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  applySectionVisibility();
-  renderAdminNavItemsManager();
-  showToast('گزینه ناوبری جدید به داک راست اضافه شد.', 'success');
-};
