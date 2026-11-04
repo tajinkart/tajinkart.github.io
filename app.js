@@ -1,3 +1,13 @@
+
+// آیکون‌های اختصاصی و متمایز SVG برای هر یک از ۵ گزینه ناوبری داک راست
+const NAV_ICONS = {
+  members: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>',
+  store: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>',
+  genesis: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>',
+  academy: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>',
+  society: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>'
+};
+
 /**
  * TAJINKART Master Spec v2.1 Engine
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
@@ -73,12 +83,14 @@ function renderShowcaseGrid() {
   `).join('');
 }
 
-// لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)
+// لایت‌باکس مطالعه موردی مقاله‌محور و اسکرولی آثار (ArtStation Style Vertical Case Study)
 window.openArtModal = function(id) {
   const art = showcaseArtworks.find(a => a.id === id);
   if (!art) return;
   activeCaseStudyArt = art;
-  activeCaseStudyPhaseIdx = 0;
+
+  // قفل کردن اسکرول صفحه زمینه برای جلوگیری از اسکرول ناخواسته پشت مدال طبق ویدیو
+  document.body.classList.add('modal-open');
 
   document.getElementById('artDetailTitle').textContent = art.title;
   document.getElementById('artDetailDesc').textContent = art.desc;
@@ -86,47 +98,43 @@ window.openArtModal = function(id) {
   document.getElementById('caseStudyLore').textContent = art.lore || 'جهان اکستوپیا';
 
   const pipeData = PIPELINE_DATA[art.pipelineKey] || PIPELINE_DATA['sketch1'];
-  document.getElementById('caseStudyPipeName').textContent = pipeData.topSub;
+  document.getElementById('caseStudyPipeName').textContent = pipeData ? pipeData.topSub : 'طراحی کاراکتر';
 
-  renderCaseStudyPhasesSwitcher();
-  updateCaseStudyPhaseView();
+  // رندر سیر مراحل خلق اثر به صورت مقاله‌ای با اسکرول مستقل عمودی
+  const feedEl = document.getElementById('caseStudyArticleFeed');
+  if (feedEl) {
+    const phases = (art.phases && art.phases.length) ? art.phases : [
+      { name: 'اتود اولیه و سیلوئت', img: art.image, desc: 'اکتشاف فرم، تناسبات اندام، خطوط دینامیک حرکت و پیش‌زمینه داستانی شخصیت در اتمسفر مگاسازه.', tech: 'براش‌های نرم زغالی با رزولوشن 4K' },
+      { name: 'لاین‌آرت فنی و کادربندی', img: art.image, desc: 'طراحی خطی تمیز، تعیین زوایای ارتوگرافیک زره تیتانیومی و ماسک منقاری فیلتردار ضد اسید.', tech: 'وکتور خطی شارپ و ترن‌اراند ۳۶۰ درجه' },
+      { name: 'مطالعه مقداری و نورپردازی', img: art.image, desc: 'تنظیم پرتوهای نوری مات در میان غبار گوگردی، تعیین نقاط کنتراست عمیق و هایلایت‌های لبه.', tech: 'سیستم Value Study ۱۶ بیتی' },
+      { name: 'رندر مستر متریال نهایی', img: art.image, desc: 'رندر متریال‌های خوردگی شیمیایی، پاشش نور اتر و جداسازی لایه‌های باز PSD جهت تولید تجاری.', tech: 'مستر نهایی ProPhoto RGB 300DPI' }
+    ];
+
+    feedEl.innerHTML = phases.map((p, idx) => `
+      <div class="case-phase-block">
+        <div class="case-phase-header">
+          <span class="case-phase-tag">فاز ${idx + 1} • ${p.name}</span>
+          <span class="case-phase-tech-badge">${p.tech || 'PROPHOTO RGB 4K'}</span>
+        </div>
+        <div class="case-phase-img-container">
+          <img src="${p.img}" alt="${p.name}" loading="lazy" />
+        </div>
+        <p class="case-phase-narrative">${p.desc || 'توضیحات و مستندات پروسه خلق این مرحله توسط سید سروش تاج.'}</p>
+      </div>
+    `).join('');
+
+    // اسکرول مقاله به ابتدای فاز ۱
+    feedEl.scrollTop = 0;
+  }
 
   document.getElementById('artDetailModal').classList.add('active');
 };
 
-function renderCaseStudyPhasesSwitcher() {
-  const switcher = document.getElementById('caseStudyPhasesSwitcher');
-  if (!switcher || !activeCaseStudyArt) return;
-  const phases = activeCaseStudyArt.phases || [
-    { name: 'اتود اولیه و سیلوئت', img: activeCaseStudyArt.image },
-    { name: 'لاین‌آرت فنی و کادر', img: activeCaseStudyArt.image },
-    { name: 'مطالعه نوری و مقداری', img: activeCaseStudyArt.image },
-    { name: 'رندر متریال نهایی', img: activeCaseStudyArt.image }
-  ];
-
-  switcher.innerHTML = phases.map((p, idx) => `
-    <button type="button" onclick="setCaseStudyPhase(${idx})" class="case-phase-btn ${idx === activeCaseStudyPhaseIdx ? 'active' : ''}">
-      ${p.name}
-    </button>
-  `).join('');
-}
-
-window.setCaseStudyPhase = function(idx) {
-  activeCaseStudyPhaseIdx = idx;
-  updateCaseStudyPhaseView();
-  renderCaseStudyPhasesSwitcher();
+window.closeArtModal = function(e) { if (e.target.id === 'artDetailModal') closeArtModalDirect(); };
+window.closeArtModalDirect = function() {
+  document.body.classList.remove('modal-open');
+  document.getElementById('artDetailModal').classList.remove('active');
 };
-
-function updateCaseStudyPhaseView() {
-  if (!activeCaseStudyArt) return;
-  const phases = activeCaseStudyArt.phases || [{ name: 'رندر نهایی اثر', img: activeCaseStudyArt.image }];
-  const currentPhase = phases[activeCaseStudyPhaseIdx] || phases[0];
-
-  const imgEl = document.getElementById('caseStudyMainImg');
-  const badgeEl = document.getElementById('caseStudyPhaseBadge');
-  if (imgEl) imgEl.src = currentPhase.img;
-  if (badgeEl) badgeEl.textContent = `فاز ${activeCaseStudyPhaseIdx + 1} • ${currentPhase.name}`;
-}
 
 // دیپ‌لینک هوشمند از مطالعه موردی به پایپلاین آتلیه کمیسیون
 window.deepLinkToPipeline = function() {
@@ -220,13 +228,17 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
 
   // محاسبه لحظه‌ای اولیه و باز کردن پنجره
   recalcWizardPrice();
+  document.body.classList.add('modal-open');
   document.getElementById('zoomModal').classList.add('active');
 }
 
 function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
-function closeModalDirect() { document.getElementById('zoomModal').classList.remove('active'); }
+function closeModalDirect() {
+  document.body.classList.remove('modal-open');
+  document.getElementById('zoomModal').classList.remove('active');
+}
 
-// موتور محاسبه‌گر لحظه‌ای قیمت و اسکوپ سفارش (Live Calculator Engine)
+// موتور محاسبه‌گر لحظه‌ای قیمت، اسکوپ و پیش‌نمایش تصویر متناسب با فاز و کادربندی انتخابی طبق ویدیو
 window.toggleWizardStep = function(stepNum) {
   const card = document.getElementById("wizardStep" + stepNum);
   if (card) card.classList.toggle('active');
@@ -246,7 +258,11 @@ window.recalcWizardPrice = function() {
   const commEl = document.getElementById('wizCommercial');
 
   let extra = 0;
-  if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  let selectedFraming = 'full';
+  if (framingEl) {
+    selectedFraming = framingEl.value;
+    extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  }
   if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (expEl && expEl.checked) extra += 35;
@@ -256,16 +272,42 @@ window.recalcWizardPrice = function() {
   const totalUSD = Math.max(50, baseUSD + extra);
   activeModalItem.calculatedPriceUSD = totalUSD;
 
+  // آپدیت تصویر پیش‌نمایش بر اساس گزینه انتخابی (شیت سه‌نما / تمام‌قد / پرتره / فازها)
+  const pData = PIPELINE_DATA[activeModalItem.pipeKey || currentSelectedPipeKey] || PIPELINE_DATA['sketch1'];
+  const samples = pData.samples || {
+    bust: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=900&q=80',
+    full: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=900&q=80',
+    turnaround: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=80',
+    sketch: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=900&q=80',
+    lineart: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=900&q=80'
+  };
+
+  const imgEl = document.getElementById('modalMediaImg');
+  const badgeEl = document.getElementById('wizardSampleBadge');
+
+  if (imgEl && samples) {
+    if (selectedFraming === 'bust' && samples.bust) {
+      imgEl.src = samples.bust;
+      if (badgeEl) badgeEl.textContent = 'پیش‌نمایش گزینه: پرتره و نیم‌تنه';
+    } else if (selectedFraming === 'turnaround' && samples.turnaround) {
+      imgEl.src = samples.turnaround;
+      if (badgeEl) badgeEl.textContent = 'پیش‌نمایش گزینه: شیت سه‌نما ارتوگرافیک';
+    } else if (samples.full) {
+      imgEl.src = samples.full;
+      if (badgeEl) badgeEl.textContent = 'پیش‌نمایش گزینه: تمام‌قد پویا';
+    }
+  }
+
   // آپدیت آنی و زنده قیمت روی صفحه
   const priceEl = document.getElementById('modalPrice');
   if (priceEl) {
     priceEl.textContent = formatPrice(totalUSD);
-    // افکت فلش ظریف هنگام تغییر عدد
     priceEl.style.transition = 'color 0.2s';
     priceEl.style.color = 'var(--cyan-electric)';
     setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 250);
   }
 };
+
 
 // مخزن دارایی‌های دیجیتال (۷ شاخه استاندارد)
 let currentStoreFilterType = 'all';
@@ -617,42 +659,28 @@ window.switchAdminTab = function(tabKey, btn) {
 };
 
 
-// ۲. پایپلاین و مراحل آتلیه در پنل ادمین با استایل بصری و گرید تایل‌ها کاملاً شبیه فروشگاه
+// ۲. کنسول مدیریت پایپلاین‌ها و فازهای آتلیه (۳ ستونه استاندارد طبق خواسته کاربر در ویدیو)
 function renderAdminSketch1() {
-  const sideCards = document.getElementById('adminAtelierServiceCards');
-  if (!sideCards) return;
-
-  const defaultImgs = {
-    sketch1: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
-    sketch_creature: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80',
-    sketch2: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
-    sketch3: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80',
-    sketch4: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80',
-    sketch5: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80'
-  };
+  const catCol = document.getElementById('adminCategoryListCol');
+  if (!catCol) return;
 
   const keys = Object.keys(PIPELINE_DATA);
-  let html = keys.map(function(key, idx) {
+  catCol.innerHTML = keys.map(function(key, idx) {
     const pipe = PIPELINE_DATA[key];
     const num = (idx + 1 < 10 ? '0' : '') + (idx + 1);
-    const cover = pipe.tiles && pipe.tiles[0] ? pipe.tiles[0].img : (defaultImgs[key] || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80');
     const isActive = (key === currentSelectedPipeKey);
 
-    return '<div onclick="selectAdminCategory(\'' + key + '\')" class="service-nav-card ' + (isActive ? 'active' : '') + '" style="margin-bottom:8px;">' +
-      '<img src="' + cover + '" alt="' + pipe.topSub + '" />' +
-      '<div class="service-nav-overlay">' +
-        '<div class="service-nav-title">' +
-          '<span class="font-mono" style="color:var(--gold);">' + num + '.</span>' +
-          '<span>' + pipe.topSub + '</span>' +
-        '</div>' +
-        '<div class="service-nav-desc">' + (pipe.note || pipe.topSub) + '</div>' +
-      '</div>' +
-    '</div>';
+    return `
+      <div class="admin-cat-item ${isActive ? 'active' : ''}" onclick="selectAdminCategory('${key}')">
+        <div>
+          <span class="font-mono" style="color:var(--gold); font-size:11px; margin-left:4px;">${num}.</span>
+          <span style="font-size:12.5px; font-weight:700;">${pipe.topSub}</span>
+        </div>
+        <span class="font-mono" style="font-size:10.5px; color:var(--text-muted);">${pipe.tiles ? pipe.tiles.length : 0} فاز</span>
+      </div>
+    `;
   }).join('');
 
-  html += '<button type="button" onclick="adminAddNewCategory()" class="btn-secondary" style="width:100%; margin-top:8px; border-style:dashed; color:var(--gold); font-size:11.5px; padding:10px;">+ افزودن دسته‌بندی جدید به آتلیه</button>';
-
-  sideCards.innerHTML = html;
   renderAdminStagesList();
 }
 
@@ -666,38 +694,33 @@ function renderAdminStagesList() {
   const data = PIPELINE_DATA[currentSelectedPipeKey];
   if (!data) return;
 
-  const topSubEl = document.getElementById('adminSketchTopSubTitle');
-  const noteEl = document.getElementById('adminSketchAnnotationNote');
-  const slugEl = document.getElementById('adminSketchBadgeSlug');
+  const titleEl = document.getElementById('adminCurrentPipeTitle');
+  if (titleEl) titleEl.textContent = `مراحل: ${data.topSub}`;
 
-  if (topSubEl) topSubEl.textContent = data.topSub;
-  if (noteEl) noteEl.textContent = data.note;
-  if (slugEl) slugEl.textContent = data.badgeSlug;
-
-  const container = document.getElementById('adminMosaicStageContainer');
-  if (container) {
-    container.innerHTML = data.tiles.map(function(tile, idx) {
+  const stagesGrid = document.getElementById('adminStagesGridCol');
+  if (stagesGrid && data.tiles) {
+    stagesGrid.innerHTML = data.tiles.map(function(t, idx) {
       const isSelected = (idx === currentSelectedStageIdx);
-      const displayPrice = formatPrice(tile.price);
+      const displayPrice = formatPrice(t.price);
 
-      return '<div class="pipeline-tile ' + (tile.span || 'col-span-4') + '" style="cursor:pointer; border-color:' + (isSelected ? 'var(--gold)' : 'rgba(255,255,255,0.12)') + '; box-shadow:' + (isSelected ? '0 0 20px rgba(250,204,21,0.35)' : 'none') + ';" onclick="selectAdminStage(' + idx + ')">' +
-        '<img src="' + tile.img + '" class="pipeline-tile-img" alt="' + tile.title + '" />' +
-        '<div class="pipeline-tile-overlay">' +
-          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
-            '<span class="pipeline-step-badge">' + tile.badge + '</span>' +
-            (isSelected ? '<span style="font-size:10px; color:var(--gold); font-weight:800; background:rgba(0,0,0,0.7); padding:2px 8px; border-radius:4px; border:1px solid var(--gold);">✓ در حال ویرایش</span>' : '') +
-          '</div>' +
-          '<h4 class="pipeline-tile-title">' + tile.title + '</h4>' +
-          '<p class="pipeline-tile-desc">' + tile.desc + '</p>' +
-          '<div class="pipeline-tile-footer">' +
-            '<div>' +
-              '<span class="font-mono" style="color:var(--gold); font-size:13.5px; font-weight:800;">' + displayPrice + '</span>' +
-              '<span style="color:var(--cyan-electric); font-size:11px; margin-right:8px;">(' + tile.timeline + ')</span>' +
-            '</div>' +
-            '<button type="button" onclick="event.stopPropagation(); adminDeleteStage(' + idx + ')" style="color:var(--crimson); font-size:11px; background:none; border:none; cursor:pointer;">حذف فاز</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
+      return `
+        <div class="admin-card-box ${isSelected ? 'active' : ''}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-color:${isSelected ? 'var(--gold)' : 'rgba(255,255,255,0.08)'};" onclick="selectAdminStage(${idx})">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+              <img src="${t.img}" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div>
+              <span class="pipeline-step-badge" style="margin-bottom:2px;">${t.badge}</span>
+              <div style="font-size:13px; font-weight:800; color:#fff;">${t.title}</div>
+              <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">⏱ تحویل: ${t.timeline}</div>
+            </div>
+          </div>
+          <div style="text-align:left; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+            <span class="font-mono" style="color:var(--gold); font-size:14px; font-weight:800;">${displayPrice}</span>
+            <button type="button" onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px; background:none; border:none; cursor:pointer;" title="حذف این فاز">🗑️ حذف فاز</button>
+          </div>
+        </div>
+      `;
     }).join('');
   }
 
@@ -707,65 +730,58 @@ function renderAdminStagesList() {
 window.selectAdminStage = function(idx) {
   currentSelectedStageIdx = idx;
   renderAdminStagesList();
-  const drawer = document.getElementById('adminStageEditDrawer');
-  if (drawer && window.innerWidth <= 1024) {
-    drawer.scrollIntoView({ behavior: 'smooth' });
-  }
 };
 
 function renderAdminStageLiveEditor() {
   const data = PIPELINE_DATA[currentSelectedPipeKey];
-  if (!data || !data.tiles[currentSelectedStageIdx]) return;
+  if (!data || !data.tiles || !data.tiles[currentSelectedStageIdx]) return;
   const tile = data.tiles[currentSelectedStageIdx];
   const col = document.getElementById('adminStageEditFormContainer');
   if (!col) return;
 
   col.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div style="display:grid; grid-template-columns:1fr 2fr; gap:10px;">
+    <div style="display:flex; flex-direction:column; gap:11px;">
+      <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نشان مرحله (بج)</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">نشان مرحله (بج)</label>
           <input type="text" value="${tile.badge}" onchange="updateCurrentStageField('badge', this.value)" />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان کامل فاز</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان کامل فاز</label>
           <input type="text" value="${tile.title}" onchange="updateCurrentStageField('title', this.value)" />
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">بازه قیمت نمایشی</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">بازه قیمت نمایشی</label>
           <input type="text" value="${tile.price}" onchange="updateCurrentStageField('price', this.value)" class="font-mono" />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">قیمت پایه دلار (محاسبه‌گر)</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">قیمت پایه دلار</label>
           <input type="number" value="${tile.usdVal || 90}" onchange="updateCurrentStageField('usdVal', parseInt(this.value, 10))" class="font-mono" />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">زمان تحویل</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">زمان تحویل</label>
           <input type="text" value="${tile.timeline}" onchange="updateCurrentStageField('timeline', this.value)" />
         </div>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">شرح خروجی فاز</label>
+        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">شرح خروجی مرحله</label>
         <textarea rows="2" onchange="updateCurrentStageField('desc', this.value)">${tile.desc}</textarea>
       </div>
-      
-      <!-- بخش آپلود تصویر فاز (هم فایل از کامپیوتر هم لینک URL) -->
-      <div style="padding:12px; border-radius:12px; background:#040609; border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:8px;">
+
+      <!-- آپلود عکس فاز پایپلاین (فایل از کامپیوتر + لینک) -->
+      <div style="padding:10px; border-radius:10px; background:#040609; border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:11.5px; font-weight:800; color:var(--gold);">تصویر پس‌زمینه این فاز:</span>
-          <label class="btn-gold" style="cursor:pointer; font-size:11px; padding:6px 14px; background:var(--gold); color:#000; border-radius:8px;">
-            📁 انتخاب و آپلود عکس از کامپیوتر
+          <span style="font-size:11px; font-weight:800; color:var(--gold);">تصویر این فاز:</span>
+          <label class="btn-gold" style="cursor:pointer; font-size:10.5px; padding:4px 10px; background:var(--gold); color:#000; border-radius:6px;">
+            📁 آپلود عکس از کامپیوتر
             <input type="file" accept="image/*" style="display:none;" onchange="handleAdminStageFileUpload(event)" />
           </label>
         </div>
-        <div>
-          <label style="font-size:10.5px; color:var(--text-muted); display:block; margin-bottom:3px;">یا کپی مستقیم لینک تصویر (URL):</label>
-          <input type="text" value="${tile.img}" onchange="updateCurrentStageField('img', this.value)" class="font-mono" style="font-size:11px;" />
-        </div>
-        <div style="height:90px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); margin-top:2px;">
-          <img id="adminStagePreviewImg" src="${tile.img}" style="width:100%; height:100%; object-fit:cover;" />
+        <input type="text" value="${tile.img}" onchange="updateCurrentStageField('img', this.value)" class="font-mono" style="font-size:11px;" placeholder="https://..." />
+        <div style="height:80px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); margin-top:2px;">
+          <img src="${tile.img}" style="width:100%; height:100%; object-fit:cover;" />
         </div>
       </div>
     </div>
@@ -796,9 +812,121 @@ window.handleAdminStageFileUpload = function(event) {
   reader.readAsDataURL(file);
 };
 
+window.adminAddNewCategory = function() {
+  const name = prompt('نام دسته‌بندی جدید خدمات آتلیه:');
+  if (!name || !name.trim()) return;
+
+  const newKey = 'sketch_' + Date.now();
+  PIPELINE_DATA[newKey] = {
+    id: newKey,
+    topSub: name.trim(),
+    badgeSlug: 'سرویس سفارشی',
+    subcategories: ['خدمت اختصاصی'],
+    note: 'پایپلاین سفارشی استودیو کانسپت آرت.',
+    samples: {
+      full: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
+    },
+    tiles: [
+      { span: 'col-span-4', badge: 'فاز ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ اولیه', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
+    ]
+  };
+  localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  currentSelectedPipeKey = newKey;
+  currentSelectedStageIdx = 0;
+  renderAdminSketch1();
+  showToast('دسته‌بندی «' + name.trim() + '» با موفقیت اضافه شد!', 'success');
+};
+
+window.adminDeleteCurrentCategory = function() {
+  const keys = Object.keys(PIPELINE_DATA);
+  if (keys.length <= 1) {
+    showToast('حداقل وجود یک دسته‌بندی در آتلیه الزامی است.', 'error');
+    return;
+  }
+  const currentTitle = PIPELINE_DATA[currentSelectedPipeKey]?.topSub || 'این دسته';
+  if (confirm('آیا مطمئن هستید که می‌خواهید دسته‌بندی «' + currentTitle + '» را حذف کنید؟')) {
+    delete PIPELINE_DATA[currentSelectedPipeKey];
+    localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+    currentSelectedPipeKey = Object.keys(PIPELINE_DATA)[0];
+    currentSelectedStageIdx = 0;
+    renderAdminSketch1();
+    showToast('دسته‌بندی با موفقیت حذف شد.', 'info');
+  }
+};
+
+window.adminAddNewStage = function() {
+  if (!PIPELINE_DATA[currentSelectedPipeKey]) return;
+  if (!PIPELINE_DATA[currentSelectedPipeKey].tiles) PIPELINE_DATA[currentSelectedPipeKey].tiles = [];
+
+  const stageCount = PIPELINE_DATA[currentSelectedPipeKey].tiles.length + 1;
+  PIPELINE_DATA[currentSelectedPipeKey].tiles.push({
+    span: 'col-span-4',
+    badge: 'فاز ' + stageCount + ' • مرحله جدید',
+    title: 'فاز توسعه تکمیلی کانسپت',
+    desc: 'مشخصات خروجی این فاز را در فرم ستون کناری تکمیل فرمایید.',
+    price: '$120 - $160',
+    usdVal: 130,
+    timeline: '۴ تا ۶ روز کاری',
+    img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
+  });
+  localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  currentSelectedStageIdx = PIPELINE_DATA[currentSelectedPipeKey].tiles.length - 1;
+  renderAdminStagesList();
+  showToast('فاز جدید اضافه شد.', 'success');
+};
+
+window.adminDeleteStage = function(idx) {
+  if (!PIPELINE_DATA[currentSelectedPipeKey] || PIPELINE_DATA[currentSelectedPipeKey].tiles.length <= 1) {
+    showToast('حداقل یک مرحله برای هر پایپلاین الزامی است.', 'error');
+    return;
+  }
+  if (confirm('آیا مطمئن هستید که می‌خواهید این فاز را حذف کنید؟')) {
+    PIPELINE_DATA[currentSelectedPipeKey].tiles.splice(idx, 1);
+    localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+    currentSelectedStageIdx = Math.max(0, currentSelectedStageIdx - 1);
+    renderAdminStagesList();
+    showToast('فاز مورد نظر حذف شد.', 'info');
+  }
+};
 
 
-// اسکچ ۲: مدیریت گالری آثار (همراه با ویرایش لایت‌باکس مطالعه موردی ۴ فازه و لور)
+// اسکچ ۲: مدیریت گالری آثار (همراه با درگ و دراپ جابجایی ترتیب آثار و آپلود فایل)
+let draggedArtIdx = null;
+
+window.handleArtDragStart = function(event, idx) {
+  draggedArtIdx = idx;
+  event.target.classList.add('dragging');
+  event.dataTransfer.effectAllowed = 'move';
+};
+
+window.handleArtDragOver = function(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  const card = event.target.closest('.admin-mosaic-card');
+  if (card) card.classList.add('drag-over');
+};
+
+window.handleArtDragLeave = function(event) {
+  const card = event.target.closest('.admin-mosaic-card');
+  if (card) card.classList.remove('drag-over');
+};
+
+window.handleArtDrop = function(event, targetIdx) {
+  event.preventDefault();
+  const card = event.target.closest('.admin-mosaic-card');
+  if (card) card.classList.remove('drag-over');
+
+  if (draggedArtIdx !== null && draggedArtIdx !== targetIdx) {
+    const movedItem = showcaseArtworks.splice(draggedArtIdx, 1)[0];
+    showcaseArtworks.splice(targetIdx, 0, movedItem);
+    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    renderShowcaseGrid();
+    renderAdminSketch2();
+    showToast('ترتیب آثار گالری با موفقیت جابجا و ذخیره شد!', 'success');
+  }
+  draggedArtIdx = null;
+};
+
 function renderAdminSketch2() {
   const container = document.getElementById('adminMosaicTilesContainer');
   if (!container) return;
@@ -811,8 +939,18 @@ function renderAdminSketch2() {
   `;
 
   html += showcaseArtworks.map((art, idx) => `
-    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" onclick="selectAdminArt(${idx})">
+    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" 
+         draggable="true" 
+         ondragstart="handleArtDragStart(event, ${idx})" 
+         ondragover="handleArtDragOver(event)" 
+         ondragleave="handleArtDragLeave(event)" 
+         ondrop="handleArtDrop(event, ${idx})" 
+         onclick="selectAdminArt(${idx})"
+         title="کلیک برای ویرایش • درگ برای تغییر ترتیب چیدمان">
       <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
+      <div style="position:absolute; top:4px; left:4px; font-size:10px; background:rgba(0,0,0,0.7); color:var(--gold); padding:1px 6px; border-radius:4px;">
+        ⋮⋮ ${idx + 1}
+      </div>
       <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.85); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
         ${art.shortSlug}
       </div>
@@ -823,10 +961,6 @@ function renderAdminSketch2() {
   renderAdminArtLiveEditor();
 }
 
-window.selectAdminArt = function(idx) {
-  currentSelectedArtIdx = idx;
-  renderAdminSketch2();
-};
 
 function renderAdminArtLiveEditor() {
   const art = showcaseArtworks[currentSelectedArtIdx];
@@ -1570,20 +1704,21 @@ function renderRightNavItems() {
   const container = document.getElementById('rightNavItemsContainer');
   if (!container) return;
 
-  const items = siteSettings.navItems || [];
+  const items = (siteSettings && siteSettings.navItems && siteSettings.navItems.length) ? siteSettings.navItems : window.DEFAULT_NAV_ITEMS;
   container.innerHTML = items.map(function(item, idx) {
-    if (!item.visible) return '';
-    return '<button onclick="' + item.action + '" class="right-exp-btn ' + (item.theme || 'gold-theme') + '" title="' + item.label + '">' +
-      '<span class="right-exp-icon">' +
-        '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
-          '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />' +
-        '</svg>' +
-      '</span>' +
-      '<span class="right-exp-text">' +
-        '<span class="right-exp-title" style="color:' + (item.color || 'var(--gold)') + ';">' + item.label + '</span>' +
-        '<span class="right-exp-sub">' + (item.sub || '') + '</span>' +
-      '</span>' +
-    '</button>';
+    if (item.visible === false) return '';
+    const svgIcon = NAV_ICONS[item.id] || NAV_ICONS.store;
+    return `
+      <button onclick="${item.action}" class="right-exp-btn ${item.theme || 'gold-theme'}" id="nav-btn-${item.id}" title="${item.label}">
+        <span class="right-exp-icon">
+          ${svgIcon}
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" style="color:${item.color || 'var(--gold)'};">${item.label}</span>
+          <span class="right-exp-sub">${item.sub || ''}</span>
+        </span>
+      </button>
+    `;
   }).join('');
 }
 

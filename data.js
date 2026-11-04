@@ -238,6 +238,17 @@ var PIPELINE_DATA = window.PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.
     topSub: 'طراحی کاراکتر و شخصیت',
     badgeSlug: '۰۱ • کاراکتر دیزاین',
     subcategories: ['هیرو/کاراکتر اصلی (جزئیات بالا)', 'NPC و کلاس‌های بازی (ماژولار)', 'طراحی اسکین و زره'],
+
+    samples: {
+      bust: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=900&q=80',
+      full: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=900&q=80',
+      turnaround: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=80',
+      sketch: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=900&q=80',
+      lineart: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=900&q=80',
+      value: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80',
+      render: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80'
+    },
+
     note: 'پایپلاین استاندارد شامل ورودی مشخصات فیزیکی، ضریب پیچیدگی دیزاین، کادربندی (پرتره/تمام‌قد/سه‌نما)، اتودهای اولیه و رندر مستر نهایی.',
     tiles: [
       { span: 'col-span-4', badge: 'فاز ۱ • اتود اولیه', title: 'اکتشاف فرم، سیلوئت و لور کاراکتر', desc: 'تولید حداقل ۲ اتود مفهومی اولیه، بررسی تناسبات، لباس و پیش‌زمینه داستانی.', price: '0 - 0', usdVal: 70, timeline: '۳ تا ۴ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' },
