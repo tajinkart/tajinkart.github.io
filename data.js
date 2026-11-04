@@ -3,7 +3,7 @@
  * مدیر استودیو و طراح دنیا: سید سروش تاج
  */
 
-const KEYS = {
+window.KEYS = {
   ORDERS: 'tajinkart_orders_fa_v2',
   SETTINGS: 'tajinkart_settings_fa_v2',
   ARTWORKS: 'tajinkart_artworks_fa_v2',
@@ -11,29 +11,67 @@ const KEYS = {
   PRODUCTS: 'tajinkart_products_fa_v2',
   MEMBERS: 'tajinkart_members_fa_v2'
 };
+var KEYS = window.KEYS;
 
-let currentView = 'showcase';
-let currentMember = null;
-let comicCurrentPage = 1;
-let activeModalItem = {};
-let currencyMode = 'USD'; // 'USD' or 'TOMAN'
-let activeCaseStudyArt = null;
-let activeCaseStudyPhaseIdx = 0;
+window.currentView = 'showcase';
+var currentView = window.currentView;
 
-let currentSelectedPipeKey = 'sketch1';
-let currentSelectedStageIdx = 0;
-let currentSelectedArtIdx = 0;
-let currentSelectedProductIdx = 0;
-let selectedMemberIdx = 0;
-let currentMemberTierFilter = 'all';
+window.currentMember = null;
+var currentMember = window.currentMember;
 
-let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
+window.comicCurrentPage = 1;
+var comicCurrentPage = window.comicCurrentPage;
+
+window.activeModalItem = {};
+var activeModalItem = window.activeModalItem;
+
+window.currencyMode = 'USD';
+var currencyMode = window.currencyMode;
+
+window.activeCaseStudyArt = null;
+var activeCaseStudyArt = window.activeCaseStudyArt;
+
+window.activeCaseStudyPhaseIdx = 0;
+var activeCaseStudyPhaseIdx = window.activeCaseStudyPhaseIdx;
+
+window.currentSelectedPipeKey = 'sketch1';
+var currentSelectedPipeKey = window.currentSelectedPipeKey;
+
+window.currentSelectedStageIdx = 0;
+var currentSelectedStageIdx = window.currentSelectedStageIdx;
+
+window.currentSelectedArtIdx = 0;
+var currentSelectedArtIdx = window.currentSelectedArtIdx;
+
+window.currentSelectedProductIdx = 0;
+var currentSelectedProductIdx = window.currentSelectedProductIdx;
+
+window.selectedMemberIdx = 0;
+var selectedMemberIdx = window.selectedMemberIdx;
+
+window.currentMemberTierFilter = 'all';
+var currentMemberTierFilter = window.currentMemberTierFilter;
+
+// پیش‌فرض‌های امن و دائمی ناوبری داک راست
+window.DEFAULT_NAV_ITEMS = [
+  { id: 'members', label: 'پورتال اعضا', sub: 'ورود / عضویت', color: 'var(--cyan-electric)', theme: 'cyan-theme', visible: true, action: 'handleMembersIconClick()' },
+  { id: 'store', label: 'فروشگاه و آتلیه', sub: 'ثبت سفارش کانسپت', color: 'var(--gold)', theme: 'gold-theme', visible: true, action: "switchView('store')" },
+  { id: 'genesis', label: 'جهان جنسیس', sub: 'کمیک و داستان', color: 'var(--crimson)', theme: 'crimson-theme', visible: true, action: "switchView('genesis')" },
+  { id: 'academy', label: 'آکادمی طراحی', sub: 'دوره‌های تخصصی', color: 'var(--violet)', theme: 'purple-theme', visible: true, action: "switchView('academy')" },
+  { id: 'society', label: 'جامعه هنری', sub: 'شبکه‌های رسمی', color: 'var(--emerald)', theme: 'emerald-theme', visible: true, action: "switchView('society')" }
+];
+
+var storedSettings = {};
+try {
+  storedSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {};
+} catch(e) {}
+
+window.siteSettings = Object.assign({
   usdRate: 72000,
   tgToken: '',
   tgChat: '',
   adminPass: 'tajinkart',
   commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده',
-  // مدیریت چشم و پنهان/آشکارسازی بخش‌های اصلی سایت (Section Visibility Eye Dropper)
   sectionVisibility: {
     showcase: true,
     store: true,
@@ -41,18 +79,20 @@ let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
     academy: true,
     society: true
   },
-  // مدیریت و شخصی‌سازی آیکون‌ها و لینک‌های داک ناوبری سمت راست بالا
-  navItems: [
-    { id: 'members', label: 'پورتال اعضا', sub: 'ورود / عضویت', color: 'var(--cyan-electric)', theme: 'cyan-theme', visible: true, action: 'handleMembersIconClick()' },
-    { id: 'store', label: 'فروشگاه و آتلیه', sub: 'ثبت سفارش کانسپت', color: 'var(--gold)', theme: 'gold-theme', visible: true, action: "switchView('store')" },
-    { id: 'genesis', label: 'جهان جنسیس', sub: 'کمیک و داستان', color: 'var(--crimson)', theme: 'crimson-theme', visible: true, action: "switchView('genesis')" },
-    { id: 'academy', label: 'آکادمی طراحی', sub: 'دوره‌های تخصصی', color: 'var(--violet)', theme: 'purple-theme', visible: true, action: "switchView('academy')" },
-    { id: 'society', label: 'جامعه هنری', sub: 'شبکه‌های رسمی', color: 'var(--emerald)', theme: 'emerald-theme', visible: true, action: "switchView('society')" }
-  ]
-};
+  navItems: window.DEFAULT_NAV_ITEMS
+}, storedSettings);
+
+// اطمینان از اینکه حتی با تنظیمات ذخیره شده قبلی، navItems و sectionVisibility خالی نمانند
+if (!window.siteSettings.navItems || !window.siteSettings.navItems.length) {
+  window.siteSettings.navItems = window.DEFAULT_NAV_ITEMS;
+}
+if (!window.siteSettings.sectionVisibility) {
+  window.siteSettings.sectionVisibility = { showcase: true, store: true, genesis: true, academy: true, society: true };
+}
+var siteSettings = window.siteSettings;
 
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
-let showcaseArtworks = JSON.parse(localStorage.getItem(KEYS.ARTWORKS)) || [
+var showcaseArtworks = window.showcaseArtworks = JSON.parse(localStorage.getItem(KEYS.ARTWORKS)) || [
   {
     id: 1,
     tag: 'environment',
@@ -192,7 +232,7 @@ let showcaseArtworks = JSON.parse(localStorage.getItem(KEYS.ARTWORKS)) || [
 ];
 
 // ۶ پایپلاین تخصصی آتلیه طبق سند مستر با زیرشاخه‌ها و مراحل شفاف
-let PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.PIPELINES)) || {
+var PIPELINE_DATA = window.PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.PIPELINES)) || {
   sketch1: {
     id: 'sketch1',
     topSub: 'طراحی کاراکتر و شخصیت',
@@ -268,7 +308,7 @@ let PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.PIPELINES)) || {
 };
 
 // مخزن دارایی‌های دیجیتال مبتنی بر ۷ شاخه استاندارد سند مستر TAJINKART
-let digitalStoreProducts = JSON.parse(localStorage.getItem(KEYS.PRODUCTS)) || [
+var digitalStoreProducts = window.digitalStoreProducts = JSON.parse(localStorage.getItem(KEYS.PRODUCTS)) || [
   {
     id: 1,
     title: 'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ (Rook Knight)',
@@ -334,7 +374,7 @@ let digitalStoreProducts = JSON.parse(localStorage.getItem(KEYS.PRODUCTS)) || [
   }
 ];
 
-let academyCourses = [
+var academyCourses = window.academyCourses = [
   {
     id: 1,
     title: 'مسترکلاس: طراحی کاراکتر فانتزی و متریال زره',
@@ -361,7 +401,7 @@ let academyCourses = [
   }
 ];
 
-let ordersList = JSON.parse(localStorage.getItem(KEYS.ORDERS)) || [
+var ordersList = window.ordersList = JSON.parse(localStorage.getItem(KEYS.ORDERS)) || [
   {
     id: 501,
     client: 'استودیو نوا',
@@ -374,14 +414,14 @@ let ordersList = JSON.parse(localStorage.getItem(KEYS.ORDERS)) || [
   }
 ];
 
-let comicPages = [
+var comicPages = window.comicPages = [
   'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80'
 ];
 
-let siteMembersData = JSON.parse(localStorage.getItem(KEYS.MEMBERS)) || [
+var siteMembersData = window.siteMembersData = JSON.parse(localStorage.getItem(KEYS.MEMBERS)) || [
   {
     id: 101,
     name: 'سید سروش تاج',
