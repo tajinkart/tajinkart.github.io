@@ -367,6 +367,7 @@
     }
     @media (max-width: 768px) { #artworkCurtain { padding: 16px 14px 40px; } }
 
+        /* چیدمان گالری صفحه اول با فرمول هوشمند خودکار ابعاد */
     #showcaseGrid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -374,24 +375,29 @@
       gap: 10px;
       grid-auto-flow: dense;
     }
-    .span-pattern-0 { grid-column: span 5; }
-    .span-pattern-1 { grid-column: span 2; }
-    .span-pattern-2 { grid-column: span 3; }
-    .span-pattern-3 { grid-column: span 2; }
-    .span-pattern-4 { grid-column: span 2; }
-    .span-pattern-5 { grid-column: span 2; }
-    .span-pattern-6 { grid-column: span 3; }
-    .span-pattern-7 { grid-column: span 5; }
+
+    /* فرمول اسپَن خودکار بر اساس ابعاد واقعی اثر */
+    .span-col-wide     { grid-column: span 5; } /* افقی عریض / ۱۶:۹ */
+    .span-col-medium   { grid-column: span 4; } /* افقی استاندارد / ۴:۳ */
+    .span-col-square   { grid-column: span 3; } /* مربعی / ۱:۱ */
+    .span-col-portrait { grid-column: span 2; } /* عمودی پرتره و کاراکتر */
+
+    /* سازگاری کامل با کلاس‌های قبلی */
+    .span-pattern-0, .span-pattern-7 { grid-column: span 5; }
+    .span-pattern-1, .span-pattern-3, .span-pattern-4, .span-pattern-5 { grid-column: span 2; }
+    .span-pattern-2, .span-pattern-6 { grid-column: span 3; }
 
     @media (max-width: 992px) {
       #showcaseGrid { grid-auto-rows: 240px; }
-      .span-pattern-0, .span-pattern-7 { grid-column: span 12; }
-      .span-pattern-1, .span-pattern-2, .span-pattern-3,
-      .span-pattern-4, .span-pattern-5, .span-pattern-6 { grid-column: span 6; }
+      .span-col-wide, .span-col-medium, .span-pattern-0, .span-pattern-7 { grid-column: span 6; }
+      .span-col-square, .span-col-portrait, .span-pattern-1, .span-pattern-2, .span-pattern-3, .span-pattern-4, .span-pattern-5, .span-pattern-6 { grid-column: span 6; }
     }
     @media (max-width: 576px) {
-      .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
-      .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 { grid-column: span 12; }
+      #showcaseGrid { grid-auto-rows: 260px; }
+      .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
+      .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
+  .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
+      .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 { grid-column: span 12 !important; }
     }
 
     .mosaic-tile {
@@ -402,6 +408,9 @@
       border-radius: 10px;
       cursor: pointer;
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .mosaic-tile:hover {
       border-color: rgba(250, 204, 21, 0.45);
@@ -416,7 +425,8 @@
       justify-content: center;
       padding: 16px;
       text-align: center;
-      background: rgba(4, 5, 7, 0.82);
+      background: rgba(4, 5, 7, 0.85);
+      backdrop-filter: blur(4px);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
@@ -449,11 +459,11 @@
     .mosaic-tile img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain; /* نمایش ۱۰۰٪ کامل اثر بدون کراپ شدن لبه‌ها */
       display: block;
       transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     }
-    .mosaic-tile:hover img { transform: scale(1.06); opacity: 0.2; }
+    .mosaic-tile:hover img { transform: scale(1.05); opacity: 0.2; }
     .mosaic-tile:hover .tile-center-title { opacity: 1; }
     .mosaic-tile:hover .tile-slug, .mosaic-tile:hover .tile-sub { transform: translateY(0); }
     .mosaic-tile:hover .tile-divider { width: 44px; }
@@ -1421,6 +1431,7 @@
     grid-auto-rows: 240px !important;
     gap: 12px !important;
   }
+  .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
   .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
   .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 {
     grid-column: span 1 !important;
@@ -1537,3 +1548,98 @@
     padding: 4px 10px !important;
   }
 }
+
+    /* =========================================================
+       شبیه‌ساز زنده تایل و پریویو ادمین با ابعاد واقعی اثر
+       (Live Admin Simulator - نه فقط مربع!)
+       ========================================================= */
+    .admin-preview-box {
+      background: #04060a;
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .admin-preview-stage {
+      width: 100%;
+      max-height: 260px;
+      min-height: 140px;
+      background: #020306;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .admin-preview-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: rgba(4, 5, 7, 0.88);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      padding: 14px;
+      text-align: center;
+    }
+    .admin-preview-stage:hover .admin-preview-overlay {
+      opacity: 1;
+    }
+    .admin-preview-stage.force-hover .admin-preview-overlay {
+      opacity: 1;
+    }
+    .admin-mosaic-card-adaptive {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: #06090e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 110px;
+    }
+    .admin-mosaic-card-adaptive:hover {
+      border-color: var(--cyan-electric);
+      transform: translateY(-2px);
+    }
+    .admin-mosaic-card-adaptive.active {
+      border-color: var(--gold);
+      box-shadow: 0 0 18px rgba(250, 204, 21, 0.35);
+    }
+    .admin-card-ratio-tag {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(4, 5, 8, 0.88);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: var(--cyan-electric);
+      z-index: 4;
+      direction: ltr;
+    }
+    .formula-info-banner {
+      padding: 10px 14px;
+      background: rgba(129, 140, 248, 0.08);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      border-radius: 10px;
+      font-size: 11.5px;
+      line-height: 1.65;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+    }
+

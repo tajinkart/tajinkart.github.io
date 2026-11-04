@@ -1,3 +1,4 @@
+
 /**
  * TAJINKART Master Spec v2.1 Engine
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
@@ -57,22 +58,93 @@ window.showToast = function(msg, type = 'gold') {
   }, 3800);
 };
 
-// رندر گالری پیوسته ۱۲ ستونه طبق Master Spec
+
+// =========================================================
+// موتور تشخیص خودکار ابعاد و فرمول کادر گالری
+// بدون نیاز به انتخاب دستی کاربر — تشخیص ۱۰۰٪ خودکار
+// =========================================================
+const artDimensionCache = {};
+
+function detectAndApplyArtworkDimensions(art, onDetected) {
+  if (!art || !art.image) return;
+  if (artDimensionCache[art.image]) {
+    const cached = artDimensionCache[art.image];
+    art.width = cached.width;
+    art.height = cached.height;
+    art.aspectRatio = cached.ratio;
+    if (onDetected) onDetected(cached);
+    return;
+  }
+  const img = new Image();
+  img.onload = function() {
+    const w = this.naturalWidth;
+    const h = this.naturalHeight;
+    const r = parseFloat((w / h).toFixed(2));
+    art.width = w;
+    art.height = h;
+    art.aspectRatio = r;
+    artDimensionCache[art.image] = { width: w, height: h, ratio: r };
+    if (onDetected) onDetected({ width: w, height: h, ratio: r });
+  };
+  img.src = art.image;
+}
+
+// فرمول هوشمند تقسیم ستون‌های ۱۲گانه بر اساس نسبت واقعی عرض به ارتفاع
+function getAutoSpanClass(art) {
+  let r = art.aspectRatio;
+  if (!r && art.width && art.height) r = art.width / art.height;
+  if (!r && artDimensionCache[art.image]) r = artDimensionCache[art.image].ratio;
+
+  // پیش‌فرض هوشمند موقت قبل از اتمام لود
+  if (!r) {
+    if (art.tag === 'character' || art.tag === 'comic') r = 0.65;
+    else if (art.tag === 'environment') r = 1.77;
+    else if (art.tag === 'props') r = 1.0;
+    else r = 1.5;
+  }
+
+  if (r >= 1.6) return 'span-col-wide';       // افقی عریض (۵ ستون)
+  if (r >= 1.2) return 'span-col-medium';     // افقی استاندارد (۴ ستون)
+  if (r >= 0.85) return 'span-col-square';    // مربعی (۳ ستون)
+  return 'span-col-portrait';                 // عمودی پرتره کاراکتر (۲ ستون)
+}
+
+// رندر گالری با فرمول خودکار کادربندی و نمایش کامل اثر بدون کراپ
 function renderShowcaseGrid() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
-  grid.innerHTML = showcaseArtworks.map((art, i) => `
-    <div class="mosaic-tile span-pattern-${i % 8}" onclick="openArtModal(${art.id})">
-      <div class="tile-center-title">
-        <span class="tile-slug">/ ${art.shortSlug} /</span>
-        <span class="tile-divider"></span>
-        <span class="tile-sub">${art.title}</span>
+  grid.innerHTML = showcaseArtworks.map((art, i) => {
+    const spanClass = getAutoSpanClass(art);
+    return `
+      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
+        <div class="tile-center-title">
+          <span class="tile-slug">/ ${art.shortSlug} /</span>
+          <span class="tile-divider"></span>
+          <span class="tile-sub">${art.title}</span>
+        </div>
+        <img src="${art.image}" loading="lazy" alt="${art.title}" onload="handleImageAutoDetect(this, ${art.id})" />
       </div>
-      <img src="${art.image}" loading="lazy" alt="${art.title}" />
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
+window.handleImageAutoDetect = function(imgEl, artId) {
+  if (!imgEl || !imgEl.naturalWidth || !imgEl.naturalHeight) return;
+  const w = imgEl.naturalWidth;
+  const h = imgEl.naturalHeight;
+  const r = parseFloat((w / h).toFixed(2));
+  artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
+  const art = showcaseArtworks.find(a => a.id === artId);
+  if (art && (!art.aspectRatio || Math.abs(art.aspectRatio - r) > 0.08)) {
+    art.width = w;
+    art.height = h;
+    art.aspectRatio = r;
+    const tile = document.getElementById(`galleryTile_${art.id}`);
+    if (tile) {
+      tile.className = `mosaic-tile ${getAutoSpanClass(art)}`;
+    }
+  }
+};
 // لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)
 window.openArtModal = function(id) {
   const art = showcaseArtworks.find(a => a.id === id);
@@ -768,7 +840,7 @@ window.adminAddNewCategory = function() {
   showToast('دسته‌بندی جدید خدمات اضافه شد.', 'success');
 };
 
-// اسکچ ۲: مدیریت گالری آثار (همراه با ویرایش لایت‌باکس مطالعه موردی ۴ فازه و لور)
+// اسکچ ۲: مدیریت گالری آثار (همراه با پیش‌نمایش کادر واقعی و تشخیص خودکار)
 function renderAdminSketch2() {
   const container = document.getElementById('adminMosaicTilesContainer');
   if (!container) return;
@@ -782,7 +854,7 @@ function renderAdminSketch2() {
 
   html += showcaseArtworks.map((art, idx) => `
     <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" onclick="selectAdminArt(${idx})">
-      <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
+      <img src="${art.image}" style="width:100%; height:100%; object-fit:contain; background:#040609;" />
       <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.85); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
         ${art.shortSlug}
       </div>
@@ -813,11 +885,26 @@ function renderAdminArtLiveEditor() {
     ];
   }
 
+  let dimLabel = '';
+  if (art.width && art.height) {
+    const r = (art.width / art.height).toFixed(2);
+    dimLabel = `${art.width} × ${art.height} (نسبت ${r})`;
+  }
+
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <div style="height:130px; border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);">
-        <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
+      
+      <!-- پیش‌نمایش کادر واقعی اثر بدون کراپ شدن و نه فقط یک مربع -->
+      <div style="background:#04060a; border:1px solid var(--border-subtle); border-radius:12px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:11.5px; font-weight:700; color:var(--gold);">پیش‌نمایش کادر واقعی اثر:</span>
+          <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">${dimLabel}</span>
+        </div>
+        <div style="max-height:220px; min-height:130px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center;">
+          <img id="adminArtPreviewImg" src="${art.image}" style="max-width:100%; max-height:220px; object-fit:contain; display:block;" alt="${art.title}" onload="onAdminPreviewImgLoad(this, ${currentSelectedArtIdx})" />
+        </div>
       </div>
+
       <div>
         <label style="font-size:11px; color:var(--text-muted);">عنوان کامل اثر</label>
         <input type="text" value="${art.title}" onchange="updateArtField(${currentSelectedArtIdx}, 'title', this.value)" />
@@ -841,7 +928,7 @@ function renderAdminArtLiveEditor() {
       </div>
       <div>
         <label style="font-size:11px; color:var(--text-muted);">لینک تصویر اصلی کاور</label>
-        <input type="text" value="${art.image}" onchange="updateArtField(${currentSelectedArtIdx}, 'image', this.value)" class="font-mono" />
+        <input type="text" value="${art.image}" oninput="handleAdminImageChange(${currentSelectedArtIdx}, this.value)" class="font-mono" />
       </div>
       <div>
         <label style="font-size:11px; color:var(--text-muted);">لور داستانی و زمینه</label>
@@ -884,6 +971,34 @@ function renderAdminArtLiveEditor() {
   `;
 }
 
+window.handleAdminImageChange = function(idx, newUrl) {
+  const url = newUrl.trim();
+  showcaseArtworks[idx].image = url;
+  const previewImg = document.getElementById('adminArtPreviewImg');
+  if (previewImg) previewImg.src = url;
+  localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+  detectAndApplyArtworkDimensions(showcaseArtworks[idx], (meta) => {
+    const badge = document.getElementById('adminArtPreviewRatioText');
+    if (badge) badge.textContent = `${meta.width} × ${meta.height} (نسبت ${meta.ratio})`;
+    renderShowcaseGrid();
+  });
+};
+
+window.onAdminPreviewImgLoad = function(imgEl, idx) {
+  if (!imgEl || !imgEl.naturalWidth || !imgEl.naturalHeight) return;
+  const w = imgEl.naturalWidth;
+  const h = imgEl.naturalHeight;
+  const r = parseFloat((w / h).toFixed(2));
+  if (showcaseArtworks[idx]) {
+    showcaseArtworks[idx].width = w;
+    showcaseArtworks[idx].height = h;
+    showcaseArtworks[idx].aspectRatio = r;
+    artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
+    const badge = document.getElementById('adminArtPreviewRatioText');
+    if (badge) badge.textContent = `${w} × ${h} (نسبت ${r})`;
+  }
+};
+
 window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
   if (showcaseArtworks[artIdx] && showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[phaseIdx]) {
     showcaseArtworks[artIdx].phases[phaseIdx].img = url.trim();
@@ -896,11 +1011,12 @@ window.updateArtField = function(idx, field, value) {
   showcaseArtworks[idx][field] = value;
   localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   renderShowcaseGrid();
+  renderAdminSketch2();
   showToast('اثر با موفقیت ویرایش شد.', 'success');
 };
 
 window.adminAddNewArtwork = function() {
-  showcaseArtworks.unshift({
+  const newArt = {
     id: Date.now(),
     tag: 'character',
     shortSlug: 'اثر جدید',
@@ -916,9 +1032,13 @@ window.adminAddNewArtwork = function() {
       { name: 'سایه‌زنی مقداری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80' },
       { name: 'رندر متریال نهایی', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80' }
     ]
-  });
+  };
+  showcaseArtworks.unshift(newArt);
   localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   currentSelectedArtIdx = 0;
+  detectAndApplyArtworkDimensions(newArt, () => {
+    renderShowcaseGrid();
+  });
   renderAdminSketch2();
   renderShowcaseGrid();
   showToast('آرت‌ورک جدید به گالری اضافه شد.', 'success');
