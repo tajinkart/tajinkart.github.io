@@ -32,7 +32,23 @@ let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
   tgToken: '',
   tgChat: '',
   adminPass: 'tajinkart',
-  commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
+  commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده',
+  // مدیریت چشم و پنهان/آشکارسازی بخش‌های اصلی سایت (Section Visibility Eye Dropper)
+  sectionVisibility: {
+    showcase: true,
+    store: true,
+    genesis: true,
+    academy: true,
+    society: true
+  },
+  // مدیریت و شخصی‌سازی آیکون‌ها و لینک‌های داک ناوبری سمت راست بالا
+  navItems: [
+    { id: 'members', label: 'پورتال اعضا', sub: 'ورود / عضویت', color: 'var(--cyan-electric)', theme: 'cyan-theme', visible: true, action: 'handleMembersIconClick()' },
+    { id: 'store', label: 'فروشگاه و آتلیه', sub: 'ثبت سفارش کانسپت', color: 'var(--gold)', theme: 'gold-theme', visible: true, action: "switchView('store')" },
+    { id: 'genesis', label: 'جهان جنسیس', sub: 'کمیک و داستان', color: 'var(--crimson)', theme: 'crimson-theme', visible: true, action: "switchView('genesis')" },
+    { id: 'academy', label: 'آکادمی طراحی', sub: 'دوره‌های تخصصی', color: 'var(--violet)', theme: 'purple-theme', visible: true, action: "switchView('academy')" },
+    { id: 'society', label: 'جامعه هنری', sub: 'شبکه‌های رسمی', color: 'var(--emerald)', theme: 'emerald-theme', visible: true, action: "switchView('society')" }
+  ]
 };
 
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
