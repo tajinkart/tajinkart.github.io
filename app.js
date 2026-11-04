@@ -27,10 +27,13 @@ function formatPrice(usdPrice) {
 
 window.setCurrencyMode = function(mode) {
   currencyMode = mode;
-  document.getElementById('currBtnUSD').classList.toggle('active', mode === 'USD');
-  document.getElementById('currBtnTOMAN').classList.toggle('active', mode === 'TOMAN');
+  const btnUSD = document.getElementById('currBtnUSD');
+  const btnTOMAN = document.getElementById('currBtnTOMAN');
+  if (btnUSD) btnUSD.classList.toggle('active', mode === 'USD');
+  if (btnTOMAN) btnTOMAN.classList.toggle('active', mode === 'TOMAN');
   renderProducts();
   selectPipeline(currentSelectedPipeKey, null, false);
+  recalcWizardPrice();
   showToast(`واحد پولی نمایش داده شده به ${mode === 'TOMAN' ? 'تومان' : 'دلار ($)'} تغییر یافت.`, 'info');
 };
 
@@ -54,7 +57,7 @@ window.showToast = function(msg, type = 'gold') {
   }, 3800);
 };
 
-// رندر گالری پیوسته ۱۲ ستونه طبق Master Spec (بدون نوار فیلتر و با رویکرد مینیمال Zen)
+// رندر گالری پیوسته ۱۲ ستونه طبق Master Spec
 function renderShowcaseGrid() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
@@ -154,10 +157,10 @@ window.selectPipeline = function(key, cardEl, userClicked) {
 
   const container = document.getElementById('mosaicStageContainer');
   if (container) {
-    container.innerHTML = data.tiles.map(tile => {
+    container.innerHTML = data.tiles.map((tile, idx) => {
       const displayPrice = formatPrice(tile.price);
       return `
-        <div class="pipeline-tile ${tile.span}" onclick="openModal('${tile.title}', '${tile.desc}', '${displayPrice}', '${tile.img}', '${tile.timeline}')">
+        <div class="pipeline-tile ${tile.span}" onclick="openModal('${tile.title}', '${tile.desc}', '${displayPrice}', '${tile.img}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
           <img src="${tile.img}" class="pipeline-tile-img" alt="${tile.title}" />
           <div class="pipeline-tile-overlay">
             <span class="pipeline-step-badge">${tile.badge}</span>
@@ -168,7 +171,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
                 <span class="font-mono" style="color:var(--gold); font-size:13.5px; font-weight:800;">${displayPrice}</span>
                 <span style="color:var(--cyan-electric); font-size:11px; margin-right:8px;">(${tile.timeline})</span>
               </div>
-              <span style="font-size:11.5px; color:var(--iris); font-weight:700;">شروع سفارش و فاکتور ←</span>
+              <span style="font-size:11.5px; color:var(--iris); font-weight:700;">محاسبه فاکتور و ثبت بریف ←</span>
             </div>
           </div>
         </div>
@@ -182,6 +185,85 @@ window.selectPipeline = function(key, cardEl, userClicked) {
       const y = target.getBoundingClientRect().top + window.pageYOffset - 80;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
+  }
+};
+
+// باز کردن مدال و محاسبه‌گر لحظه‌ای با مقدار عددی پایه واقعی
+function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
+  activeModalItem = {
+    title: title,
+    desc: desc,
+    price: price,
+    img: img,
+    timeline: timeline || '۵ تا ۷ روز کاری',
+    usdVal: usdVal || 90,
+    pipeKey: pipeKey || currentSelectedPipeKey
+  };
+
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('modalTimeline').textContent = activeModalItem.timeline;
+  document.getElementById('modalMediaImg').src = img;
+
+  const badgeEl = document.getElementById('wizardPipeBadge');
+  if (badgeEl) {
+    const pData = PIPELINE_DATA[activeModalItem.pipeKey];
+    badgeEl.textContent = pData ? pData.topSub : 'ATELIER PIPELINE';
+  }
+
+  if (currentMember) {
+    const nameInput = document.getElementById('orderClientName');
+    const contactInput = document.getElementById('orderClientContact');
+    if (nameInput) nameInput.value = currentMember.name;
+    if (contactInput) contactInput.value = currentMember.contact || currentMember.email;
+  }
+
+  // محاسبه لحظه‌ای اولیه و باز کردن پنجره
+  recalcWizardPrice();
+  document.getElementById('zoomModal').classList.add('active');
+}
+
+function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
+function closeModalDirect() { document.getElementById('zoomModal').classList.remove('active'); }
+
+// موتور محاسبه‌گر لحظه‌ای قیمت و اسکوپ سفارش (Live Calculator Engine)
+window.toggleWizardStep = function(stepNum) {
+  const card = document.getElementById("wizardStep" + stepNum);
+  if (card) card.classList.toggle('active');
+};
+
+window.recalcWizardPrice = function() {
+  let baseUSD = 90;
+  if (activeModalItem && typeof activeModalItem.usdVal === 'number' && activeModalItem.usdVal > 0) {
+    baseUSD = activeModalItem.usdVal;
+  }
+
+  const framingEl = document.getElementById('wizFraming');
+  const compEl = document.getElementById('wizComplexity');
+  const phaseEl = document.getElementById('orderPhaseSelect');
+  const expEl = document.getElementById('wizExpressions');
+  const vfxEl = document.getElementById('wizVFX');
+  const commEl = document.getElementById('wizCommercial');
+
+  let extra = 0;
+  if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  if (expEl && expEl.checked) extra += 35;
+  if (vfxEl && vfxEl.checked) extra += 25;
+  if (commEl && commEl.checked) extra += 45;
+
+  const totalUSD = Math.max(50, baseUSD + extra);
+  activeModalItem.calculatedPriceUSD = totalUSD;
+
+  // آپدیت آنی و زنده قیمت روی صفحه
+  const priceEl = document.getElementById('modalPrice');
+  if (priceEl) {
+    priceEl.textContent = formatPrice(totalUSD);
+    // افکت فلش ظریف هنگام تغییر عدد
+    priceEl.style.transition = 'color 0.2s';
+    priceEl.style.color = 'var(--cyan-electric)';
+    setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 250);
   }
 };
 
@@ -333,24 +415,6 @@ window.navigateComic = function(delta) {
   renderComicPage();
 };
 
-function openModal(title, desc, price, img, timeline) {
-  activeModalItem = { title, desc, price, img, timeline: timeline || '۵ تا ۷ روز کاری' };
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalDesc').textContent = desc;
-  document.getElementById('modalPrice').textContent = price;
-  document.getElementById('modalTimeline').textContent = activeModalItem.timeline;
-  document.getElementById('modalMediaImg').src = img;
-
-  if (currentMember) {
-    document.getElementById('orderClientName').value = currentMember.name;
-    document.getElementById('orderClientContact').value = currentMember.contact || currentMember.email;
-  }
-  recalcWizardPrice();
-  document.getElementById('zoomModal').classList.add('active');
-}
-function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
-function closeModalDirect() { document.getElementById('zoomModal').classList.remove('active'); }
-
 // ارسال بریف به ربات تلگرام مدیر استودیو
 async function dispatchTelegramNotification(order) {
   if (!siteSettings.tgToken || !siteSettings.tgChat) return;
@@ -361,7 +425,7 @@ async function dispatchTelegramNotification(order) {
     `• *پکیج:* ${order.pkg}\n` +
     `• *فاز:* ${order.phase}\n` +
     `• *توضیحات بریف:* ${order.brief}\n` +
-    `• *تعرفه:* ${order.price}`
+    `• *تعرفه محاسبه‌شده:* ${order.price}`
   );
   try {
     await fetch(`https://api.telegram.org/bot${siteSettings.tgToken}/sendMessage?chat_id=${siteSettings.tgChat}&text=${text}&parse_mode=Markdown`);
@@ -628,6 +692,10 @@ function renderAdminStageLiveEditor() {
         </div>
       </div>
       <div>
+        <label style="font-size:11px; color:var(--text-muted);">قیمت پایه عددی دلار (جهت محاسبه‌گر لحظه‌ای)</label>
+        <input type="number" value="${tile.usdVal || 90}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'usdVal', parseInt(this.value, 10))" class="font-mono" />
+      </div>
+      <div>
         <label style="font-size:11px; color:var(--text-muted);">شرح خروجی مرحله</label>
         <textarea rows="3" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'desc', this.value)">${tile.desc}</textarea>
       </div>
@@ -657,6 +725,7 @@ window.adminAddNewStage = function() {
     title: 'فاز جدید توسعه کانسپت',
     desc: 'مشخصات خروجی این فاز را در فرم ستون کناری تکمیل فرمایید.',
     price: '$120 - $160',
+    usdVal: 130,
     timeline: '۴ تا ۶ روز کاری',
     img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
   });
@@ -689,7 +758,7 @@ window.adminAddNewCategory = function() {
     subcategories: ['زیرشاخه ۱', 'زیرشاخه ۲'],
     note: 'پایپلاین سفارشی استودیو.',
     tiles: [
-      { span: 'col-span-12', badge: 'فاز ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ مفهومی', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
+      { span: 'col-span-12', badge: 'فاز ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ مفهومی', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
     ]
   };
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
@@ -699,7 +768,7 @@ window.adminAddNewCategory = function() {
   showToast('دسته‌بندی جدید خدمات اضافه شد.', 'success');
 };
 
-// اسکچ ۲: مدیریت گالری آثار
+// اسکچ ۲: مدیریت گالری آثار (همراه با ویرایش لایت‌باکس مطالعه موردی ۴ فازه و لور)
 function renderAdminSketch2() {
   const container = document.getElementById('adminMosaicTilesContainer');
   if (!container) return;
@@ -733,42 +802,95 @@ function renderAdminArtLiveEditor() {
   const art = showcaseArtworks[currentSelectedArtIdx];
   const box = document.getElementById('adminArtFormFields');
   if (!art || !box) return;
+
+  // اطمینان از وجود ۴ فاز
+  if (!art.phases || art.phases.length < 4) {
+    art.phases = [
+      { name: 'اتود اولیه و سیلوئت', img: art.image },
+      { name: 'لاین‌آرت فنی و کادر', img: art.image },
+      { name: 'مطالعه نوری و مقداری', img: art.image },
+      { name: 'رندر متریال نهایی', img: art.image }
+    ];
+  }
+
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <div style="height:140px; border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);">
+      <div style="height:130px; border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);">
         <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
       </div>
       <div>
         <label style="font-size:11px; color:var(--text-muted);">عنوان کامل اثر</label>
         <input type="text" value="${art.title}" onchange="updateArtField(${currentSelectedArtIdx}, 'title', this.value)" />
       </div>
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">اسلاگ هاور (روی تصویر در گالری)</label>
-        <input type="text" value="${art.shortSlug}" onchange="updateArtField(${currentSelectedArtIdx}, 'shortSlug', this.value)" />
-      </div>
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">پایپلاین مرتبط (جهت دیپ‌لینک)</label>
-        <select onchange="updateArtField(${currentSelectedArtIdx}, 'pipelineKey', this.value)">
-          <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>طراحی کاراکتر و شخصیت</option>
-          <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>طراحی موجودات و هیولاها</option>
-          <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>طراحی فضا و معماری دنیا</option>
-          <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم سینمایی</option>
-          <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
-          <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک، مانگا و استوری‌بورد</option>
-        </select>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div>
+          <label style="font-size:11px; color:var(--text-muted);">اسلاگ هاور گالری</label>
+          <input type="text" value="${art.shortSlug}" onchange="updateArtField(${currentSelectedArtIdx}, 'shortSlug', this.value)" />
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک</label>
+          <select onchange="updateArtField(${currentSelectedArtIdx}, 'pipelineKey', this.value)">
+            <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر</option>
+            <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>هیولا و موجودات</option>
+            <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
+            <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
+            <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>پراپ و UI</option>
+            <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک و مانگا</option>
+          </select>
+        </div>
       </div>
       <div>
         <label style="font-size:11px; color:var(--text-muted);">لینک تصویر اصلی کاور</label>
         <input type="text" value="${art.image}" onchange="updateArtField(${currentSelectedArtIdx}, 'image', this.value)" class="font-mono" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">لور و توضیحات داستانی</label>
-        <textarea rows="3" onchange="updateArtField(${currentSelectedArtIdx}, 'desc', this.value)">${art.desc || ''}</textarea>
+        <label style="font-size:11px; color:var(--text-muted);">لور داستانی و زمینه</label>
+        <input type="text" value="${art.lore || 'جهان اکستوپیا'}" onchange="updateArtField(${currentSelectedArtIdx}, 'lore', this.value)" />
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">مشخصات فضای رنگی</label>
+        <input type="text" value="${art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB'}" onchange="updateArtField(${currentSelectedArtIdx}, 'colorSpace', this.value)" />
+      </div>
+      
+      <!-- ویرایش تصاویر ۴ فاز مطالعه موردی (Case-Study Phases) -->
+      <div style="padding:10px; border-radius:10px; background:#070a10; border:1px solid var(--border-subtle); margin-top:4px;">
+        <span style="font-size:11px; font-weight:800; color:var(--gold); display:block; margin-bottom:6px;">تصاویر فازهای مطالعه موردی (Case-Study):</span>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۱ (سیلوئت):</label>
+            <input type="text" value="${art.phases[0]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 0, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۲ (لاین‌آرت):</label>
+            <input type="text" value="${art.phases[1]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 1, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۳ (والیو/نور):</label>
+            <input type="text" value="${art.phases[2]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 2, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۴ (رندر نهایی):</label>
+            <input type="text" value="${art.phases[3]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 3, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">توضیحات تکمیلی اثر</label>
+        <textarea rows="2" onchange="updateArtField(${currentSelectedArtIdx}, 'desc', this.value)">${art.desc || ''}</textarea>
       </div>
       <button onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این اثر از گالری</button>
     </div>
   `;
 }
+
+window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
+  if (showcaseArtworks[artIdx] && showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[phaseIdx]) {
+    showcaseArtworks[artIdx].phases[phaseIdx].img = url.trim();
+    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    showToast(`تصویر فاز ${phaseIdx + 1} مطالعه موردی ذخیره شد.`, 'success');
+  }
+};
 
 window.updateArtField = function(idx, field, value) {
   showcaseArtworks[idx][field] = value;
@@ -1149,13 +1271,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const contact = document.getElementById('orderClientContact').value.trim();
       const phase = document.getElementById('orderPhaseSelect').value;
       const brief = document.getElementById('orderClientBrief').value.trim();
+      const priceText = document.getElementById('modalPrice').textContent;
 
       const newOrder = {
         id: Date.now(),
         client: client,
         contact: contact,
         pkg: activeModalItem.title,
-        price: activeModalItem.price,
+        price: priceText,
         timeline: activeModalItem.timeline,
         phase: phase,
         brief: brief,
@@ -1283,37 +1406,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-// توابع محاسبه‌گر ویزاردی مرحله‌به‌مرحله طبق Master Spec v2.1
-window.toggleWizardStep = function(stepNum) {
-  const card = document.getElementById("wizardStep" + stepNum);
-  if (card) card.classList.toggle('active');
-};
-
-window.recalcWizardPrice = function() {
-  let baseUSD = 90;
-  if (activeModalItem && activeModalItem.usdVal) {
-    baseUSD = activeModalItem.usdVal;
-  }
-
-  const framingEl = document.getElementById('wizFraming');
-  const compEl = document.getElementById('wizComplexity');
-  const phaseEl = document.getElementById('orderPhaseSelect');
-  const expEl = document.getElementById('wizExpressions');
-  const vfxEl = document.getElementById('wizVFX');
-  const commEl = document.getElementById('wizCommercial');
-
-  let extra = 0;
-  if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (expEl && expEl.checked) extra += 35;
-  if (vfxEl && vfxEl.checked) extra += 25;
-  if (commEl && commEl.checked) extra += 45;
-
-  const totalUSD = Math.max(50, baseUSD + extra);
-  activeModalItem.calculatedPriceUSD = totalUSD;
-
-  const priceEl = document.getElementById('modalPrice');
-  if (priceEl) priceEl.textContent = formatPrice(totalUSD);
-};

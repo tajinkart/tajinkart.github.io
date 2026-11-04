@@ -1352,3 +1352,188 @@
   color: var(--gold);
 }
 .mob-nav-btn svg { width: 18px; height: 18px; }
+
+
+/* ===================================================
+   سیستم واکنش‌گرای جامع موبایل (Comprehensive Mobile Engine)
+   =================================================== */
+
+.wizard-modal-window {
+  max-width: 1050px;
+  grid-template-columns: 1.05fr 1.35fr;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .wizard-modal-window {
+    grid-template-columns: 1fr !important;
+    max-height: 94vh;
+    padding: 16px;
+    gap: 16px;
+  }
+  .case-study-window {
+    grid-template-columns: 1fr !important;
+    max-height: 94vh;
+    padding: 16px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* تنظیم پدینگ‌های کلی بدنه و کانتینرها */
+  body {
+    padding-bottom: 70px !important;
+  }
+  .container {
+    padding: 68px 12px 30px !important;
+  }
+  #artworkCurtain {
+    padding: 16px 10px 40px !important;
+  }
+
+  /* هیرو صفحه اصلی */
+  #stickyBrandHero {
+    height: 55vh !important;
+    padding: 14px !important;
+  }
+  .brand-giant-title {
+    font-size: clamp(2.2rem, 9.5vw, 3.8rem) !important;
+    letter-spacing: 0.12em !important;
+  }
+  .brand-sub-caption {
+    font-size: 11px !important;
+    line-height: 1.6 !important;
+  }
+
+  /* نشان شناور هدر در موبایل */
+  #topCenterBrandBar {
+    top: 12px !important;
+    left: 12px !important;
+  }
+  .top-center-pill {
+    padding: 5px 12px !important;
+    font-size: 11.5px !important;
+  }
+
+  /* گرید موزاییک گالری صفحه اول */
+  #showcaseGrid {
+    grid-template-columns: 1fr !important;
+    grid-auto-rows: 240px !important;
+    gap: 12px !important;
+  }
+  .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
+  .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 {
+    grid-column: span 1 !important;
+  }
+
+  /* هدر بخش فروشگاه و آتلیه */
+  .section-head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .view-hero-title {
+    font-size: 20px !important;
+  }
+  .store-action-bar {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .store-dual-nav {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .store-dual-btn {
+    flex: 1 !important;
+    text-align: center !important;
+    padding: 7px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* پایپلاین‌ها و سایدبار در موبایل */
+  .comm-studio-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .studio-side-tabs {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    padding-bottom: 8px !important;
+    gap: 8px !important;
+    position: static !important;
+  }
+  .service-nav-card {
+    min-width: 200px !important;
+    max-width: 220px !important;
+    height: 82px !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: start !important;
+  }
+
+  /* گرید فازهای پایپلاین */
+  .mosaic-pipeline-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .pipeline-tile {
+    min-height: 180px !important;
+    grid-column: span 12 !important;
+  }
+
+  /* کارت‌های دارایی‌های دیجیتال و محصولات */
+  .cards-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* پنجره‌های مدال در موبایل */
+  .zoom-modal, .art-detail-modal {
+    padding: 10px !important;
+    align-items: flex-end !important;
+  }
+  .zoom-window, .case-study-window, .art-detail-window {
+    border-radius: 18px 18px 0 0 !important;
+    max-height: 90vh !important;
+    padding: 16px 14px !important;
+    width: 100% !important;
+  }
+
+  /* گام‌های محاسبه‌گر ویزارد در موبایل */
+  .wizard-step-header {
+    padding: 10px 12px !important;
+  }
+  .wizard-step-body {
+    padding: 12px 10px !important;
+  }
+
+  /* پنل ادمین در موبایل */
+  .admin-sketch1-layout, .admin-sketch2-layout, .admin-sketch3-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+  .admin-live-editor-col, #adminArtLiveEditorCol, #adminProductEditCol, #adminMemberDetailCol {
+    position: static !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .case-phases-switcher {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+  .case-phase-btn {
+    font-size: 10px !important;
+    padding: 6px 4px !important;
+  }
+  .comm-capacity-badge {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+}
