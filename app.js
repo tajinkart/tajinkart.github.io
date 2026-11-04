@@ -1,13 +1,3 @@
-
-// آیکون‌های اختصاصی و متمایز SVG برای هر یک از ۵ گزینه ناوبری داک راست
-const NAV_ICONS = {
-  members: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>',
-  store: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>',
-  genesis: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>',
-  academy: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>',
-  society: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>'
-};
-
 /**
  * TAJINKART Master Spec v2.1 Engine
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
@@ -83,14 +73,12 @@ function renderShowcaseGrid() {
   `).join('');
 }
 
-// لایت‌باکس مطالعه موردی مقاله‌محور و اسکرولی آثار (ArtStation Style Vertical Case Study)
+// لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)
 window.openArtModal = function(id) {
   const art = showcaseArtworks.find(a => a.id === id);
   if (!art) return;
   activeCaseStudyArt = art;
-
-  // قفل کردن اسکرول صفحه زمینه برای جلوگیری از اسکرول ناخواسته پشت مدال طبق ویدیو
-  document.body.classList.add('modal-open');
+  activeCaseStudyPhaseIdx = 0;
 
   document.getElementById('artDetailTitle').textContent = art.title;
   document.getElementById('artDetailDesc').textContent = art.desc;
@@ -98,43 +86,47 @@ window.openArtModal = function(id) {
   document.getElementById('caseStudyLore').textContent = art.lore || 'جهان اکستوپیا';
 
   const pipeData = PIPELINE_DATA[art.pipelineKey] || PIPELINE_DATA['sketch1'];
-  document.getElementById('caseStudyPipeName').textContent = pipeData ? pipeData.topSub : 'طراحی کاراکتر';
+  document.getElementById('caseStudyPipeName').textContent = pipeData.topSub;
 
-  // رندر سیر مراحل خلق اثر به صورت مقاله‌ای با اسکرول مستقل عمودی
-  const feedEl = document.getElementById('caseStudyArticleFeed');
-  if (feedEl) {
-    const phases = (art.phases && art.phases.length) ? art.phases : [
-      { name: 'اتود اولیه و سیلوئت', img: art.image, desc: 'اکتشاف فرم، تناسبات اندام، خطوط دینامیک حرکت و پیش‌زمینه داستانی شخصیت در اتمسفر مگاسازه.', tech: 'براش‌های نرم زغالی با رزولوشن 4K' },
-      { name: 'لاین‌آرت فنی و کادربندی', img: art.image, desc: 'طراحی خطی تمیز، تعیین زوایای ارتوگرافیک زره تیتانیومی و ماسک منقاری فیلتردار ضد اسید.', tech: 'وکتور خطی شارپ و ترن‌اراند ۳۶۰ درجه' },
-      { name: 'مطالعه مقداری و نورپردازی', img: art.image, desc: 'تنظیم پرتوهای نوری مات در میان غبار گوگردی، تعیین نقاط کنتراست عمیق و هایلایت‌های لبه.', tech: 'سیستم Value Study ۱۶ بیتی' },
-      { name: 'رندر مستر متریال نهایی', img: art.image, desc: 'رندر متریال‌های خوردگی شیمیایی، پاشش نور اتر و جداسازی لایه‌های باز PSD جهت تولید تجاری.', tech: 'مستر نهایی ProPhoto RGB 300DPI' }
-    ];
-
-    feedEl.innerHTML = phases.map((p, idx) => `
-      <div class="case-phase-block">
-        <div class="case-phase-header">
-          <span class="case-phase-tag">فاز ${idx + 1} • ${p.name}</span>
-          <span class="case-phase-tech-badge">${p.tech || 'PROPHOTO RGB 4K'}</span>
-        </div>
-        <div class="case-phase-img-container">
-          <img src="${p.img}" alt="${p.name}" loading="lazy" />
-        </div>
-        <p class="case-phase-narrative">${p.desc || 'توضیحات و مستندات پروسه خلق این مرحله توسط سید سروش تاج.'}</p>
-      </div>
-    `).join('');
-
-    // اسکرول مقاله به ابتدای فاز ۱
-    feedEl.scrollTop = 0;
-  }
+  renderCaseStudyPhasesSwitcher();
+  updateCaseStudyPhaseView();
 
   document.getElementById('artDetailModal').classList.add('active');
 };
 
-window.closeArtModal = function(e) { if (e.target.id === 'artDetailModal') closeArtModalDirect(); };
-window.closeArtModalDirect = function() {
-  document.body.classList.remove('modal-open');
-  document.getElementById('artDetailModal').classList.remove('active');
+function renderCaseStudyPhasesSwitcher() {
+  const switcher = document.getElementById('caseStudyPhasesSwitcher');
+  if (!switcher || !activeCaseStudyArt) return;
+  const phases = activeCaseStudyArt.phases || [
+    { name: 'اتود اولیه و سیلوئت', img: activeCaseStudyArt.image },
+    { name: 'لاین‌آرت فنی و کادر', img: activeCaseStudyArt.image },
+    { name: 'مطالعه نوری و مقداری', img: activeCaseStudyArt.image },
+    { name: 'رندر متریال نهایی', img: activeCaseStudyArt.image }
+  ];
+
+  switcher.innerHTML = phases.map((p, idx) => `
+    <button type="button" onclick="setCaseStudyPhase(${idx})" class="case-phase-btn ${idx === activeCaseStudyPhaseIdx ? 'active' : ''}">
+      ${p.name}
+    </button>
+  `).join('');
+}
+
+window.setCaseStudyPhase = function(idx) {
+  activeCaseStudyPhaseIdx = idx;
+  updateCaseStudyPhaseView();
+  renderCaseStudyPhasesSwitcher();
 };
+
+function updateCaseStudyPhaseView() {
+  if (!activeCaseStudyArt) return;
+  const phases = activeCaseStudyArt.phases || [{ name: 'رندر نهایی اثر', img: activeCaseStudyArt.image }];
+  const currentPhase = phases[activeCaseStudyPhaseIdx] || phases[0];
+
+  const imgEl = document.getElementById('caseStudyMainImg');
+  const badgeEl = document.getElementById('caseStudyPhaseBadge');
+  if (imgEl) imgEl.src = currentPhase.img;
+  if (badgeEl) badgeEl.textContent = `فاز ${activeCaseStudyPhaseIdx + 1} • ${currentPhase.name}`;
+}
 
 // دیپ‌لینک هوشمند از مطالعه موردی به پایپلاین آتلیه کمیسیون
 window.deepLinkToPipeline = function() {
@@ -228,17 +220,13 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
 
   // محاسبه لحظه‌ای اولیه و باز کردن پنجره
   recalcWizardPrice();
-  document.body.classList.add('modal-open');
   document.getElementById('zoomModal').classList.add('active');
 }
 
 function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
-function closeModalDirect() {
-  document.body.classList.remove('modal-open');
-  document.getElementById('zoomModal').classList.remove('active');
-}
+function closeModalDirect() { document.getElementById('zoomModal').classList.remove('active'); }
 
-// موتور محاسبه‌گر لحظه‌ای قیمت، اسکوپ و پیش‌نمایش تصویر متناسب با فاز و کادربندی انتخابی طبق ویدیو
+// موتور محاسبه‌گر لحظه‌ای قیمت و اسکوپ سفارش (Live Calculator Engine)
 window.toggleWizardStep = function(stepNum) {
   const card = document.getElementById("wizardStep" + stepNum);
   if (card) card.classList.toggle('active');
@@ -258,11 +246,7 @@ window.recalcWizardPrice = function() {
   const commEl = document.getElementById('wizCommercial');
 
   let extra = 0;
-  let selectedFraming = 'full';
-  if (framingEl) {
-    selectedFraming = framingEl.value;
-    extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  }
+  if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (expEl && expEl.checked) extra += 35;
@@ -272,42 +256,16 @@ window.recalcWizardPrice = function() {
   const totalUSD = Math.max(50, baseUSD + extra);
   activeModalItem.calculatedPriceUSD = totalUSD;
 
-  // آپدیت تصویر پیش‌نمایش بر اساس گزینه انتخابی (شیت سه‌نما / تمام‌قد / پرتره / فازها)
-  const pData = PIPELINE_DATA[activeModalItem.pipeKey || currentSelectedPipeKey] || PIPELINE_DATA['sketch1'];
-  const samples = pData.samples || {
-    bust: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=900&q=80',
-    full: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=900&q=80',
-    turnaround: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=80',
-    sketch: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=900&q=80',
-    lineart: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=900&q=80'
-  };
-
-  const imgEl = document.getElementById('modalMediaImg');
-  const badgeEl = document.getElementById('wizardSampleBadge');
-
-  if (imgEl && samples) {
-    if (selectedFraming === 'bust' && samples.bust) {
-      imgEl.src = samples.bust;
-      if (badgeEl) badgeEl.textContent = 'پیش‌نمایش گزینه: پرتره و نیم‌تنه';
-    } else if (selectedFraming === 'turnaround' && samples.turnaround) {
-      imgEl.src = samples.turnaround;
-      if (badgeEl) badgeEl.textContent = 'پیش‌نمایش گزینه: شیت سه‌نما ارتوگرافیک';
-    } else if (samples.full) {
-      imgEl.src = samples.full;
-      if (badgeEl) badgeEl.textContent = 'پیش‌نمایش گزینه: تمام‌قد پویا';
-    }
-  }
-
   // آپدیت آنی و زنده قیمت روی صفحه
   const priceEl = document.getElementById('modalPrice');
   if (priceEl) {
     priceEl.textContent = formatPrice(totalUSD);
+    // افکت فلش ظریف هنگام تغییر عدد
     priceEl.style.transition = 'color 0.2s';
     priceEl.style.color = 'var(--cyan-electric)';
     setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 250);
   }
 };
-
 
 // مخزن دارایی‌های دیجیتال (۷ شاخه استاندارد)
 let currentStoreFilterType = 'all';
@@ -484,6 +442,7 @@ window.switchView = function(vKey) {
   if (target) target.classList.remove('hidden');
 
   const topBar = document.getElementById('topCenterBrandBar');
+  const dock = document.getElementById('rightVerticalNav');
   const homeBtn = document.getElementById('rightDockHomeBtn');
 
   // آپدیت وضعیت دکمه‌های ناوبری موبایل
@@ -492,12 +451,18 @@ window.switchView = function(vKey) {
     btn.classList.toggle('active', keys[idx] === vKey);
   });
 
+  if (dock) {
+    dock.classList.add('dock-collapsed');
+    dock.classList.remove('dock-open');
+  }
+
   if (vKey === 'showcase') {
     if (homeBtn) homeBtn.classList.add('hidden');
-    if (window.scrollY > 120) {
-      if (topBar) topBar.classList.add('visible');
-    } else {
+    if (window.scrollY <= 140) {
+      if (dock) dock.classList.remove('dock-collapsed');
       if (topBar) topBar.classList.remove('visible');
+    } else {
+      if (topBar) topBar.classList.add('visible');
     }
   } else {
     if (homeBtn) homeBtn.classList.remove('hidden');
@@ -513,8 +478,9 @@ window.switchStoreTab = function(tabKey, btn) {
   if (btn) btn.classList.add('active');
 };
 
-// پارالاکس سبک ZEN در اسکرول بدون لگ و بدون افت فریم
+// پارالاکس هیرو سبک ZEN در اسکرول
 window.addEventListener('scroll', () => {
+  const dock = document.getElementById('rightVerticalNav');
   const topBar = document.getElementById('topCenterBrandBar');
   const hero = document.getElementById('stickyBrandHero');
 
@@ -522,30 +488,52 @@ window.addEventListener('scroll', () => {
     const scrolled = window.scrollY;
 
     if (scrolled > 120) {
+      if (dock) dock.classList.add('dock-collapsed');
       if (topBar) topBar.classList.add('visible');
     } else {
+      if (dock) dock.classList.remove('dock-collapsed');
       if (topBar) topBar.classList.remove('visible');
     }
 
     if (hero) {
       if (scrolled < 650) {
         const ratio = Math.min(scrolled / 500, 1);
-        const scale = 1 - (ratio * 0.06);
-        const translateY = scrolled * 0.25;
-        const opacity = Math.max(1 - (ratio * 0.8), 0.15);
+        const scale = 1 - (ratio * 0.08);
+        const translateY = scrolled * 0.28;
+        const opacity = Math.max(1 - (ratio * 0.75), 0.15);
+        const blur = ratio * 7;
 
         hero.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
         hero.style.opacity = opacity;
+        hero.style.filter = `blur(${blur}px)`;
       } else {
-        hero.style.transform = 'translate3d(0, 130px, 0) scale(0.94)';
+        hero.style.transform = 'translate3d(0, 140px, 0) scale(0.92)';
         hero.style.opacity = '0.15';
+        hero.style.filter = 'blur(7px)';
       }
     }
   }
 }, { passive: true });
 
+window.toggleDockExpand = function() {
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) dock.classList.toggle('dock-open');
+};
+
+document.addEventListener('click', (e) => {
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock && !dock.contains(e.target)) {
+    dock.classList.remove('dock-open');
+  }
+});
+
 // احراز هویت اعضا و بازیابی رمز
 window.handleMembersIconClick = function() {
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    dock.classList.add('dock-collapsed');
+    dock.classList.remove('dock-open');
+  }
   if (currentMember) {
     renderMemberDashboard();
     switchView('member-dashboard');
@@ -610,29 +598,7 @@ window.logoutAdmin = function() {
   switchView('showcase');
 };
 
-// ورود ایمن و بدون کرش مدیر استودیو
-window.handleAdminLogin = function(e) {
-  if (e) e.preventDefault();
-  const uInput = document.getElementById('adminUsernameInput');
-  const pInput = document.getElementById('adminPasswordInput');
-  const u = (uInput ? uInput.value : '').trim().toLowerCase();
-  const p = (pInput ? pInput.value : '').trim();
-
-  const isMasterUser = (u === 'soroush' || u === 'admin' || u === '');
-  const isMasterPass = (p === (siteSettings.adminPass || 'tajinkart') || p === 'tajinkart' || p === 'soroush' || p.length >= 4);
-
-  const gate = document.getElementById('adminLoginGate');
-  const ws = document.getElementById('adminWorkspace');
-  if (gate) gate.classList.add('hidden');
-  if (ws) ws.classList.remove('hidden');
-
-  switchView('admin');
-  switchAdminTab('artworks');
-  showToast('مرکز کنترل و پنل مدیریت استودیو گشوده شد.', 'success');
-  return false;
-};
-
-// مدیریت تب‌های ۶گانه پنل ادمین بدون ریسک کرش
+// مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
 window.switchAdminTab = function(tabKey, btn) {
   const tabs = ['pipelines', 'artworks', 'products', 'members', 'orders', 'settings'];
   tabs.forEach(t => {
@@ -640,44 +606,25 @@ window.switchAdminTab = function(tabKey, btn) {
     if (el) el.classList.toggle('hidden', t !== tabKey);
   });
   document.querySelectorAll('#adminWorkspace .store-dual-btn').forEach(b => b.classList.remove('active'));
-  const targetBtn = btn || document.querySelector(`#adminWorkspace .store-dual-btn[onclick*="${tabKey}"]`) || document.querySelector('#adminWorkspace .store-dual-btn');
-  if (targetBtn) targetBtn.classList.add('active');
+  if (btn) btn.classList.add('active');
 
-  try {
-    if (tabKey === 'pipelines') renderAdminSketch1();
-    else if (tabKey === 'artworks') renderAdminSketch2();
-    else if (tabKey === 'products') renderAdminProductsTab();
-    else if (tabKey === 'members') renderAdminSketch3();
-    else if (tabKey === 'orders') renderAdminLists();
-    else if (tabKey === 'settings') renderAdminEyeControls();
-  } catch (err) {
-    console.error('Error switching admin tab:', err);
-  }
+  if (tabKey === 'pipelines') renderAdminSketch1();
+  if (tabKey === 'artworks') renderAdminSketch2();
+  if (tabKey === 'products') renderAdminProductsTab();
+  if (tabKey === 'members') renderAdminSketch3();
+  if (tabKey === 'orders') renderAdminLists();
+  if (tabKey === 'settings') renderAdminEyeControls();
 };
 
-
-
-// ۲. کنسول مدیریت پایپلاین‌ها و فازهای آتلیه (۳ ستونه استاندارد طبق خواسته کاربر در ویدیو)
 function renderAdminSketch1() {
-  const catCol = document.getElementById('adminCategoryListCol');
-  if (!catCol) return;
-
-  const keys = Object.keys(PIPELINE_DATA);
-  catCol.innerHTML = keys.map(function(key, idx) {
-    const pipe = PIPELINE_DATA[key];
-    const num = (idx + 1 < 10 ? '0' : '') + (idx + 1);
-    const isActive = (key === currentSelectedPipeKey);
-
-    return `
-      <div class="admin-cat-item ${isActive ? 'active' : ''}" onclick="selectAdminCategory('${key}')">
-        <div>
-          <span class="font-mono" style="color:var(--gold); font-size:11px; margin-left:4px;">${num}.</span>
-          <span style="font-size:12.5px; font-weight:700;">${pipe.topSub}</span>
-        </div>
-        <span class="font-mono" style="font-size:10.5px; color:var(--text-muted);">${pipe.tiles ? pipe.tiles.length : 0} فاز</span>
-      </div>
-    `;
-  }).join('');
+  const catList = document.getElementById('adminCategoryListCol');
+  if (!catList) return;
+  catList.innerHTML = Object.keys(PIPELINE_DATA).map(key => `
+    <div class="admin-cat-item ${key === currentSelectedPipeKey ? 'active' : ''}" onclick="selectAdminCategory('${key}')">
+      <span style="font-size:12.5px; font-weight:700;">${PIPELINE_DATA[key].topSub}</span>
+      <span class="font-mono" style="font-size:10.5px; color:var(--gold);">${PIPELINE_DATA[key].tiles.length} فاز</span>
+    </div>
+  `).join('');
 
   renderAdminStagesList();
 }
@@ -691,35 +638,24 @@ window.selectAdminCategory = function(key) {
 function renderAdminStagesList() {
   const data = PIPELINE_DATA[currentSelectedPipeKey];
   if (!data) return;
-
   const titleEl = document.getElementById('adminCurrentPipeTitle');
   if (titleEl) titleEl.textContent = `مراحل: ${data.topSub}`;
 
   const stagesGrid = document.getElementById('adminStagesGridCol');
-  if (stagesGrid && data.tiles) {
-    stagesGrid.innerHTML = data.tiles.map(function(t, idx) {
-      const isSelected = (idx === currentSelectedStageIdx);
-      const displayPrice = formatPrice(t.price);
-
-      return `
-        <div class="admin-card-box ${isSelected ? 'active' : ''}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-color:${isSelected ? 'var(--gold)' : 'rgba(255,255,255,0.08)'};" onclick="selectAdminStage(${idx})">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
-              <img src="${t.img}" style="width:100%; height:100%; object-fit:cover;" />
-            </div>
-            <div>
-              <span class="pipeline-step-badge" style="margin-bottom:2px;">${t.badge}</span>
-              <div style="font-size:13px; font-weight:800; color:#fff;">${t.title}</div>
-              <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">⏱ تحویل: ${t.timeline}</div>
-            </div>
-          </div>
-          <div style="text-align:left; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-            <span class="font-mono" style="color:var(--gold); font-size:14px; font-weight:800;">${displayPrice}</span>
-            <button type="button" onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px; background:none; border:none; cursor:pointer;" title="حذف این فاز">🗑️ حذف فاز</button>
-          </div>
+  if (stagesGrid) {
+    stagesGrid.innerHTML = data.tiles.map((t, idx) => `
+      <div class="admin-card-box ${idx === currentSelectedStageIdx ? 'active' : ''}" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-color:${idx === currentSelectedStageIdx ? 'var(--gold)' : 'rgba(255,255,255,0.08)'};" onclick="selectAdminStage(${idx})">
+        <div>
+          <span class="pipeline-step-badge" style="margin-bottom:4px;">${t.badge}</span>
+          <div style="font-size:13.5px; font-weight:800; color:#fff;">${t.title}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">⏱ زمان تحویل: ${t.timeline}</div>
         </div>
-      `;
-    }).join('');
+        <div style="text-align:left; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+          <span class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800;">${t.price}</span>
+          <button onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px;">حذف فاز</button>
+        </div>
+      </div>
+    `).join('');
   }
 
   renderAdminStageLiveEditor();
@@ -732,135 +668,62 @@ window.selectAdminStage = function(idx) {
 
 function renderAdminStageLiveEditor() {
   const data = PIPELINE_DATA[currentSelectedPipeKey];
-  if (!data || !data.tiles || !data.tiles[currentSelectedStageIdx]) return;
+  if (!data || !data.tiles[currentSelectedStageIdx]) return;
   const tile = data.tiles[currentSelectedStageIdx];
   const col = document.getElementById('adminStageEditFormContainer');
   if (!col) return;
-
   col.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:11px;">
-      <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">نشان مرحله (بج)</label>
-          <input type="text" value="${tile.badge}" onchange="updateCurrentStageField('badge', this.value)" />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان کامل فاز</label>
-          <input type="text" value="${tile.title}" onchange="updateCurrentStageField('title', this.value)" />
-        </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">عنوان مرحله (بج)</label>
+        <input type="text" value="${tile.badge}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'badge', this.value)" />
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">عنوان کامل فاز</label>
+        <input type="text" value="${tile.title}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'title', this.value)" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">بازه قیمت نمایشی</label>
-          <input type="text" value="${tile.price}" onchange="updateCurrentStageField('price', this.value)" class="font-mono" />
+          <label style="font-size:11px; color:var(--text-muted);">تعرفه تخمینی (دلار)</label>
+          <input type="text" value="${tile.price}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'price', this.value)" class="font-mono" />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">قیمت پایه دلار</label>
-          <input type="number" value="${tile.usdVal || 90}" onchange="updateCurrentStageField('usdVal', parseInt(this.value, 10))" class="font-mono" />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">زمان تحویل</label>
-          <input type="text" value="${tile.timeline}" onchange="updateCurrentStageField('timeline', this.value)" />
+          <label style="font-size:11px; color:var(--text-muted);">زمان تحویل</label>
+          <input type="text" value="${tile.timeline}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'timeline', this.value)" />
         </div>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">شرح خروجی مرحله</label>
-        <textarea rows="2" onchange="updateCurrentStageField('desc', this.value)">${tile.desc}</textarea>
+        <label style="font-size:11px; color:var(--text-muted);">قیمت پایه عددی دلار (جهت محاسبه‌گر لحظه‌ای)</label>
+        <input type="number" value="${tile.usdVal || 90}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'usdVal', parseInt(this.value, 10))" class="font-mono" />
       </div>
-
-      <!-- آپلود عکس فاز پایپلاین (فایل از کامپیوتر + لینک) -->
-      <div style="padding:10px; border-radius:10px; background:#040609; border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:11px; font-weight:800; color:var(--gold);">تصویر این فاز:</span>
-          <label class="btn-gold" style="cursor:pointer; font-size:10.5px; padding:4px 10px; background:var(--gold); color:#000; border-radius:6px;">
-            📁 آپلود عکس از کامپیوتر
-            <input type="file" accept="image/*" style="display:none;" onchange="handleAdminStageFileUpload(event)" />
-          </label>
-        </div>
-        <input type="text" value="${tile.img}" onchange="updateCurrentStageField('img', this.value)" class="font-mono" style="font-size:11px;" placeholder="https://..." />
-        <div style="height:80px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); margin-top:2px;">
-          <img src="${tile.img}" style="width:100%; height:100%; object-fit:cover;" />
-        </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">شرح خروجی مرحله</label>
+        <textarea rows="3" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'desc', this.value)">${tile.desc}</textarea>
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر زمینه فاز</label>
+        <input type="text" value="${tile.img}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'img', this.value)" class="font-mono" />
+      </div>
+      <div style="margin-top:6px; height:80px; border-radius:8px; overflow:hidden; border:1px solid var(--border-subtle);">
+        <img src="${tile.img}" style="width:100%; height:100%; object-fit:cover;" />
       </div>
     </div>
   `;
 }
 
-window.updateCurrentStageField = function(field, val) {
-  PIPELINE_DATA[currentSelectedPipeKey].tiles[currentSelectedStageIdx][field] = val;
+window.updateTileField = function(pipeKey, tileIdx, field, val) {
+  PIPELINE_DATA[pipeKey].tiles[tileIdx][field] = val;
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
-  selectPipeline(currentSelectedPipeKey, null, false);
-  renderAdminStagesList();
+  selectPipeline(pipeKey, null, false);
   showToast('تغییرات فاز ذخیره شد.', 'success');
-};
-
-window.handleAdminStageFileUpload = function(event) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    PIPELINE_DATA[currentSelectedPipeKey].tiles[currentSelectedStageIdx].img = dataUrl;
-    localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
-    renderAdminStagesList();
-    selectPipeline(currentSelectedPipeKey, null, false);
-    showToast('تصویر فاز با موفقیت از سیستم بارگذاری و ذخیره شد!', 'success');
-  };
-  reader.readAsDataURL(file);
-};
-
-window.adminAddNewCategory = function() {
-  const name = prompt('نام دسته‌بندی جدید خدمات آتلیه:');
-  if (!name || !name.trim()) return;
-
-  const newKey = 'sketch_' + Date.now();
-  PIPELINE_DATA[newKey] = {
-    id: newKey,
-    topSub: name.trim(),
-    badgeSlug: 'سرویس سفارشی',
-    subcategories: ['خدمت اختصاصی'],
-    note: 'پایپلاین سفارشی استودیو کانسپت آرت.',
-    samples: {
-      full: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
-    },
-    tiles: [
-      { span: 'col-span-4', badge: 'فاز ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ اولیه', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
-    ]
-  };
-  localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
-  currentSelectedPipeKey = newKey;
-  currentSelectedStageIdx = 0;
-  renderAdminSketch1();
-  showToast('دسته‌بندی «' + name.trim() + '» با موفقیت اضافه شد!', 'success');
-};
-
-window.adminDeleteCurrentCategory = function() {
-  const keys = Object.keys(PIPELINE_DATA);
-  if (keys.length <= 1) {
-    showToast('حداقل وجود یک دسته‌بندی در آتلیه الزامی است.', 'error');
-    return;
-  }
-  const currentTitle = PIPELINE_DATA[currentSelectedPipeKey]?.topSub || 'این دسته';
-  if (confirm('آیا مطمئن هستید که می‌خواهید دسته‌بندی «' + currentTitle + '» را حذف کنید؟')) {
-    delete PIPELINE_DATA[currentSelectedPipeKey];
-    localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
-    currentSelectedPipeKey = Object.keys(PIPELINE_DATA)[0];
-    currentSelectedStageIdx = 0;
-    renderAdminSketch1();
-    showToast('دسته‌بندی با موفقیت حذف شد.', 'info');
-  }
 };
 
 window.adminAddNewStage = function() {
   if (!PIPELINE_DATA[currentSelectedPipeKey]) return;
-  if (!PIPELINE_DATA[currentSelectedPipeKey].tiles) PIPELINE_DATA[currentSelectedPipeKey].tiles = [];
-
-  const stageCount = PIPELINE_DATA[currentSelectedPipeKey].tiles.length + 1;
   PIPELINE_DATA[currentSelectedPipeKey].tiles.push({
     span: 'col-span-4',
-    badge: 'فاز ' + stageCount + ' • مرحله جدید',
-    title: 'فاز توسعه تکمیلی کانسپت',
+    badge: `فاز ${PIPELINE_DATA[currentSelectedPipeKey].tiles.length + 1}`,
+    title: 'فاز جدید توسعه کانسپت',
     desc: 'مشخصات خروجی این فاز را در فرم ستون کناری تکمیل فرمایید.',
     price: '$120 - $160',
     usdVal: 130,
@@ -870,61 +733,43 @@ window.adminAddNewStage = function() {
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   currentSelectedStageIdx = PIPELINE_DATA[currentSelectedPipeKey].tiles.length - 1;
   renderAdminStagesList();
-  showToast('فاز جدید اضافه شد.', 'success');
+  selectPipeline(currentSelectedPipeKey, null, false);
+  showToast('فاز جدید به پایپلاین اضافه شد.', 'success');
 };
 
 window.adminDeleteStage = function(idx) {
-  if (!PIPELINE_DATA[currentSelectedPipeKey] || PIPELINE_DATA[currentSelectedPipeKey].tiles.length <= 1) {
+  if (PIPELINE_DATA[currentSelectedPipeKey].tiles.length <= 1) {
     showToast('حداقل یک مرحله برای هر پایپلاین الزامی است.', 'error');
     return;
   }
-  if (confirm('آیا مطمئن هستید که می‌خواهید این فاز را حذف کنید؟')) {
-    PIPELINE_DATA[currentSelectedPipeKey].tiles.splice(idx, 1);
-    localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
-    currentSelectedStageIdx = Math.max(0, currentSelectedStageIdx - 1);
-    renderAdminStagesList();
-    showToast('فاز مورد نظر حذف شد.', 'info');
-  }
+  PIPELINE_DATA[currentSelectedPipeKey].tiles.splice(idx, 1);
+  localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  currentSelectedStageIdx = Math.max(0, currentSelectedStageIdx - 1);
+  renderAdminStagesList();
+  selectPipeline(currentSelectedPipeKey, null, false);
+  showToast('فاز مورد نظر حذف شد.', 'info');
 };
 
-
-// اسکچ ۲: مدیریت گالری آثار (همراه با درگ و دراپ جابجایی ترتیب آثار و آپلود فایل)
-let draggedArtIdx = null;
-
-window.handleArtDragStart = function(event, idx) {
-  draggedArtIdx = idx;
-  event.target.classList.add('dragging');
-  event.dataTransfer.effectAllowed = 'move';
+window.adminAddNewCategory = function() {
+  const newKey = `sketch_cat_${Date.now()}`;
+  PIPELINE_DATA[newKey] = {
+    id: newKey,
+    topSub: 'سرویس جدید استودیو',
+    badgeSlug: 'سرویس سفارشی',
+    subcategories: ['زیرشاخه ۱', 'زیرشاخه ۲'],
+    note: 'پایپلاین سفارشی استودیو.',
+    tiles: [
+      { span: 'col-span-12', badge: 'فاز ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ مفهومی', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
+    ]
+  };
+  localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  currentSelectedPipeKey = newKey;
+  currentSelectedStageIdx = 0;
+  renderAdminSketch1();
+  showToast('دسته‌بندی جدید خدمات اضافه شد.', 'success');
 };
 
-window.handleArtDragOver = function(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-  const card = event.target.closest('.admin-mosaic-card');
-  if (card) card.classList.add('drag-over');
-};
-
-window.handleArtDragLeave = function(event) {
-  const card = event.target.closest('.admin-mosaic-card');
-  if (card) card.classList.remove('drag-over');
-};
-
-window.handleArtDrop = function(event, targetIdx) {
-  event.preventDefault();
-  const card = event.target.closest('.admin-mosaic-card');
-  if (card) card.classList.remove('drag-over');
-
-  if (draggedArtIdx !== null && draggedArtIdx !== targetIdx) {
-    const movedItem = showcaseArtworks.splice(draggedArtIdx, 1)[0];
-    showcaseArtworks.splice(targetIdx, 0, movedItem);
-    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    renderShowcaseGrid();
-    renderAdminSketch2();
-    showToast('ترتیب آثار گالری با موفقیت جابجا و ذخیره شد!', 'success');
-  }
-  draggedArtIdx = null;
-};
-
+// اسکچ ۲: مدیریت گالری آثار (همراه با ویرایش لایت‌باکس مطالعه موردی ۴ فازه و لور)
 function renderAdminSketch2() {
   const container = document.getElementById('adminMosaicTilesContainer');
   if (!container) return;
@@ -937,18 +782,8 @@ function renderAdminSketch2() {
   `;
 
   html += showcaseArtworks.map((art, idx) => `
-    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" 
-         draggable="true" 
-         ondragstart="handleArtDragStart(event, ${idx})" 
-         ondragover="handleArtDragOver(event)" 
-         ondragleave="handleArtDragLeave(event)" 
-         ondrop="handleArtDrop(event, ${idx})" 
-         onclick="selectAdminArt(${idx})"
-         title="کلیک برای ویرایش • درگ برای تغییر ترتیب چیدمان">
+    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" onclick="selectAdminArt(${idx})">
       <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
-      <div style="position:absolute; top:4px; left:4px; font-size:10px; background:rgba(0,0,0,0.7); color:var(--gold); padding:1px 6px; border-radius:4px;">
-        ⋮⋮ ${idx + 1}
-      </div>
       <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.85); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
         ${art.shortSlug}
       </div>
@@ -959,12 +794,17 @@ function renderAdminSketch2() {
   renderAdminArtLiveEditor();
 }
 
+window.selectAdminArt = function(idx) {
+  currentSelectedArtIdx = idx;
+  renderAdminSketch2();
+};
 
 function renderAdminArtLiveEditor() {
   const art = showcaseArtworks[currentSelectedArtIdx];
   const box = document.getElementById('adminArtFormFields');
   if (!art || !box) return;
 
+  // اطمینان از وجود ۴ فاز
   if (!art.phases || art.phases.length < 4) {
     art.phases = [
       { name: 'اتود اولیه و سیلوئت', img: art.image },
@@ -976,34 +816,21 @@ function renderAdminArtLiveEditor() {
 
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <div style="height:140px; border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);">
-        <img id="adminArtPreviewCover" src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
+      <div style="height:130px; border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);">
+        <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
       </div>
-      
-      <!-- آپلود کاور اصلی اثر (هم انتخاب فایل هم لینک) -->
-      <div style="padding:10px; border-radius:10px; background:#040609; border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:11px; font-weight:800; color:var(--iris);">تصویر اصلی اثر (کاور گالری):</span>
-          <label class="btn-gold" style="cursor:pointer; font-size:10.5px; padding:5px 12px; background:var(--iris); color:#fff; border-radius:6px;">
-            📁 انتخاب فایل عکس
-            <input type="file" accept="image/*" style="display:none;" onchange="handleAdminArtCoverUpload(event)" />
-          </label>
-        </div>
-        <input type="text" value="${art.image}" onchange="updateCurrentArtField('image', this.value)" class="font-mono" style="font-size:11px;" placeholder="https://..." />
-      </div>
-
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان کامل اثر</label>
-        <input type="text" value="${art.title}" onchange="updateCurrentArtField('title', this.value)" />
+        <label style="font-size:11px; color:var(--text-muted);">عنوان کامل اثر</label>
+        <input type="text" value="${art.title}" onchange="updateArtField(${currentSelectedArtIdx}, 'title', this.value)" />
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">اسلاگ هاور گالری</label>
-          <input type="text" value="${art.shortSlug}" onchange="updateCurrentArtField('shortSlug', this.value)" />
+          <label style="font-size:11px; color:var(--text-muted);">اسلاگ هاور گالری</label>
+          <input type="text" value="${art.shortSlug}" onchange="updateArtField(${currentSelectedArtIdx}, 'shortSlug', this.value)" />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">پایپلاین دیپ‌لینک</label>
-          <select onchange="updateCurrentArtField('pipelineKey', this.value)">
+          <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک</label>
+          <select onchange="updateArtField(${currentSelectedArtIdx}, 'pipelineKey', this.value)">
             <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر</option>
             <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>هیولا و موجودات</option>
             <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
@@ -1013,94 +840,58 @@ function renderAdminArtLiveEditor() {
           </select>
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">لور داستانی</label>
-          <input type="text" value="${art.lore || 'جهان اکستوپیا'}" onchange="updateCurrentArtField('lore', this.value)" />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">مشخصات رنگی</label>
-          <input type="text" value="${art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB'}" onchange="updateCurrentArtField('colorSpace', this.value)" />
-        </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر اصلی کاور</label>
+        <input type="text" value="${art.image}" onchange="updateArtField(${currentSelectedArtIdx}, 'image', this.value)" class="font-mono" />
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">لور داستانی و زمینه</label>
+        <input type="text" value="${art.lore || 'جهان اکستوپیا'}" onchange="updateArtField(${currentSelectedArtIdx}, 'lore', this.value)" />
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">مشخصات فضای رنگی</label>
+        <input type="text" value="${art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB'}" onchange="updateArtField(${currentSelectedArtIdx}, 'colorSpace', this.value)" />
       </div>
       
-      <!-- تصاویر ۴ فاز مطالعه موردی (هم آپلود فایل هم لینک) -->
-      <div style="padding:10px; border-radius:10px; background:#070a10; border:1px solid var(--border-subtle); margin-top:2px;">
-        <span style="font-size:11px; font-weight:800; color:var(--gold); display:block; margin-bottom:6px;">تصاویر ۴ فاز لایت‌باکس مطالعه موردی (Case-Study):</span>
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          ${[0, 1, 2, 3].map(pIdx => {
-            const phaseNames = ['فاز ۱ (سیلوئت)', 'فاز ۲ (لاین‌آرت)', 'فاز ۳ (والیو/نور)', 'فاز ۴ (رندر نهایی)'];
-            const currentImg = (art.phases && art.phases[pIdx]) ? art.phases[pIdx].img : art.image;
-            return `
-              <div style="padding:6px; background:#040609; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
-                  <span style="font-size:10px; color:var(--text-muted); font-weight:700;">${phaseNames[pIdx]}</span>
-                  <label class="btn-secondary" style="cursor:pointer; font-size:9.5px; padding:2px 8px; border-radius:4px;">
-                    📁 انتخاب عکس
-                    <input type="file" accept="image/*" style="display:none;" onchange="handleAdminPhaseFileUpload(event, ${pIdx})" />
-                  </label>
-                </div>
-                <input type="text" value="${currentImg}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, ${pIdx}, this.value)" class="font-mono" style="font-size:10.5px; padding:4px 8px;" />
-              </div>
-            `;
-          }).join('')}
+      <!-- ویرایش تصاویر ۴ فاز مطالعه موردی (Case-Study Phases) -->
+      <div style="padding:10px; border-radius:10px; background:#070a10; border:1px solid var(--border-subtle); margin-top:4px;">
+        <span style="font-size:11px; font-weight:800; color:var(--gold); display:block; margin-bottom:6px;">تصاویر فازهای مطالعه موردی (Case-Study):</span>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۱ (سیلوئت):</label>
+            <input type="text" value="${art.phases[0]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 0, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۲ (لاین‌آرت):</label>
+            <input type="text" value="${art.phases[1]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 1, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۳ (والیو/نور):</label>
+            <input type="text" value="${art.phases[2]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 2, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
+          <div>
+            <label style="font-size:10px; color:var(--text-muted);">فاز ۴ (رندر نهایی):</label>
+            <input type="text" value="${art.phases[3]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 3, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
+          </div>
         </div>
       </div>
 
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">توضیحات اثر</label>
-        <textarea rows="2" onchange="updateCurrentArtField('desc', this.value)">${art.desc || ''}</textarea>
+        <label style="font-size:11px; color:var(--text-muted);">توضیحات تکمیلی اثر</label>
+        <textarea rows="2" onchange="updateArtField(${currentSelectedArtIdx}, 'desc', this.value)">${art.desc || ''}</textarea>
       </div>
-      <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:4px; border-color:rgba(239,68,68,0.3);">حذف این اثر از گالری</button>
+      <button onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این اثر از گالری</button>
     </div>
   `;
 }
 
-window.updateCurrentArtField = function(field, value) {
-  showcaseArtworks[currentSelectedArtIdx][field] = value;
-  localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-  applySectionVisibility();
-  renderShowcaseGrid();
-  renderAdminSketch2();
-  showToast('اثر با موفقیت ویرایش شد.', 'success');
-};
-
-window.handleAdminArtCoverUpload = function(event) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    showcaseArtworks[currentSelectedArtIdx].image = dataUrl;
-    if (showcaseArtworks[currentSelectedArtIdx].phases && showcaseArtworks[currentSelectedArtIdx].phases[3]) {
-      showcaseArtworks[currentSelectedArtIdx].phases[3].img = dataUrl;
-    }
+window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
+  if (showcaseArtworks[artIdx] && showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[phaseIdx]) {
+    showcaseArtworks[artIdx].phases[phaseIdx].img = url.trim();
     localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    renderShowcaseGrid();
-    renderAdminSketch2();
-    showToast('تصویر کاور اثر با موفقیت از سیستم بارگذاری شد!', 'success');
-  };
-  reader.readAsDataURL(file);
+    showToast(`تصویر فاز ${phaseIdx + 1} مطالعه موردی ذخیره شد.`, 'success');
+  }
 };
-
-window.handleAdminPhaseFileUpload = function(event, phaseIdx) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    if (showcaseArtworks[currentSelectedArtIdx] && showcaseArtworks[currentSelectedArtIdx].phases && showcaseArtworks[currentSelectedArtIdx].phases[phaseIdx]) {
-      showcaseArtworks[currentSelectedArtIdx].phases[phaseIdx].img = dataUrl;
-      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-      renderAdminArtLiveEditor();
-      showToast('تصویر فاز ' + (phaseIdx + 1) + ' با موفقیت آپلود شد.', 'success');
-    }
-  };
-  reader.readAsDataURL(file);
-};
-
 
 window.updateArtField = function(idx, field, value) {
   showcaseArtworks[idx][field] = value;
@@ -1178,29 +969,16 @@ function renderAdminProductLiveEditor() {
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
       <div style="height:120px; border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);">
-        <img id="adminProductPreviewImg" src="${p.img}" style="width:100%; height:100%; object-fit:cover;" />
+        <img src="${p.img}" style="width:100%; height:100%; object-fit:cover;" />
       </div>
-      
-      <!-- بخش آپلود تصویر کاور دارایی دیجیتال (هم فایل هم لینک) -->
-      <div style="padding:10px; border-radius:10px; background:#040609; border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:11px; font-weight:800; color:var(--cyan-electric);">تصویر کاور دارایی:</span>
-          <label class="btn-gold" style="cursor:pointer; font-size:10.5px; padding:5px 12px; background:var(--cyan-electric); color:#000; border-radius:6px;">
-            📁 انتخاب عکس از سیستم
-            <input type="file" accept="image/*" style="display:none;" onchange="handleAdminProductCoverUpload(event)" />
-          </label>
-        </div>
-        <input type="text" value="${p.img}" onchange="updateCurrentProductField('img', this.value)" class="font-mono" style="font-size:11px;" placeholder="https://..." />
-      </div>
-
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان دارایی / پکیج</label>
-        <input type="text" value="${p.title}" onchange="updateCurrentProductField('title', this.value)" />
+        <label style="font-size:11px; color:var(--text-muted);">عنوان دارایی / پکیج</label>
+        <input type="text" value="${p.title}" onchange="updateProductField(${currentSelectedProductIdx}, 'title', this.value)" />
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">شاخه دارایی (۷ شاخه)</label>
-          <select onchange="updateCurrentProductField('type', this.value)">
+          <label style="font-size:11px; color:var(--text-muted);">شاخه دارایی (۷ شاخه)</label>
+          <select onchange="updateProductField(${currentSelectedProductIdx}, 'type', this.value)">
             <option value="بسته‌های اسست بازی و اسپریت ۲D" ${p.type === 'بسته‌های اسست بازی و اسپریت ۲D' ? 'selected' : ''}>بسته‌های اسست بازی و اسپریت ۲D</option>
             <option value="موتور براش، تکسچر و استمپ‌های کانسپت آرت" ${p.type === 'موتور براش، تکسچر و استمپ‌های کانسپت آرت' ? 'selected' : ''}>موتور براش، تکسچر و استمپ‌ها</option>
             <option value="کیت‌های پراپ، آیکون و اینترفیس بازی" ${p.type === 'کیت‌های پراپ، آیکون و اینترفیس بازی' ? 'selected' : ''}>کیت‌های پراپ و UI</option>
@@ -1211,47 +989,26 @@ function renderAdminProductLiveEditor() {
           </select>
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">قیمت پایه (دلار)</label>
-          <input type="number" value="${p.price}" onchange="updateCurrentProductField('price', parseInt(this.value, 10))" class="font-mono" />
+          <label style="font-size:11px; color:var(--text-muted);">قیمت پایه (دلار)</label>
+          <input type="number" value="${p.price}" onchange="updateProductField(${currentSelectedProductIdx}, 'price', parseInt(this.value, 10))" class="font-mono" />
         </div>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">کلید دسترسی لور (Genesis Key)</label>
-        <input type="text" value="${p.loreKey || ''}" onchange="updateCurrentProductField('loreKey', this.value)" />
+        <label style="font-size:11px; color:var(--text-muted);">کلید دسترسی لور (Genesis Key)</label>
+        <input type="text" value="${p.loreKey || ''}" onchange="updateProductField(${currentSelectedProductIdx}, 'loreKey', this.value)" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">توضیحات و محتویات بسته</label>
-        <textarea rows="3" onchange="updateCurrentProductField('desc', this.value)">${p.desc || ''}</textarea>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر کاور</label>
+        <input type="text" value="${p.img}" onchange="updateProductField(${currentSelectedProductIdx}, 'img', this.value)" class="font-mono" />
       </div>
-      <button type="button" onclick="adminDeleteProduct(${currentSelectedProductIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:4px; border-color:rgba(239,68,68,0.3);">حذف این دارایی از فروشگاه</button>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">توضیحات و محتویات بسته</label>
+        <textarea rows="3" onchange="updateProductField(${currentSelectedProductIdx}, 'desc', this.value)">${p.desc || ''}</textarea>
+      </div>
+      <button onclick="adminDeleteProduct(${currentSelectedProductIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این دارایی</button>
     </div>
   `;
 }
-
-window.updateCurrentProductField = function(field, val) {
-  digitalStoreProducts[currentSelectedProductIdx][field] = val;
-  localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
-  renderProducts();
-  renderAdminProductsTab();
-  showToast('مشخصات دارایی ذخیره شد.', 'success');
-};
-
-window.handleAdminProductCoverUpload = function(event) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    digitalStoreProducts[currentSelectedProductIdx].img = dataUrl;
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
-    renderProducts();
-    renderAdminProductsTab();
-    showToast('تصویر کاور دارایی با موفقیت بارگذاری و ذخیره شد!', 'success');
-  };
-  reader.readAsDataURL(file);
-};
-
 
 window.updateProductField = function(idx, field, val) {
   digitalStoreProducts[idx][field] = val;
@@ -1495,8 +1252,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAcademy();
   renderComicPage();
 
-  renderAdminSketch2();
   renderAdminSketch1();
+  renderAdminSketch2();
   renderAdminProductsTab();
   renderAdminSketch3();
   renderAdminLists();
@@ -1552,9 +1309,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const pw = document.getElementById('loginPass').value.trim();
 
       if (em === 'soroush') {
-        closeMemberModal();
-        handleAdminLogin(e);
-        return;
+        if (pw === (siteSettings.adminPass || 'tajinkart')) {
+          closeMemberModal();
+          document.getElementById('adminLoginGate').classList.add('hidden');
+          document.getElementById('adminWorkspace').classList.remove('hidden');
+          switchView('admin');
+          showToast('مرکز کنترل و پنل مدیریت استودیو گشوده شد.', 'success');
+          return;
+        } else {
+          showToast('رمز عبور مدیر استودیو نامعتبر است.', 'error');
+          return;
+        }
       }
 
       currentMember = { name: em.split('@')[0], email: em, contact: em, assetsBought: [] };
@@ -1618,7 +1383,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (adminForm) {
     adminForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      handleAdminLogin(e);
+      const u = document.getElementById('adminUsernameInput').value.trim().toLowerCase();
+      const p = document.getElementById('adminPasswordInput').value.trim();
+      if (u === 'soroush' && p === (siteSettings.adminPass || 'tajinkart')) {
+        document.getElementById('adminLoginGate').classList.add('hidden');
+        document.getElementById('adminWorkspace').classList.remove('hidden');
+        showToast('مرکز کنترل استودیو گشوده شد.', 'success');
+      } else {
+        showToast('اطلاعات ورود مدیر صحیح نیست.', 'error');
+      }
     });
   }
 
@@ -1684,21 +1457,20 @@ function renderRightNavItems() {
   const container = document.getElementById('rightNavItemsContainer');
   if (!container) return;
 
-  const items = (siteSettings && siteSettings.navItems && siteSettings.navItems.length) ? siteSettings.navItems : window.DEFAULT_NAV_ITEMS;
+  const items = siteSettings.navItems || [];
   container.innerHTML = items.map(function(item, idx) {
-    if (item.visible === false) return '';
-    const svgIcon = NAV_ICONS[item.id] || NAV_ICONS.store;
-    return `
-      <button onclick="${item.action}" class="right-exp-btn ${item.theme || 'gold-theme'}" id="nav-btn-${item.id}" title="${item.label}">
-        <span class="right-exp-icon">
-          ${svgIcon}
-        </span>
-        <span class="right-exp-text">
-          <span class="right-exp-title" style="color:${item.color || 'var(--gold)'};">${item.label}</span>
-          <span class="right-exp-sub">${item.sub || ''}</span>
-        </span>
-      </button>
-    `;
+    if (!item.visible) return '';
+    return '<button onclick="' + item.action + '" class="right-exp-btn ' + (item.theme || 'gold-theme') + '" title="' + item.label + '">' +
+      '<span class="right-exp-icon">' +
+        '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
+          '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />' +
+        '</svg>' +
+      '</span>' +
+      '<span class="right-exp-text">' +
+        '<span class="right-exp-title" style="color:' + (item.color || 'var(--gold)') + ';">' + item.label + '</span>' +
+        '<span class="right-exp-sub">' + (item.sub || '') + '</span>' +
+      '</span>' +
+    '</button>';
   }).join('');
 }
 
@@ -1830,13 +1602,3 @@ window.adminAddNewNavItem = function() {
   renderAdminNavItemsManager();
   showToast('گزینه ناوبری جدید به داک راست اضافه شد.', 'success');
 };
-
-// بستن کلیه مدال‌ها با کلید Escape و تضمین عدم قفل ماندن اسکرول صفحه
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if (typeof closeModalDirect === 'function') closeModalDirect();
-    if (typeof closeArtModalDirect === 'function') closeArtModalDirect();
-    if (typeof closeMemberModal === 'function') closeMemberModal();
-    document.body.classList.remove('modal-open');
-  }
-});
