@@ -19,12 +19,6 @@
     </button>
   </div>
 
-  <!-- دکمه کنترل اتمسفر صوتی دارک فانتزی -->
-  <button id="ambientSoundToggle" onclick="toggleAmbientSound()" class="ambient-sound-btn" title="پخش / توقف اتمسفر صوتی استودیو">
-    <span class="sound-pulse"></span>
-    <span id="ambientSoundLabel">اتمسفر صوتی استودیو</span>
-  </button>
-
   <!-- ۲. داک عمودی ناوبری راست -->
   <nav id="rightVerticalNav">
     <div id="dockMasterTrigger" title="منو" onclick="toggleDockExpand()">
@@ -122,12 +116,6 @@
     </div>
 
     <div id="artworkCurtain">
-      <div class="gallery-filter-bar">
-        <button class="gallery-filter-btn active" onclick="filterGalleryByTag('all', this)">همه آثار</button>
-        <button class="gallery-filter-btn" onclick="filterGalleryByTag('character', this)">کاراکتر و موجودات</button>
-        <button class="gallery-filter-btn" onclick="filterGalleryByTag('environment', this)">محیط و لنداسکیپ</button>
-        <button class="gallery-filter-btn" onclick="filterGalleryByTag('keyframe', this)">کاور و کی‌فریم سینمایی</button>
-      </div>
       <div id="showcaseGrid"></div>
     </div>
   </section>
@@ -280,9 +268,9 @@
         </div>
 
         <div class="comm-studio-layout">
-          <!-- سایدبار دسته‌های دارایی با تصاویر کامل، اوورلی و استایل بصری کاملاً شبیه سفارشات کانسپت -->
+                    <!-- سایدبار دسته‌های دارایی با ۷ شاخه استاندارد Master Spec v2.1 -->
           <div class="studio-side-tabs" id="assetCategoryTabs">
-            
+
             <div onclick="filterStoreAssets('all', this)" class="service-nav-card cyan-card active" data-asset-cat="all">
               <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="همه دارایی‌ها" />
               <div class="service-nav-overlay">
@@ -294,64 +282,86 @@
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('پک اسست بازی', this)" class="service-nav-card cyan-card" data-asset-cat="پک اسست بازی">
+            <div onclick="filterStoreAssets('بسته‌های اسست بازی و اسپریت ۲D', this)" class="service-nav-card cyan-card" data-asset-cat="بسته‌های اسست بازی و اسپریت ۲D">
               <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="اسست بازی" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">01.</span>
                   <span>اسست بازی و اسپریت ۲D</span>
                 </div>
-                <div class="service-nav-desc">انیمیشن‌های ۸ جهته، اسپرایت‌شیت‌های بازی، فریم‌های حرکتی آماده Unity و Godot.</div>
+                <div class="service-nav-desc">اسپرایت‌شیت‌های کاراکتر، انیمیشن‌های چندجهته بهینه‌شده برای Unity و Godot.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('کمیک دیجیتال', this)" class="service-nav-card cyan-card" data-asset-cat="کمیک دیجیتال">
-              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="کمیک و مانگا" />
-              <div class="service-nav-overlay">
-                <div class="service-nav-title">
-                  <span class="font-mono" style="color:var(--cyan-electric);">02.</span>
-                  <span>کمیک، مانگا و استوری‌بورد</span>
-                </div>
-                <div class="service-nav-desc">فصل‌های کمیک جنسیس، اتودهای مفهومی و فایل‌های مستر PSD با رزولوشن چاپ.</div>
-              </div>
-            </div>
-
-            <div onclick="filterStoreAssets('موتور براش', this)" class="service-nav-card cyan-card" data-asset-cat="موتور براش">
+            <div onclick="filterStoreAssets('موتور براش، تکسچر و استمپ‌های کانسپت آرت', this)" class="service-nav-card cyan-card" data-asset-cat="موتور براش، تکسچر و استمپ‌های کانسپت آرت">
               <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="موتور براش" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
-                  <span class="font-mono" style="color:var(--cyan-electric);">03.</span>
-                  <span>موتور براش و تکسچرها</span>
+                  <span class="font-mono" style="color:var(--cyan-electric);">02.</span>
+                  <span>موتور براش، بافت و آلفا</span>
                 </div>
-                <div class="service-nav-desc">۶۴ براش دست‌ساز فتوشاپ و پروکریت با بافت‌های زنگ‌زدگی، فلس، پوست و مه اتمسفریک.</div>
+                <div class="service-nav-desc">ست‌های براش فتوشاپ و پروکریت برای متریال زنگ‌زدگی، فلس، پوست و مه اتمسفریک.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('انیمیشن لوپ', this)" class="service-nav-card cyan-card" data-asset-cat="انیمیشن لوپ">
-              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="انیمیشن لوپ" />
-              <div class="service-nav-overlay">
-                <div class="service-nav-title">
-                  <span class="font-mono" style="color:var(--cyan-electric);">04.</span>
-                  <span>اسپلش و لوپ متحرک 4K</span>
-                </div>
-                <div class="service-nav-desc">لوپ‌های منوی اصلی بازی، پس‌زمینه‌های سینمایی متحرک و ویدیوهای آماده پروجکشن.</div>
-              </div>
-            </div>
-
-            <div onclick="filterStoreAssets('پراپ و رابط کاربری', this)" class="service-nav-card cyan-card" data-asset-cat="پراپ و رابط کاربری">
+            <div onclick="filterStoreAssets('کیت‌های پراپ، آیکون و اینترفیس بازی', this)" class="service-nav-card cyan-card" data-asset-cat="کیت‌های پراپ، آیکون و اینترفیس بازی">
               <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="پراپ و UI" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
-                  <span class="font-mono" style="color:var(--cyan-electric);">05.</span>
-                  <span>آیکون‌ها و فریم‌های اینترفیس</span>
+                  <span class="font-mono" style="color:var(--cyan-electric);">03.</span>
+                  <span>کیت‌های پراپ، آیکون و UI</span>
                 </div>
-                <div class="service-nav-desc">پک آیکون‌های مهارت‌های جادویی، کادرهای HUD دارک‌فانتزی و المان‌های RPG.</div>
+                <div class="service-nav-desc">آیکون‌های مهارت جادویی، معجون‌ها، فریم‌های دارک‌فانتزی HUD و اینونتوری.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر', this)" class="service-nav-card cyan-card" data-asset-cat="کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر">
+              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="کمیک و ناول" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">04.</span>
+                  <span>کمیک، آرت‌بوک و مستر PSD</span>
+                </div>
+                <div class="service-nav-desc">چپترهای کمیک با لایه‌های تفکیک‌شده PSD، آرت‌بوک لور و یادداشت‌های کارگردانی.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش', this)" class="service-nav-card cyan-card" data-asset-cat="فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="لوپ سینمایی" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">05.</span>
+                  <span>لوپ‌های سینمایی 4K</span>
+                </div>
+                <div class="service-nav-desc">ویدیوهای لوپ بدون درز مناسب منوی اصلی بازی، والپیپر استیم و تیزرهای تبلیغاتی.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی', this)" class="service-nav-card cyan-card" data-asset-cat="فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی">
+              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="پرینت ۳D" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">06.</span>
+                  <span>پرینت ۳D و مینیاتوری STL</span>
+                </div>
+                <div class="service-nav-desc">فایل‌های STL و OBJ سر هیولاها برای پرینترهای رزینی همراه با بیس‌مش خام ZBrush.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری', this)" class="service-nav-card cyan-card" data-asset-cat="اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="افکت FX" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">07.</span>
+                  <span>اوورلی ذرات و افکت FX</span>
+                </div>
+                <div class="service-nav-desc">ذرات معلق اتر، مه سنگین، باران گوگردی و پاشش خون در فرمت PNG ترنسپرنت و بلک‌اسکرین.</div>
               </div>
             </div>
 
           </div>
 
-          <!-- میزکار نمایش اسست‌ها که از نظر بصری کاملاً شبیه سفارشات کانسپت شده است -->
+          <!-- میزکار نمایش اسست‌ها -->
           <div class="sketch-workbench" id="assetWorkbenchArea">
             <div class="sketch-workbench-header">
               <div>
@@ -693,89 +703,178 @@
     </div>
   </section>
 
-  <!-- مدال جزئیات آرت‌ورک -->
+  <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
-    <div class="art-detail-window" onclick="event.stopPropagation()">
-      <div style="aspect-ratio:1; background:#020305; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden;">
-        <img id="artDetailImg" src="" style="width:100%; height:100%; object-fit:cover;" />
+    <div class="case-study-window" onclick="event.stopPropagation()">
+      <div class="case-study-stage-box">
+        <div class="case-main-preview">
+          <img id="caseStudyMainImg" src="" alt="پیش‌نمایش مرحله اثر" />
+          <span id="caseStudyPhaseBadge" class="case-phase-badge">فاز ۱ • اتود اولیه و سیلوئت</span>
+        </div>
+        <div>
+          <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:6px; font-weight:700;">فازهای مرحله‌به‌مرحله خلق کانسپت:</span>
+          <div id="caseStudyPhasesSwitcher" class="case-phases-switcher"></div>
+        </div>
       </div>
+
       <div style="display:flex; flex-direction:column; justify-content:space-between;">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span id="artDetailCategory" class="font-mono" style="color:var(--iris); font-size:11px; letter-spacing:0.12em;"></span>
+            <span id="artDetailCategory" class="font-mono" style="color:var(--iris); font-size:11.5px; letter-spacing:0.12em;">/ CASE STUDY LOG /</span>
             <button onclick="closeArtModalDirect()" style="color:var(--text-muted); font-size:20px;">✕</button>
           </div>
-          <h3 id="artDetailTitle" style="font-size:20px; font-weight:900; color:#fff; margin-top:8px;"></h3>
-          <p id="artDetailDesc" style="font-size:13px; color:var(--text-muted); margin-top:12px; line-height:1.75;"></p>
-          <div style="margin-top:16px; padding:12px; border-radius:10px; background:#06080c; border:1px solid var(--border-subtle); font-size:12px; color:var(--text-muted);">
-            <div><strong>پایپلاین تولید:</strong> کانسپت آرت و تصویرسازی دیجیتال مات</div>
-            <div style="margin-top:4px;"><strong>فضای رنگی:</strong> مستر 4K / ۱۶ بیتی ProPhoto RGB</div>
+          <h3 id="artDetailTitle" style="font-size:19px; font-weight:900; color:#fff; margin-top:8px; line-height:1.4;"></h3>
+          <p id="artDetailDesc" style="font-size:12.5px; color:var(--text-muted); margin-top:10px; line-height:1.75;"></p>
+
+          <div style="margin-top:14px; padding:12px; border-radius:12px; background:#06080c; border:1px solid var(--border-subtle); font-size:11.5px; display:flex; flex-direction:column; gap:6px;">
+            <div><strong style="color:#fff;">پایپلاین تولید:</strong> <span id="caseStudyPipeName" style="color:var(--gold);">طراحی کاراکتر و شخصیت</span></div>
+            <div><strong style="color:#fff;">فضای رنگی و مستر:</strong> <span id="caseStudyColorSpace" class="font-mono" style="color:var(--cyan-electric);">مستر 4K / ۱۶ بیتی ProPhoto RGB</span></div>
+            <div><strong style="color:#fff;">لور و زمینه داستانی:</strong> <span id="caseStudyLore" style="color:#cbd5e1;">جهان اکستوپیا</span></div>
           </div>
         </div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-          <button onclick="closeArtModalDirect(); switchView('store');" class="btn-gold" style="flex:1;">سفارش اثر مشابه در آتلیه ←</button>
+
+        <div style="margin-top:18px;">
+          <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:12px; font-size:12.5px;">
+            سفارش اثر مشابه در پایپلاین آتلیه ←
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- مدال بریف و ثبت سفارش -->
+    <!-- مدال محاسبه‌گر لحظه‌ای سفارش و موتور داینامیک قیمت‌گذاری (Interactive Wizard Accordion) -->
   <div id="zoomModal" class="zoom-modal" onclick="closeModal(event)">
-    <div class="zoom-window" onclick="event.stopPropagation()">
-      <div>
-        <div style="aspect-ratio:16/10; background:#020305; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden;">
-          <img id="modalMediaImg" src="" style="width:100%; height:100%; object-fit:cover;" />
+    <div class="zoom-window" style="max-width:1050px; grid-template-columns:1.05fr 1.35fr;" onclick="event.stopPropagation()">
+      
+      <!-- ستون چپ: پیش‌نمایش، فاکتور زنده و خلاصه سفارش -->
+      <div style="display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+        <div>
+          <div style="aspect-ratio:16/10; background:#020305; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden;">
+            <img id="modalMediaImg" src="" style="width:100%; height:100%; object-fit:cover;" alt="پیش‌نمایش پایپلاین" />
+          </div>
+          <div style="margin-top:12px;">
+            <span class="font-mono" style="font-size:10.5px; color:var(--iris);" id="wizardPipeBadge">ATELIER PIPELINE</span>
+            <h3 id="modalTitle" style="font-size:17px; font-weight:900; color:#fff; margin-top:2px;"></h3>
+            <p id="modalDesc" style="font-size:11.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;"></p>
+          </div>
         </div>
-        <div style="margin-top:14px;">
-          <h3 id="modalTitle" style="font-size:17.5px; font-weight:900; color:#fff;"></h3>
-          <p id="modalDesc" style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.6;"></p>
-          <div style="margin-top:14px; padding:12px; border-radius:10px; background:#06080c; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-size:11px; color:var(--text-muted);">تعرفه تخمینی پایه:</div>
-              <div id="modalPrice" class="font-mono" style="font-size:20px; font-weight:800; color:var(--gold); margin-top:2px;">$120</div>
-            </div>
-            <div style="text-align:left;">
-              <div style="font-size:11px; color:var(--text-muted);">مدت زمان تحویل:</div>
-              <div id="modalTimeline" class="font-mono" style="font-size:13px; font-weight:700; color:var(--cyan-electric); margin-top:2px;">5 - 7 Work Days</div>
-            </div>
+
+        <!-- فاکتور داینامیک لحظه‌ای محاسبه‌شده -->
+        <div style="padding:16px; border-radius:14px; background:#06080e; border:1px solid rgba(250,204,21,0.3); display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            <span style="font-size:11.5px; color:var(--text-muted);">مبلغ تخمینی کل سفارش:</span>
+            <span id="modalPrice" class="font-mono" style="font-size:22px; font-weight:900; color:var(--gold);">80</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11.5px;">
+            <span style="color:var(--text-muted);">زمان‌بندی تحویل:</span>
+            <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">۵ تا ۷ روز کاری</span>
+          </div>
+          <div style="font-size:10.5px; color:var(--emerald); display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span>✓</span> <span>فیگور مقایسه ابعاد انسانی به صورت رایگان در شیت نهایی ارائه می‌شود.</span>
           </div>
         </div>
       </div>
 
+      <!-- ستون راست: فرم ویزارد آکاردئونی مرحله‌به‌مرحله -->
       <form id="commissionOrderForm" style="display:flex; flex-direction:column; justify-content:space-between;">
-        <div>
+        <div style="max-height:68vh; overflow-y:auto; padding-left:4px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h4 style="font-size:14px; font-weight:800; color:#fff;">تکمیل بریف پروژه و انتخاب فاز</h4>
+            <h4 style="font-size:14.5px; font-weight:900; color:#fff;">محاسبه‌گر مشخصات و اسکوپ پروژه</h4>
             <button type="button" onclick="closeModalDirect()" style="color:var(--text-muted); font-size:19px;">✕</button>
           </div>
 
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <div>
-              <label style="font-size:11.5px; display:block; margin-bottom:4px;">فاز اجرایی مورد نظر</label>
-              <select id="orderPhaseSelect">
-                <option value="فاز ۱: اتود اولیه، کشف فرم و سیلوئت">فاز ۱: اتود اولیه، کشف فرم و سیلوئت</option>
-                <option value="فاز ۲: لاین‌آرت دقیق فنی و مدل‌شیت">فاز ۲: لاین‌آرت دقیق فنی و مدل‌شیت</option>
-                <option value="فاز ۳: سایه‌زنی مقداری و نورپردازی">فاز ۳: سایه‌زنی مقداری و نورپردازی</option>
-                <option value="فاز ۴: رندر کامل سینمایی + فایل لایه‌باز PSD" selected>فاز ۴: رندر کامل سینمایی + فایل لایه‌باز PSD</option>
-              </select>
+          <!-- گام ۱: مشخصات پایه و کادربندی -->
+          <div class="wizard-step-card active" id="wizardStep1">
+            <div class="wizard-step-header" onclick="toggleWizardStep(1)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">۱.</span> کادربندی و ضریب پیچیدگی</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
-            <div>
-              <label style="font-size:11.5px; display:block; margin-bottom:4px;">نام کارفرما / استودیو</label>
-              <input type="text" id="orderClientName" required placeholder="مثال: سید سروش تاج / استودیو نوا" />
+            <div class="wizard-step-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">کادربندی (Framing)</label>
+                  <select id="wizFraming" onchange="recalcWizardPrice()">
+                    <option value="bust" data-usd="0">پرتره / نیم‌تنه (پایه)</option>
+                    <option value="full" data-usd="50" selected>تمام‌قد پویا (+۵۰$)</option>
+                    <option value="turnaround" data-usd="90">شیت سه‌نما ارتوگرافیک (+۹۰$)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ضریب پیچیدگی دیزاین</label>
+                  <select id="wizComplexity" onchange="recalcWizardPrice()">
+                    <option value="simple" data-usd="0">ساده (المان‌های مینیمال)</option>
+                    <option value="medium" data-usd="35" selected>پیچیده (زره نیمه‌سنگین / بافت)</option>
+                    <option value="hard" data-usd="70">سخت (زره تشریفاتی / مکانیکال)</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div>
-              <label style="font-size:11.5px; display:block; margin-bottom:4px;">ایمیل یا آیدی تلگرام / شماره تماس</label>
-              <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com یا ۰۹۱۲..." />
+          </div>
+
+          <!-- گام ۲: سطح فیدلیتی و رندرینگ نهایی -->
+          <div class="wizard-step-card active" id="wizardStep2">
+            <div class="wizard-step-header" onclick="toggleWizardStep(2)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">۲.</span> سطح رندرینگ و فازهای اتود</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
-            <div>
-              <label style="font-size:11.5px; display:block; margin-bottom:4px;">جزئیات بریف و ویژگی‌های آرت</label>
-              <textarea id="orderClientBrief" rows="3" required placeholder="توضیحاتی درباره نژاد کاراکتر، سلاح‌ها، زاویه دوربین، اتمسفر نوری..."></textarea>
+            <div class="wizard-step-body">
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">فیدلیتی پرداخت و رندرینگ</label>
+                <select id="orderPhaseSelect" onchange="recalcWizardPrice()">
+                  <option value="فاز ۱: اتود اولیه، کشف فرم و سیلوئت" data-usd="-40">فاز ۱: اتود اولیه و کشف سیلوئت</option>
+                  <option value="فاز ۲: لاین‌آرت دقیق فنی و مدل‌شیت" data-usd="-20">فاز ۲: لاین‌آرت فنی و ترن‌اراند</option>
+                  <option value="فاز ۳: سایه‌زنی مقداری و نورپردازی" data-usd="0">فاز ۳: مطالعه مقداری و نورپردازی</option>
+                  <option value="فاز ۴: رندر کامل سینمایی + فایل لایه‌باز PSD" data-usd="50" selected>فاز ۴: رندر مستر سینمایی + لایه‌باز PSD</option>
+                </select>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
+                  <span>شیت حالات چهره (+۳۵$)</span>
+                </label>
+                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="wizVFX" onchange="recalcWizardPrice()" style="width:auto;" />
+                  <span>افکت جادویی و VFX (+۲۵$)</span>
+                </label>
+                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
+                  <span>حقوق لایسنس تجاری (+۴۵$)</span>
+                </label>
+                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked style="width:auto;" />
+                  <span>فایل مستر لایه‌باز PSD (شامل)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- گام ۳: مشخصات کارفرما و بریف متنی -->
+          <div class="wizard-step-card active" id="wizardStep3">
+            <div class="wizard-step-header" onclick="toggleWizardStep(3)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">۳.</span> مشخصات کارفرما و متن بریف</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نام کارفرما / استودیو</label>
+                  <input type="text" id="orderClientName" required placeholder="سید سروش تاج / استودیو نوا" />
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ایمیل یا آیدی تلگرام / شماره</label>
+                  <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com یا ۰۹۱۲..." />
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">توضیحات تکمیلی، جزئیات لور و نکات کلیدی (Lore & Details)</label>
+                <textarea id="orderClientBrief" rows="3" required placeholder="نژاد، سلاح‌ها، زوایا، ویژگی‌های ظاهری و حس کلی اثر..."></textarea>
+              </div>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="btn-gold" style="padding:12px; font-size:12.5px; margin-top:14px; width:100%;">
-          ارسال بریف و ثبت رسمی در آتلیه ←
+        <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:14px; width:100%;">
+          ثبت رسمی بریف و ارسال مستقیم به تلگرام مدیر استودیو ←
         </button>
       </form>
     </div>
@@ -898,5 +997,30 @@
   </footer>
   <script src="data.js"></script>
   <script src="app.js" defer></script>
+
+  <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
+  <div id="mobileBottomNav">
+    <button onclick="switchView('showcase')" class="mob-nav-btn active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      <span>گالری</span>
+    </button>
+    <button onclick="switchView('store')" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+      <span>فروشگاه</span>
+    </button>
+    <button onclick="switchView('genesis')" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+      <span>جنسیس</span>
+    </button>
+    <button onclick="switchView('academy')" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
+      <span>آکادمی</span>
+    </button>
+    <button onclick="handleMembersIconClick()" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      <span>پورتال اعضا</span>
+    </button>
+  </div>
+
 </body>
 </html>
