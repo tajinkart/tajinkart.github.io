@@ -685,7 +685,7 @@
 
             <!-- ۳. بخش مدیریت کامل دارایی‌های دیجیتال (اضافه شده به درخواست کاربر) -->
         <div id="adminTabProducts" class="hidden">
-          <div class="admin-sketch2-layout">
+          <div class="admin-products-layout">
             <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
                 <div>
@@ -743,29 +743,63 @@
 
         <!-- ۶. تنظیمات سیستم -->
         <div id="adminTabSettings" class="hidden">
-          <div style="max-width:540px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:16px; padding:22px;">
-            <h3 style="font-size:16px; font-weight:800; margin-bottom:14px;">پارامترهای سراسری سیستم</h3>
-            <form id="adminSettingsForm" style="display:flex; flex-direction:column; gap:12px;">
-              <div>
-                <label style="font-size:12px;">توکن بات تلگرام (جهت دریافت آنی بریف):</label>
-                <input type="text" id="setTgToken" placeholder="123456:ABC-DEF..." class="font-mono" />
+            <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%;">
+              <div style="margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
+                <h3 style="font-size:16px; font-weight:800; color:#fff;">⚙️ تنظیمات سراسری سیستم، نرخ ارز و ربات تلگرام</h3>
+                <span style="font-size:12px; color:var(--text-muted);">مدیریت نرخ تسعیر دلار به تومان، کلیدهای ارتباطی بریف تلگرام و امنیت دسترسی مدیر.</span>
               </div>
-              <div>
-                <label style="font-size:12px;">شناسه چت تلگرام (Chat ID):</label>
-                <input type="text" id="setTgChat" placeholder="12345678" class="font-mono" />
-              </div>
-              <div>
-                <label style="font-size:12px;">نرخ تبدیل دلار به تومان (محاسبه خودکار):</label>
-                <input type="number" id="setUsdRate" class="font-mono" style="color:var(--gold);" />
-              </div>
-              <div>
-                <label style="font-size:12px;">تغییر رمز عبور ادمین:</label>
-                <input type="text" id="setAdminPass" class="font-mono" />
-              </div>
-              <button type="submit" class="btn-gold" style="padding:12px; margin-top:6px;">ذخیره تنظیمات سیستم</button>
-            </form>
+
+              <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+                
+                <!-- کارت ۱: نرخ تسعیر ارز -->
+                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; font-weight:800; color:var(--gold);">💵 مدیریت نرخ تسعیر ارز</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">CURRENCY</span>
+                  </div>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیه قیمت‌های آتلیه و فروشگاه بر اساس این نرخ به تومان تبدیل می‌شوند.</p>
+                  <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نرخ برابری هر دلار (تومان):</label>
+                    <input type="number" id="setUsdRate" class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800;" placeholder="72000" required />
+                  </div>
+                </div>
+
+                <!-- کارت ۲: ربات تلگرام -->
+                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">🤖 اتصال بریف تلگرام</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">TELEGRAM BOT</span>
+                  </div>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">ارسال آنی بریف‌های ثبت‌شده توسط کارفرمایان مستقیماً به تلگرام مدیر استودیو.</p>
+                  <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token):</label>
+                    <input type="text" id="setTgToken" placeholder="123456:ABC-DEF..." class="font-mono" style="font-size:11px;" />
+                  </div>
+                  <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">شناسه چت تلگرام (Chat ID):</label>
+                    <input type="text" id="setTgChat" placeholder="12345678" class="font-mono" style="font-size:11px;" />
+                  </div>
+                </div>
+
+                <!-- کارت ۳: امنیت و رمز عبور -->
+                <div style="background:#06080d; border:1px solid rgba(168,85,247,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; font-weight:800; color:var(--violet);">🔒 امنیت پنل و رمز عبور</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--violet); padding:2px 8px; border-radius:4px; background:rgba(168,85,247,0.1);">SECURITY</span>
+                  </div>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">رمز عبور ترمینال مدیریت استودیو (ورود با کلید ` + Esc یا فرم لاگین).</p>
+                  <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">رمز عبور جدید مدیر:</label>
+                    <input type="text" id="setAdminPass" class="font-mono" style="font-size:13px;" placeholder="tajinkart" required />
+                  </div>
+                  <button type="submit" class="btn-gold" style="width:100%; padding:11px; margin-top:8px;">
+                    ✓ ذخیره کلیه تنظیمات سیستم
+                  </button>
+                </div>
+
+              </form>
+            </div>
           </div>
-        </div>
           </main>
         </div>
       </div>

@@ -1,4 +1,16 @@
 
+window.renderAdminSettingsTab = function() {
+  const rateEl = document.getElementById('setUsdRate');
+  if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
+  const tokenEl = document.getElementById('setTgToken');
+  if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
+  const chatEl = document.getElementById('setTgChat');
+  if (chatEl) chatEl.value = siteSettings.tgChat || '';
+  const passEl = document.getElementById('setAdminPass');
+  if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
+};
+
+
 // =========================================================
 // سیستم هوشمند پیش‌گیری و مدیریت آثار گالری ادمین
 // ثبت پس از تایید نهایی کاربر (Staging & Confirmation)
@@ -965,6 +977,7 @@ window.switchAdminTab = function(tabKey, btn) {
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
   if (tabKey === 'orders') renderAdminLists();
+  if (tabKey === 'settings') renderAdminSettingsTab();
 };
 
 function renderAdminSketch1() {

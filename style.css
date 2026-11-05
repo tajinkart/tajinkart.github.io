@@ -1870,3 +1870,73 @@
   width: 100%;
   min-width: 0;
 }
+
+
+/* =========================================================
+   استایل‌های بهینه‌سازی‌شده تب‌های داخلی ادمین (پایپلاین، محصولات، اعضا، ارز)
+   ========================================================= */
+
+/* پایپلاین و قیمت‌گذاری کمیسیون (اسکچ ۱) */
+.admin-sketch1-layout {
+  display: grid;
+  grid-template-columns: 220px 1.15fr 330px;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+@media (max-width: 1350px) {
+  .admin-sketch1-layout {
+    grid-template-columns: 200px 1fr;
+  }
+  .admin-live-editor-col {
+    grid-column: span 2;
+    position: static !important;
+  }
+}
+@media (max-width: 860px) {
+  .admin-sketch1-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+/* مدیریت محصولات و دارایی‌های دیجیتال (فروشگاه) */
+.admin-products-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 18px;
+  align-items: start;
+  width: 100%;
+}
+@media (max-width: 1200px) {
+  .admin-products-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  #adminProductEditCol {
+    position: static !important;
+    width: 100% !important;
+  }
+}
+
+/* مدیریت اعضا و گزارش‌های مالی (اسکچ ۳) */
+.admin-sketch3-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 18px;
+  align-items: start;
+  width: 100%;
+}
+@media (max-width: 1100px) {
+  .admin-sketch3-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  #adminMemberDetailCol {
+    position: static !important;
+    width: 100% !important;
+  }
+}
