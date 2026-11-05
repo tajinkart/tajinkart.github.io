@@ -1,5 +1,55 @@
 
 // =========================================================
+// مدیریت دکمه بازگشت (Back Button) گوشی و سابقه مرورگر (HTML5 History API)
+// جلوگیری از پرت شدن کاربر به بیرون از سایت در زمان کار با موبایل
+// =========================================================
+window.addEventListener('popstate', (event) => {
+  // ۱. بستن لایت‌باکس مطالعه موردی اثر در صورت باز بودن
+  const artModal = document.getElementById('artDetailModal');
+  if (artModal && artModal.classList.contains('active')) {
+    closeArtModalDirect();
+    return;
+  }
+  // ۲. بستن مدال سفارش کمیسیون در صورت باز بودن
+  const zoomModal = document.getElementById('zoomModal');
+  if (zoomModal && zoomModal.classList.contains('active')) {
+    closeModalDirect();
+    return;
+  }
+  // ۳. بستن پنجره ادیتور آرت‌ورک ادمین
+  const adminEditor = document.getElementById('adminArtLiveEditorCol');
+  if (adminEditor && adminEditor.classList.contains('active')) {
+    closeAdminArtEditor();
+    return;
+  }
+  // ۴. بستن پنجره ورود اعضا
+  const memberModal = document.getElementById('memberModal');
+  if (memberModal && memberModal.style.display === 'flex') {
+    closeMemberModal();
+    return;
+  }
+  // ۵. بستن منوی شناور بازشده موبایل
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock && dock.classList.contains('dock-open')) {
+    dock.classList.remove('dock-open');
+    return;
+  }
+  // ۶. بازگشت به صفحه اصلی گالری در صورت حضور در بخش‌های دیگر
+  if (currentView !== 'showcase') {
+    switchView('showcase');
+    return;
+  }
+});
+
+// ثبت وضعیت در History هنگام باز شدن مدال‌ها
+function pushModalState(modalName) {
+  try {
+    window.history.pushState({ modalOpen: modalName }, '');
+  } catch(e) {}
+}
+
+
+// =========================================================
 // موتور فشرده‌سازی هوشمند تصاویر در فرانت‌اند
 // جلوگیری ۱۰۰٪ از پر شدن سقف حافظه مرورگر (LocalStorage Quota)
 // تبدیل تصاویر ۱۰ مگابایتی به وب‌فرمت سبک ۱۵۰ کیلوبایتی با کیفیت HD
@@ -66,7 +116,7 @@ window.openCreateArtworkModal = function() {
   if (titleEl) titleEl.textContent = '✨ افزودن اثر جدید به گالری';
 
   renderAdminArtModalForm(stagingNewArt, true);
-  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+  document.getElementById('adminArtLiveEditorCol').classList.add('active'); pushModalState('adminEditor');
 };
 
 // ۲. باز کردن مدال برای ویرایش اثر موجود
@@ -80,7 +130,7 @@ window.selectAdminArt = function(idx) {
   if (titleEl) titleEl.textContent = `ویرایش آرت‌ورک: ${art.shortSlug || art.title}`;
 
   renderAdminArtModalForm(art, false);
-  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+  document.getElementById('adminArtLiveEditorCol').classList.add('active'); pushModalState('adminEditor');
 };
 
 // بستن مدال ادیتور
@@ -492,7 +542,7 @@ window.openArtModal = function(id) {
   renderCaseStudyPhasesSwitcher();
   updateCaseStudyPhaseView();
 
-  document.getElementById('artDetailModal').classList.add('active');
+  document.getElementById('artDetailModal').classList.add('active'); pushModalState('artDetail');
 };
 
 function renderCaseStudyPhasesSwitcher() {
@@ -621,7 +671,7 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
 
   // محاسبه لحظه‌ای اولیه و باز کردن پنجره
   recalcWizardPrice();
-  document.getElementById('zoomModal').classList.add('active');
+  document.getElementById('zoomModal').classList.add('active'); pushModalState('zoomModal');
 }
 
 function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
@@ -858,6 +908,7 @@ window.switchView = function(vKey) {
   }
 
   if (vKey === 'showcase') {
+    renderShowcaseGrid();
     if (homeBtn) homeBtn.classList.add('hidden');
     if (window.scrollY <= 140) {
       if (dock) dock.classList.remove('dock-collapsed');
@@ -906,7 +957,11 @@ window.addEventListener('scroll', () => {
 
         hero.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
         hero.style.opacity = opacity;
-        hero.style.filter = `blur(${blur}px)`;
+        if (window.innerWidth > 768) {
+          hero.style.filter = `blur(${blur}px)`;
+        } else {
+          hero.style.filter = 'none';
+        }
       } else {
         hero.style.transform = 'translate3d(0, 140px, 0) scale(0.92)';
         hero.style.opacity = '0.15';
@@ -1197,10 +1252,7 @@ function renderAdminSketch2() {
   container.innerHTML = html;
 }
 
-window.selectAdminArt = function(idx) {
-  currentSelectedArtIdx = idx;
-  renderAdminSketch2();
-};
+// selectAdminArt handled by artwork manager above
 
 function renderAdminArtLiveEditor() {
   const art = showcaseArtworks[currentSelectedArtIdx];

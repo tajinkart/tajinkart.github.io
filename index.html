@@ -799,6 +799,7 @@
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
     <div class="case-study-window" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeArtModalDirect()" class="modal-corner-close-btn" title="بستن">✕</button>
       <div class="case-study-stage-box">
         <div class="case-main-preview">
           <img id="caseStudyMainImg" src="" alt="پیش‌نمایش مرحله اثر" />
@@ -838,6 +839,7 @@
     <!-- مدال محاسبه‌گر لحظه‌ای سفارش و موتور داینامیک قیمت‌گذاری (Interactive Wizard Accordion) -->
   <div id="zoomModal" class="zoom-modal" onclick="closeModal(event)">
     <div class="zoom-window wizard-modal-window" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeModalDirect()" class="modal-corner-close-btn" title="بستن">✕</button>
       
       <!-- ستون چپ: پیش‌نمایش، فاکتور زنده و خلاصه سفارش -->
       <div style="display:flex; flex-direction:column; justify-content:space-between; gap:14px;">

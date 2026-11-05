@@ -1927,3 +1927,42 @@
     padding-bottom: 25px !important;
   }
 }
+
+
+/* دکمه دایره‌ای شناور خروج لایت‌باکس‌ها در موبایل و دسکتاپ */
+.modal-corner-close-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(9, 12, 18, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.85);
+}
+.modal-corner-close-btn:hover {
+  background: rgba(239, 68, 68, 0.35);
+  border-color: var(--crimson);
+  color: #fca5a5;
+  transform: scale(1.08);
+}
+@media (max-width: 768px) {
+  .modal-corner-close-btn {
+    top: 10px;
+    left: 10px;
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+}
