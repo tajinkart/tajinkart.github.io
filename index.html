@@ -528,11 +528,11 @@
         <form id="adminLoginForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
             <label style="font-size:12px;">نام کاربری</label>
-            <input type="text" id="adminUsernameInput" placeholder="soroush" class="font-mono" required />
+            <input type="text" id="adminUsernameInput" value="soroush" class="font-mono" required />
           </div>
           <div>
             <label style="font-size:12px;">رمز عبور</label>
-            <input type="password" id="adminPasswordInput" placeholder="رمز عبور مدیر" class="font-mono" required />
+            <input type="password" id="adminPasswordInput" value="tajinkart" class="font-mono" required />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px;">باز کردن پنل مدیریت</button>
         </form>
@@ -557,37 +557,16 @@
 
         <!-- تب‌های ناوبری ادمین همراه با تب اختصاصی جدید مدیریت دارایی‌های دیجیتال -->
         <div style="display:flex; gap:8px; margin-bottom:20px; background:var(--bg-panel); padding:6px; border-radius:12px; border:1px solid var(--border-subtle); overflow-x:auto;">
-          <button onclick="switchAdminTab('artworks', this)" class="store-dual-btn active">۱. موزاییک آثار گالری</button>
-          <button onclick="switchAdminTab('pipelines', this)" class="store-dual-btn">۲. پایپلاین و مراحل قیمت‌گذاری</button>
+          <button onclick="switchAdminTab('pipelines', this)" class="store-dual-btn active">۱. پایپلاین و مراحل قیمت‌گذاری</button>
+          <button onclick="switchAdminTab('artworks', this)" class="store-dual-btn">۲. موزاییک آثار گالری</button>
           <button onclick="switchAdminTab('products', this)" class="store-dual-btn">۳. مدیریت دارایی‌های دیجیتال (فروشگاه)</button>
           <button onclick="switchAdminTab('members', this)" class="store-dual-btn">۴. اعضا و گزارش‌های مالی</button>
           <button onclick="switchAdminTab('orders', this)" class="store-dual-btn">۵. سفارش‌های دریافتی</button>
           <button onclick="switchAdminTab('settings', this)" class="store-dual-btn">۶. تنظیمات سراسری و تلگرام</button>
         </div>
 
-        <!-- ۱. موزاییک آثار گالری (تب شماره ۱) -->
-        <div id="adminTabArtworks">
-          <div class="admin-sketch2-layout">
-            <!-- گرید موزاییک با تایل اختصاصی + افزودن اثر از اینجا -->
-            <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
-              <div style="margin-bottom:14px;">
-                <h4 style="font-size:15px; font-weight:800;">مدیریت چیدمان گالری صفحه اصلی</h4>
-                <span style="font-size:11.5px; color:var(--text-muted);">روی هر تایل کلیک کنید تا در پنل ادیتور ویرایش شود یا تایل + را برای افزودن اثر جدید بزنید.</span>
-              </div>
-              <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
-            </div>
-
-            <!-- پنل ادیتور آرت‌ورک -->
-            <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle); position:sticky; top:90px;" id="adminArtLiveEditorCol">
-              <h4 style="font-size:14px; font-weight:800; color:var(--iris); margin-bottom:12px;">ویرایش آرت‌ورک</h4>
-              <div id="adminArtFormFields">
-                <p style="font-size:12px; color:var(--text-muted);">یک اثر را انتخاب کنید.</p>
-              </div>
-            </div>
-          </div>
-
-        <!-- ۲. پایپلاین و قیمت‌گذاری (تب شماره ۲) -->
-        <div id="adminTabPipelines" class="hidden">
+        <!-- ۱. پایپلاین و قیمت‌گذاری بر اساس اسکچ ۱ -->
+        <div id="adminTabPipelines">
           <div class="admin-sketch1-layout">
             <!-- ستون اول: کارت‌های دسته‌بندی + دکمه افزودن دسته جدید -->
             <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
@@ -614,6 +593,35 @@
             </div>
           </div>
         </div>
+
+        <!-- ۲. موزاییک آثار گالری -->
+        <div id="adminTabArtworks" class="hidden">
+          <div class="admin-sketch2-layout">
+            <!-- گرید موزاییک تمام‌عرض آثار -->
+            <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
+              <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
+                  <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید کلید + را بزنید یا برای ادیت هر اثر روی کارت آن کلیک نمایید.</span>
+                </div>
+                <button type="button" onclick="adminAddNewArtwork()" class="btn-gold" style="font-size:12px; padding:8px 16px;">+ افزودن اثر جدید به گالری</button>
+              </div>
+              <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
+            </div>
+
+            <!-- مدال / پنجره شناور ادیتور اثر (در حالت عادی باز نیست؛ فقط با کلیک روی اثر یا افزودن باز می‌شود) -->
+            <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
+              <div class="admin-art-modal-box" onclick="event.stopPropagation()">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                  <h4 style="font-size:15px; font-weight:800; color:var(--iris);" id="adminArtEditorModalTitle">ویرایش آرت‌ورک</h4>
+                  <button type="button" onclick="closeAdminArtEditor()" style="font-size:18px; color:var(--text-muted); cursor:pointer;">✕</button>
+                </div>
+                <div id="adminArtFormFields">
+                  <p style="font-size:12px; color:var(--text-muted);">در حال بارگذاری فرم...</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ۳. بخش مدیریت کامل دارایی‌های دیجیتال (اضافه شده به درخواست کاربر) -->
@@ -893,7 +901,7 @@
         <form id="memberLoginForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
             <label style="font-size:12px; display:block; margin-bottom:5px;">ایمیل یا نام کاربری</label>
-            <input type="text" id="loginEmail" required  class="font-mono" placeholder="user@domain.com" />
+            <input type="text" id="loginEmail" required value="client@novagames.io" class="font-mono" placeholder="user@domain.com" />
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -901,7 +909,7 @@
               <!-- لینک فراموشی رمز عبور اضافه شده -->
               <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز عبور؟</button>
             </div>
-            <input type="password" id="loginPass" required  class="font-mono" placeholder="••••••••" />
+            <input type="password" id="loginPass" required value="123456" class="font-mono" placeholder="••••••••" />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">ورود به حساب کاربری</button>
         </form>

@@ -1,4 +1,47 @@
 
+// مدیریت دراور/مدال ادیتور آثار در ادمین
+window.openAdminArtEditor = function(titleText = 'ویرایش مشخصات اثر') {
+  const modal = document.getElementById('adminArtLiveEditorCol');
+  const titleEl = document.getElementById('adminArtEditorModalTitle');
+  if (titleEl) titleEl.textContent = titleText;
+  if (modal) modal.classList.add('active');
+};
+
+window.closeAdminArtEditor = function() {
+  const modal = document.getElementById('adminArtLiveEditorCol');
+  if (modal) modal.classList.remove('active');
+};
+
+window.closeAdminArtEditorDirect = function(e) {
+  if (e.target.id === 'adminArtLiveEditorCol') {
+    closeAdminArtEditor();
+  }
+};
+
+// هندلر آپلود تصویر از کامپیوتر کاربر
+window.handleAdminLocalFileUpload = function(inputEl, artIdx) {
+  if (!inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Url = e.target.result;
+    if (showcaseArtworks[artIdx]) {
+      showcaseArtworks[artIdx].image = base64Url;
+      if (showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[3]) {
+        showcaseArtworks[artIdx].phases[3].img = base64Url;
+      }
+      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      renderShowcaseGrid();
+      renderAdminSketch2();
+      renderAdminArtLiveEditor();
+      openAdminArtEditor('ویرایش مشخصات اثر');
+      showToast('تصویر از کامپیوتر با موفقیت جایگزین شد.', 'success');
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+
 /**
  * TAJINKART Master Spec v2.1 Engine
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
@@ -655,7 +698,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === '`' || e.key === '~' || e.key === '÷') backtickActive = true;
   if ((e.key === 'Escape' && backtickActive) || (e.key === '`' && e.shiftKey)) {
     e.preventDefault();
-    switchView('admin'); setTimeout(() => { switchAdminTab('artworks', document.querySelector('#adminWorkspace .store-dual-btn')); }, 50);
+    switchView('admin');
   }
 });
 window.addEventListener('keyup', (e) => {
@@ -672,7 +715,7 @@ window.logoutAdmin = function() {
 
 // مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
 window.switchAdminTab = function(tabKey, btn) {
-  const tabs = ['artworks', 'pipelines', 'products', 'members', 'orders', 'settings'];
+  const tabs = ['pipelines', 'artworks', 'products', 'members', 'orders', 'settings'];
   tabs.forEach(t => {
     const el = document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
     if (el) el.classList.toggle('hidden', t !== tabKey);
@@ -680,8 +723,8 @@ window.switchAdminTab = function(tabKey, btn) {
   document.querySelectorAll('#adminWorkspace .store-dual-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
-  if (tabKey === 'artworks') renderAdminSketch2();
   if (tabKey === 'pipelines') renderAdminSketch1();
+  if (tabKey === 'artworks') renderAdminSketch2();
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
   if (tabKey === 'orders') renderAdminLists();
@@ -868,6 +911,7 @@ function renderAdminSketch2() {
 window.selectAdminArt = function(idx) {
   currentSelectedArtIdx = idx;
   renderAdminSketch2();
+  openAdminArtEditor('ویرایش مشخصات اثر: ' + (showcaseArtworks[idx]?.shortSlug || ''));
 };
 
 function renderAdminArtLiveEditor() {
@@ -926,10 +970,22 @@ function renderAdminArtLiveEditor() {
           </select>
         </div>
       </div>
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر اصلی کاور</label>
-        <input type="text" value="${art.image}" oninput="handleAdminImageChange(${currentSelectedArtIdx}, this.value)" class="font-mono" />
+      
+      <!-- آپلود مستقیم فایل از کامپیوتر یا وارد کردن لینک -->
+      <div style="background:#05070d; border:1px solid var(--border-subtle); border-radius:12px; padding:12px;">
+        <label style="font-size:11.5px; font-weight:700; color:var(--cyan-electric); display:block; margin-bottom:6px;">
+          📁 تصویر اثر (انتخاب از سیستم یا لینک وب):
+        </label>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px;">
+            📁 انتخاب عکس از کامپیوتر
+          </button>
+          <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this, currentSelectedArtIdx)" />
+        </div>
+        <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">یا درج لینک مستقیم تصویر:</label>
+        <input type="text" value="${art.image}" oninput="handleAdminImageChange(${currentSelectedArtIdx}, this.value)" class="font-mono" style="font-size:11px;" />
       </div>
+    
       <div>
         <label style="font-size:11px; color:var(--text-muted);">لور داستانی و زمینه</label>
         <input type="text" value="${art.lore || 'جهان اکستوپیا'}" onchange="updateArtField(${currentSelectedArtIdx}, 'lore', this.value)" />
@@ -966,6 +1022,7 @@ function renderAdminArtLiveEditor() {
         <label style="font-size:11px; color:var(--text-muted);">توضیحات تکمیلی اثر</label>
         <textarea rows="2" onchange="updateArtField(${currentSelectedArtIdx}, 'desc', this.value)">${art.desc || ''}</textarea>
       </div>
+      <button type="button" onclick="closeAdminArtEditor()" class="btn-gold" style="width:100%; padding:11px; margin-top:8px; margin-bottom:6px;">✓ ذخیره و بستن پنجره</button>
       <button onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این اثر از گالری</button>
     </div>
   `;
@@ -1041,7 +1098,8 @@ window.adminAddNewArtwork = function() {
   });
   renderAdminSketch2();
   renderShowcaseGrid();
-  showToast('آرت‌ورک جدید به گالری اضافه شد.', 'success');
+  openAdminArtEditor('✨ افزودن آرت‌ورک جدید به گالری');
+  showToast('آرت‌ورک جدید ایجاد شد. مشخصات یا عکس را وارد فرمایید.', 'success');
 };
 
 window.adminDeleteArtwork = function(idx) {
@@ -1428,7 +1486,7 @@ document.addEventListener('DOMContentLoaded', () => {
           closeMemberModal();
           document.getElementById('adminLoginGate').classList.add('hidden');
           document.getElementById('adminWorkspace').classList.remove('hidden');
-          switchView('admin'); setTimeout(() => { switchAdminTab('artworks', document.querySelector('#adminWorkspace .store-dual-btn')); }, 50);
+          switchView('admin');
           showToast('مرکز کنترل و پنل مدیریت استودیو گشوده شد.', 'success');
           return;
         } else {
