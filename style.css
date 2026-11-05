@@ -1656,77 +1656,8 @@
     }
 
 
-    /* استایل اختصاصی گالری ادمین: چیدمان تمام‌عرض تمیز بدون کادر اضافه در حالت عادی */
-    .admin-sketch2-layout {
-      display: block;
-      width: 100%;
-    }
-    .admin-art-mosaic-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 14px;
-    }
-    .admin-mosaic-card {
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1.5px solid var(--border-subtle);
-      cursor: pointer;
-      transition: all 0.25s;
-      background: #06090e;
-      aspect-ratio: 16/11;
-    }
-    .admin-mosaic-card:hover {
-      border-color: var(--cyan-electric);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 240, 255, 0.2);
-    }
-    .admin-mosaic-card.active {
-      border-color: var(--gold);
-      box-shadow: 0 0 18px rgba(250, 204, 21, 0.35);
-    }
-
-    /* مدال / دراور ادیتور آرت‌ورک ادمین (در حالت عادی کاملاً مخفی است) */
-    #adminArtLiveEditorCol {
-      position: fixed !important;
-      inset: 0 !important;
-      z-index: 2500 !important;
-      background: rgba(4, 5, 8, 0.88) !important;
-      backdrop-filter: blur(14px) !important;
-      -webkit-backdrop-filter: blur(14px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-    }
-    #adminArtLiveEditorCol.active {
-      display: flex !important;
-    }
-    .admin-art-modal-box {
-      background: #090c12;
-      border: 1px solid var(--iris);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 580px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 24px;
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98);
-      position: relative;
-      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.93); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-@media (max-width: 768px) {
-  #rightVerticalNav { display: none !important; }
-  #mobileBottomNav { display: flex !important; z-index: 1000 !important; }
-}
-
 /* =========================================================
-   داشبورد ادمین بر اساس طرح فتوشاپ: سایدبار عمودی در سمت راست (RTL)
+   داشبورد ادمین: سایدبار عمودی در سمت راست (RTL) و تب‌های مستقل
    ========================================================= */
 .admin-dashboard-layout {
   display: grid;
@@ -1734,6 +1665,7 @@
   gap: 22px;
   align-items: start;
   margin-top: 18px;
+  width: 100%;
 }
 @media (max-width: 1024px) {
   .admin-dashboard-layout {
@@ -1835,7 +1767,7 @@
   transition: color 0.2s;
 }
 
-/* حالت اکتیو و انتخاب‌شده کاملاً متمایز، درخشان و زنده */
+/* حالت اکتیو و انتخاب‌شده کاملاً متمایز و درخشان */
 .admin-nav-item.active {
   background: linear-gradient(270deg, rgba(250, 204, 21, 0.18) 0%, rgba(250, 204, 21, 0.04) 100%) !important;
   border-color: var(--gold) !important;
@@ -1871,37 +1803,70 @@
   min-width: 0;
 }
 
-
-/* =========================================================
-   استایل‌های بهینه‌سازی‌شده تب‌های داخلی ادمین (پایپلاین، محصولات، اعضا، ارز)
-   ========================================================= */
-
-/* پایپلاین و قیمت‌گذاری کمیسیون (اسکچ ۱) */
-.admin-sketch1-layout {
-  display: grid;
-  grid-template-columns: 220px 1.15fr 330px;
-  gap: 16px;
-  align-items: start;
+/* بهینه‌سازی گالری ادمین */
+.admin-artworks-fullwidth {
   width: 100%;
 }
-@media (max-width: 1350px) {
-  .admin-sketch1-layout {
-    grid-template-columns: 200px 1fr;
-  }
-  .admin-live-editor-col {
-    grid-column: span 2;
-    position: static !important;
-  }
+.admin-art-mosaic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
 }
-@media (max-width: 860px) {
-  .admin-sketch1-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
+.admin-mosaic-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.25s;
+  background: #06090e;
+  aspect-ratio: 16/11;
+}
+.admin-mosaic-card:hover {
+  border-color: var(--cyan-electric);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.2);
+}
+.admin-mosaic-card.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.35);
 }
 
-/* مدیریت محصولات و دارایی‌های دیجیتال (فروشگاه) */
+/* مدال شناور ادیتور اثر در ادمین */
+#adminArtLiveEditorCol {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2500 !important;
+  background: rgba(4, 5, 8, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+#adminArtLiveEditorCol.active {
+  display: flex !important;
+}
+.admin-art-modal-box {
+  background: #090c12;
+  border: 1px solid var(--iris);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98);
+  position: relative;
+  animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* چیدمان اختصاصی ۲ ستونه محصولات دیجیتال در ادمین */
 .admin-products-layout {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -1921,22 +1886,44 @@
   }
 }
 
-/* مدیریت اعضا و گزارش‌های مالی (اسکچ ۳) */
-.admin-sketch3-layout {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 18px;
-  align-items: start;
-  width: 100%;
+/* دکمه شیک خروج لایت‌باکس کمیسیون */
+.modal-close-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-size: 11.5px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
-@media (max-width: 1100px) {
-  .admin-sketch3-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.modal-close-badge:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--crimson);
+  color: #fca5a5;
+  transform: scale(1.03);
+}
+
+/* مرحله دوم: ناوبری موبایل در گوشه راست بالا (حذف نوار پایین و بازگشت داک بالا) */
+#mobileBottomNav {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    display: flex !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 9999 !important;
   }
-  #adminMemberDetailCol {
-    position: static !important;
-    width: 100% !important;
+  #rightVerticalNav.dock-collapsed #dockMasterTrigger {
+    display: flex !important;
+  }
+  body {
+    padding-bottom: 25px !important;
   }
 }

@@ -555,11 +555,10 @@
           <strong style="color:var(--cyan-electric);">💡 راهنمای ذخیره‌سازی دائمی:</strong> تغییرات ایجاد شده در مرورگر شما ذخیره می‌شوند. برای ماندگاری همیشگی و مستقل، کلید <strong>«دانلود سورس به‌روز شده HTML»</strong> را بزنید و فایل جدید را جایگزین کنید.
         </div>
 
-        
-        <!-- چیدمان داشبورد ادمین بر اساس طرح فتوشاپ: منوی عمودی در سمت راست و محتوای تب در سمت چپ -->
+        <!-- چیدمان داشبورد ادمین: سایدبار عمودی در سمت راست (RTL) و تب‌ها در سمت چپ -->
         <div class="admin-dashboard-layout">
           
-          <!-- سایدبار دسته‌بندی‌های ادمین (سمت راست صفحه در RTL) -->
+          <!-- سایدبار دسته‌بندی‌ها (سمت راست) -->
           <aside class="admin-vertical-sidebar">
             <div class="admin-sidebar-header">
               <span class="font-mono" style="font-size:10.5px; color:var(--gold);">STUDIO DIRECTOR</span>
@@ -567,7 +566,7 @@
             </div>
             
             <nav class="admin-sidebar-menu">
-              <!-- ۱. موزاییک آثار گالری (گزینه اول طبق طرح فتوشاپ) -->
+              <!-- ۱. موزاییک آثار گالری (گزینه اول) -->
               <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
                 <span class="admin-nav-icon">🖼️</span>
                 <div class="admin-nav-text">
@@ -580,7 +579,7 @@
               <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
                 <span class="admin-nav-icon">⚡</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۲. پایپلاین و مراحل قیمت‌گذاری</span>
+                  <span class="admin-nav-title">۲. پایپلاین و قیمت‌گذاری</span>
                   <span class="admin-nav-sub">تعرفه و فازهای کمیسیون</span>
                 </div>
               </button>
@@ -623,25 +622,19 @@
             </nav>
           </aside>
 
-          <!-- کانتینر اصلی محتوای تب‌ها (سمت چپ صفحه در RTL) -->
+          <!-- کانتینر اصلی تب‌های ادمین (همه تب‌ها برادر و مستقل از هم) -->
           <main class="admin-main-panes-holder">
-
-            <!-- ۲. موزاییک آثار گالری -->
-        <div id="adminTabArtworks" >
-          <div class="admin-sketch2-layout">
-            <!-- گرید موزاییک تمام‌عرض آثار -->
+            <div id="adminTabArtworks">
+          <div class="admin-artworks-fullwidth">
             <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
-              <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <div>
-                  <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
-                  <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید کلید + را بزنید یا برای ادیت هر اثر روی کارت آن کلیک نمایید.</span>
-                </div>
-                
+              <div style="margin-bottom:16px;">
+                <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
+                <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید روی کادر + در گرید کلیک کنید یا برای ادیت هر اثر روی کارت آن ضربه بزنید.</span>
               </div>
               <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
             </div>
 
-            <!-- مدال / پنجره شناور ادیتور اثر (در حالت عادی باز نیست؛ فقط با کلیک روی اثر یا افزودن باز می‌شود) -->
+            <!-- مدال شناور ادیتور اثر (در حالت عادی باز نیست) -->
             <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
               <div class="admin-art-modal-box" onclick="event.stopPropagation()">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
@@ -653,9 +646,10 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- ۱. پایپلاین و قیمت‌گذاری بر اساس اسکچ ۱ -->
-        <div id="adminTabPipelines" class="hidden">
+            <div id="adminTabPipelines" class="hidden">
           <div class="admin-sketch1-layout">
             <!-- ستون اول: کارت‌های دسته‌بندی + دکمه افزودن دسته جدید -->
             <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
@@ -683,8 +677,7 @@
           </div>
         </div>
 
-            <!-- ۳. بخش مدیریت کامل دارایی‌های دیجیتال (اضافه شده به درخواست کاربر) -->
-        <div id="adminTabProducts" class="hidden">
+            <div id="adminTabProducts" class="hidden">
           <div class="admin-products-layout">
             <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
@@ -707,8 +700,7 @@
           </div>
         </div>
 
-        <!-- ۴. مدیریت اعضا و دارایی‌ها بر اساس اسکچ ۳ -->
-        <div id="adminTabMembers" class="hidden">
+            <div id="adminTabMembers" class="hidden">
           <div class="admin-sketch3-layout">
             <!-- ستون چپ: مشخصات دارایی‌ها، مبلغ برداشت شده/خریدها، رنگ‌بندی بر اساس رنک -->
             <div id="adminMemberDetailCol" style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); position:sticky; top:90px;">
@@ -733,23 +725,21 @@
           </div>
         </div>
 
-        <!-- ۵. سفارش‌ها -->
-        <div id="adminTabOrders" class="hidden">
+            <div id="adminTabOrders" class="hidden">
           <div style="padding:20px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
             <h3 style="font-size:16px; font-weight:800; margin-bottom:14px;">سفارش‌ها و درخواست‌های دریافتی استودیو</h3>
             <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:10px;"></div>
           </div>
         </div>
 
-        <!-- ۶. تنظیمات سیستم -->
-        <div id="adminTabSettings" class="hidden">
+            <div id="adminTabSettings" class="hidden">
             <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%;">
               <div style="margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
                 <h3 style="font-size:16px; font-weight:800; color:#fff;">⚙️ تنظیمات سراسری سیستم، نرخ ارز و ربات تلگرام</h3>
                 <span style="font-size:12px; color:var(--text-muted);">مدیریت نرخ تسعیر دلار به تومان، کلیدهای ارتباطی بریف تلگرام و امنیت دسترسی مدیر.</span>
               </div>
 
-              <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+              <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
                 
                 <!-- کارت ۱: نرخ تسعیر ارز -->
                 <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
@@ -802,11 +792,9 @@
           </div>
           </main>
         </div>
-      </div>
-    </div>
-    </div>
 </div>
-</section>
+    </div>
+  </section>
 
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
@@ -885,7 +873,7 @@
         <div style="max-height:68vh; overflow-y:auto; padding-left:4px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <h4 style="font-size:14.5px; font-weight:900; color:#fff;">محاسبه‌گر مشخصات و اسکوپ پروژه</h4>
-            <button type="button" onclick="closeModalDirect()" style="color:var(--text-muted); font-size:19px;">✕</button>
+            <button type="button" onclick="closeModalDirect()" class="modal-close-badge" title="بستن پنجره و بازگشت">✕ بازگشت به گالری</button>
           </div>
 
           <!-- گام ۱: مشخصات پایه و کادربندی -->

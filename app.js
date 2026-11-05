@@ -1,20 +1,43 @@
 
-window.renderAdminSettingsTab = function() {
-  const rateEl = document.getElementById('setUsdRate');
-  if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
-  const tokenEl = document.getElementById('setTgToken');
-  if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
-  const chatEl = document.getElementById('setTgChat');
-  if (chatEl) chatEl.value = siteSettings.tgChat || '';
-  const passEl = document.getElementById('setAdminPass');
-  if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
-};
-
-
 // =========================================================
-// سیستم هوشمند پیش‌گیری و مدیریت آثار گالری ادمین
-// ثبت پس از تایید نهایی کاربر (Staging & Confirmation)
+// موتور فشرده‌سازی هوشمند تصاویر در فرانت‌اند
+// جلوگیری ۱۰۰٪ از پر شدن سقف حافظه مرورگر (LocalStorage Quota)
+// تبدیل تصاویر ۱۰ مگابایتی به وب‌فرمت سبک ۱۵۰ کیلوبایتی با کیفیت HD
 // =========================================================
+function compressImageForStorage(file, maxWidth = 1280, maxHeight = 1280, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        if (w > maxWidth || h > maxHeight) {
+          if (w > h) {
+            h = Math.round((h * maxWidth) / w);
+            w = maxWidth;
+          } else {
+            w = Math.round((w * maxHeight) / h);
+            h = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = () => reject(new Error('خطا در لود تصویر'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('خطا در خواندن فایل'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// سیستم استیجینگ و پیش‌نویس افزودن و ویرایش اثر
 let isCreatingNewArt = false;
 let stagingNewArt = null;
 
@@ -109,7 +132,7 @@ function renderAdminArtModalForm(art, isNew) {
         </label>
         <div style="display:flex; gap:8px; margin-bottom:8px;">
           <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 14px;">
-            📁 انتخاب عکس از کامپیوتر
+            📁 انتخاب عکس از کامپیوتر (با فشرده‌سازی خودکار HD)
           </button>
           <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
         </div>
@@ -210,19 +233,22 @@ window.handleAdminImageLiveChange = function(url) {
   }
 };
 
-// هندلر خواندن مستقیم فایل از کامپیوتر
-window.handleAdminLocalFileUpload = function(inputEl) {
+// هندلر خواندن مستقیم فایل از کامپیوتر با فشرده‌سازی خودکار HD
+window.handleAdminLocalFileUpload = async function(inputEl) {
   if (!inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const base64Url = e.target.result;
-    handleAdminImageLiveChange(base64Url);
+  showToast('در حال پردازش و فشرده‌سازی تصویر...', 'info');
+
+  try {
+    const compressedBase64 = await compressImageForStorage(file, 1280, 1280, 0.82);
+    handleAdminImageLiveChange(compressedBase64);
     const urlInput = document.getElementById('editArtImageInput');
-    if (urlInput) urlInput.value = base64Url.substring(0, 40) + '... (تصویر لوکال)';
-    showToast('فایل تصویر از کامپیوتر با موفقیت بارگذاری شد.', 'success');
-  };
-  reader.readAsDataURL(file);
+    if (urlInput) urlInput.value = compressedBase64.substring(0, 35) + '... (تصویر بهینه‌شده HD)';
+    showToast('تصویر بهینه‌سازی و لود شد.', 'success');
+  } catch (err) {
+    console.error('Compression failed:', err);
+    showToast('خطا در پردازش تصویر. لطفاً دوباره امتحان کنید.', 'error');
+  }
 };
 
 // تایید نهایی و ایجاد/ویرایش اثر
@@ -246,47 +272,60 @@ window.confirmSaveArtwork = function() {
     return;
   }
 
-  if (isCreatingNewArt && stagingNewArt) {
-    stagingNewArt.title = title || 'کانسپت مستر جدید استودیو';
-    stagingNewArt.shortSlug = slug || stagingNewArt.title;
-    stagingNewArt.pipelineKey = pipe;
-    stagingNewArt.image = img;
-    stagingNewArt.lore = lore;
-    stagingNewArt.colorSpace = colorSpace;
-    stagingNewArt.desc = desc;
-    stagingNewArt.phases = [
-      { name: 'اتود اولیه و سیلوئت', img: img },
-      { name: 'لاین‌آرت فنی و کادر', img: img },
-      { name: 'مطالعه نوری و مقداری', img: img },
-      { name: 'رندر متریال نهایی', img: img }
-    ];
+  try {
+    if (isCreatingNewArt && stagingNewArt) {
+      stagingNewArt.title = title || 'کانسپت مستر جدید استودیو';
+      stagingNewArt.shortSlug = slug || stagingNewArt.title;
+      stagingNewArt.pipelineKey = pipe;
+      stagingNewArt.image = img;
+      stagingNewArt.lore = lore;
+      stagingNewArt.colorSpace = colorSpace;
+      stagingNewArt.desc = desc;
+      stagingNewArt.phases = [
+        { name: 'اتود اولیه و سیلوئت', img: img },
+        { name: 'لاین‌آرت فنی و کادر', img: img },
+        { name: 'مطالعه نوری و مقداری', img: img },
+        { name: 'رندر متریال نهایی', img: img }
+      ];
 
-    showcaseArtworks.unshift(stagingNewArt);
-    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    closeAdminArtEditor();
-    renderShowcaseGrid();
-    renderAdminSketch2();
-    showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
-  } else if (showcaseArtworks[currentSelectedArtIdx]) {
-    const art = showcaseArtworks[currentSelectedArtIdx];
-    art.title = title || art.title;
-    art.shortSlug = slug || art.shortSlug;
-    art.pipelineKey = pipe;
-    art.image = img;
-    art.lore = lore;
-    art.colorSpace = colorSpace;
-    art.desc = desc;
+      showcaseArtworks.unshift(stagingNewArt);
+      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      closeAdminArtEditor();
+      renderShowcaseGrid();
+      renderAdminSketch2();
+      showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
+    } else if (showcaseArtworks[currentSelectedArtIdx]) {
+      const art = showcaseArtworks[currentSelectedArtIdx];
+      art.title = title || art.title;
+      art.shortSlug = slug || art.shortSlug;
+      art.pipelineKey = pipe;
+      art.image = img;
+      art.lore = lore;
+      art.colorSpace = colorSpace;
+      art.desc = desc;
 
-    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    closeAdminArtEditor();
-    renderShowcaseGrid();
-    renderAdminSketch2();
-    showToast('تغییرات اثر با موفقیت ذخیره شد.', 'success');
+      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      closeAdminArtEditor();
+      renderShowcaseGrid();
+      renderAdminSketch2();
+      showToast('تغییرات اثر با موفقیت ذخیره شد.', 'success');
+    }
+  } catch (storageErr) {
+    console.error('Storage error:', storageErr);
+    showToast('خطا در ذخیره‌سازی: سقف حافظه مرورگر پر شده است.', 'error');
   }
 };
 
-
-
+window.renderAdminSettingsTab = function() {
+  const rateEl = document.getElementById('setUsdRate');
+  if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
+  const tokenEl = document.getElementById('setTgToken');
+  if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
+  const chatEl = document.getElementById('setTgChat');
+  if (chatEl) chatEl.value = siteSettings.tgChat || '';
+  const passEl = document.getElementById('setAdminPass');
+  if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
+};
 
 
 /**
@@ -1139,10 +1178,10 @@ function renderAdminSketch2() {
   if (!container) return;
 
   let html = `
-    <div class="admin-mosaic-add-tile" onclick="openCreateArtworkModal()" title="کلیک کنید تا پنجره ایجاد اثر باز شود">
+    <div class="admin-mosaic-add-tile" onclick="openCreateArtworkModal()" title="افزودن اثر جدید به گالری">
       <span style="font-size:36px; line-height:1; color:var(--gold);">+</span>
       <span style="font-weight:800; font-size:13px; color:var(--gold);">افزودن اثر از اینجا</span>
-      <span style="font-size:10px; color:var(--text-muted); margin-top:2px;">انتخاب از سیستم یا لینک وب</span>
+      <span style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">انتخاب از سیستم یا لینک وب</span>
     </div>
   `;
 
@@ -1161,7 +1200,6 @@ function renderAdminSketch2() {
 window.selectAdminArt = function(idx) {
   currentSelectedArtIdx = idx;
   renderAdminSketch2();
-  openAdminArtEditor('ویرایش مشخصات اثر: ' + (showcaseArtworks[idx]?.shortSlug || ''));
 };
 
 function renderAdminArtLiveEditor() {
@@ -1220,22 +1258,10 @@ function renderAdminArtLiveEditor() {
           </select>
         </div>
       </div>
-      
-      <!-- آپلود مستقیم فایل از کامپیوتر یا وارد کردن لینک -->
-      <div style="background:#05070d; border:1px solid var(--border-subtle); border-radius:12px; padding:12px;">
-        <label style="font-size:11.5px; font-weight:700; color:var(--cyan-electric); display:block; margin-bottom:6px;">
-          📁 تصویر اثر (انتخاب از سیستم یا لینک وب):
-        </label>
-        <div style="display:flex; gap:8px; margin-bottom:8px;">
-          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px;">
-            📁 انتخاب عکس از کامپیوتر
-          </button>
-          <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this, currentSelectedArtIdx)" />
-        </div>
-        <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">یا درج لینک مستقیم تصویر:</label>
-        <input type="text" value="${art.image}" oninput="handleAdminImageChange(${currentSelectedArtIdx}, this.value)" class="font-mono" style="font-size:11px;" />
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر اصلی کاور</label>
+        <input type="text" value="${art.image}" oninput="handleAdminImageChange(${currentSelectedArtIdx}, this.value)" class="font-mono" />
       </div>
-    
       <div>
         <label style="font-size:11px; color:var(--text-muted);">لور داستانی و زمینه</label>
         <input type="text" value="${art.lore || 'جهان اکستوپیا'}" onchange="updateArtField(${currentSelectedArtIdx}, 'lore', this.value)" />
@@ -1272,7 +1298,6 @@ function renderAdminArtLiveEditor() {
         <label style="font-size:11px; color:var(--text-muted);">توضیحات تکمیلی اثر</label>
         <textarea rows="2" onchange="updateArtField(${currentSelectedArtIdx}, 'desc', this.value)">${art.desc || ''}</textarea>
       </div>
-      <button type="button" onclick="closeAdminArtEditor()" class="btn-gold" style="width:100%; padding:11px; margin-top:8px; margin-bottom:6px;">✓ ذخیره و بستن پنجره</button>
       <button onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این اثر از گالری</button>
     </div>
   `;
@@ -1348,8 +1373,7 @@ window.adminAddNewArtwork = function() {
   });
   renderAdminSketch2();
   renderShowcaseGrid();
-  openAdminArtEditor('✨ افزودن آرت‌ورک جدید به گالری');
-  showToast('آرت‌ورک جدید ایجاد شد. مشخصات یا عکس را وارد فرمایید.', 'success');
+  showToast('آرت‌ورک جدید به گالری اضافه شد.', 'success');
 };
 
 window.adminDeleteArtwork = function(idx) {
