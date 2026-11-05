@@ -555,18 +555,107 @@
           <strong style="color:var(--cyan-electric);">💡 راهنمای ذخیره‌سازی دائمی:</strong> تغییرات ایجاد شده در مرورگر شما ذخیره می‌شوند. برای ماندگاری همیشگی و مستقل، کلید <strong>«دانلود سورس به‌روز شده HTML»</strong> را بزنید و فایل جدید را جایگزین کنید.
         </div>
 
-        <!-- تب‌های ناوبری ادمین همراه با تب اختصاصی جدید مدیریت دارایی‌های دیجیتال -->
-        <div style="display:flex; gap:8px; margin-bottom:20px; background:var(--bg-panel); padding:6px; border-radius:12px; border:1px solid var(--border-subtle); overflow-x:auto;">
-          <button onclick="switchAdminTab('pipelines', this)" class="store-dual-btn active">۱. پایپلاین و مراحل قیمت‌گذاری</button>
-          <button onclick="switchAdminTab('artworks', this)" class="store-dual-btn">۲. موزاییک آثار گالری</button>
-          <button onclick="switchAdminTab('products', this)" class="store-dual-btn">۳. مدیریت دارایی‌های دیجیتال (فروشگاه)</button>
-          <button onclick="switchAdminTab('members', this)" class="store-dual-btn">۴. اعضا و گزارش‌های مالی</button>
-          <button onclick="switchAdminTab('orders', this)" class="store-dual-btn">۵. سفارش‌های دریافتی</button>
-          <button onclick="switchAdminTab('settings', this)" class="store-dual-btn">۶. تنظیمات سراسری و تلگرام</button>
-        </div>
+        
+        <!-- چیدمان داشبورد ادمین بر اساس طرح فتوشاپ: منوی عمودی در سمت راست و محتوای تب در سمت چپ -->
+        <div class="admin-dashboard-layout">
+          
+          <!-- سایدبار دسته‌بندی‌های ادمین (سمت راست صفحه در RTL) -->
+          <aside class="admin-vertical-sidebar">
+            <div class="admin-sidebar-header">
+              <span class="font-mono" style="font-size:10.5px; color:var(--gold);">STUDIO DIRECTOR</span>
+              <h3 style="font-size:14.5px; font-weight:800; color:#fff; margin-top:2px;">منوی مدیریت استودیو</h3>
+            </div>
+            
+            <nav class="admin-sidebar-menu">
+              <!-- ۱. موزاییک آثار گالری (گزینه اول طبق طرح فتوشاپ) -->
+              <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
+                <span class="admin-nav-icon">🖼️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۱. موزاییک آثار گالری</span>
+                  <span class="admin-nav-sub">مدیریت و چیدمان پورتفولیو</span>
+                </div>
+              </button>
 
-        <!-- ۱. پایپلاین و قیمت‌گذاری بر اساس اسکچ ۱ -->
-        <div id="adminTabPipelines">
+              <!-- ۲. پایپلاین و مراحل قیمت‌گذاری -->
+              <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
+                <span class="admin-nav-icon">⚡</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۲. پایپلاین و مراحل قیمت‌گذاری</span>
+                  <span class="admin-nav-sub">تعرفه و فازهای کمیسیون</span>
+                </div>
+              </button>
+
+              <!-- ۳. مدیریت دارایی‌های دیجیتال -->
+              <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
+                <span class="admin-nav-icon">💎</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۳. دارایی‌های دیجیتال</span>
+                  <span class="admin-nav-sub">فروشگاه اسست‌ها و لور</span>
+                </div>
+              </button>
+
+              <!-- ۴. اعضا و گزارش‌های مالی -->
+              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
+                <span class="admin-nav-icon">👥</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۴. اعضا و گزارش‌های مالی</span>
+                  <span class="admin-nav-sub">سطوح کاربری و درآمدها</span>
+                </div>
+              </button>
+
+              <!-- ۵. سفارش‌های دریافتی -->
+              <button type="button" onclick="switchAdminTab('orders', this)" class="admin-nav-item" data-tab="orders">
+                <span class="admin-nav-icon">📋</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۵. سفارش‌های دریافتی</span>
+                  <span class="admin-nav-sub">بریف‌ها و وضعیت پروژه</span>
+                </div>
+              </button>
+
+              <!-- ۶. تنظیمات سراسری و تلگرام -->
+              <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
+                <span class="admin-nav-icon">⚙️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۶. تنظیمات سراسری و تلگرام</span>
+                  <span class="admin-nav-sub">نرخ دلار، توکن بات و رمز</span>
+                </div>
+              </button>
+            </nav>
+          </aside>
+
+          <!-- کانتینر اصلی محتوای تب‌ها (سمت چپ صفحه در RTL) -->
+          <main class="admin-main-panes-holder">
+
+            <!-- ۲. موزاییک آثار گالری -->
+        <div id="adminTabArtworks" >
+          <div class="admin-sketch2-layout">
+            <!-- گرید موزاییک تمام‌عرض آثار -->
+            <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
+              <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
+                  <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید کلید + را بزنید یا برای ادیت هر اثر روی کارت آن کلیک نمایید.</span>
+                </div>
+                
+              </div>
+              <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
+            </div>
+
+            <!-- مدال / پنجره شناور ادیتور اثر (در حالت عادی باز نیست؛ فقط با کلیک روی اثر یا افزودن باز می‌شود) -->
+            <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
+              <div class="admin-art-modal-box" onclick="event.stopPropagation()">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                  <h4 style="font-size:15px; font-weight:800; color:var(--iris);" id="adminArtEditorModalTitle">ویرایش آرت‌ورک</h4>
+                  <button type="button" onclick="closeAdminArtEditor()" style="font-size:18px; color:var(--text-muted); cursor:pointer;">✕</button>
+                </div>
+                <div id="adminArtFormFields">
+                  <p style="font-size:12px; color:var(--text-muted);">در حال بارگذاری فرم...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ۱. پایپلاین و قیمت‌گذاری بر اساس اسکچ ۱ -->
+        <div id="adminTabPipelines" class="hidden">
           <div class="admin-sketch1-layout">
             <!-- ستون اول: کارت‌های دسته‌بندی + دکمه افزودن دسته جدید -->
             <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
@@ -594,37 +683,7 @@
           </div>
         </div>
 
-        <!-- ۲. موزاییک آثار گالری -->
-        <div id="adminTabArtworks" class="hidden">
-          <div class="admin-sketch2-layout">
-            <!-- گرید موزاییک تمام‌عرض آثار -->
-            <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
-              <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <div>
-                  <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
-                  <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید کلید + را بزنید یا برای ادیت هر اثر روی کارت آن کلیک نمایید.</span>
-                </div>
-                <button type="button" onclick="adminAddNewArtwork()" class="btn-gold" style="font-size:12px; padding:8px 16px;">+ افزودن اثر جدید به گالری</button>
-              </div>
-              <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
-            </div>
-
-            <!-- مدال / پنجره شناور ادیتور اثر (در حالت عادی باز نیست؛ فقط با کلیک روی اثر یا افزودن باز می‌شود) -->
-            <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
-              <div class="admin-art-modal-box" onclick="event.stopPropagation()">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
-                  <h4 style="font-size:15px; font-weight:800; color:var(--iris);" id="adminArtEditorModalTitle">ویرایش آرت‌ورک</h4>
-                  <button type="button" onclick="closeAdminArtEditor()" style="font-size:18px; color:var(--text-muted); cursor:pointer;">✕</button>
-                </div>
-                <div id="adminArtFormFields">
-                  <p style="font-size:12px; color:var(--text-muted);">در حال بارگذاری فرم...</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ۳. بخش مدیریت کامل دارایی‌های دیجیتال (اضافه شده به درخواست کاربر) -->
+            <!-- ۳. بخش مدیریت کامل دارایی‌های دیجیتال (اضافه شده به درخواست کاربر) -->
         <div id="adminTabProducts" class="hidden">
           <div class="admin-sketch2-layout">
             <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
@@ -707,9 +766,13 @@
             </form>
           </div>
         </div>
+          </main>
+        </div>
       </div>
     </div>
-  </section>
+    </div>
+</div>
+</section>
 
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">

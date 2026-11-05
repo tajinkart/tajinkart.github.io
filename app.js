@@ -1,15 +1,59 @@
 
-// مدیریت دراور/مدال ادیتور آثار در ادمین
-window.openAdminArtEditor = function(titleText = 'ویرایش مشخصات اثر') {
-  const modal = document.getElementById('adminArtLiveEditorCol');
+// =========================================================
+// سیستم هوشمند پیش‌گیری و مدیریت آثار گالری ادمین
+// ثبت پس از تایید نهایی کاربر (Staging & Confirmation)
+// =========================================================
+let isCreatingNewArt = false;
+let stagingNewArt = null;
+
+// ۱. باز کردن مدال برای افزودن اثر جدید (بدون ایجاد درجا در گالری)
+window.openCreateArtworkModal = function() {
+  isCreatingNewArt = true;
+  stagingNewArt = {
+    id: Date.now(),
+    tag: 'character',
+    shortSlug: '',
+    title: '',
+    desc: '',
+    pipelineKey: 'sketch1',
+    image: '',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+    lore: 'جهان اکستوپیا',
+    phases: [
+      { name: 'اتود اولیه و سیلوئت', img: '' },
+      { name: 'لاین‌آرت فنی و کادر', img: '' },
+      { name: 'مطالعه نوری و مقداری', img: '' },
+      { name: 'رندر متریال نهایی', img: '' }
+    ]
+  };
+
   const titleEl = document.getElementById('adminArtEditorModalTitle');
-  if (titleEl) titleEl.textContent = titleText;
-  if (modal) modal.classList.add('active');
+  if (titleEl) titleEl.textContent = '✨ افزودن اثر جدید به گالری';
+
+  renderAdminArtModalForm(stagingNewArt, true);
+  document.getElementById('adminArtLiveEditorCol').classList.add('active');
 };
 
+// ۲. باز کردن مدال برای ویرایش اثر موجود
+window.selectAdminArt = function(idx) {
+  isCreatingNewArt = false;
+  currentSelectedArtIdx = idx;
+  const art = showcaseArtworks[idx];
+  if (!art) return;
+
+  const titleEl = document.getElementById('adminArtEditorModalTitle');
+  if (titleEl) titleEl.textContent = `ویرایش آرت‌ورک: ${art.shortSlug || art.title}`;
+
+  renderAdminArtModalForm(art, false);
+  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+};
+
+// بستن مدال ادیتور
 window.closeAdminArtEditor = function() {
   const modal = document.getElementById('adminArtLiveEditorCol');
   if (modal) modal.classList.remove('active');
+  isCreatingNewArt = false;
+  stagingNewArt = null;
 };
 
 window.closeAdminArtEditorDirect = function(e) {
@@ -18,28 +62,219 @@ window.closeAdminArtEditorDirect = function(e) {
   }
 };
 
-// هندلر آپلود تصویر از کامپیوتر کاربر
-window.handleAdminLocalFileUpload = function(inputEl, artIdx) {
+// ۳. رندر فرم داخل پنجره مدال ادیتور
+function renderAdminArtModalForm(art, isNew) {
+  const box = document.getElementById('adminArtFormFields');
+  if (!box || !art) return;
+
+  const previewDisplay = art.image ? 'block' : 'none';
+  const emptyPreviewDisplay = art.image ? 'none' : 'flex';
+
+  box.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      
+      <!-- پیش‌نمایش تصویر -->
+      <div style="background:#04060a; border:1px solid var(--border-subtle); border-radius:14px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:11.5px; font-weight:700; color:var(--gold);">پیش‌نمایش تصویر اثر:</span>
+          <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">
+            ${art.image ? 'تصویر انتخاب شد' : 'هنوز عکسی انتخاب نشده'}
+          </span>
+        </div>
+        <div style="max-height:220px; min-height:120px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative;">
+          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:220px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش" />
+          <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:20px;">
+            <span>📷</span>
+            <span>برای نمایش پیش‌نمایش، تصویر را آپلود کنید یا لینک آن را قرار دهید.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- آپلود مستقیم عکس از کامپیوتر یا لینک وب -->
+      <div style="background:#05070d; border:1px solid var(--border-subtle); border-radius:12px; padding:14px;">
+        <label style="font-size:11.5px; font-weight:700; color:var(--cyan-electric); display:block; margin-bottom:6px;">
+          📁 انتخاب تصویر (از حافظه سیستم یا لینک مستقیم):
+        </label>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 14px;">
+            📁 انتخاب عکس از کامپیوتر
+          </button>
+          <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
+        </div>
+        <label style="font-size:10.5px; color:var(--text-muted); display:block; margin-bottom:3px;">یا درج لینک وب (URL):</label>
+        <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="https://images.unsplash.com/..." class="font-mono" style="font-size:11.5px;" />
+      </div>
+
+      <!-- فیلدهای مشخصات -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label style="font-size:11px; color:var(--text-muted);">عنوان اثر</label>
+          <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--text-muted);">اسلاگ هاور (عنوان کوتاه)</label>
+          <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک به آتلیه</label>
+          <select id="editArtPipeSelect">
+            <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
+            <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
+            <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
+            <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
+            <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
+            <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک و استوری‌بورد</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--text-muted);">لور داستانی</label>
+          <input type="text" id="editArtLoreInput" value="${art.lore || 'جهان اکستوپیا'}" placeholder="جهان جنسیس / اکستوپیا" />
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">مشخصات فنی و فضای رنگی</label>
+        <input type="text" id="editArtColorSpaceInput" value="${art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB'}" />
+      </div>
+
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);">شرح و توضیحات تکمیلی اثر</label>
+        <textarea id="editArtDescInput" rows="2" placeholder="توضیحات و بریف هنری اثر...">${art.desc || ''}</textarea>
+      </div>
+
+      <!-- دکمه‌های عملیاتی -->
+      <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+        ${isNew ? `
+          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
+            ✓ تایید و افزودن قطعی به گالری
+          </button>
+          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px;">
+            انصراف و لغو
+          </button>
+        ` : `
+          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
+            ✓ ذخیره تغییرات اثر
+          </button>
+          <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3);">
+            حذف این اثر از گالری
+          </button>
+          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px;">
+            بستن بدون تغییر
+          </button>
+        `}
+      </div>
+
+    </div>
+  `;
+}
+
+// تغییر تصویر در پیش‌نمایش به صورت زنده
+window.handleAdminImageLiveChange = function(url) {
+  const cleanUrl = url.trim();
+  const previewImg = document.getElementById('adminArtPreviewImg');
+  const emptyPlaceholder = document.getElementById('adminArtEmptyPreviewPlaceholder');
+  const ratioText = document.getElementById('adminArtPreviewRatioText');
+
+  if (isCreatingNewArt && stagingNewArt) {
+    stagingNewArt.image = cleanUrl;
+  } else if (showcaseArtworks[currentSelectedArtIdx]) {
+    showcaseArtworks[currentSelectedArtIdx].image = cleanUrl;
+  }
+
+  if (cleanUrl) {
+    if (previewImg) {
+      previewImg.src = cleanUrl;
+      previewImg.style.display = 'block';
+    }
+    if (emptyPlaceholder) emptyPlaceholder.style.display = 'none';
+    if (ratioText) ratioText.textContent = 'تصویر وارد شد';
+  } else {
+    if (previewImg) previewImg.style.display = 'none';
+    if (emptyPlaceholder) emptyPlaceholder.style.display = 'flex';
+    if (ratioText) ratioText.textContent = 'هنوز عکسی انتخاب نشده';
+  }
+};
+
+// هندلر خواندن مستقیم فایل از کامپیوتر
+window.handleAdminLocalFileUpload = function(inputEl) {
   if (!inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
   const reader = new FileReader();
   reader.onload = function(e) {
     const base64Url = e.target.result;
-    if (showcaseArtworks[artIdx]) {
-      showcaseArtworks[artIdx].image = base64Url;
-      if (showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[3]) {
-        showcaseArtworks[artIdx].phases[3].img = base64Url;
-      }
-      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-      renderShowcaseGrid();
-      renderAdminSketch2();
-      renderAdminArtLiveEditor();
-      openAdminArtEditor('ویرایش مشخصات اثر');
-      showToast('تصویر از کامپیوتر با موفقیت جایگزین شد.', 'success');
-    }
+    handleAdminImageLiveChange(base64Url);
+    const urlInput = document.getElementById('editArtImageInput');
+    if (urlInput) urlInput.value = base64Url.substring(0, 40) + '... (تصویر لوکال)';
+    showToast('فایل تصویر از کامپیوتر با موفقیت بارگذاری شد.', 'success');
   };
   reader.readAsDataURL(file);
 };
+
+// تایید نهایی و ایجاد/ویرایش اثر
+window.confirmSaveArtwork = function() {
+  const title = document.getElementById('editArtTitleInput')?.value.trim() || '';
+  const slug = document.getElementById('editArtSlugInput')?.value.trim() || '';
+  const pipe = document.getElementById('editArtPipeSelect')?.value || 'sketch1';
+  const lore = document.getElementById('editArtLoreInput')?.value.trim() || 'جهان اکستوپیا';
+  const colorSpace = document.getElementById('editArtColorSpaceInput')?.value.trim() || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
+  const desc = document.getElementById('editArtDescInput')?.value.trim() || '';
+
+  let img = '';
+  if (isCreatingNewArt && stagingNewArt) {
+    img = stagingNewArt.image || document.getElementById('editArtImageInput')?.value.trim() || '';
+  } else if (showcaseArtworks[currentSelectedArtIdx]) {
+    img = showcaseArtworks[currentSelectedArtIdx].image || document.getElementById('editArtImageInput')?.value.trim() || '';
+  }
+
+  if (!img) {
+    showToast('لطفاً ابتدا تصویر اثر را از کامپیوتر انتخاب کنید یا لینک آن را وارد نمایید.', 'error');
+    return;
+  }
+
+  if (isCreatingNewArt && stagingNewArt) {
+    stagingNewArt.title = title || 'کانسپت مستر جدید استودیو';
+    stagingNewArt.shortSlug = slug || stagingNewArt.title;
+    stagingNewArt.pipelineKey = pipe;
+    stagingNewArt.image = img;
+    stagingNewArt.lore = lore;
+    stagingNewArt.colorSpace = colorSpace;
+    stagingNewArt.desc = desc;
+    stagingNewArt.phases = [
+      { name: 'اتود اولیه و سیلوئت', img: img },
+      { name: 'لاین‌آرت فنی و کادر', img: img },
+      { name: 'مطالعه نوری و مقداری', img: img },
+      { name: 'رندر متریال نهایی', img: img }
+    ];
+
+    showcaseArtworks.unshift(stagingNewArt);
+    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    closeAdminArtEditor();
+    renderShowcaseGrid();
+    renderAdminSketch2();
+    showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
+  } else if (showcaseArtworks[currentSelectedArtIdx]) {
+    const art = showcaseArtworks[currentSelectedArtIdx];
+    art.title = title || art.title;
+    art.shortSlug = slug || art.shortSlug;
+    art.pipelineKey = pipe;
+    art.image = img;
+    art.lore = lore;
+    art.colorSpace = colorSpace;
+    art.desc = desc;
+
+    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    closeAdminArtEditor();
+    renderShowcaseGrid();
+    renderAdminSketch2();
+    showToast('تغییرات اثر با موفقیت ذخیره شد.', 'success');
+  }
+};
+
+
+
 
 
 /**
@@ -715,16 +950,18 @@ window.logoutAdmin = function() {
 
 // مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
 window.switchAdminTab = function(tabKey, btn) {
-  const tabs = ['pipelines', 'artworks', 'products', 'members', 'orders', 'settings'];
+  const tabs = ['artworks', 'pipelines', 'products', 'members', 'orders', 'settings'];
   tabs.forEach(t => {
     const el = document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
     if (el) el.classList.toggle('hidden', t !== tabKey);
   });
-  document.querySelectorAll('#adminWorkspace .store-dual-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
 
-  if (tabKey === 'pipelines') renderAdminSketch1();
+  document.querySelectorAll('.admin-sidebar-menu .admin-nav-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-tab') === tabKey);
+  });
+
   if (tabKey === 'artworks') renderAdminSketch2();
+  if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
   if (tabKey === 'orders') renderAdminLists();
@@ -889,23 +1126,23 @@ function renderAdminSketch2() {
   if (!container) return;
 
   let html = `
-    <div class="admin-mosaic-add-tile" onclick="adminAddNewArtwork()">
-      <span style="font-size:32px; line-height:1;">+</span>
-      <span>افزودن اثر از اینجا</span>
+    <div class="admin-mosaic-add-tile" onclick="openCreateArtworkModal()" title="کلیک کنید تا پنجره ایجاد اثر باز شود">
+      <span style="font-size:36px; line-height:1; color:var(--gold);">+</span>
+      <span style="font-weight:800; font-size:13px; color:var(--gold);">افزودن اثر از اینجا</span>
+      <span style="font-size:10px; color:var(--text-muted); margin-top:2px;">انتخاب از سیستم یا لینک وب</span>
     </div>
   `;
 
   html += showcaseArtworks.map((art, idx) => `
-    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" onclick="selectAdminArt(${idx})">
-      <img src="${art.image}" style="width:100%; height:100%; object-fit:contain; background:#040609;" />
+    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" onclick="selectAdminArt(${idx})" title="برای ویرایش کلیک کنید">
+      <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
       <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.85); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-        ${art.shortSlug}
+        ${art.shortSlug || art.title}
       </div>
     </div>
   `).join('');
 
   container.innerHTML = html;
-  renderAdminArtLiveEditor();
 }
 
 window.selectAdminArt = function(idx) {
