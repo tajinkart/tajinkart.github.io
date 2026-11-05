@@ -528,11 +528,11 @@
         <form id="adminLoginForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
             <label style="font-size:12px;">نام کاربری</label>
-            <input type="text" id="adminUsernameInput" value="soroush" class="font-mono" required />
+            <input type="text" id="adminUsernameInput" placeholder="soroush" class="font-mono" required />
           </div>
           <div>
             <label style="font-size:12px;">رمز عبور</label>
-            <input type="password" id="adminPasswordInput" value="tajinkart" class="font-mono" required />
+            <input type="password" id="adminPasswordInput" placeholder="رمز عبور مدیر" class="font-mono" required />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px;">باز کردن پنل مدیریت</button>
         </form>
@@ -893,7 +893,7 @@
         <form id="memberLoginForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
             <label style="font-size:12px; display:block; margin-bottom:5px;">ایمیل یا نام کاربری</label>
-            <input type="text" id="loginEmail" required value="client@novagames.io" class="font-mono" placeholder="user@domain.com" />
+            <input type="text" id="loginEmail" required  class="font-mono" placeholder="user@domain.com" />
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -901,7 +901,7 @@
               <!-- لینک فراموشی رمز عبور اضافه شده -->
               <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز عبور؟</button>
             </div>
-            <input type="password" id="loginPass" required value="123456" class="font-mono" placeholder="••••••••" />
+            <input type="password" id="loginPass" required  class="font-mono" placeholder="••••••••" />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">ورود به حساب کاربری</button>
         </form>

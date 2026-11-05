@@ -29,7 +29,8 @@
       background-color: var(--bg-obsidian);
       color: var(--text-main);
       font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      overflow-x: hidden;
+      overflow-x: hidden !important;
+      max-width: 100vw;
       line-height: 1.75;
       min-height: 100vh;
       display: flex;
@@ -279,7 +280,7 @@
       margin-left: 4px;
     }
     .right-exp-title { display: block; font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2; }
-    .right-exp-sub { display: block; font-size: 9px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); }
+    .right-exp-sub { display: block; font-size: 10px; font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text-muted); }
 
     /* ۳. صفحه اول: ترنزیشن پارالاکس سبک ZEN */
     #stickyBrandHero {
@@ -944,9 +945,10 @@
     .zoom-modal, .art-detail-modal {
       position: fixed;
       inset: 0;
-      z-index: 100;
-      background: rgba(3, 4, 7, 0.94);
-      backdrop-filter: blur(14px);
+      z-index: 1000 !important;
+      background: rgba(3, 4, 7, 0.96) !important;
+      backdrop-filter: blur(18px) !important;
+      -webkit-backdrop-filter: blur(18px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1174,7 +1176,7 @@
 
 /* لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine) */
 .case-study-window {
-  background: var(--bg-panel);
+  background: #090c12 !important;
   border: 1px solid var(--iris);
   border-radius: 22px;
   max-width: 1040px;
@@ -1182,15 +1184,45 @@
   padding: 24px;
   transform: scale(0.94);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 25px 75px rgba(0, 0, 0, 0.98);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98);
   display: grid;
   grid-template-columns: 1.35fr 1fr;
   gap: 22px;
   max-height: 92vh;
   overflow-y: auto;
 }
-@media (max-width: 900px) { .case-study-window { grid-template-columns: 1fr; } }
-.art-detail-modal.active .case-study-window { transform: scale(1); }
+@media (max-width: 900px) { .case-study-window {
+  background: #090c12 !important;
+  border: 1px solid var(--iris);
+  border-radius: 22px;
+  max-width: 1040px;
+  width: 100%;
+  padding: 24px;
+  transform: scale(0.94);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98);
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 22px;
+  max-height: 92vh;
+  overflow-y: auto;
+} }
+.art-detail-modal.active .case-study-window {
+  background: #090c12 !important;
+  border: 1px solid var(--iris);
+  border-radius: 22px;
+  max-width: 1040px;
+  width: 100%;
+  padding: 24px;
+  transform: scale(0.94);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98);
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 22px;
+  max-height: 92vh;
+  overflow-y: auto;
+}
 
 .case-study-stage-box {
   display: flex;
@@ -1304,13 +1336,31 @@
   gap: 8px;
 }
 .wizard-step-body {
-  padding: 14px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.wizard-step-card:not(.active) .wizard-step-body { display: none; }
+      background-color: var(--bg-obsidian);
+      color: var(--text-main);
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      direction: rtl;
+    }
+.wizard-step-card:not(.active) .wizard-step-body {
+      background-color: var(--bg-obsidian);
+      color: var(--text-main);
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      direction: rtl;
+    }
 
 .wizard-invoice-sidebar {
   background: #06090e;
@@ -1342,7 +1392,19 @@
 @media (max-width: 768px) {
   #mobileBottomNav { display: flex; }
   #rightVerticalNav { display: none !important; }
-  body { padding-bottom: 60px; }
+  body {
+      background-color: var(--bg-obsidian);
+      color: var(--text-main);
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      direction: rtl;
+    }
 }
 
 .mob-nav-btn {
@@ -1382,18 +1444,38 @@
     gap: 16px;
   }
   .case-study-window {
-    grid-template-columns: 1fr !important;
-    max-height: 94vh;
-    padding: 16px;
-    gap: 16px;
-  }
+  background: #090c12 !important;
+  border: 1px solid var(--iris);
+  border-radius: 22px;
+  max-width: 1040px;
+  width: 100%;
+  padding: 24px;
+  transform: scale(0.94);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98);
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 22px;
+  max-height: 92vh;
+  overflow-y: auto;
+}
 }
 
 @media (max-width: 768px) {
   /* تنظیم پدینگ‌های کلی بدنه و کانتینرها */
   body {
-    padding-bottom: 70px !important;
-  }
+      background-color: var(--bg-obsidian);
+      color: var(--text-main);
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      direction: rtl;
+    }
   .container {
     padding: 68px 12px 30px !important;
   }
@@ -1504,9 +1586,20 @@
 
   /* پنجره‌های مدال در موبایل */
   .zoom-modal, .art-detail-modal {
-    padding: 10px !important;
-    align-items: flex-end !important;
-  }
+      position: fixed;
+      inset: 0;
+      z-index: 1000 !important;
+      background: rgba(3, 4, 7, 0.96) !important;
+      backdrop-filter: blur(18px) !important;
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
   .zoom-window, .case-study-window, .art-detail-window {
     border-radius: 18px 18px 0 0 !important;
     max-height: 90vh !important;
@@ -1519,8 +1612,18 @@
     padding: 10px 12px !important;
   }
   .wizard-step-body {
-    padding: 12px 10px !important;
-  }
+      background-color: var(--bg-obsidian);
+      color: var(--text-main);
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      direction: rtl;
+    }
 
   /* پنل ادمین در موبایل */
   .admin-sketch1-layout, .admin-sketch2-layout, .admin-sketch3-layout {
@@ -1643,3 +1746,19 @@
       margin-bottom: 12px;
     }
 
+
+
+/* Fix: Guarantee mobile isolation of rightVerticalNav & prevent collisions */
+@media (max-width: 768px) {
+  #rightVerticalNav, #dockMasterTrigger {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  #mobileBottomNav {
+    display: flex !important;
+    z-index: 1000 !important;
+  }
+  body {
+    padding-bottom: 75px !important;
+  }
+}
