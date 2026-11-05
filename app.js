@@ -655,7 +655,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === '`' || e.key === '~' || e.key === '÷') backtickActive = true;
   if ((e.key === 'Escape' && backtickActive) || (e.key === '`' && e.shiftKey)) {
     e.preventDefault();
-    switchView('admin');
+    switchView('admin'); setTimeout(() => { switchAdminTab('artworks', document.querySelector('#adminWorkspace .store-dual-btn')); }, 50);
   }
 });
 window.addEventListener('keyup', (e) => {
@@ -672,7 +672,7 @@ window.logoutAdmin = function() {
 
 // مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
 window.switchAdminTab = function(tabKey, btn) {
-  const tabs = ['pipelines', 'artworks', 'products', 'members', 'orders', 'settings'];
+  const tabs = ['artworks', 'pipelines', 'products', 'members', 'orders', 'settings'];
   tabs.forEach(t => {
     const el = document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
     if (el) el.classList.toggle('hidden', t !== tabKey);
@@ -680,8 +680,8 @@ window.switchAdminTab = function(tabKey, btn) {
   document.querySelectorAll('#adminWorkspace .store-dual-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
-  if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'artworks') renderAdminSketch2();
+  if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
   if (tabKey === 'orders') renderAdminLists();
@@ -1428,7 +1428,7 @@ document.addEventListener('DOMContentLoaded', () => {
           closeMemberModal();
           document.getElementById('adminLoginGate').classList.add('hidden');
           document.getElementById('adminWorkspace').classList.remove('hidden');
-          switchView('admin');
+          switchView('admin'); setTimeout(() => { switchAdminTab('artworks', document.querySelector('#adminWorkspace .store-dual-btn')); }, 50);
           showToast('مرکز کنترل و پنل مدیریت استودیو گشوده شد.', 'success');
           return;
         } else {

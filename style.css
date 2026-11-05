@@ -368,54 +368,62 @@
     }
     @media (max-width: 768px) { #artworkCurtain { padding: 16px 14px 40px; } }
 
-        /* چیدمان گالری صفحه اول با فرمول هوشمند خودکار ابعاد */
+        /* چیدمان گالری صفحه اول — موزاییک پیوسته بدون فضای خالی (Edge-to-Edge Pure Masonry) */
     #showcaseGrid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-auto-rows: 310px;
-      gap: 10px;
-      grid-auto-flow: dense;
+      column-count: 4;
+      column-gap: 14px;
+      width: 100%;
+      margin: 0 auto;
     }
-
-    /* فرمول اسپَن خودکار بر اساس ابعاد واقعی اثر */
-    .span-col-wide     { grid-column: span 5; } /* افقی عریض / ۱۶:۹ */
-    .span-col-medium   { grid-column: span 4; } /* افقی استاندارد / ۴:۳ */
-    .span-col-square   { grid-column: span 3; } /* مربعی / ۱:۱ */
-    .span-col-portrait { grid-column: span 2; } /* عمودی پرتره و کاراکتر */
-
-    /* سازگاری کامل با کلاس‌های قبلی */
-    .span-pattern-0, .span-pattern-7 { grid-column: span 5; }
-    .span-pattern-1, .span-pattern-3, .span-pattern-4, .span-pattern-5 { grid-column: span 2; }
-    .span-pattern-2, .span-pattern-6 { grid-column: span 3; }
-
-    @media (max-width: 992px) {
-      #showcaseGrid { grid-auto-rows: 240px; }
-      .span-col-wide, .span-col-medium, .span-pattern-0, .span-pattern-7 { grid-column: span 6; }
-      .span-col-square, .span-col-portrait, .span-pattern-1, .span-pattern-2, .span-pattern-3, .span-pattern-4, .span-pattern-5, .span-pattern-6 { grid-column: span 6; }
+    @media (max-width: 1400px) {
+      #showcaseGrid { column-count: 4; column-gap: 12px; }
     }
-    @media (max-width: 576px) {
-      #showcaseGrid { grid-auto-rows: 260px; }
-      .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
-      .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
-  .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
-      .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 { grid-column: span 12 !important; }
+    @media (max-width: 1100px) {
+      #showcaseGrid { column-count: 3; column-gap: 12px; }
+    }
+    @media (max-width: 768px) {
+      #showcaseGrid { column-count: 2 !important; column-gap: 10px !important; }
+    }
+    @media (max-width: 480px) {
+      #showcaseGrid { column-count: 1 !important; }
     }
 
     .mosaic-tile {
+      break-inside: avoid;
+      margin-bottom: 14px;
       position: relative;
       overflow: hidden;
       background: #06080c;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
       cursor: pointer;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
+      display: block;
+      width: 100%;
     }
+    @media (max-width: 768px) {
+      .mosaic-tile { margin-bottom: 10px; border-radius: 10px; }
+    }
+
     .mosaic-tile:hover {
-      border-color: rgba(250, 204, 21, 0.45);
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 16px rgba(250, 204, 21, 0.25);
     }
+
+    .mosaic-tile img {
+      width: 100%;
+      height: auto; /* ارتفاع ۱۰۰٪ متناسب با نسبت واقعی اثر بدون ذره‌ای فضای خالی */
+      display: block;
+      object-fit: cover;
+      border-radius: 11px;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+    .mosaic-tile:hover img {
+      transform: scale(1.03);
+      opacity: 0.35;
+    }
+
     .tile-center-title {
       position: absolute;
       inset: 0;
@@ -431,6 +439,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
+      border-radius: 11px;
     }
     .tile-slug {
       font-family: 'JetBrains Mono', monospace;
@@ -457,14 +466,6 @@
       transition: transform 0.25s ease; 
       max-width: 90%;
     }
-    .mosaic-tile img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* نمایش ۱۰۰٪ کامل اثر بدون کراپ شدن لبه‌ها */
-      display: block;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-    }
-    .mosaic-tile:hover img { transform: scale(1.05); opacity: 0.2; }
     .mosaic-tile:hover .tile-center-title { opacity: 1; }
     .mosaic-tile:hover .tile-slug, .mosaic-tile:hover .tile-sub { transform: translateY(0); }
     .mosaic-tile:hover .tile-divider { width: 44px; }
@@ -1508,11 +1509,7 @@
   }
 
   /* گرید موزاییک گالری صفحه اول */
-  #showcaseGrid {
-    grid-template-columns: 1fr !important;
-    grid-auto-rows: 240px !important;
-    gap: 12px !important;
-  }
+  
   .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
   .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
   .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 {
