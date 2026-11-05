@@ -1989,11 +1989,29 @@
   #rightVerticalNav #dockMasterTrigger {
     display: flex !important;
   }
-  #rightVerticalNav.dock-collapsed .right-exp-btn {
+  #rightVerticalNav .right-exp-btn {
     display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-8px) scale(0.95);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   #rightVerticalNav.dock-open .right-exp-btn {
     display: flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
     height: 44px !important;
+    margin-top: 6px !important;
+  }
+  #rightVerticalNav #dockMasterTrigger {
+    display: flex !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(9, 12, 18, 0.95) !important;
+    backdrop-filter: blur(14px) !important;
+    border: 1.5px solid var(--cyan-electric) !important;
+    box-shadow: 0 4px 20px rgba(0, 240, 255, 0.35) !important;
   }
 }

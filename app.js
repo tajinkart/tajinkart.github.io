@@ -1,5 +1,54 @@
 
 // =========================================================
+// موتور آپلود ابری تصاویر CLOUDINARY (پایدار و جهانی)
+// =========================================================
+async function uploadFileToCloudinary(file) {
+  // شناسایی هوشمند کلاود نیم و پریست (بررسی هر دو حالت ارائه‌شده توسط کاربر)
+  const cName1 = siteSettings.cloudinaryCloudName || 'erlvtkx9';
+  const preset1 = siteSettings.cloudinaryPreset || 'tajinkart';
+
+  const formData1 = new FormData();
+  formData1.append('file', file);
+  formData1.append('upload_preset', preset1);
+
+  try {
+    const res1 = await fetch(`https://api.cloudinary.com/v1_1/${cName1}/image/upload`, {
+      method: 'POST',
+      body: formData1
+    });
+    if (res1.ok) {
+      const data1 = await res1.json();
+      return data1.secure_url;
+    }
+  } catch (e) {
+    console.warn('First Cloudinary attempt error:', e);
+  }
+
+  // تلاش با چیدمان معکوس نام‌ها در صورت مغایرت
+  try {
+    const formData2 = new FormData();
+    formData2.append('file', file);
+    formData2.append('upload_preset', 'erlvtkx9');
+    const res2 = await fetch(`https://api.cloudinary.com/v1_1/tajinkart/image/upload`, {
+      method: 'POST',
+      body: formData2
+    });
+    if (res2.ok) {
+      const data2 = await res2.json();
+      siteSettings.cloudinaryCloudName = 'tajinkart';
+      siteSettings.cloudinaryPreset = 'erlvtkx9';
+      try { localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings)); } catch(e){}
+      return data2.secure_url;
+    }
+  } catch (e2) {
+    console.warn('Second Cloudinary attempt error:', e2);
+  }
+
+  return null;
+}
+
+
+// =========================================================
 // مدیریت دکمه بازگشت (Back Button) گوشی و سابقه مرورگر (HTML5 History API)
 // جلوگیری از پرت شدن کاربر به بیرون از سایت در زمان کار با موبایل
 // =========================================================
@@ -287,17 +336,29 @@ window.handleAdminImageLiveChange = function(url) {
 window.handleAdminLocalFileUpload = async function(inputEl) {
   if (!inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
-  showToast('در حال پردازش و فشرده‌سازی تصویر...', 'info');
+  showToast('در حال آپلود و ذخیره در فضای ابری Cloudinary...', 'info');
 
   try {
+    // ۱. ابتدا تلاش برای آپلود مستقیم به کلودیناری جهت دریافت لینک دائمی جهانی
+    const cloudUrl = await uploadFileToCloudinary(file);
+    if (cloudUrl) {
+      handleAdminImageLiveChange(cloudUrl);
+      const urlInput = document.getElementById('editArtImageInput');
+      if (urlInput) urlInput.value = cloudUrl;
+      showToast('تصویر با موفقیت در فضای ابری کلودیناری ذخیره شد و لینک جهانی دریافت کرد!', 'success');
+      return;
+    }
+
+    // ۲. در صورت آفلاین بودن یا عدم پاسخ کلود، ذخیره با موتور فشرده‌سازی خودکار HD
+    showToast('در حال فشرده‌سازی و ذخیره بهینه لوکال...', 'info');
     const compressedBase64 = await compressImageForStorage(file, 1280, 1280, 0.82);
     handleAdminImageLiveChange(compressedBase64);
     const urlInput = document.getElementById('editArtImageInput');
     if (urlInput) urlInput.value = compressedBase64.substring(0, 35) + '... (تصویر بهینه‌شده HD)';
-    showToast('تصویر بهینه‌سازی و لود شد.', 'success');
+    showToast('تصویر فشرده و با کیفیت HD ثبت شد.', 'success');
   } catch (err) {
-    console.error('Compression failed:', err);
-    showToast('خطا در پردازش تصویر. لطفاً دوباره امتحان کنید.', 'error');
+    console.error('Upload failed:', err);
+    showToast('خطا در بارگذاری تصویر. لطفاً دوباره امتحان کنید.', 'error');
   }
 };
 
@@ -375,6 +436,10 @@ window.renderAdminSettingsTab = function() {
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
   const passEl = document.getElementById('setAdminPass');
   if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
+  const cCloudEl = document.getElementById('setCloudinaryCloud');
+  if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'erlvtkx9';
+  const cPresetEl = document.getElementById('setCloudinaryPreset');
+  if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'tajinkart';
 };
 
 
@@ -982,9 +1047,19 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 
-window.toggleDockExpand = function() {
+window.toggleDockExpand = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
   const dock = document.getElementById('rightVerticalNav');
-  if (dock) dock.classList.toggle('dock-open');
+  if (dock) {
+    const isOpen = dock.classList.contains('dock-open');
+    if (isOpen) {
+      dock.classList.remove('dock-open');
+      dock.classList.add('dock-collapsed');
+    } else {
+      dock.classList.add('dock-open');
+      dock.classList.remove('dock-collapsed');
+    }
+  }
 };
 
 document.addEventListener('click', (e) => {
@@ -1785,6 +1860,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
   const passEl = document.getElementById('setAdminPass');
   if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
+  const cCloudEl = document.getElementById('setCloudinaryCloud');
+  if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'erlvtkx9';
+  const cPresetEl = document.getElementById('setCloudinaryPreset');
+  if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'tajinkart';
 
   // ثبت فرم بریف سفارش
   const orderForm = document.getElementById('commissionOrderForm');
@@ -1923,6 +2002,8 @@ document.addEventListener('DOMContentLoaded', () => {
       siteSettings.tgToken = document.getElementById('setTgToken').value.trim();
       siteSettings.tgChat = document.getElementById('setTgChat').value.trim();
       siteSettings.adminPass = document.getElementById('setAdminPass').value.trim() || 'tajinkart';
+      siteSettings.cloudinaryCloudName = document.getElementById('setCloudinaryCloud')?.value.trim() || 'erlvtkx9';
+      siteSettings.cloudinaryPreset = document.getElementById('setCloudinaryPreset')?.value.trim() || 'tajinkart';
       localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
       renderProducts();
       selectPipeline(currentSelectedPipeKey, null, false);
