@@ -298,8 +298,7 @@
       background: radial-gradient(circle at 50% 36%, rgba(129, 140, 248, 0.15), transparent 60%),
                   radial-gradient(circle at 50% 70%, rgba(250, 204, 21, 0.08), transparent 50%),
                   linear-gradient(180deg, #07090f 0%, #040507 100%);
-      transition: transform 0.1s linear, opacity 0.1s linear, filter 0.1s linear;
-      will-change: transform, opacity, filter;
+      will-change: transform, opacity;
     }
     .hero-badge {
       display: inline-flex;
@@ -1964,5 +1963,37 @@
     width: 34px;
     height: 34px;
     font-size: 15px;
+  }
+}
+
+
+/* بهینه‌سازی عملکرد اسکرول ۶۰ فریم و ناوبری در موبایل */
+@media (max-width: 768px) {
+  #stickyBrandHero {
+    height: 52vh !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  .brand-giant-title {
+    will-change: auto;
+  }
+  
+  #rightVerticalNav {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    transition: none !important;
+  }
+  #rightVerticalNav #dockMasterTrigger {
+    display: flex !important;
+  }
+  #rightVerticalNav.dock-collapsed .right-exp-btn {
+    display: none !important;
+  }
+  #rightVerticalNav.dock-open .right-exp-btn {
+    display: flex !important;
+    height: 44px !important;
   }
 }

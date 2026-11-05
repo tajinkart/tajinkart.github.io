@@ -939,33 +939,44 @@ window.addEventListener('scroll', () => {
   if (currentView === 'showcase') {
     const scrolled = window.scrollY;
 
-    if (scrolled > 120) {
-      if (dock) dock.classList.add('dock-collapsed');
-      if (topBar) topBar.classList.add('visible');
-    } else {
-      if (dock) dock.classList.remove('dock-collapsed');
-      if (topBar) topBar.classList.remove('visible');
-    }
-
-    if (hero) {
-      if (scrolled < 650) {
-        const ratio = Math.min(scrolled / 500, 1);
-        const scale = 1 - (ratio * 0.08);
-        const translateY = scrolled * 0.28;
-        const opacity = Math.max(1 - (ratio * 0.75), 0.15);
-        const blur = ratio * 7;
-
-        hero.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
-        hero.style.opacity = opacity;
-        if (window.innerWidth > 768) {
-          hero.style.filter = `blur(${blur}px)`;
-        } else {
-          hero.style.filter = 'none';
-        }
+    // در دسکتاپ: تغییر حالت منوی کپسولی
+    if (window.innerWidth > 768) {
+      if (scrolled > 120) {
+        if (dock) dock.classList.add('dock-collapsed');
+        if (topBar) topBar.classList.add('visible');
       } else {
-        hero.style.transform = 'translate3d(0, 140px, 0) scale(0.92)';
-        hero.style.opacity = '0.15';
-        hero.style.filter = 'blur(7px)';
+        if (dock) dock.classList.remove('dock-collapsed');
+        if (topBar) topBar.classList.remove('visible');
+      }
+      
+      if (hero) {
+        if (scrolled < 650) {
+          const ratio = Math.min(scrolled / 500, 1);
+          const scale = 1 - (ratio * 0.08);
+          const translateY = scrolled * 0.28;
+          const opacity = Math.max(1 - (ratio * 0.75), 0.15);
+          hero.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
+          hero.style.opacity = opacity;
+        } else {
+          hero.style.transform = 'translate3d(0, 140px, 0) scale(0.92)';
+          hero.style.opacity = '0.15';
+        }
+      }
+    } else {
+      // در موبایل: اسکرول سبک ۶۰ فریم بدون هرگونه محاسبه سنگین فیلتر بلور یا تغییر ارتفاع داک
+      if (topBar) {
+        if (scrolled > 150) topBar.classList.add('visible');
+        else topBar.classList.remove('visible');
+      }
+      if (hero) {
+        if (scrolled < 400) {
+          const opacity = Math.max(1 - (scrolled / 320), 0.25);
+          hero.style.opacity = opacity;
+          hero.style.transform = `translate3d(0, ${scrolled * 0.22}px, 0)`;
+        } else {
+          hero.style.opacity = '0.25';
+          hero.style.transform = 'translate3d(0, 88px, 0)';
+        }
       }
     }
   }
@@ -1429,12 +1440,21 @@ window.adminAddNewArtwork = function() {
 };
 
 window.adminDeleteArtwork = function(idx) {
-  showcaseArtworks.splice(idx, 1);
-  localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-  currentSelectedArtIdx = Math.max(0, currentSelectedArtIdx - 1);
-  renderAdminSketch2();
-  renderShowcaseGrid();
-  showToast('اثر حذف شد.', 'info');
+  if (!showcaseArtworks || showcaseArtworks.length <= 1) {
+    showToast('حداقل یک اثر باید در گالری باقی بماند.', 'error');
+    return;
+  }
+  if (confirm('آیا از حذف قطعی این اثر از گالری اطمینان دارید؟')) {
+    showcaseArtworks.splice(idx, 1);
+    try {
+      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    } catch(e) {}
+    currentSelectedArtIdx = 0;
+    closeAdminArtEditor(); // پنجره بلافاصله بسته می‌شود تا از حذف تصادفی اثر بعدی جلوگیری شود
+    renderAdminSketch2();
+    renderShowcaseGrid();
+    showToast('اثر مورد نظر با موفقیت حذف شد.', 'info');
+  }
 };
 
 // مدیریت دارایی‌های دیجیتال (۷ شاخه)
