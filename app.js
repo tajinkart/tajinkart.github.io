@@ -2105,16 +2105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // ۱. اعتبارسنجی قطعی: جلوگیری از ثبت‌نام مجدد با ایمیل تکراری
-      const isDuplicate = siteMembersData.some(m => m.email && m.email.toLowerCase() === email);
-      if (isDuplicate) {
-        showToast('این ایمیل قبلاً ثبت‌نام شده است! لطفاً وارد شوید.', 'error');
-        switchAuthView('login');
-        const loginEmailEl = document.getElementById('loginEmail');
-        if (loginEmailEl) loginEmailEl.value = email;
-        return;
-      }
-
       showToast('در حال ثبت حساب کاربری در سرورهای ابری Supabase...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
@@ -2134,13 +2124,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (error) {
             console.warn('[Supabase SignUp Error]', error);
-            if (error.message.includes('already registered') || error.message.includes('already exists') || error.status === 422) {
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('already registered') || msg.includes('already exists') || error.status === 422) {
               showToast('این ایمیل قبلاً در سیستم ثبت‌نام شده است. لطفاً وارد شوید.', 'error');
               switchAuthView('login');
               const loginEmailEl = document.getElementById('loginEmail');
               if (loginEmailEl) loginEmailEl.value = email;
             } else {
-              showToast('خطا در ثبت‌نام: ' + (error.message || 'مشکل در برقراری ارتباط'), 'error');
+              showToast('خطای سوپابیس: ' + (error.message || 'ثبت‌نام ناموفق بود'), 'error');
             }
             return;
           }
