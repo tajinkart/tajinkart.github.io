@@ -722,9 +722,14 @@
                     <button onclick="filterMembersByTier('VIP')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px;">اعضای ویژه (VIP)</button>
                     <button onclick="filterMembersByTier('PRO')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px;">پرو (PRO)</button>
                   </div>
-                  <button type="button" onclick="adminClearAllTestMembers()" class="btn-secondary" style="font-size:11px; padding:4px 10px; color:var(--crimson); border-color:rgba(239,68,68,0.3);" title="پاکسازی کاربران تستی ثبت‌شده در مرورگر">
-                    🧹 پاکسازی اعضای تستی
-                  </button>
+                  <div style="display:flex; gap:8px;">
+                    <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11px; padding:6px 14px; background:var(--cyan-electric); color:#000;" title="واکشی زنده و بازیابی تمام اعضای ثبت‌شده و خریدهای آنلاین از Supabase">
+                      🔄 همگام‌سازی و بازیابی اعضا از سرور ابری
+                    </button>
+                    <button type="button" onclick="exportMembersBackupJSON()" class="btn-secondary" style="font-size:11px; padding:6px 12px; color:var(--text-muted); border-color:var(--border-subtle);" title="دانلود نسخه پشتیبان رسمی از مشخصات و لایسنس‌های اعضا">
+                      💾 دانلود بک‌آپ (JSON)
+                    </button>
+                  </div>
                 </div>
               </div>
               <div id="adminMembersListContainer"></div>
@@ -1080,8 +1085,18 @@
           <div>
             <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب (حداقل ۶ کاراکتر)</label>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="signupPass" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+            <!-- نوار داینامیک سنجش قدرت رمز عبور -->
+            <div id="signupPassStrengthBox" style="margin-top:6px; display:none;">
+              <div style="height:4px; border-radius:4px; background:#1e293b; overflow:hidden; margin-bottom:4px;">
+                <div id="signupPassStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:10.5px;">
+                <span id="signupPassStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
+                <span id="signupPassStrengthHint" class="font-mono" style="color:var(--text-muted);">حداقل ۶ کاراکتر</span>
+              </div>
             </div>
           </div>
           <div>
@@ -1150,8 +1165,18 @@
           <div>
             <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور جدید</label>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="userNewPassword" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <input type="password" id="userNewPassword" required minlength="6" oninput="evalPassStrength(this.value, 'userNewPassword')" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('userNewPassword', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+            <!-- نوار داینامیک سنجش قدرت رمز عبور -->
+            <div id="userNewPasswordStrengthBox" style="margin-top:6px; display:none;">
+              <div style="height:4px; border-radius:4px; background:#1e293b; overflow:hidden; margin-bottom:4px;">
+                <div id="userNewPasswordStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:10.5px;">
+                <span id="userNewPasswordStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
+                <span id="userNewPasswordStrengthHint" class="font-mono" style="color:var(--text-muted);">حداقل ۶ کاراکتر</span>
+              </div>
             </div>
           </div>
           <div>

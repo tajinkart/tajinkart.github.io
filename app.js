@@ -173,6 +173,53 @@ function safeSetStorage(key, value) {
 
 
 // موتور همگام‌سازی کاملاً خودکار و دوطرفه ابری (Automated Two-Way Cloud Sync)
+
+// =========================================================
+// موتور همگام‌سازی خودکار و دوطرفه اعضا با دیتابیس ابری SUPABASE
+// =========================================================
+async function syncMembersFromSupabase(showNotification = false) {
+  if (!window.supabaseClient) return;
+  try {
+    const { data: cloudMembers, error } = await window.supabaseClient
+      .from('members')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('[Supabase Members Fetch]', error);
+      if (showNotification) showToast('خطا در دریافت لیست اعضا از سرور ابری.', 'error');
+      return;
+    }
+
+    if (cloudMembers && cloudMembers.length > 0) {
+      siteMembersData = cloudMembers.map(m => ({
+        id: m.id,
+        name: m.name || (m.email ? m.email.split('@')[0] : 'عضو استودیو'),
+        email: m.email || '',
+        contact: m.contact || '',
+        tier: m.tier || 'STANDARD',
+        balance: m.balance || '$0',
+        withdrawn: m.withdrawn || '$0',
+        assetsBought: Array.isArray(m.assets_bought) ? m.assets_bought : [],
+        totalSpent: m.total_spent || '$0'
+      }));
+
+      safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+      renderAdminSketch3();
+      if (showNotification) {
+        showToast(`✓ لیست تمام ${siteMembersData.length} عضو با موفقیت از دیتابیس ابری بازیابی شد!`, 'success');
+      }
+      console.log('[Supabase Members] Synced members from cloud:', siteMembersData.length);
+    } else if (showNotification) {
+      showToast('جدول اعضا در دیتابیس ابری خالی است.', 'info');
+    }
+  } catch (err) {
+    console.warn('[Sync Members Exception]', err);
+  }
+}
+
+window.syncMembersFromSupabase = syncMembersFromSupabase;
+
 async function syncArtworksFromSupabase() {
   if (!window.supabaseClient) return;
 
@@ -1217,9 +1264,20 @@ function renderProductsWithList(list) {
 window.downloadDigitalAsset = function(title) {
   showToast(`دارایی «${title}» همراه با لایسنس دائمی و کلید لور به داشبورد شما اضافه شد.`, 'success');
   if (currentMember) {
+    if (!currentMember.assetsBought) currentMember.assetsBought = [];
     if (!currentMember.assetsBought.includes(title)) {
       currentMember.assetsBought.push(title);
-      localStorage.setItem(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+      safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+
+      // ذخیره دائمی و آنلاین در جدول اعضای دیتابیس ابری Supabase
+      if (window.supabaseClient) {
+        window.supabaseClient.from('members').update({
+          assets_bought: currentMember.assetsBought
+        }).eq('email', currentMember.email).then(({ error }) => {
+          if (error) console.warn('Cloud asset purchase sync warning:', error);
+          else console.log('Successfully saved bought asset to Supabase cloud!');
+        });
+      }
     }
   }
 };
@@ -2053,6 +2111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSupabaseAuthSession();
   checkEmailRecoveryFlow();
   syncArtworksFromSupabase();
+  syncMembersFromSupabase();
   selectPipeline('sketch1', document.querySelector('#atelierServiceCards .service-nav-card.active'), false);
   renderProducts();
   renderAcademy();
@@ -2251,8 +2310,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (data && data.user) {
             applyLoggedInMember(data.user);
 
-            // ثبت همزمان در حافظه کش ادمین استودیو
-            siteMembersData.push({
+            const newMemberObj = {
               id: data.user.id || Date.now(),
               name: name,
               email: email,
@@ -2262,8 +2320,25 @@ document.addEventListener('DOMContentLoaded', () => {
               withdrawn: '$0',
               assetsBought: [],
               totalSpent: '$0'
-            });
+            };
+
+            siteMembersData.unshift(newMemberObj);
             safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+
+            // ذخیره آنلاین، دائمی و ابری در جدول members سوپابیس
+            if (window.supabaseClient) {
+              window.supabaseClient.from('members').upsert([{
+                id: data.user.id,
+                name: name,
+                email: email,
+                contact: phone,
+                tier: 'STANDARD',
+                assets_bought: []
+              }]).then(({ error }) => {
+                if (error) console.warn('Supabase members table upsert warning:', error);
+                else console.log('Member profile stored in Supabase cloud database!');
+              });
+            }
 
             closeMemberModal();
             renderMemberDashboard();
@@ -2549,12 +2624,18 @@ window.handleGoogleSignIn = async function() {
 window.adminDeleteMember = function(idx) {
   if (!siteMembersData || !siteMembersData[idx]) return;
   const m = siteMembersData[idx];
-  if (confirm(`آیا از حذف کاربر «${m.name}» (${m.email}) اطمینان دارید؟`)) {
+  if (confirm(`آیا از حذف کاربر «${m.name}» (${m.email}) از پنل اطمینان دارید؟ (با دکمه بازیابی ابری همیشه می‌توانید آن را برگردانید)`)) {
+    const deletedEmail = m.email;
     siteMembersData.splice(idx, 1);
     safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
     selectedMemberIdx = 0;
     renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
-    showToast(`کاربر «${m.name}» با موفقیت حذف شد. اکنون می‌توانید با این ایمیل مجدداً تست بزنید.`, 'info');
+    showToast(`کاربر «${m.name}» از لیست پنل حذف شد. با دکمه «بازیابی از سرور ابری» می‌توانید بازگردانیدش.`, 'info');
+
+    // حذف از جدول عمومی members در سوپابیس
+    if (window.supabaseClient && deletedEmail) {
+      window.supabaseClient.from('members').delete().eq('email', deletedEmail).then(() => {});
+    }
   }
 };
 
@@ -2570,26 +2651,21 @@ window.adminEditMemberEmail = function(idx) {
   }
 };
 
-window.adminClearAllTestMembers = function() {
-  if (confirm('آیا مایلید تمام کاربران تستی ثبت‌شده در مرورگر پاک شوند تا لیست اعضا کاملاً تازه شود؟')) {
-    siteMembersData = [
-      {
-        id: 101,
-        name: 'سید سروش تاج',
-        email: 'soroush@tajinkart.com',
-        contact: '09120000000',
-        tier: 'VIP',
-        balance: '$1,450',
-        withdrawn: '$1,200',
-        assetsBought: ['کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD'],
-        totalSpent: '$420'
-      }
-    ];
-    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
-    selectedMemberIdx = 0;
-    renderAdminSketch3('', 'all');
-    showToast('تمام کاربران تستی با موفقیت پاک شدند. اکنون می‌توانید تست تازه انجام دهید.', 'success');
-  }
+window.exportMembersBackupJSON = function() {
+  const backupData = {
+    title: 'TAJINKART Studio Members Master Backup',
+    exportedAt: new Date().toISOString(),
+    totalMembers: siteMembersData.length,
+    members: siteMembersData
+  };
+  const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tajinkart_members_backup_${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('نسخه پشتیبان کامل اطلاعات اعضا (JSON) با موفقیت دانلود شد.', 'success');
 };
 
 
@@ -2619,4 +2695,55 @@ window.openTermsModal = function(e) {
 window.closeTermsModal = function() {
   const modal = document.getElementById('termsModal');
   if (modal) modal.style.display = 'none';
+};
+
+
+// =========================================================
+// موتور هوشمند سنجش کیفیت و قدرت رمز عبور (Password Strength)
+// =========================================================
+window.evalPassStrength = function(pass, prefix) {
+  const box = document.getElementById(prefix + 'StrengthBox');
+  const bar = document.getElementById(prefix + 'StrengthBar');
+  const text = document.getElementById(prefix + 'StrengthText');
+  const hint = document.getElementById(prefix + 'StrengthHint');
+  if (!box || !bar || !text) return;
+
+  if (!pass || pass.length === 0) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = 'block';
+
+  let score = 0;
+  if (pass.length >= 6) score += 1;
+  if (pass.length >= 8) score += 1;
+  if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score += 1;
+  if (/[0-9]/.test(pass)) score += 1;
+  if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+
+  if (score <= 1) {
+    bar.style.width = '25%';
+    bar.style.background = 'var(--crimson)';
+    text.textContent = 'سطح امنیت: بسیار ضعیف';
+    text.style.color = 'var(--crimson)';
+    if (hint) hint.textContent = 'افزودن عدد و علامت الزامی است';
+  } else if (score === 2) {
+    bar.style.width = '50%';
+    bar.style.background = 'var(--amber)';
+    text.textContent = 'سطح امنیت: متوسط';
+    text.style.color = 'var(--amber)';
+    if (hint) hint.textContent = 'افزودن حروف بزرگ یا نماد خاص';
+  } else if (score === 3 || score === 4) {
+    bar.style.width = '75%';
+    bar.style.background = 'var(--cyan-electric)';
+    text.textContent = 'سطح امنیت: خوب و ایمن';
+    text.style.color = 'var(--cyan-electric)';
+    if (hint) hint.textContent = 'استاندارد و مناسب';
+  } else {
+    bar.style.width = '100%';
+    bar.style.background = 'var(--emerald)';
+    text.textContent = 'سطح امنیت: فوق‌العاده قوی ✓';
+    text.style.color = 'var(--emerald)';
+    if (hint) hint.textContent = 'حداکثر مقاومت امنیتی';
+  }
 };
