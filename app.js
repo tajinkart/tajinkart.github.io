@@ -2262,6 +2262,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const agreeTerms = document.getElementById('signupAgreeTerms')?.checked;
       const agreeAge = document.getElementById('signupAgreeAge')?.checked;
 
+      // ۱. اعتبارسنجی نام کاربری (ممانعت از نام‌های جعلی یا حروف تکراری متوالی)
+      const isRepeatedName = /(.)\1{2,}/.test(name);
+      if (name.length < 3 || isRepeatedName) {
+        showToast('نام وارد شده نامعتبر است! لطفاً یک نام یا لقب معتبر (حداقل ۳ حرف بدون تکرار متوالی کاراکتر) وارد فرمایید.', 'error');
+        document.getElementById('signupName')?.focus();
+        return;
+      }
+
+      // ۲. اعتبارسنجی دقیق سینتکس و پسوند ایمیل
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email)) {
+        showToast('آدرس ایمیل نامعتبر است! لطفاً یک ایمیل کامل با دامنه معتبر (مانند user@gmail.com) وارد فرمایید.', 'error');
+        document.getElementById('signupEmail')?.focus();
+        return;
+      }
+
       const countryCode = document.getElementById('signupCountryCode')?.value || '+98';
       const rawPhone = document.getElementById('signupPhone')?.value.trim() || '';
       let cleanDigits = rawPhone.replace(/[^0-9]/g, '');
@@ -2808,50 +2824,69 @@ window.openChangePasswordModal = function() {
 };
 
 
-// بررسی زنده تکراری بودن ایمیل در زمان تایپ
+// بررسی زنده ساختار رسمی ایمیل و ممانعت از دامنه‌های ناقص (مانند gmail بدون .com)
 let emailCheckTimeout = null;
 window.handleLiveEmailCheck = function(emailVal) {
   const notice = document.getElementById('signupEmailLiveNotice');
-  if (!notice) return;
+  const emailInput = document.getElementById('signupEmail');
+  if (!notice || !emailInput) return;
   const cleanEmail = (emailVal || '').trim().toLowerCase();
 
   clearTimeout(emailCheckTimeout);
-  if (!cleanEmail || !cleanEmail.includes('@') || cleanEmail.length < 5) {
+  if (!cleanEmail) {
     notice.style.display = 'none';
+    emailInput.style.borderColor = 'var(--border-subtle)';
     return;
   }
 
-  // ۱. بررسی فوری در حافظه کلاینت
+  notice.style.display = 'inline-block';
+
+  // اعتبارسنجی سینتکس کامل ایمیل با پسوند دامنه رسمی حداقل ۲ حرفی (.com, .ir, .net, ...)
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(cleanEmail)) {
+    notice.style.color = 'var(--crimson)';
+    notice.textContent = '✕ فرمت ایمیل ناقص است (مثال: user@gmail.com)';
+    emailInput.style.borderColor = 'var(--crimson)';
+    return;
+  }
+
+  // بررسی عدم تکراری بودن در حافظه کلاینت
   const localExists = siteMembersData.some(m => m.email && m.email.toLowerCase() === cleanEmail);
   if (localExists) {
-    notice.style.display = 'inline-block';
     notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ این ایمیل قبلاً ثبت شده است';
+    notice.textContent = '✕ این ایمیل قبلاً در استودیو ثبت شده است';
+    emailInput.style.borderColor = 'var(--crimson)';
     return;
   }
 
-  // ۲. بررسی در جدول سوپابیس با تاخیر ۵۰۰ میلی‌ثانیه برای عدم ارسال درخواست‌های اضافی
+  notice.style.color = 'var(--gold)';
+  notice.textContent = '⏳ در حال بررسی در سرور ابری...';
+
+  // بررسی آنلاین در جدول اعضای سوپابیس
   emailCheckTimeout = setTimeout(async () => {
     if (window.supabaseClient) {
       try {
-        const { data, error } = await window.supabaseClient
+        const { data } = await window.supabaseClient
           .from('members')
           .select('email')
           .eq('email', cleanEmail)
           .maybeSingle();
 
         if (data && data.email) {
-          notice.style.display = 'inline-block';
           notice.style.color = 'var(--crimson)';
-          notice.textContent = '✕ این ایمیل قبلاً در استودیو ثبت شده است';
+          notice.textContent = '✕ این ایمیل قبلاً در سیستم ثبت‌نام شده است';
+          emailInput.style.borderColor = 'var(--crimson)';
         } else {
-          notice.style.display = 'inline-block';
           notice.style.color = 'var(--emerald)';
-          notice.textContent = '✓ ایمیل مجاز و آزاد است';
+          notice.textContent = '✓ ایمیل معتبر و آزاد است';
+          emailInput.style.borderColor = 'var(--emerald)';
         }
-      } catch(e) {}
+      } catch(e) {
+        notice.style.color = 'var(--emerald)';
+        notice.textContent = '✓ فرمت ایمیل معتبر است';
+      }
     }
-  }, 450);
+  }, 400);
 };
 
 
@@ -2877,11 +2912,15 @@ window.handleLivePhoneCheck = function() {
 
   notice.style.display = 'inline-block';
 
-  // بررسی شماره ایران (+98)
+  // بررسی دقیق شماره تلفن همراه ایران (+98)
   if (countryCode === '+98') {
-    if (val.length === 10 && val.startsWith('9')) {
+    if (!val.startsWith('9')) {
+      notice.style.color = 'var(--crimson)';
+      notice.textContent = '✕ شماره باید با ۹ آغاز گردد (بدون صفر)';
+      phoneInput.style.borderColor = 'var(--crimson)';
+    } else if (val.length === 10) {
       notice.style.color = 'var(--emerald)';
-      notice.textContent = '✓ شماره موبایل صحیح است';
+      notice.textContent = '✓ شماره موبایل ۱۰ رقمی صحیح است';
       phoneInput.style.borderColor = 'var(--emerald)';
     } else {
       notice.style.color = 'var(--crimson)';
@@ -2891,14 +2930,53 @@ window.handleLivePhoneCheck = function() {
     return;
   }
 
-  // سایر کشورها (بین ۶ تا ۱۲ رقم)
-  if (val.length >= 6 && val.length <= 13) {
+  // بررسی شماره‌های بین‌المللی استاندارد E.164 (بین ۷ تا ۱۲ رقم متناسب با کشور)
+  if (val.length >= 7 && val.length <= 12) {
     notice.style.color = 'var(--emerald)';
     notice.textContent = '✓ شماره معتبر است';
     phoneInput.style.borderColor = 'var(--emerald)';
   } else {
     notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ طول شماره نامعتبر است';
+    notice.textContent = `✕ طول شماره نامعتبر است (${val.length} رقم)`;
     phoneInput.style.borderColor = 'var(--crimson)';
+  }
+};
+
+
+// بررسی زنده صحت نام و ممانعت از حروف تکراری چرت و پرت (مانند sss یا 111)
+window.handleLiveNameCheck = function(nameVal) {
+  const notice = document.getElementById('signupNameLiveNotice');
+  const nameInput = document.getElementById('signupName');
+  if (!notice || !nameInput) return;
+
+  const val = (nameVal || '').trim();
+  if (val.length === 0) {
+    notice.style.display = 'none';
+    nameInput.style.borderColor = 'var(--border-subtle)';
+    return;
+  }
+
+  notice.style.display = 'inline-block';
+
+  // بررسی تکرار ۳ کاراکتر مشابه پشت سر هم (مانند sss, aaaa, ...) یا کمتر از ۳ حرف
+  const hasRepeatingChars = /(.)\1{2,}/.test(val);
+  const isValidChars = /^[\u0600-\u06FFa-zA-Z\s\-_0-9]{3,30}$/.test(val);
+
+  if (val.length < 3) {
+    notice.style.color = 'var(--crimson)';
+    notice.textContent = '✕ نام حداقل باید ۳ حرف باشد';
+    nameInput.style.borderColor = 'var(--crimson)';
+  } else if (hasRepeatingChars) {
+    notice.style.color = 'var(--crimson)';
+    notice.textContent = '✕ نام نامعتبر است (حروف تکراری متوالی)';
+    nameInput.style.borderColor = 'var(--crimson)';
+  } else if (!isValidChars) {
+    notice.style.color = 'var(--crimson)';
+    notice.textContent = '✕ فقط حروف فارسی و انگلیسی مجاز است';
+    nameInput.style.borderColor = 'var(--crimson)';
+  } else {
+    notice.style.color = 'var(--emerald)';
+    notice.textContent = '✓ نام معتبر است';
+    nameInput.style.borderColor = 'var(--emerald)';
   }
 };
