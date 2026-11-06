@@ -1,11 +1,146 @@
 
 // =========================================================
+// موتور همگام‌سازی ابری SUPABASE (اتصال زنده کامپیوتر و گوشی)
+// =========================================================
+const SUPABASE_PROJECT_URL = 'https://ahuasiouokvtryzxohri.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_dyUVO6elCOkL_a3Mukm0Ww_4XZNLohX';
+
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+  window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+}
+
+// واکشی خودکار و زنده آثار از دیتابیس ابری
+async function syncArtworksFromSupabase() {
+  if (!window.supabaseClient) return;
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('artworks')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      showcaseArtworks = data.map(item => ({
+        id: item.id,
+        tag: item.tag || 'character',
+        shortSlug: item.short_slug || item.title,
+        title: item.title,
+        desc: item.desc_text || '',
+        pipelineKey: item.pipeline_key || 'sketch1',
+        image: item.image,
+        colorSpace: item.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+        lore: item.lore || 'جهان اکستوپیا',
+        phases: item.phases || [
+          { name: 'اتود اولیه و سیلوئت', img: item.image },
+          { name: 'لاین‌آرت فنی و کادر', img: item.image },
+          { name: 'مطالعه نوری و مقداری', img: item.image },
+          { name: 'رندر متریال نهایی', img: item.image }
+        ]
+      }));
+      try { localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks)); } catch(e){}
+      renderShowcaseGrid();
+  syncArtworksFromSupabase();
+      renderAdminSketch2();
+      console.log('Artworks synced live from Supabase cloud!');
+    } else if (!error && data && data.length === 0) {
+      // بارگذاری اولیه آثار پیش‌فرض در دیتابیس ابری
+      seedInitialArtworksToSupabase();
+    }
+  } catch (err) {
+    console.warn('Supabase sync skipped, using cached artworks:', err);
+  }
+}
+
+// انتقال خودکار آثار پیش‌فرض به سوپابیس در اولین راه‌اندازی
+async function seedInitialArtworksToSupabase() {
+  if (!window.supabaseClient || !showcaseArtworks || showcaseArtworks.length === 0) return;
+  try {
+    const rows = showcaseArtworks.map(a => ({
+      id: a.id,
+      tag: a.tag || 'character',
+      short_slug: a.shortSlug || a.title,
+      title: a.title,
+      desc_text: a.desc || '',
+      pipeline_key: a.pipelineKey || 'sketch1',
+      image: a.image,
+      color_space: a.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+      lore: a.lore || 'جهان اکستوپیا',
+      phases: a.phases || []
+    }));
+    await window.supabaseClient.from('artworks').upsert(rows);
+    console.log('Default artworks seeded to Supabase successfully.');
+  } catch (e) {
+    console.warn('Seeding error:', e);
+  }
+}
+
+
+// دانلود مستقیم فایل به‌روز شده data.js با کلیه آثار جدید و تنظیمات جهت انتشار جهانی روی گیت‌هاب
+window.exportUpdatedDataJS = function() {
+  const fileContent = `/**
+ * TAJINKART Master Spec Data Store
+ * مدیر استودیو و طراح دنیا: سید سروش تاج
+ * تاریخ به‌روزرسانی: ${new Date().toLocaleDateString('fa-IR')}
+ */
+
+const KEYS = {
+  ORDERS: 'tajinkart_orders_fa_v2',
+  SETTINGS: 'tajinkart_settings_fa_v2',
+  ARTWORKS: 'tajinkart_artworks_fa_v2',
+  PIPELINES: 'tajinkart_pipelines_fa_v2',
+  PRODUCTS: 'tajinkart_products_fa_v2',
+  MEMBERS: 'tajinkart_members_fa_v2'
+};
+
+let currentView = 'showcase';
+let currentMember = null;
+let comicCurrentPage = 1;
+let activeModalItem = {};
+let currencyMode = '${currencyMode || "USD"}';
+let activeCaseStudyArt = null;
+let activeCaseStudyPhaseIdx = 0;
+
+let currentSelectedPipeKey = '${currentSelectedPipeKey || "sketch1"}';
+let currentSelectedStageIdx = 0;
+let currentSelectedArtIdx = 0;
+let currentSelectedProductIdx = 0;
+let selectedMemberIdx = 0;
+let currentMemberTierFilter = 'all';
+
+let siteSettings = ${JSON.stringify(siteSettings, null, 2)};
+
+let showcaseArtworks = ${JSON.stringify(showcaseArtworks, null, 2)};
+
+let PIPELINE_DATA = ${JSON.stringify(PIPELINE_DATA, null, 2)};
+
+let digitalStoreProducts = ${JSON.stringify(digitalStoreProducts, null, 2)};
+
+let academyCourses = ${JSON.stringify(academyCourses, null, 2)};
+
+let ordersList = ${JSON.stringify(ordersList, null, 2)};
+
+let comicPages = ${JSON.stringify(comicPages, null, 2)};
+
+let siteMembersData = ${JSON.stringify(siteMembersData, null, 2)};
+`;
+
+  const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.js';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('فایل جدید data.js دانلود شد! آن را در گیت‌هاب جایگزین کنید تا همه در گوشی ببینند.', 'success');
+};
+
+
+// =========================================================
 // موتور آپلود ابری تصاویر CLOUDINARY (پایدار و جهانی)
 // =========================================================
 async function uploadFileToCloudinary(file) {
   // شناسایی هوشمند کلاود نیم و پریست (بررسی هر دو حالت ارائه‌شده توسط کاربر)
-  const cName1 = siteSettings.cloudinaryCloudName || 'erlvtkx9';
-  const preset1 = siteSettings.cloudinaryPreset || 'tajinkart';
+  const cName1 = siteSettings.cloudinaryCloudName || 'tajinkart';
+  const preset1 = siteSettings.cloudinaryPreset || 'erlvtkx9';
 
   const formData1 = new FormData();
   formData1.append('file', file);
@@ -405,6 +540,26 @@ window.confirmSaveArtwork = function() {
       renderShowcaseGrid();
       renderAdminSketch2();
       showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
+
+      // ارسال زنده به دیتابیس ابری سوپابیس
+      if (window.supabaseClient) {
+        window.supabaseClient.from('artworks').insert([{
+          id: stagingNewArt.id,
+          tag: stagingNewArt.tag || 'character',
+          short_slug: stagingNewArt.shortSlug,
+          title: stagingNewArt.title,
+          desc_text: stagingNewArt.desc,
+          pipeline_key: stagingNewArt.pipelineKey,
+          image: stagingNewArt.image,
+          color_space: stagingNewArt.colorSpace,
+          lore: stagingNewArt.lore,
+          phases: stagingNewArt.phases
+        }]).then(({ error }) => {
+          if (error) console.warn('Supabase insert error:', error);
+          else showToast('اثر جدید در دیتابیس ابری ذخیره و در گوشی و تمام دنیا همگام شد!', 'success');
+        });
+      }
+
     } else if (showcaseArtworks[currentSelectedArtIdx]) {
       const art = showcaseArtworks[currentSelectedArtIdx];
       art.title = title || art.title;
@@ -420,6 +575,25 @@ window.confirmSaveArtwork = function() {
       renderShowcaseGrid();
       renderAdminSketch2();
       showToast('تغییرات اثر با موفقیت ذخیره شد.', 'success');
+
+      // به‌روزرسانی زنده در دیتابیس ابری سوپابیس
+      if (window.supabaseClient) {
+        window.supabaseClient.from('artworks').update({
+          tag: art.tag,
+          short_slug: art.shortSlug,
+          title: art.title,
+          desc_text: art.desc,
+          pipeline_key: art.pipelineKey,
+          image: art.image,
+          color_space: art.colorSpace,
+          lore: art.lore,
+          phases: art.phases
+        }).eq('id', art.id).then(({ error }) => {
+          if (error) console.warn('Supabase update error:', error);
+          else showToast('تغییرات در دیتابیس ابری ذخیره و همگام شد.', 'success');
+        });
+      }
+
     }
   } catch (storageErr) {
     console.error('Storage error:', storageErr);
@@ -1004,17 +1178,20 @@ window.addEventListener('scroll', () => {
   if (currentView === 'showcase') {
     const scrolled = window.scrollY;
 
-    // در دسکتاپ: تغییر حالت منوی کپسولی
-    if (window.innerWidth > 768) {
-      if (scrolled > 120) {
-        if (dock) dock.classList.add('dock-collapsed');
-        if (topBar) topBar.classList.add('visible');
-      } else {
-        if (dock) dock.classList.remove('dock-collapsed');
-        if (topBar) topBar.classList.remove('visible');
+    // رفتار محبوب کاربر: داک در بالای صفحه باز است و با اسکرول به پایین جمع می‌شود
+    if (scrolled > 120) {
+      if (dock) dock.classList.add('dock-collapsed');
+      if (topBar) topBar.classList.add('visible');
+    } else {
+      if (dock) {
+        dock.classList.remove('dock-collapsed');
+        dock.classList.remove('dock-open');
       }
-      
-      if (hero) {
+      if (topBar) topBar.classList.remove('visible');
+    }
+
+    if (hero) {
+      if (window.innerWidth > 768) {
         if (scrolled < 650) {
           const ratio = Math.min(scrolled / 500, 1);
           const scale = 1 - (ratio * 0.08);
@@ -1026,21 +1203,15 @@ window.addEventListener('scroll', () => {
           hero.style.transform = 'translate3d(0, 140px, 0) scale(0.92)';
           hero.style.opacity = '0.15';
         }
-      }
-    } else {
-      // در موبایل: اسکرول سبک ۶۰ فریم بدون هرگونه محاسبه سنگین فیلتر بلور یا تغییر ارتفاع داک
-      if (topBar) {
-        if (scrolled > 150) topBar.classList.add('visible');
-        else topBar.classList.remove('visible');
-      }
-      if (hero) {
+      } else {
+        // در موبایل: حرکت سبک بدون لگ
         if (scrolled < 400) {
           const opacity = Math.max(1 - (scrolled / 320), 0.25);
           hero.style.opacity = opacity;
-          hero.style.transform = `translate3d(0, ${scrolled * 0.22}px, 0)`;
+          hero.style.transform = `translate3d(0, ${scrolled * 0.2}px, 0)`;
         } else {
           hero.style.opacity = '0.25';
-          hero.style.transform = 'translate3d(0, 88px, 0)';
+          hero.style.transform = 'translate3d(0, 80px, 0)';
         }
       }
     }
@@ -1520,6 +1691,14 @@ window.adminDeleteArtwork = function(idx) {
     return;
   }
   if (confirm('آیا از حذف قطعی این اثر از گالری اطمینان دارید؟')) {
+    
+    const deletedId = showcaseArtworks[idx]?.id;
+    if (window.supabaseClient && deletedId) {
+      window.supabaseClient.from('artworks').delete().eq('id', deletedId).then(({ error }) => {
+        if (error) console.warn('Supabase delete error:', error);
+      });
+    }
+
     showcaseArtworks.splice(idx, 1);
     try {
       localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -21,7 +22,7 @@
   </div>
 
   <!-- ۲. داک عمودی ناوبری راست -->
-  <nav id="rightVerticalNav" class="dock-collapsed">
+  <nav id="rightVerticalNav">
     <div id="dockMasterTrigger" title="منو" onclick="toggleDockExpand()">
       <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
     </div>
@@ -537,22 +538,7 @@
           </div>
           <button type="submit" class="btn-gold" style="padding:12px;">باز کردن پنل مدیریت</button>
         
-                <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9 یا tajinkart" />
-                  </div>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
-                  </div>
-                </div>
+                
 
               </form>
       </div>
@@ -565,6 +551,7 @@
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button onclick="exportSiteDataJSON()" class="btn-gold" style="background:var(--cyan-electric); color:#000;">دانلود بک‌آپ اطلاعات (JSON)</button>
+            <button onclick="exportUpdatedDataJS()" class="btn-gold" style="background:var(--gold); color:#000;">دانلود فایل به‌روز شده data.js (انتشار همگانی)</button>
             <button onclick="exportFullSelfContainedHTML()" class="btn-gold">دانلود سورس به‌روز شده HTML</button>
             <button onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af;">قفل پنل</button>
           </div>
@@ -1009,22 +996,7 @@
           ثبت رسمی بریف و ارسال مستقیم به تلگرام مدیر استودیو ←
         </button>
       
-                <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9 یا tajinkart" />
-                  </div>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
-                  </div>
-                </div>
+                
 
               </form>
     </div>
@@ -1055,22 +1027,7 @@
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">ورود به حساب کاربری</button>
         
-                <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9 یا tajinkart" />
-                  </div>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
-                  </div>
-                </div>
+                
 
               </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
@@ -1104,22 +1061,7 @@
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">تکمیل ثبت‌نام ←</button>
         
-                <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9 یا tajinkart" />
-                  </div>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
-                  </div>
-                </div>
+                
 
               </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
@@ -1163,22 +1105,7 @@
             </button>
           </div>
         
-                <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9 یا tajinkart" />
-                  </div>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
-                  </div>
-                </div>
+                
 
               </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px;">
