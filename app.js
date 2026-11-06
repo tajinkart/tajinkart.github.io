@@ -202,7 +202,7 @@ async function syncMembersFromSupabase(showNotification = false) {
       return;
     }
 
-    if (cloudMembers && cloudMembers.length > 0) {
+    if (cloudMembers) {
       siteMembersData = cloudMembers.map(m => ({
         id: m.id,
         name: m.name || (m.email ? m.email.split('@')[0] : 'عضو استودیو'),
@@ -216,13 +216,17 @@ async function syncMembersFromSupabase(showNotification = false) {
       }));
 
       safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+      selectedMemberIdx = 0;
       renderAdminSketch3();
+
       if (showNotification) {
-        showToast(`✓ لیست تمام ${siteMembersData.length} عضو با موفقیت از دیتابیس ابری بازیابی شد!`, 'success');
+        if (siteMembersData.length > 0) {
+          showToast(`✓ لیست اعضا با موفقیت از دیتابیس ابری همگام شد (${siteMembersData.length} عضو فعال).`, 'success');
+        } else {
+          showToast('✓ همگام‌سازی کامل شد: تمام اعضای حذف‌شده از پنل سایت نیز پاک شدند (لیست همگام با دیتابیس ابری شد).', 'info');
+        }
       }
-      console.log('[Supabase Members] Synced members from cloud:', siteMembersData.length);
-    } else if (showNotification) {
-      showToast('جدول اعضا در دیتابیس ابری خالی است.', 'info');
+      console.log('[Supabase Members] Synced members from cloud. Active count:', siteMembersData.length);
     }
   } catch (err) {
     console.warn('[Sync Members Exception]', err);
