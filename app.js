@@ -3,6 +3,19 @@
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
  */
 
+// ۱. شناسایی فوری لینک بازیابی رمز قبل از پاکسازی توکن‌ها توسط کلاینت‌ها
+let isRecoveryFlowDetected = false;
+try {
+  const _h = window.location.hash || '';
+  const _s = window.location.search || '';
+  if (_h.includes('type=recovery') || _s.includes('type=recovery') || _s.includes('action=reset-password') || (_h.includes('access_token=') && !_h.includes('provider='))) {
+    isRecoveryFlowDetected = true;
+    sessionStorage.setItem('tajinkart_recovering_password', 'true');
+    console.log('[Early Recovery Flag] Detected password reset link in URL!');
+  }
+} catch(e) {}
+
+
 // =========================================================
 // کلاینت دیتابیس ابری SUPABASE (اتصال زنده کامپیوتر و گوشی)
 // =========================================================
@@ -10,7 +23,26 @@ const SUPABASE_PROJECT_URL = 'https://ahuasiouokvtryzxohri.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_dyUVO6elCOkL_a3Mukm0Ww_4XZNLohX';
 
 if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
-  window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+  window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      flowType: 'implicit',
+      detectSessionInUrl: true,
+      persistSession: true,
+      autoRefreshToken: true
+    }
+  });
+
+  // شنونده فوری سشن‌ها بدون فوت وقت جهت گرفتن رویداد بازیابی رمز
+  window.supabaseClient.auth.onAuthStateChange((event, session) => {
+    console.log('[Supabase Immediate Auth Event]', event);
+    if (event === 'PASSWORD_RECOVERY') {
+      isRecoveryFlowDetected = true;
+      sessionStorage.setItem('tajinkart_recovering_password', 'true');
+      triggerPasswordResetModal();
+    } else if (session && session.user && !isRecoveryFlowDetected && sessionStorage.getItem('tajinkart_recovering_password') !== 'true') {
+      applyLoggedInMember(session.user);
+    }
+  });
 }
 
 // =========================================================
@@ -34,22 +66,41 @@ function applyLoggedInMember(user) {
 }
 
 
+
+// تابع باز کردن قطعی و نفوذناپذیر پنجره تنظیم رمز جدید
+function triggerPasswordResetModal() {
+  function doOpen() {
+    switchAuthView('reset');
+    const modal = document.getElementById('memberModal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+    showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(doOpen, 350));
+  } else {
+    setTimeout(doOpen, 350);
+  }
+}
+
 // شنونده خودکار لینک بازیابی رمز عبور بازگشتی از ایمیل
 function checkEmailRecoveryFlow() {
   const hash = window.location.hash || '';
   const search = window.location.search || '';
 
-  // تشخیص بازگشت از لینک بازیابی رمز سوپابیس
-  if (hash.includes('type=recovery') || search.includes('type=recovery') || hash.includes('access_token=')) {
-    console.log('[Auth Recovery] Detected recovery token from email link!');
-    setTimeout(() => {
-      switchAuthView('reset');
-      const modal = document.getElementById('memberModal');
-      if (modal) modal.style.display = 'flex';
-      showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
-    }, 450);
+  if (isRecoveryFlowDetected || 
+      sessionStorage.getItem('tajinkart_recovering_password') === 'true' || 
+      hash.includes('type=recovery') || 
+      search.includes('type=recovery') || 
+      search.includes('action=reset-password') || 
+      (hash.includes('access_token=') && !hash.includes('provider='))) {
+    console.log('[Auth Recovery] Initiating password reset UI!');
+    triggerPasswordResetModal();
   }
 }
+
 
 async function initSupabaseAuthSession() {
   if (!window.supabaseClient || !window.supabaseClient.auth) return;
@@ -2236,8 +2287,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
+          const targetRedirect = window.location.origin + window.location.pathname + '?action=reset-password';
           const { error } = await window.supabaseClient.auth.resetPasswordForEmail(iden, {
-            redirectTo: window.location.origin + window.location.pathname
+            redirectTo: targetRedirect
           });
 
           if (error) {
@@ -2331,7 +2383,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMemberDashboard();
             switchView('member-dashboard');
             showToast('✓ رمز عبور جدید شما با موفقیت ثبت شد! خوش آمدید.', 'success');
-            // پاکسازی هش آدرس‌بار
+            // پاکسازی نشست بازیابی و بازنشانی آدرس‌بار
+            sessionStorage.removeItem('tajinkart_recovering_password');
+            isRecoveryFlowDetected = false;
             try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
             return;
           }
