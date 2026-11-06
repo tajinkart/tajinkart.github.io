@@ -13,6 +13,27 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
   window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
 }
 
+// تابع کمکی برای ذخیره‌سازی ایمن در LocalStorage (جلوگیری از خطای پر شدن ۵ مگابایتی)
+function safeSetStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err) {
+    console.warn('[Storage Warning] LocalStorage quota reached for ' + key + '. Stored in memory & synced via Supabase Cloud.', err);
+    try {
+      localStorage.removeItem('tajinkart_temp_cache');
+      localStorage.setItem(key, value);
+      return true;
+    } catch (innerErr) {
+      console.warn('[Storage Critical] Local quota full. Data maintained in memory and Supabase cloud.', innerErr);
+      return false;
+    }
+  }
+}
+
+
+
+
 // موتور همگام‌سازی کاملاً خودکار و دوطرفه ابری (Automated Two-Way Cloud Sync)
 async function syncArtworksFromSupabase() {
   if (!window.supabaseClient) return;
@@ -83,7 +104,7 @@ async function syncArtworksFromSupabase() {
       showcaseArtworks = Array.from(mergedMap.values()).sort((a, b) => b.id - a.id);
       
       try {
-        localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+        safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
       } catch (e) {}
 
       renderShowcaseGrid();
@@ -129,47 +150,56 @@ function compressImageForStorage(file, maxWidth = 1280, maxHeight = 1280, qualit
   });
 }
 
-// موتور آپلود ابری تصاویر CLOUDINARY
+// موتور آپلود ابری تصاویر CLOUDINARY با تشخیص خودکار پریست و کلود نیم
 async function uploadFileToCloudinary(file) {
-  const cName1 = siteSettings.cloudinaryCloudName || 'tajinkart';
-  const preset1 = siteSettings.cloudinaryPreset || 'erlvtkx9';
+  const currentCloud = siteSettings.cloudinaryCloudName || 'tajinkart';
+  const currentPreset = siteSettings.cloudinaryPreset || 'tajinkart';
 
-  const formData1 = new FormData();
-  formData1.append('file', file);
-  formData1.append('upload_preset', preset1);
+  const candidates = [
+    { cloud: currentCloud, preset: currentPreset },
+    { cloud: 'tajinkart', preset: 'tajinkart' },
+    { cloud: 'tajinkart', preset: 'erlvtkx9' },
+    { cloud: 'erlvtkx9', preset: 'tajinkart' },
+    { cloud: 'erlvtkx9', preset: 'erlvtkx9' }
+  ];
 
-  try {
-    const res1 = await fetch(`https://api.cloudinary.com/v1_1/${cName1}/image/upload`, {
-      method: 'POST',
-      body: formData1
-    });
-    if (res1.ok) {
-      const data1 = await res1.json();
-      return data1.secure_url;
+  const seen = new Set();
+  const uniqueCandidates = [];
+  for (const c of candidates) {
+    const key = c.cloud + ':::' + c.preset;
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueCandidates.push(c);
     }
-  } catch (e) {
-    console.warn('Primary Cloudinary attempt error:', e);
   }
 
-  try {
-    const cName2 = (cName1 === 'tajinkart') ? 'erlvtkx9' : 'tajinkart';
-    const preset2 = (preset1 === 'erlvtkx9') ? 'tajinkart' : 'erlvtkx9';
-    const formData2 = new FormData();
-    formData2.append('file', file);
-    formData2.append('upload_preset', preset2);
-    const res2 = await fetch(`https://api.cloudinary.com/v1_1/${cName2}/image/upload`, {
-      method: 'POST',
-      body: formData2
-    });
-    if (res2.ok) {
-      const data2 = await res2.json();
-      siteSettings.cloudinaryCloudName = cName2;
-      siteSettings.cloudinaryPreset = preset2;
-      try { localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings)); } catch(e){}
-      return data2.secure_url;
+  for (const item of uniqueCandidates) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', item.preset);
+
+      const res = await fetch('https://api.cloudinary.com/v1_1/' + item.cloud + '/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.secure_url) {
+          siteSettings.cloudinaryCloudName = item.cloud;
+          siteSettings.cloudinaryPreset = item.preset;
+          safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+          console.log('[Cloudinary Success] Uploaded to cloud="' + item.cloud + '", preset="' + item.preset + '":', data.secure_url);
+          return data.secure_url;
+        }
+      } else {
+        const errData = await res.json().catch(function() { return {}; });
+        console.warn('[Cloudinary Warning] Attempt with cloud="' + item.cloud + '", preset="' + item.preset + '" returned:', errData);
+      }
+    } catch (err) {
+      console.warn('[Cloudinary Error] Network issue for cloud="' + item.cloud + '", preset="' + item.preset + '":', err);
     }
-  } catch (e2) {
-    console.warn('Fallback Cloudinary attempt error:', e2);
   }
 
   return null;
@@ -383,12 +413,12 @@ window.handleAdminLocalFileUpload = async function(inputEl) {
       return;
     }
 
-    showToast('در حال فشرده‌سازی و ذخیره بهینه لوکال...', 'info');
-    const compressedBase64 = await compressImageForStorage(file, 1280, 1280, 0.82);
+    showToast('کلودیناری هنوز وصل نشده؛ در حال بهینه‌سازی خودکار HD برای سوپابیس...', 'info');
+    const compressedBase64 = await compressImageForStorage(file, 1200, 1200, 0.78);
     handleAdminImageLiveChange(compressedBase64);
     const urlInput = document.getElementById('editArtImageInput');
-    if (urlInput) urlInput.value = compressedBase64.substring(0, 35) + '... (تصویر بهینه‌شده HD)';
-    showToast('تصویر فشرده و با کیفیت HD ثبت شد.', 'success');
+    if (urlInput) urlInput.value = compressedBase64;
+    showToast('تصویر با کیفیت HD آماده و همگام با دیتابیس سوپابیس شد.', 'success');
   } catch (err) {
     console.error('Upload failed:', err);
     showToast('خطا در بارگذاری تصویر. لطفاً دوباره امتحان کنید.', 'error');
@@ -424,15 +454,17 @@ window.confirmSaveArtwork = function() {
       stagingNewArt.lore = lore;
       stagingNewArt.colorSpace = colorSpace;
       stagingNewArt.desc = desc;
+      const isBase64Img = img.startsWith('data:image/');
+      const phaseSecondaryImg = isBase64Img ? '' : img;
       stagingNewArt.phases = [
         { name: 'اتود اولیه و سیلوئت', img: img },
-        { name: 'لاین‌آرت فنی و کادر', img: img },
-        { name: 'مطالعه نوری و مقداری', img: img },
-        { name: 'رندر متریال نهایی', img: img }
+        { name: 'لاین‌آرت فنی و کادر', img: phaseSecondaryImg },
+        { name: 'مطالعه نوری و مقداری', img: phaseSecondaryImg },
+        { name: 'رندر متریال نهایی', img: phaseSecondaryImg }
       ];
 
       showcaseArtworks.unshift(stagingNewArt);
-      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
@@ -465,7 +497,7 @@ window.confirmSaveArtwork = function() {
       art.colorSpace = colorSpace;
       art.desc = desc;
 
-      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
@@ -508,7 +540,7 @@ window.adminDeleteArtwork = function(idx) {
     }
     showcaseArtworks.splice(idx, 1);
     try {
-      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
     } catch(e) {}
     currentSelectedArtIdx = 0;
     closeAdminArtEditor();
@@ -1478,7 +1510,7 @@ window.handleAdminImageChange = function(idx, newUrl) {
   showcaseArtworks[idx].image = url;
   const previewImg = document.getElementById('adminArtPreviewImg');
   if (previewImg) previewImg.src = url;
-  localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+  safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   detectAndApplyArtworkDimensions(showcaseArtworks[idx], (meta) => {
     const badge = document.getElementById('adminArtPreviewRatioText');
     if (badge) badge.textContent = `${meta.width} × ${meta.height} (نسبت ${meta.ratio})`;
@@ -1504,14 +1536,14 @@ window.onAdminPreviewImgLoad = function(imgEl, idx) {
 window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
   if (showcaseArtworks[artIdx] && showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[phaseIdx]) {
     showcaseArtworks[artIdx].phases[phaseIdx].img = url.trim();
-    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
     showToast(`تصویر فاز ${phaseIdx + 1} مطالعه موردی ذخیره شد.`, 'success');
   }
 };
 
 window.updateArtField = function(idx, field, value) {
   showcaseArtworks[idx][field] = value;
-  localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+  safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   renderShowcaseGrid();
   renderAdminSketch2();
   showToast('اثر با موفقیت ویرایش شد.', 'success');
@@ -1990,7 +2022,7 @@ document.addEventListener('DOMContentLoaded', () => {
       siteSettings.adminPass = document.getElementById('setAdminPass').value.trim() || 'tajinkart';
       siteSettings.cloudinaryCloudName = document.getElementById('setCloudinaryCloud')?.value.trim() || 'tajinkart';
       siteSettings.cloudinaryPreset = document.getElementById('setCloudinaryPreset')?.value.trim() || 'erlvtkx9';
-      localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
+      safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
       renderProducts();
       selectPipeline(currentSelectedPipeKey, null, false);
       showToast('تنظیمات سراسری ذخیره و نرخ دلار به‌روزرسانی شد!', 'success');
