@@ -1032,7 +1032,10 @@
               <label style="font-size:12px;">رمز عبور</label>
               <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز عبور؟</button>
             </div>
-            <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" />
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('loginPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">ورود به حساب کاربری</button>
         </form>
@@ -1067,18 +1070,43 @@
             <input type="text" id="signupName" required placeholder="مثال: آریا تهرانی / استودیو پایا" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">آدرس ایمیل رسمی</label>
-            <input type="email" id="signupEmail" required class="font-mono" placeholder="aria@domain.com" />
+            <label style="font-size:12px; display:block; margin-bottom:4px;">آدرس ایمیل معتبر</label>
+            <input type="email" id="signupEmail" required class="font-mono" placeholder="user@gmail.com" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">شماره تماس / آیدی تلگرام</label>
-            <input type="tel" id="signupPhone" required class="font-mono" placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا @username" />
+            <label style="font-size:12px; display:block; margin-bottom:4px;">شماره همراه معتبر (یا آیدی تلگرام با @)</label>
+            <input type="text" id="signupPhone" required class="font-mono" placeholder="مثال: 09123456789 یا @username" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب</label>
-            <input type="password" id="signupPass" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" />
+            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب (حداقل ۶ کاراکتر)</label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="signupPass" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
           </div>
-          <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">تکمیل ثبت‌نام و ایجاد حساب ابری ←</button>
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">تکرار رمز عبور</label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="signupPassConfirm" required minlength="6" class="font-mono" placeholder="تکرار دقیق رمز عبور" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('signupPassConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+          </div>
+
+          <!-- چک‌باکس قوانین سایت و رده‌بندی سنی ۱۶+ -->
+          <div style="display:flex; flex-direction:column; gap:8px; margin:4px 0 6px; padding:10px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
+            <label style="display:flex; align-items:flex-start; gap:8px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.6;">
+              <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:2px; accent-color:var(--gold); flex-shrink:0;" />
+              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline;">قوانین و شرایط خدمات استودیو</a> و عدم بازفروش لایسنس‌ها را می‌پذیرم.</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:11.5px; color:#cbd5e1; cursor:pointer;">
+              <input type="checkbox" id="signupAgreeAge" required style="width:16px; height:16px; accent-color:var(--gold); flex-shrink:0;" />
+              <span>تایید می‌کنم دارای حداقل <strong>۱۶ سال سن</strong> می‌باشم (رده‌بندی محتوای فانتزی).</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-gold" style="padding:12px; margin-top:2px;">
+            تکمیل ثبت‌نام و ورود به استودیو ←
+          </button>
         </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
           <span>حساب دارید؟</span>
@@ -1121,11 +1149,17 @@
         <form id="setNewPasswordForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
             <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور جدید</label>
-            <input type="password" id="userNewPassword" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" />
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="userNewPassword" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('userNewPassword', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
           </div>
           <div>
             <label style="font-size:12px; display:block; margin-bottom:4px;">تکرار رمز عبور جدید</label>
-            <input type="password" id="userNewPasswordConfirm" required minlength="6" class="font-mono" placeholder="تکرار رمز عبور" />
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="userNewPasswordConfirm" required minlength="6" class="font-mono" placeholder="تکرار رمز عبور" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('userNewPasswordConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
           </div>
           <button type="submit" class="btn-gold" style="width:100%; padding:12px; margin-top:4px;">
             ✓ ذخیره قطعی رمز جدید و ورود به استودیو
@@ -1137,13 +1171,50 @@
   </div>
 
   <!-- توست نوتیفیکیشن -->
+  
+  <!-- پنجره اختصاصی قوانین و شرایط خدمات استودیو (Terms & Legal Modal) -->
+  <div id="termsModal" style="position:fixed; inset:0; z-index:2200; background:rgba(3,4,7,0.94); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:18px;">
+    <div style="max-width:620px; width:100%; max-height:85vh; background:var(--bg-panel); border:1px solid var(--gold); border-radius:20px; padding:26px; overflow-y:auto; box-shadow:0 25px 70px rgba(0,0,0,0.95); position:relative;">
+      <button type="button" onclick="closeTermsModal()" class="modal-corner-close-btn" title="بستن">✕</button>
+      <h3 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:6px;">منشور حقوقی و شرایط خدمات TAJINKART</h3>
+      <span class="font-mono" style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:16px;">TERMS OF SERVICE & COMMERCIAL LICENSING</span>
+      
+      <div style="font-size:12.5px; color:#cbd5e1; line-height:1.85; display:flex; flex-direction:column; gap:14px; text-align:justify;">
+        <div>
+          <strong style="color:#fff;">۱. مالکیت فکری و لایسنس دارایی‌ها:</strong>
+          کلیه آثار، سورس‌فایل‌ها و کانسپت‌ها متعلق به سید سروش تاج و استودیو تاج‌اینک‌آرت است. خرید هر محصول به منزله اعطای لایسنس استفاده تجاری غیرانحصاری در بازی یا اثر نهایی خریدار است و بازفروش یا بازنشر فایل خام سورس اکیداً ممنوع می‌باشد.
+        </div>
+        <div>
+          <strong style="color:#fff;">۲. ودیعه ۵۰٪ سفارش‌های آتلیه:</strong>
+          پیش‌پرداخت ۵۰٪ جهت رزرو ظرفیت آتلیه و آغاز اتودهای اولیه دریافت می‌گردد و به دلیل تخصیص زمان طراح، غیرقابل‌استرداد است.
+        </div>
+        <div>
+          <strong style="color:#fff;">۳. منع صریح آموزش هوش مصنوعی (Anti-AI):</strong>
+          استفاده از تصاویر، کانسپت‌ها و متون لور این استودیو جهت آموزش مدل‌های هوش مصنوعی مولد اکیداً ممنوع و دارای پیگرد حقوقی است.
+        </div>
+        <div>
+          <strong style="color:#fff;">۴. رده‌بندی سنی محتوا (16+):</strong>
+          تمامی کاربران با ثبت‌نام تایید می‌نمایند دارای حداقل ۱۶ سال سن بوده و با تم‌های دارک‌فانتزی استودیو آشنایی کامل دارند.
+        </div>
+      </div>
+
+      <div style="margin-top:22px; text-align:center;">
+        <button type="button" onclick="closeTermsModal()" class="btn-gold" style="width:100%; padding:11px;">متوجه شدم و می‌پذیرم</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer"></div>
 
-  <!-- فوتر تک‌خطی دارک -->
+  <!-- فوتر تک‌خطی دارک با لینک‌های حقوقی و رده‌بندی سنی -->
   <footer style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:18px 32px; text-align:center;">
-    <div style="max-width:1440px; margin:0 auto; font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+    <div style="max-width:1440px; margin:0 auto; font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
       <div>تمامی حقوق آثار هنری، داستان و مفاهیم بصری متعلق به استودیو تاج اینک آرت (TAJINKART © 2026) است.</div>
-      <div style="font-size:11px; color:var(--text-muted);">کانسپت آرت، توسعه بصری و طراحی دنیا • سید سروش تاج</div>
+      <div style="display:flex; align-items:center; gap:14px; font-size:11px;">
+        <span style="padding:2px 8px; border-radius:6px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; font-weight:700;">16+ CONTENT ADVISORY</span>
+        <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:11px; cursor:pointer;">قوانین لایسنس و شرایط خدمات</button>
+        <span style="color:var(--text-muted);">• سید سروش تاج</span>
+      </div>
     </div>
   </footer>
   <script src="data.js"></script>

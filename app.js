@@ -834,7 +834,7 @@ window.showToast = function(msg, type = 'gold') {
     toast.style.transform = 'translateY(15px)';
     toast.style.transition = 'all 0.3s ease';
     setTimeout(() => toast.remove(), 350);
-  }, 3800);
+  }, 6500);
 };
 
 
@@ -2129,7 +2129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      showToast('در حال بررسی و ورود با سرور ابری Supabase...', 'info');
+      showToast('در حال تایید هویت و ورود به استودیو...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -2182,15 +2182,42 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = document.getElementById('signupName').value.trim();
       const email = document.getElementById('signupEmail').value.trim().toLowerCase();
       const phone = document.getElementById('signupPhone').value.trim();
-      const passEl = document.getElementById('signupPass');
-      const password = passEl ? passEl.value.trim() : '';
+      const password = document.getElementById('signupPass')?.value.trim() || '';
+      const passwordConfirm = document.getElementById('signupPassConfirm')?.value.trim() || '';
+      const agreeTerms = document.getElementById('signupAgreeTerms')?.checked;
+      const agreeAge = document.getElementById('signupAgreeAge')?.checked;
 
+      // ۱. اعتبارسنجی سخت‌گیرانه شماره تماس / تلگرام
+      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+      const isTelegram = phone.startsWith('@') && phone.length >= 4;
+      const isDigitsPhone = /^[0-9+]{10,15}$/.test(cleanPhone);
+
+      if (!isTelegram && !isDigitsPhone) {
+        showToast('شماره تماس نامعتبر است! لطفاً شماره موبایل کامل (حداقل ۱۰ رقم مانند 0912...) یا آیدی تلگرام با @ وارد کنید.', 'error');
+        document.getElementById('signupPhone')?.focus();
+        return;
+      }
+
+      // ۲. اعتبارسنجی طول و یکسان نبودن با مقدار پیش‌فرض
       if (password.length < 6) {
         showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
         return;
       }
 
-      showToast('در حال ثبت حساب کاربری در سرورهای ابری Supabase...', 'info');
+      // ۳. تطابق رمز عبور و تکرار آن
+      if (password !== passwordConfirm) {
+        showToast('رمز عبور و تکرار آن یکسان نیستند! لطفاً مجدداً بررسی فرمایید.', 'error');
+        document.getElementById('signupPassConfirm')?.focus();
+        return;
+      }
+
+      // ۴. بررسی تایید قوانین و رده‌بندی سنی ۱۶+
+      if (!agreeTerms || !agreeAge) {
+        showToast('لطفاً تیک پذیرش قوانین استودیو و تایید شرط سنی ۱۶+ را علامت بزنید.', 'error');
+        return;
+      }
+
+      showToast('در حال تایید مشخصات و ایجاد حساب در پورتال استودیو...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -2216,7 +2243,7 @@ document.addEventListener('DOMContentLoaded', () => {
               const loginEmailEl = document.getElementById('loginEmail');
               if (loginEmailEl) loginEmailEl.value = email;
             } else {
-              showToast('خطای سوپابیس: ' + (error.message || 'ثبت‌نام ناموفق بود'), 'error');
+              showToast('خطای سامانه احراز هویت: ' + (error.message || 'ثبت‌نام ناموفق بود'), 'error');
             }
             return;
           }
@@ -2241,7 +2268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeMemberModal();
             renderMemberDashboard();
             switchView('member-dashboard');
-            showToast('حساب ابری شما با موفقیت در Supabase ایجاد شد!', 'success');
+            showToast('حساب کاربری شما با موفقیت ایجاد شد! خوش آمدید.', 'success');
             return;
           }
         } catch (authErr) {
@@ -2283,7 +2310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      showToast('در حال ارسال لینک بازیابی به صندوق جیمیل شما...', 'info');
+      showToast('در حال صدور لینک امن بازیابی به صندوق جیمیل...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -2373,7 +2400,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (error) {
             console.warn('[Update Password Error]', error);
-            showToast('خطا در به‌روزرسانی رمز: ' + error.message, 'error');
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('should be different') || msg.includes('same password')) {
+              showToast('رمز عبور جدید نمی‌تواند با رمز عبور قبلی شما یکسان باشد! لطفاً یک رمز تازه و متفاوت انتخاب فرمایید.', 'error');
+            } else {
+              showToast('خطا در به‌روزرسانی رمز: ' + (error.message || 'لطفاً دوباره امتحان کنید'), 'error');
+            }
             return;
           }
 
@@ -2558,4 +2590,33 @@ window.adminClearAllTestMembers = function() {
     renderAdminSketch3('', 'all');
     showToast('تمام کاربران تستی با موفقیت پاک شدند. اکنون می‌توانید تست تازه انجام دهید.', 'success');
   }
+};
+
+
+// =========================================================
+// ابزارهای پیشرفته فرم‌ها: مشاهده رمز، قوانین و لودر
+// =========================================================
+window.togglePasswordVisibility = function(inputId, btnEl) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btnEl.textContent = '🔒';
+    btnEl.title = 'مخفی‌سازی رمز';
+  } else {
+    input.type = 'password';
+    btnEl.textContent = '👁️';
+    btnEl.title = 'نمایش رمز';
+  }
+};
+
+window.openTermsModal = function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const modal = document.getElementById('termsModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeTermsModal = function() {
+  const modal = document.getElementById('termsModal');
+  if (modal) modal.style.display = 'none';
 };
