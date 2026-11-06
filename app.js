@@ -13,6 +13,46 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
   window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
 }
 
+// =========================================================
+// سیستم یکپارچه احراز هویت ابری SUPABASE AUTH
+// =========================================================
+function applyLoggedInMember(user) {
+  if (!user) return;
+  const meta = user.user_metadata || {};
+  const name = meta.name || user.email.split('@')[0];
+  const phone = meta.phone || '';
+  currentMember = {
+    id: user.id,
+    name: name,
+    email: user.email,
+    contact: phone || user.email,
+    tier: meta.tier || 'STANDARD',
+    assetsBought: meta.assetsBought || []
+  };
+  const labelEl = document.getElementById('rightMemberLabel');
+  if (labelEl) labelEl.textContent = currentMember.name;
+}
+
+async function initSupabaseAuthSession() {
+  if (!window.supabaseClient || !window.supabaseClient.auth) return;
+  try {
+    const { data } = await window.supabaseClient.auth.getSession();
+    if (data && data.session && data.session.user) {
+      applyLoggedInMember(data.session.user);
+      console.log('[Supabase Auth] Active cloud session restored for:', data.session.user.email);
+    }
+
+    window.supabaseClient.auth.onAuthStateChange((_event, session) => {
+      if (session && session.user) {
+        applyLoggedInMember(session.user);
+      }
+    });
+  } catch (err) {
+    console.warn('[Supabase Auth] Session check error:', err);
+  }
+}
+
+
 // تابع کمکی برای ذخیره‌سازی ایمن در LocalStorage (جلوگیری از خطای پر شدن ۵ مگابایتی)
 
 // موتور بهینه‌سازی و تسریع لود تصاویر کلودیناری (کاهش حجم از ۵ مگابایت به ۵۰ کیلوبایت با حفظ کیفیت)
@@ -1318,9 +1358,15 @@ window.handleSendResetCode = function() {
   showToast('کد تایید ۶ رقمی به ایمیل/شماره شما صادر گردید.', 'info');
 };
 
-window.logoutMemberAccount = function() {
+window.logoutMemberAccount = async function() {
+  if (window.supabaseClient && window.supabaseClient.auth) {
+    try {
+      await window.supabaseClient.auth.signOut();
+    } catch(e) {}
+  }
   currentMember = null;
-  document.getElementById('rightMemberLabel').textContent = 'پورتال اعضا';
+  const labelEl = document.getElementById('rightMemberLabel');
+  if (labelEl) labelEl.textContent = 'پورتال اعضا';
   showToast('از حساب کاربری خارج شدید.', 'info');
   switchView('showcase');
 };
@@ -1906,6 +1952,7 @@ window.exportFullSelfContainedHTML = function() {
 // راه‌اندازی اولیه در زمان لود صفحه
 document.addEventListener('DOMContentLoaded', () => {
   renderShowcaseGrid();
+  initSupabaseAuthSession();
   syncArtworksFromSupabase();
   selectPipeline('sketch1', document.querySelector('#atelierServiceCards .service-nav-card.active'), false);
   renderProducts();
@@ -1960,14 +2007,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // فرم ورود اعضا
+  // فرم ورود اعضا (متصل به احراز هویت ابری Supabase Auth)
   const loginForm = document.getElementById('memberLoginForm');
   if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const em = document.getElementById('loginEmail').value.trim().toLowerCase();
       const pw = document.getElementById('loginPass').value.trim();
 
+      // ورود اختصاصی مدیر استودیو
       if (em === 'soroush') {
         if (pw === (siteSettings.adminPass || 'tajinkart')) {
           closeMemberModal();
@@ -1982,7 +2030,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      currentMember = { name: em.split('@')[0], email: em, contact: em, assetsBought: [] };
+      showToast('در حال بررسی و ورود با سرور ابری Supabase...', 'info');
+
+      if (window.supabaseClient && window.supabaseClient.auth) {
+        try {
+          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+            email: em,
+            password: pw
+          });
+
+          if (error) {
+            console.warn('[Supabase Auth Error]', error);
+            if (error.message.includes('Invalid login credentials')) {
+              showToast('ایمیل یا رمز عبور وارد شده نادرست است.', 'error');
+            } else if (error.message.includes('Email not confirmed')) {
+              showToast('ایمیل تایید نشده است. لطفاً لینک فعال‌سازی ایمیل را بررسی کنید.', 'info');
+            } else {
+              showToast(error.message || 'خطا در ورود به حساب.', 'error');
+            }
+            return;
+          }
+
+          if (data && data.user) {
+            applyLoggedInMember(data.user);
+            closeMemberModal();
+            renderMemberDashboard();
+            switchView('member-dashboard');
+            showToast(`خوش آمدید، ${currentMember.name}`, 'success');
+            return;
+          }
+        } catch (authErr) {
+          console.warn('[Supabase Auth Network]', authErr);
+        }
+      }
+
+      // فال‌بک به حافظه لوکال
+      const localFound = siteMembersData.find(m => m.email.toLowerCase() === em);
+      currentMember = localFound || { name: em.split('@')[0], email: em, contact: em, assetsBought: [] };
       document.getElementById('rightMemberLabel').textContent = currentMember.name;
       closeMemberModal();
       renderMemberDashboard();
@@ -1991,16 +2075,75 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // فرم ثبت‌نام اعضا
+  // فرم ثبت‌نام اعضا (ذخیره قطعی و رمزنگاری‌شده در دیتابیس ابری Supabase Auth)
   const signUpForm = document.getElementById('memberSignUpForm');
   if (signUpForm) {
-    signUpForm.addEventListener('submit', (e) => {
+    signUpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('signupName').value.trim();
-      const email = document.getElementById('signupEmail').value.trim();
+      const email = document.getElementById('signupEmail').value.trim().toLowerCase();
       const phone = document.getElementById('signupPhone').value.trim();
-      currentMember = { name: name, email: email, contact: phone, assetsBought: [] };
+      const passEl = document.getElementById('signupPass');
+      const password = passEl ? passEl.value.trim() : '';
 
+      if (password.length < 6) {
+        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
+        return;
+      }
+
+      showToast('در حال ثبت حساب کاربری در سرورهای ابری Supabase...', 'info');
+
+      if (window.supabaseClient && window.supabaseClient.auth) {
+        try {
+          const { data, error } = await window.supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                name: name,
+                phone: phone,
+                tier: 'STANDARD',
+                assetsBought: []
+              }
+            }
+          });
+
+          if (error) {
+            console.warn('[Supabase SignUp Error]', error);
+            showToast('خطا در ثبت‌نام ابری: ' + (error.message || 'مشکل در برقراری ارتباط'), 'error');
+            return;
+          }
+
+          if (data && data.user) {
+            applyLoggedInMember(data.user);
+
+            // ثبت همزمان در حافظه کش ادمین استودیو
+            siteMembersData.push({
+              id: data.user.id || Date.now(),
+              name: name,
+              email: email,
+              contact: phone,
+              tier: 'STANDARD',
+              balance: '$0',
+              withdrawn: '$0',
+              assetsBought: [],
+              totalSpent: '$0'
+            });
+            safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+
+            closeMemberModal();
+            renderMemberDashboard();
+            switchView('member-dashboard');
+            showToast('حساب ابری شما با موفقیت در Supabase ایجاد شد!', 'success');
+            return;
+          }
+        } catch (authErr) {
+          console.warn('[Supabase SignUp Exception]', authErr);
+        }
+      }
+
+      // فال‌بک موقت در صورت عدم برقراری ارتباط با شبکه
+      currentMember = { name: name, email: email, contact: phone, assetsBought: [] };
       siteMembersData.push({
         id: Date.now(),
         name: name,
@@ -2012,28 +2155,44 @@ document.addEventListener('DOMContentLoaded', () => {
         assetsBought: [],
         totalSpent: '$0'
       });
-      localStorage.setItem(KEYS.MEMBERS, JSON.stringify(siteMembersData));
-
+      safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
       document.getElementById('rightMemberLabel').textContent = currentMember.name;
       closeMemberModal();
       renderMemberDashboard();
       switchView('member-dashboard');
-      showToast('حساب کاربری جدید شما با موفقیت ایجاد شد!', 'success');
+      showToast('حساب کاربری جدید ایجاد شد.', 'success');
     });
   }
 
-  // فرم بازیابی رمز
+  // فرم بازیابی رمز (ارسال لینک بازیابی از طریق Supabase)
   const forgotForm = document.getElementById('forgotPasswordForm');
   if (forgotForm) {
-    forgotForm.addEventListener('submit', (e) => {
+    forgotForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const newPass = document.getElementById('forgotNewPass').value.trim();
-      if (newPass.length < 6) {
+      const iden = document.getElementById('forgotIdentifier')?.value.trim();
+      const newPass = document.getElementById('forgotNewPass')?.value.trim();
+
+      if (window.supabaseClient && window.supabaseClient.auth && iden && iden.includes('@')) {
+        try {
+          const { error } = await window.supabaseClient.auth.resetPasswordForEmail(iden);
+          if (!error) {
+            showToast('لینک امن بازیابی رمز عبور به ایمیل شما ارسال شد.', 'success');
+            switchAuthView('login');
+            return;
+          }
+        } catch(err) {
+          console.warn('Supabase reset pass error:', err);
+        }
+      }
+
+      if (newPass && newPass.length < 6) {
         showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
         return;
       }
-      showToast('رمز عبور جدید شما با موفقیت ذخیره شد. اکنون وارد شوید.', 'success');
-      document.getElementById('loginPass').value = newPass;
+      showToast('رمز عبور جدید شما ذخیره شد. اکنون وارد شوید.', 'success');
+      if (document.getElementById('loginPass') && newPass) {
+        document.getElementById('loginPass').value = newPass;
+      }
       switchAuthView('login');
     });
   }
