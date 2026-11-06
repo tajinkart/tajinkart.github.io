@@ -2262,42 +2262,50 @@ document.addEventListener('DOMContentLoaded', () => {
       const agreeTerms = document.getElementById('signupAgreeTerms')?.checked;
       const agreeAge = document.getElementById('signupAgreeAge')?.checked;
 
-      const telegramHandle = document.getElementById('signupTelegram')?.value.trim() || '';
+      const countryCode = document.getElementById('signupCountryCode')?.value || '+98';
+      const rawPhone = document.getElementById('signupPhone')?.value.trim() || '';
+      let cleanDigits = rawPhone.replace(/[^0-9]/g, '');
 
-      // ۱. اعتبارسنجی ریاضی و دقیق شماره تلفن همراه (دقیقاً ۱۱ رقم و با آغاز 09)
-      const cleanPhone = phone.replace(/[^0-9]/g, '');
-      const isValidMobile = /^09[0-9]{9}$/.test(cleanPhone);
-
-      if (!isValidMobile) {
-        showToast('شماره همراه نامعتبر است! شماره تلفن همراه باید دقیقاً ۱۱ رقم بوده و با 09 آغاز گردد (مثال: 09207702950).', 'error');
-        document.getElementById('signupPhone')?.focus();
-        return;
+      // اگر کاربر با صفر اول وارد کرد، صفر را بردار
+      if (countryCode === '+98' && cleanDigits.startsWith('0')) {
+        cleanDigits = cleanDigits.substring(1);
       }
 
-      // ۲. اعتبارسنجی آیدی تلگرام در صورت تمایل به ارسال
-      if (telegramHandle && !telegramHandle.startsWith('@')) {
-        showToast('آیدی تلگرام باید با علامت @ آغاز گردد (مثال: @username).', 'error');
-        document.getElementById('signupTelegram')?.focus();
-        return;
+      // ۱. اعتبارسنجی بین‌المللی شماره تلفن همراه
+      if (countryCode === '+98') {
+        if (cleanDigits.length !== 10 || !cleanDigits.startsWith('9')) {
+          showToast('شماره همراه نامعتبر است! شماره موبایل ایران باید ۱۰ رقم (بدون صفر اول مانند 9207702950) باشد.', 'error');
+          document.getElementById('signupPhone')?.focus();
+          return;
+        }
+      } else {
+        if (cleanDigits.length < 6 || cleanDigits.length > 14) {
+          showToast('طول شماره تلفن بین‌المللی نامعتبر است.', 'error');
+          document.getElementById('signupPhone')?.focus();
+          return;
+        }
       }
+      const fullContactNumber = (countryCode === 'other' ? '' : countryCode + ' ') + cleanDigits;
 
-      // ۳. اعتبارسنجی قدرت رمز (ممانعت از پسوردهای ۱ تا ۶ و ارقام ساده)
+      // ۲. اعتبارسنجی قدرت رمز
       if (password.length < 6 || /^(123456|12345678|111111|000000)$/.test(password) || /^[0-9]+$/.test(password)) {
         showToast('رمز عبور بسیار ضعیف است! رمز عبور نمی‌تواند صرفاً از ارقام ساده یا ترتیبی تشکیل شود؛ لطفاً از ترکیب حروف و عدد استفاده کنید.', 'error');
         document.getElementById('signupPass')?.focus();
         return;
       }
 
-      // ۴. تطابق رمز عبور و تکرار آن
+      // ۳. تطابق رمز عبور و تکرار آن
       if (password !== passwordConfirm) {
         showToast('رمز عبور و تکرار آن یکسان نیستند! لطفاً مجدداً بررسی فرمایید.', 'error');
         document.getElementById('signupPassConfirm')?.focus();
         return;
       }
 
-      // ۵. بررسی تایید قوانین و شرایط خدمات استودیو
-      if (!agreeTerms) {
+      // ۴. بررسی تایید قوانین استودیو (بررسی تیک چک‌باکس)
+      const agreeBox = document.getElementById('signupAgreeTerms');
+      if (!agreeBox || !agreeBox.checked) {
         showToast('لطفاً تیک مطالعه و پذیرش قوانین و شرایط خدمات استودیو را علامت بزنید.', 'error');
+        agreeBox?.focus();
         return;
       }
 
@@ -2339,7 +2347,7 @@ document.addEventListener('DOMContentLoaded', () => {
               id: data.user.id || Date.now(),
               name: name,
               email: email,
-              contact: phone,
+              contact: fullContactNumber,
               tier: 'STANDARD',
               balance: '$0',
               withdrawn: '$0',
@@ -2356,7 +2364,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: data.user.id,
                 name: name,
                 email: email,
-                contact: phone,
+                contact: fullContactNumber,
                 tier: 'STANDARD',
                 assets_bought: []
               }]).then(({ error }) => {
@@ -2377,12 +2385,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // فال‌بک موقت در صورت عدم برقراری ارتباط با شبکه
-      currentMember = { name: name, email: email, contact: phone, assetsBought: [] };
+      currentMember = { name: name, email: email, contact: fullContactNumber, assetsBought: [] };
       siteMembersData.push({
         id: Date.now(),
         name: name,
         email: email,
-        contact: phone,
+        contact: fullContactNumber,
         tier: 'STANDARD',
         balance: '$0',
         withdrawn: '$0',
@@ -2844,4 +2852,53 @@ window.handleLiveEmailCheck = function(emailVal) {
       } catch(e) {}
     }
   }, 450);
+};
+
+
+// بررسی زنده و آنی شماره تلفن همراه
+window.handleLivePhoneCheck = function() {
+  const notice = document.getElementById('signupPhoneLiveNotice');
+  const phoneInput = document.getElementById('signupPhone');
+  const countryCode = document.getElementById('signupCountryCode')?.value || '+98';
+  if (!notice || !phoneInput) return;
+
+  let val = (phoneInput.value || '').trim();
+  // اگر کاربر با صفر اول وارد کرد، خودکار صفر را بردار
+  if (countryCode === '+98' && val.startsWith('0')) {
+    val = val.substring(1);
+    phoneInput.value = val;
+  }
+
+  if (val.length === 0) {
+    notice.style.display = 'none';
+    phoneInput.style.borderColor = 'var(--border-subtle)';
+    return;
+  }
+
+  notice.style.display = 'inline-block';
+
+  // بررسی شماره ایران (+98)
+  if (countryCode === '+98') {
+    if (val.length === 10 && val.startsWith('9')) {
+      notice.style.color = 'var(--emerald)';
+      notice.textContent = '✓ شماره موبایل صحیح است';
+      phoneInput.style.borderColor = 'var(--emerald)';
+    } else {
+      notice.style.color = 'var(--crimson)';
+      notice.textContent = `✕ شماره باید ۱۰ رقم باشد (${val.length}/10)`;
+      phoneInput.style.borderColor = 'var(--crimson)';
+    }
+    return;
+  }
+
+  // سایر کشورها (بین ۶ تا ۱۲ رقم)
+  if (val.length >= 6 && val.length <= 13) {
+    notice.style.color = 'var(--emerald)';
+    notice.textContent = '✓ شماره معتبر است';
+    phoneInput.style.borderColor = 'var(--emerald)';
+  } else {
+    notice.style.color = 'var(--crimson)';
+    notice.textContent = '✕ طول شماره نامعتبر است';
+    phoneInput.style.borderColor = 'var(--crimson)';
+  }
 };

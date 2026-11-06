@@ -1086,12 +1086,28 @@
             <input type="email" id="signupEmail" required oninput="handleLiveEmailCheck(this.value)" class="font-mono" placeholder="user@gmail.com" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">شماره تلفن همراه (فقط ارقام ۱۱ رقمی مانند 09123456789)</label>
-            <input type="tel" id="signupPhone" required inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11" class="font-mono" placeholder="09123456789" />
-          </div>
-          <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">آیدی تلگرام (اختیاری جهت هماهنگی بریف)</label>
-            <input type="text" id="signupTelegram" class="font-mono" placeholder="@username" />
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-size:12px;">شماره تماس معتبر (پشتیبانی و تایید هویت خریدار)</label>
+              <span id="signupPhoneLiveNotice" style="font-size:10.5px; display:none;"></span>
+            </div>
+            <!-- فیلد ترکیبی پیش‌شماره بین‌المللی + شماره تلفن -->
+            <div style="display:flex; gap:8px; direction:ltr;">
+              <select id="signupCountryCode" onchange="handleLivePhoneCheck()" style="width:115px; padding:11px 8px; font-size:12px; text-align:left; direction:ltr; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px;">
+                <option value="+98" selected>🇮🇷 +98 (ایران)</option>
+                <option value="+1">🇺🇸 +1 (آمریکا/کانادا)</option>
+                <option value="+44">🇬🇧 +44 (انگلستان)</option>
+                <option value="+49">🇩🇪 +49 (آلمان)</option>
+                <option value="+33">🇫🇷 +33 (فرانسه)</option>
+                <option value="+971">🇦🇪 +971 (امارات)</option>
+                <option value="+90">🇹🇷 +90 (ترکیه)</option>
+                <option value="+7">🇷🇺 +7 (روسیه)</option>
+                <option value="other">🌐 سایر کشورها</option>
+              </select>
+              <input type="tel" id="signupPhone" required inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleLivePhoneCheck();" class="font-mono" placeholder="9123456789" style="flex:1; text-align:left; direction:ltr;" />
+            </div>
+            <span style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:3px;">
+              شماره همراه را بدون صفر اول وارد فرمایید (مثال برای ایران: 9123456789)
+            </span>
           </div>
           <div>
             <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب</label>
