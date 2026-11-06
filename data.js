@@ -9,7 +9,8 @@ const KEYS = {
   ARTWORKS: 'tajinkart_artworks_fa_v2',
   PIPELINES: 'tajinkart_pipelines_fa_v2',
   PRODUCTS: 'tajinkart_products_fa_v2',
-  MEMBERS: 'tajinkart_members_fa_v2'
+  MEMBERS: 'tajinkart_members_fa_v2',
+  DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2'
 };
 
 let currentView = 'showcase';

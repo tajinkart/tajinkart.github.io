@@ -14,6 +14,29 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
 }
 
 // تابع کمکی برای ذخیره‌سازی ایمن در LocalStorage (جلوگیری از خطای پر شدن ۵ مگابایتی)
+
+// موتور بهینه‌سازی و تسریع لود تصاویر کلودیناری (کاهش حجم از ۵ مگابایت به ۵۰ کیلوبایت با حفظ کیفیت)
+function getOptimizedImageUrl(url, width = 800) {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('data:image/')) return url;
+
+  // بهینه‌سازی خودکار در Cloudinary با فرمت نسل جدید WebP/AVIF و کیفیت تطبیقی
+  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+    if (!url.includes('/upload/f_auto') && !url.includes('/upload/q_auto')) {
+      return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
+    }
+  }
+
+  // بهینه‌سازی Unsplash
+  if (url.includes('images.unsplash.com')) {
+    if (!url.includes('auto=format')) {
+      return url + (url.includes('?') ? '&' : '?') + `auto=format&fit=crop&w=${width}&q=80`;
+    }
+  }
+
+  return url;
+}
+
 function safeSetStorage(key, value) {
   try {
     localStorage.setItem(key, value);
@@ -49,14 +72,49 @@ async function syncArtworksFromSupabase() {
       return;
     }
 
-    const localArtworks = showcaseArtworks || [];
-    const cloudIds = new Set((cloudArtworks || []).map(row => Number(row.id)));
-    
-    // شناسایی و ارسال خودکار آثاری که در این سیستم هستند ولی در کلود نیستند
-    const missingInCloud = localArtworks.filter(localItem => !cloudIds.has(Number(localItem.id)));
-    
-    if (missingInCloud.length > 0) {
-      const rowsToInsert = missingInCloud.map(a => ({
+    let deletedIds = [];
+    try {
+      deletedIds = JSON.parse(localStorage.getItem(KEYS.DELETED_ARTWORKS) || '[]').map(Number);
+    } catch(e) { deletedIds = []; }
+    const deletedSet = new Set(deletedIds);
+
+    // ۱. اگر کلود آثاری دارد، دیتابیس ابری منبع قطعی حقیقت است
+    if (cloudArtworks && cloudArtworks.length > 0) {
+      // حذف قطعی آثاری که در بلک‌لیست حذف هستند حتی از کلود
+      const itemsToPurge = cloudArtworks.filter(row => deletedSet.has(Number(row.id)));
+      if (itemsToPurge.length > 0) {
+        itemsToPurge.forEach(row => {
+          window.supabaseClient.from('artworks').delete().eq('id', row.id).then(() => {});
+        });
+      }
+
+      // فقط آثاری که حذف نشده‌اند نمایش داده شوند
+      const validRows = cloudArtworks.filter(row => !deletedSet.has(Number(row.id)));
+
+      showcaseArtworks = validRows.map(row => ({
+        id: Number(row.id),
+        tag: row.tag || 'character',
+        shortSlug: row.short_slug || row.title,
+        title: row.title,
+        desc: row.desc_text || '',
+        pipelineKey: row.pipeline_key || 'sketch1',
+        image: row.image,
+        colorSpace: row.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+        lore: row.lore || 'جهان اکستوپیا',
+        phases: row.phases || []
+      })).sort((a, b) => b.id - a.id);
+
+      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      renderShowcaseGrid();
+      renderAdminSketch2();
+      console.log('Automated two-way cloud sync complete. Active artworks:', showcaseArtworks.length);
+      return;
+    }
+
+    // ۲. فقط در صورتی که دیتابیس نو و کاملاً خالی است و حذفی هم ثبت نشده
+    const localArtworks = (showcaseArtworks || []).filter(item => !deletedSet.has(Number(item.id)));
+    if (localArtworks.length > 0 && (!cloudArtworks || cloudArtworks.length === 0) && deletedSet.size === 0) {
+      const rowsToInsert = localArtworks.map(a => ({
         id: a.id,
         tag: a.tag || 'character',
         short_slug: a.shortSlug || a.title,
@@ -69,47 +127,6 @@ async function syncArtworksFromSupabase() {
         phases: a.phases || []
       }));
       await window.supabaseClient.from('artworks').upsert(rowsToInsert);
-    }
-
-    // ادغام داده‌های کلود با این دستگاه تا تمام گوشی‌ها و کامپیوترها همه آثار را یکدست ببینند
-    if (cloudArtworks && cloudArtworks.length > 0) {
-      const mergedMap = new Map();
-      
-      cloudArtworks.forEach(row => {
-        mergedMap.set(Number(row.id), {
-          id: Number(row.id),
-          tag: row.tag || 'character',
-          shortSlug: row.short_slug || row.title,
-          title: row.title,
-          desc: row.desc_text || '',
-          pipelineKey: row.pipeline_key || 'sketch1',
-          image: row.image,
-          colorSpace: row.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
-          lore: row.lore || 'جهان اکستوپیا',
-          phases: row.phases || [
-            { name: 'اتود اولیه و سیلوئت', img: row.image },
-            { name: 'لاین‌آرت فنی و کادر', img: row.image },
-            { name: 'مطالعه نوری و مقداری', img: row.image },
-            { name: 'رندر متریال نهایی', img: row.image }
-          ]
-        });
-      });
-
-      localArtworks.forEach(item => {
-        if (!mergedMap.has(Number(item.id))) {
-          mergedMap.set(Number(item.id), item);
-        }
-      });
-
-      showcaseArtworks = Array.from(mergedMap.values()).sort((a, b) => b.id - a.id);
-      
-      try {
-        safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-      } catch (e) {}
-
-      renderShowcaseGrid();
-      renderAdminSketch2();
-      console.log('Automated two-way cloud sync complete. Active artworks:', showcaseArtworks.length);
     }
   } catch (err) {
     console.warn('Auto-sync execution error:', err);
@@ -447,24 +464,30 @@ window.confirmSaveArtwork = function() {
 
   try {
     if (isCreatingNewArt && stagingNewArt) {
-      stagingNewArt.title = title || 'کانسپت مستر جدید استودیو';
-      stagingNewArt.shortSlug = slug || stagingNewArt.title;
-      stagingNewArt.pipelineKey = pipe;
-      stagingNewArt.image = img;
-      stagingNewArt.lore = lore;
-      stagingNewArt.colorSpace = colorSpace;
-      stagingNewArt.desc = desc;
+      // ایجاد شیء مستقل قبل از بستن مودال تا دسترسی به اطلاعات قطع نشود
       const isBase64Img = img.startsWith('data:image/');
       const phaseSecondaryImg = isBase64Img ? '' : img;
-      stagingNewArt.phases = [
-        { name: 'اتود اولیه و سیلوئت', img: img },
-        { name: 'لاین‌آرت فنی و کادر', img: phaseSecondaryImg },
-        { name: 'مطالعه نوری و مقداری', img: phaseSecondaryImg },
-        { name: 'رندر متریال نهایی', img: phaseSecondaryImg }
-      ];
+      const newArtRecord = {
+        id: stagingNewArt.id || Date.now(),
+        tag: stagingNewArt.tag || 'character',
+        shortSlug: slug || stagingNewArt.shortSlug || title || 'کانسپت جدید',
+        title: title || 'کانسپت مستر جدید استودیو',
+        desc: desc,
+        pipelineKey: pipe,
+        image: img,
+        colorSpace: colorSpace,
+        lore: lore,
+        phases: [
+          { name: 'اتود اولیه و سیلوئت', img: img },
+          { name: 'لاین‌آرت فنی و کادر', img: phaseSecondaryImg },
+          { name: 'مطالعه نوری و مقداری', img: phaseSecondaryImg },
+          { name: 'رندر متریال نهایی', img: phaseSecondaryImg }
+        ]
+      };
 
-      showcaseArtworks.unshift(stagingNewArt);
+      showcaseArtworks.unshift(newArtRecord);
       safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
@@ -472,16 +495,16 @@ window.confirmSaveArtwork = function() {
 
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').insert([{
-          id: stagingNewArt.id,
-          tag: stagingNewArt.tag || 'character',
-          short_slug: stagingNewArt.shortSlug,
-          title: stagingNewArt.title,
-          desc_text: stagingNewArt.desc,
-          pipeline_key: stagingNewArt.pipelineKey,
-          image: stagingNewArt.image,
-          color_space: stagingNewArt.colorSpace,
-          lore: stagingNewArt.lore,
-          phases: stagingNewArt.phases
+          id: newArtRecord.id,
+          tag: newArtRecord.tag,
+          short_slug: newArtRecord.shortSlug,
+          title: newArtRecord.title,
+          desc_text: newArtRecord.desc,
+          pipeline_key: newArtRecord.pipelineKey,
+          image: newArtRecord.image,
+          color_space: newArtRecord.colorSpace,
+          lore: newArtRecord.lore,
+          phases: newArtRecord.phases
         }]).then(({ error }) => {
           if (error) console.warn('Supabase insert error:', error);
           else showToast('اثر جدید در دیتابیس ابری ثبت و در تمام جهان همگام شد!', 'success');
@@ -527,26 +550,40 @@ window.confirmSaveArtwork = function() {
 };
 
 window.adminDeleteArtwork = function(idx) {
-  if (!showcaseArtworks || showcaseArtworks.length <= 1) {
-    showToast('حداقل یک اثر باید در گالری باقی بماند.', 'error');
+  if (!showcaseArtworks || showcaseArtworks.length <= 0) {
+    showToast('اثری برای حذف وجود ندارد.', 'error');
     return;
   }
   if (confirm('آیا از حذف قطعی این اثر از گالری اطمینان دارید؟')) {
-    const deletedId = showcaseArtworks[idx]?.id;
-    if (window.supabaseClient && deletedId) {
-      window.supabaseClient.from('artworks').delete().eq('id', deletedId).then(({ error }) => {
-        if (error) console.warn('Supabase delete error:', error);
-      });
+    const deletedItem = showcaseArtworks[idx];
+    const deletedId = deletedItem ? Number(deletedItem.id) : null;
+
+    if (deletedId) {
+      // ثبت در بلک‌لیست آثار حذف‌شده تا هرگز در رفرش یا همگام‌سازی ابری برنگردد
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem(KEYS.DELETED_ARTWORKS) || '[]');
+      } catch(e) { deletedIds = []; }
+      if (!deletedIds.includes(deletedId)) {
+        deletedIds.push(deletedId);
+        safeSetStorage(KEYS.DELETED_ARTWORKS, JSON.stringify(deletedIds));
+      }
+
+      if (window.supabaseClient) {
+        window.supabaseClient.from('artworks').delete().eq('id', deletedId).then(({ error }) => {
+          if (error) console.warn('Supabase delete error:', error);
+          else console.log('Successfully deleted artwork', deletedId, 'from cloud database.');
+        });
+      }
     }
+
     showcaseArtworks.splice(idx, 1);
-    try {
-      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    } catch(e) {}
+    safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
     currentSelectedArtIdx = 0;
     closeAdminArtEditor();
     renderAdminSketch2();
     renderShowcaseGrid();
-    showToast('اثر مورد نظر با موفقیت حذف شد.', 'info');
+    showToast('اثر مورد نظر با موفقیت حذف شد و دیگر برنخواهد گشت.', 'info');
   }
 };
 
@@ -817,7 +854,8 @@ function updateCaseStudyPhaseView() {
 
   const imgEl = document.getElementById('caseStudyMainImg');
   const badgeEl = document.getElementById('caseStudyPhaseBadge');
-  if (imgEl) imgEl.src = currentPhase.img;
+  const displayImg = currentPhase.img || activeCaseStudyArt.image;
+  if (imgEl) imgEl.src = getOptimizedImageUrl(displayImg, 1600);
   if (badgeEl) badgeEl.textContent = `فاز ${activeCaseStudyPhaseIdx + 1} • ${currentPhase.name}`;
 }
 
