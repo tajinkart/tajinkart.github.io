@@ -1,243 +1,101 @@
+/**
+ * TAJINKART Master Spec Cloud Engine
+ * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
+ */
 
 // =========================================================
-// موتور همگام‌سازی ابری SUPABASE (اتصال زنده کامپیوتر و گوشی)
+// کلاینت دیتابیس ابری SUPABASE (اتصال زنده کامپیوتر و گوشی)
 // =========================================================
 const SUPABASE_PROJECT_URL = 'https://ahuasiouokvtryzxohri.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_dyUVO6elCOkL_a3Mukm0Ww_4XZNLohX';
 
-if (window.supabase && typeof window.supabase.createClient === 'function') {
+if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
   window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
 }
 
-// واکشی خودکار و زنده آثار از دیتابیس ابری
+// موتور همگام‌سازی کاملاً خودکار و دوطرفه ابری (Automated Two-Way Cloud Sync)
 async function syncArtworksFromSupabase() {
   if (!window.supabaseClient) return;
+
   try {
-    const { data, error } = await window.supabaseClient
+    const { data: cloudArtworks, error } = await window.supabaseClient
       .from('artworks')
       .select('*')
       .order('id', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      showcaseArtworks = data.map(item => ({
-        id: item.id,
-        tag: item.tag || 'character',
-        shortSlug: item.short_slug || item.title,
-        title: item.title,
-        desc: item.desc_text || '',
-        pipelineKey: item.pipeline_key || 'sketch1',
-        image: item.image,
-        colorSpace: item.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
-        lore: item.lore || 'جهان اکستوپیا',
-        phases: item.phases || [
-          { name: 'اتود اولیه و سیلوئت', img: item.image },
-          { name: 'لاین‌آرت فنی و کادر', img: item.image },
-          { name: 'مطالعه نوری و مقداری', img: item.image },
-          { name: 'رندر متریال نهایی', img: item.image }
-        ]
+    if (error) {
+      console.warn('Supabase fetch error, fallback to local cache:', error);
+      return;
+    }
+
+    const localArtworks = showcaseArtworks || [];
+    const cloudIds = new Set((cloudArtworks || []).map(row => Number(row.id)));
+    
+    // شناسایی و ارسال خودکار آثاری که در این سیستم هستند ولی در کلود نیستند
+    const missingInCloud = localArtworks.filter(localItem => !cloudIds.has(Number(localItem.id)));
+    
+    if (missingInCloud.length > 0) {
+      const rowsToInsert = missingInCloud.map(a => ({
+        id: a.id,
+        tag: a.tag || 'character',
+        short_slug: a.shortSlug || a.title,
+        title: a.title,
+        desc_text: a.desc || '',
+        pipeline_key: a.pipelineKey || 'sketch1',
+        image: a.image,
+        color_space: a.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+        lore: a.lore || 'جهان اکستوپیا',
+        phases: a.phases || []
       }));
-      try { localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks)); } catch(e){}
+      await window.supabaseClient.from('artworks').upsert(rowsToInsert);
+    }
+
+    // ادغام داده‌های کلود با این دستگاه تا تمام گوشی‌ها و کامپیوترها همه آثار را یکدست ببینند
+    if (cloudArtworks && cloudArtworks.length > 0) {
+      const mergedMap = new Map();
+      
+      cloudArtworks.forEach(row => {
+        mergedMap.set(Number(row.id), {
+          id: Number(row.id),
+          tag: row.tag || 'character',
+          shortSlug: row.short_slug || row.title,
+          title: row.title,
+          desc: row.desc_text || '',
+          pipelineKey: row.pipeline_key || 'sketch1',
+          image: row.image,
+          colorSpace: row.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+          lore: row.lore || 'جهان اکستوپیا',
+          phases: row.phases || [
+            { name: 'اتود اولیه و سیلوئت', img: row.image },
+            { name: 'لاین‌آرت فنی و کادر', img: row.image },
+            { name: 'مطالعه نوری و مقداری', img: row.image },
+            { name: 'رندر متریال نهایی', img: row.image }
+          ]
+        });
+      });
+
+      localArtworks.forEach(item => {
+        if (!mergedMap.has(Number(item.id))) {
+          mergedMap.set(Number(item.id), item);
+        }
+      });
+
+      showcaseArtworks = Array.from(mergedMap.values()).sort((a, b) => b.id - a.id);
+      
+      try {
+        localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      } catch (e) {}
+
       renderShowcaseGrid();
-  syncArtworksFromSupabase();
       renderAdminSketch2();
-      console.log('Artworks synced live from Supabase cloud!');
-    } else if (!error && data && data.length === 0) {
-      // بارگذاری اولیه آثار پیش‌فرض در دیتابیس ابری
-      seedInitialArtworksToSupabase();
+      console.log('Automated two-way cloud sync complete. Active artworks:', showcaseArtworks.length);
     }
   } catch (err) {
-    console.warn('Supabase sync skipped, using cached artworks:', err);
+    console.warn('Auto-sync execution error:', err);
   }
 }
 
-// انتقال خودکار آثار پیش‌فرض به سوپابیس در اولین راه‌اندازی
-async function seedInitialArtworksToSupabase() {
-  if (!window.supabaseClient || !showcaseArtworks || showcaseArtworks.length === 0) return;
-  try {
-    const rows = showcaseArtworks.map(a => ({
-      id: a.id,
-      tag: a.tag || 'character',
-      short_slug: a.shortSlug || a.title,
-      title: a.title,
-      desc_text: a.desc || '',
-      pipeline_key: a.pipelineKey || 'sketch1',
-      image: a.image,
-      color_space: a.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
-      lore: a.lore || 'جهان اکستوپیا',
-      phases: a.phases || []
-    }));
-    await window.supabaseClient.from('artworks').upsert(rows);
-    console.log('Default artworks seeded to Supabase successfully.');
-  } catch (e) {
-    console.warn('Seeding error:', e);
-  }
-}
-
-
-// دانلود مستقیم فایل به‌روز شده data.js با کلیه آثار جدید و تنظیمات جهت انتشار جهانی روی گیت‌هاب
-window.exportUpdatedDataJS = function() {
-  const fileContent = `/**
- * TAJINKART Master Spec Data Store
- * مدیر استودیو و طراح دنیا: سید سروش تاج
- * تاریخ به‌روزرسانی: ${new Date().toLocaleDateString('fa-IR')}
- */
-
-const KEYS = {
-  ORDERS: 'tajinkart_orders_fa_v2',
-  SETTINGS: 'tajinkart_settings_fa_v2',
-  ARTWORKS: 'tajinkart_artworks_fa_v2',
-  PIPELINES: 'tajinkart_pipelines_fa_v2',
-  PRODUCTS: 'tajinkart_products_fa_v2',
-  MEMBERS: 'tajinkart_members_fa_v2'
-};
-
-let currentView = 'showcase';
-let currentMember = null;
-let comicCurrentPage = 1;
-let activeModalItem = {};
-let currencyMode = '${currencyMode || "USD"}';
-let activeCaseStudyArt = null;
-let activeCaseStudyPhaseIdx = 0;
-
-let currentSelectedPipeKey = '${currentSelectedPipeKey || "sketch1"}';
-let currentSelectedStageIdx = 0;
-let currentSelectedArtIdx = 0;
-let currentSelectedProductIdx = 0;
-let selectedMemberIdx = 0;
-let currentMemberTierFilter = 'all';
-
-let siteSettings = ${JSON.stringify(siteSettings, null, 2)};
-
-let showcaseArtworks = ${JSON.stringify(showcaseArtworks, null, 2)};
-
-let PIPELINE_DATA = ${JSON.stringify(PIPELINE_DATA, null, 2)};
-
-let digitalStoreProducts = ${JSON.stringify(digitalStoreProducts, null, 2)};
-
-let academyCourses = ${JSON.stringify(academyCourses, null, 2)};
-
-let ordersList = ${JSON.stringify(ordersList, null, 2)};
-
-let comicPages = ${JSON.stringify(comicPages, null, 2)};
-
-let siteMembersData = ${JSON.stringify(siteMembersData, null, 2)};
-`;
-
-  const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'data.js';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('فایل جدید data.js دانلود شد! آن را در گیت‌هاب جایگزین کنید تا همه در گوشی ببینند.', 'success');
-};
-
-
-// =========================================================
-// موتور آپلود ابری تصاویر CLOUDINARY (پایدار و جهانی)
-// =========================================================
-async function uploadFileToCloudinary(file) {
-  // شناسایی هوشمند کلاود نیم و پریست (بررسی هر دو حالت ارائه‌شده توسط کاربر)
-  const cName1 = siteSettings.cloudinaryCloudName || 'tajinkart';
-  const preset1 = siteSettings.cloudinaryPreset || 'erlvtkx9';
-
-  const formData1 = new FormData();
-  formData1.append('file', file);
-  formData1.append('upload_preset', preset1);
-
-  try {
-    const res1 = await fetch(`https://api.cloudinary.com/v1_1/${cName1}/image/upload`, {
-      method: 'POST',
-      body: formData1
-    });
-    if (res1.ok) {
-      const data1 = await res1.json();
-      return data1.secure_url;
-    }
-  } catch (e) {
-    console.warn('First Cloudinary attempt error:', e);
-  }
-
-  // تلاش با چیدمان معکوس نام‌ها در صورت مغایرت
-  try {
-    const formData2 = new FormData();
-    formData2.append('file', file);
-    formData2.append('upload_preset', 'erlvtkx9');
-    const res2 = await fetch(`https://api.cloudinary.com/v1_1/tajinkart/image/upload`, {
-      method: 'POST',
-      body: formData2
-    });
-    if (res2.ok) {
-      const data2 = await res2.json();
-      siteSettings.cloudinaryCloudName = 'tajinkart';
-      siteSettings.cloudinaryPreset = 'erlvtkx9';
-      try { localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings)); } catch(e){}
-      return data2.secure_url;
-    }
-  } catch (e2) {
-    console.warn('Second Cloudinary attempt error:', e2);
-  }
-
-  return null;
-}
-
-
-// =========================================================
-// مدیریت دکمه بازگشت (Back Button) گوشی و سابقه مرورگر (HTML5 History API)
-// جلوگیری از پرت شدن کاربر به بیرون از سایت در زمان کار با موبایل
-// =========================================================
-window.addEventListener('popstate', (event) => {
-  // ۱. بستن لایت‌باکس مطالعه موردی اثر در صورت باز بودن
-  const artModal = document.getElementById('artDetailModal');
-  if (artModal && artModal.classList.contains('active')) {
-    closeArtModalDirect();
-    return;
-  }
-  // ۲. بستن مدال سفارش کمیسیون در صورت باز بودن
-  const zoomModal = document.getElementById('zoomModal');
-  if (zoomModal && zoomModal.classList.contains('active')) {
-    closeModalDirect();
-    return;
-  }
-  // ۳. بستن پنجره ادیتور آرت‌ورک ادمین
-  const adminEditor = document.getElementById('adminArtLiveEditorCol');
-  if (adminEditor && adminEditor.classList.contains('active')) {
-    closeAdminArtEditor();
-    return;
-  }
-  // ۴. بستن پنجره ورود اعضا
-  const memberModal = document.getElementById('memberModal');
-  if (memberModal && memberModal.style.display === 'flex') {
-    closeMemberModal();
-    return;
-  }
-  // ۵. بستن منوی شناور بازشده موبایل
-  const dock = document.getElementById('rightVerticalNav');
-  if (dock && dock.classList.contains('dock-open')) {
-    dock.classList.remove('dock-open');
-    return;
-  }
-  // ۶. بازگشت به صفحه اصلی گالری در صورت حضور در بخش‌های دیگر
-  if (currentView !== 'showcase') {
-    switchView('showcase');
-    return;
-  }
-});
-
-// ثبت وضعیت در History هنگام باز شدن مدال‌ها
-function pushModalState(modalName) {
-  try {
-    window.history.pushState({ modalOpen: modalName }, '');
-  } catch(e) {}
-}
-
-
-// =========================================================
-// موتور فشرده‌سازی هوشمند تصاویر در فرانت‌اند
-// جلوگیری ۱۰۰٪ از پر شدن سقف حافظه مرورگر (LocalStorage Quota)
-// تبدیل تصاویر ۱۰ مگابایتی به وب‌فرمت سبک ۱۵۰ کیلوبایتی با کیفیت HD
-// =========================================================
+// موتور فشرده‌سازی خودکار تصاویر (جلوگیری از پر شدن حافظه لوکال)
 function compressImageForStorage(file, maxWidth = 1280, maxHeight = 1280, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -271,11 +129,56 @@ function compressImageForStorage(file, maxWidth = 1280, maxHeight = 1280, qualit
   });
 }
 
-// سیستم استیجینگ و پیش‌نویس افزودن و ویرایش اثر
+// موتور آپلود ابری تصاویر CLOUDINARY
+async function uploadFileToCloudinary(file) {
+  const cName1 = siteSettings.cloudinaryCloudName || 'tajinkart';
+  const preset1 = siteSettings.cloudinaryPreset || 'erlvtkx9';
+
+  const formData1 = new FormData();
+  formData1.append('file', file);
+  formData1.append('upload_preset', preset1);
+
+  try {
+    const res1 = await fetch(`https://api.cloudinary.com/v1_1/${cName1}/image/upload`, {
+      method: 'POST',
+      body: formData1
+    });
+    if (res1.ok) {
+      const data1 = await res1.json();
+      return data1.secure_url;
+    }
+  } catch (e) {
+    console.warn('Primary Cloudinary attempt error:', e);
+  }
+
+  try {
+    const cName2 = (cName1 === 'tajinkart') ? 'erlvtkx9' : 'tajinkart';
+    const preset2 = (preset1 === 'erlvtkx9') ? 'tajinkart' : 'erlvtkx9';
+    const formData2 = new FormData();
+    formData2.append('file', file);
+    formData2.append('upload_preset', preset2);
+    const res2 = await fetch(`https://api.cloudinary.com/v1_1/${cName2}/image/upload`, {
+      method: 'POST',
+      body: formData2
+    });
+    if (res2.ok) {
+      const data2 = await res2.json();
+      siteSettings.cloudinaryCloudName = cName2;
+      siteSettings.cloudinaryPreset = preset2;
+      try { localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings)); } catch(e){}
+      return data2.secure_url;
+    }
+  } catch (e2) {
+    console.warn('Fallback Cloudinary attempt error:', e2);
+  }
+
+  return null;
+}
+
+// سیستم استیجینگ و پیش‌نویس افزودن و ویرایش اثر در ادمین
 let isCreatingNewArt = false;
 let stagingNewArt = null;
 
-// ۱. باز کردن مدال برای افزودن اثر جدید (بدون ایجاد درجا در گالری)
 window.openCreateArtworkModal = function() {
   isCreatingNewArt = true;
   stagingNewArt = {
@@ -300,10 +203,10 @@ window.openCreateArtworkModal = function() {
   if (titleEl) titleEl.textContent = '✨ افزودن اثر جدید به گالری';
 
   renderAdminArtModalForm(stagingNewArt, true);
-  document.getElementById('adminArtLiveEditorCol').classList.add('active'); pushModalState('adminEditor');
+  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+  pushModalState('adminEditor');
 };
 
-// ۲. باز کردن مدال برای ویرایش اثر موجود
 window.selectAdminArt = function(idx) {
   isCreatingNewArt = false;
   currentSelectedArtIdx = idx;
@@ -314,10 +217,10 @@ window.selectAdminArt = function(idx) {
   if (titleEl) titleEl.textContent = `ویرایش آرت‌ورک: ${art.shortSlug || art.title}`;
 
   renderAdminArtModalForm(art, false);
-  document.getElementById('adminArtLiveEditorCol').classList.add('active'); pushModalState('adminEditor');
+  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+  pushModalState('adminEditor');
 };
 
-// بستن مدال ادیتور
 window.closeAdminArtEditor = function() {
   const modal = document.getElementById('adminArtLiveEditorCol');
   if (modal) modal.classList.remove('active');
@@ -331,7 +234,6 @@ window.closeAdminArtEditorDirect = function(e) {
   }
 };
 
-// ۳. رندر فرم داخل پنجره مدال ادیتور
 function renderAdminArtModalForm(art, isNew) {
   const box = document.getElementById('adminArtFormFields');
   if (!box || !art) return;
@@ -366,7 +268,7 @@ function renderAdminArtModalForm(art, isNew) {
         </label>
         <div style="display:flex; gap:8px; margin-bottom:8px;">
           <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 14px;">
-            📁 انتخاب عکس از کامپیوتر (با فشرده‌سازی خودکار HD)
+            📁 انتخاب عکس از کامپیوتر (با ارسال ابری به کلودیناری)
           </button>
           <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
         </div>
@@ -440,7 +342,6 @@ function renderAdminArtModalForm(art, isNew) {
   `;
 }
 
-// تغییر تصویر در پیش‌نمایش به صورت زنده
 window.handleAdminImageLiveChange = function(url) {
   const cleanUrl = url.trim();
   const previewImg = document.getElementById('adminArtPreviewImg');
@@ -467,14 +368,12 @@ window.handleAdminImageLiveChange = function(url) {
   }
 };
 
-// هندلر خواندن مستقیم فایل از کامپیوتر با فشرده‌سازی خودکار HD
 window.handleAdminLocalFileUpload = async function(inputEl) {
   if (!inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
   showToast('در حال آپلود و ذخیره در فضای ابری Cloudinary...', 'info');
 
   try {
-    // ۱. ابتدا تلاش برای آپلود مستقیم به کلودیناری جهت دریافت لینک دائمی جهانی
     const cloudUrl = await uploadFileToCloudinary(file);
     if (cloudUrl) {
       handleAdminImageLiveChange(cloudUrl);
@@ -484,7 +383,6 @@ window.handleAdminLocalFileUpload = async function(inputEl) {
       return;
     }
 
-    // ۲. در صورت آفلاین بودن یا عدم پاسخ کلود، ذخیره با موتور فشرده‌سازی خودکار HD
     showToast('در حال فشرده‌سازی و ذخیره بهینه لوکال...', 'info');
     const compressedBase64 = await compressImageForStorage(file, 1280, 1280, 0.82);
     handleAdminImageLiveChange(compressedBase64);
@@ -497,7 +395,6 @@ window.handleAdminLocalFileUpload = async function(inputEl) {
   }
 };
 
-// تایید نهایی و ایجاد/ویرایش اثر
 window.confirmSaveArtwork = function() {
   const title = document.getElementById('editArtTitleInput')?.value.trim() || '';
   const slug = document.getElementById('editArtSlugInput')?.value.trim() || '';
@@ -541,7 +438,6 @@ window.confirmSaveArtwork = function() {
       renderAdminSketch2();
       showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
 
-      // ارسال زنده به دیتابیس ابری سوپابیس
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').insert([{
           id: stagingNewArt.id,
@@ -556,10 +452,9 @@ window.confirmSaveArtwork = function() {
           phases: stagingNewArt.phases
         }]).then(({ error }) => {
           if (error) console.warn('Supabase insert error:', error);
-          else showToast('اثر جدید در دیتابیس ابری ذخیره و در گوشی و تمام دنیا همگام شد!', 'success');
+          else showToast('اثر جدید در دیتابیس ابری ثبت و در تمام جهان همگام شد!', 'success');
         });
       }
-
     } else if (showcaseArtworks[currentSelectedArtIdx]) {
       const art = showcaseArtworks[currentSelectedArtIdx];
       art.title = title || art.title;
@@ -576,7 +471,6 @@ window.confirmSaveArtwork = function() {
       renderAdminSketch2();
       showToast('تغییرات اثر با موفقیت ذخیره شد.', 'success');
 
-      // به‌روزرسانی زنده در دیتابیس ابری سوپابیس
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').update({
           tag: art.tag,
@@ -593,11 +487,34 @@ window.confirmSaveArtwork = function() {
           else showToast('تغییرات در دیتابیس ابری ذخیره و همگام شد.', 'success');
         });
       }
-
     }
   } catch (storageErr) {
     console.error('Storage error:', storageErr);
-    showToast('خطا در ذخیره‌سازی: سقف حافظه مرورگر پر شده است.', 'error');
+    showToast('خطا در ذخیره‌سازی داده‌ها.', 'error');
+  }
+};
+
+window.adminDeleteArtwork = function(idx) {
+  if (!showcaseArtworks || showcaseArtworks.length <= 1) {
+    showToast('حداقل یک اثر باید در گالری باقی بماند.', 'error');
+    return;
+  }
+  if (confirm('آیا از حذف قطعی این اثر از گالری اطمینان دارید؟')) {
+    const deletedId = showcaseArtworks[idx]?.id;
+    if (window.supabaseClient && deletedId) {
+      window.supabaseClient.from('artworks').delete().eq('id', deletedId).then(({ error }) => {
+        if (error) console.warn('Supabase delete error:', error);
+      });
+    }
+    showcaseArtworks.splice(idx, 1);
+    try {
+      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+    } catch(e) {}
+    currentSelectedArtIdx = 0;
+    closeAdminArtEditor();
+    renderAdminSketch2();
+    renderShowcaseGrid();
+    showToast('اثر مورد نظر با موفقیت حذف شد.', 'info');
   }
 };
 
@@ -611,9 +528,63 @@ window.renderAdminSettingsTab = function() {
   const passEl = document.getElementById('setAdminPass');
   if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
   const cCloudEl = document.getElementById('setCloudinaryCloud');
-  if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'erlvtkx9';
+  if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'tajinkart';
   const cPresetEl = document.getElementById('setCloudinaryPreset');
-  if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'tajinkart';
+  if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'erlvtkx9';
+};
+
+// سابقه مرورگر و دکمه بازگشت در موبایل (HTML5 History API)
+window.addEventListener('popstate', (event) => {
+  const artModal = document.getElementById('artDetailModal');
+  if (artModal && artModal.classList.contains('active')) {
+    closeArtModalDirect();
+    return;
+  }
+  const zoomModal = document.getElementById('zoomModal');
+  if (zoomModal && zoomModal.classList.contains('active')) {
+    closeModalDirect();
+    return;
+  }
+  const adminEditor = document.getElementById('adminArtLiveEditorCol');
+  if (adminEditor && adminEditor.classList.contains('active')) {
+    closeAdminArtEditor();
+    return;
+  }
+  const memberModal = document.getElementById('memberModal');
+  if (memberModal && memberModal.style.display === 'flex') {
+    closeMemberModal();
+    return;
+  }
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock && dock.classList.contains('dock-open')) {
+    dock.classList.remove('dock-open');
+    return;
+  }
+  if (currentView !== 'showcase') {
+    switchView('showcase');
+    return;
+  }
+});
+
+function pushModalState(modalName) {
+  try {
+    window.history.pushState({ modalOpen: modalName }, '');
+  } catch(e) {}
+}
+
+window.toggleDockExpand = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    const isOpen = dock.classList.contains('dock-open');
+    if (isOpen) {
+      dock.classList.remove('dock-open');
+      dock.classList.add('dock-collapsed');
+    } else {
+      dock.classList.add('dock-open');
+      dock.classList.remove('dock-collapsed');
+    }
+  }
 };
 
 
@@ -781,7 +752,7 @@ window.openArtModal = function(id) {
   renderCaseStudyPhasesSwitcher();
   updateCaseStudyPhaseView();
 
-  document.getElementById('artDetailModal').classList.add('active'); pushModalState('artDetail');
+  document.getElementById('artDetailModal').classList.add('active');
 };
 
 function renderCaseStudyPhasesSwitcher() {
@@ -910,7 +881,7 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
 
   // محاسبه لحظه‌ای اولیه و باز کردن پنجره
   recalcWizardPrice();
-  document.getElementById('zoomModal').classList.add('active'); pushModalState('zoomModal');
+  document.getElementById('zoomModal').classList.add('active');
 }
 
 function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
@@ -1204,7 +1175,6 @@ window.addEventListener('scroll', () => {
           hero.style.opacity = '0.15';
         }
       } else {
-        // در موبایل: حرکت سبک بدون لگ
         if (scrolled < 400) {
           const opacity = Math.max(1 - (scrolled / 320), 0.25);
           hero.style.opacity = opacity;
@@ -1218,19 +1188,9 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 
-window.toggleDockExpand = function(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
+window.toggleDockExpand = function() {
   const dock = document.getElementById('rightVerticalNav');
-  if (dock) {
-    const isOpen = dock.classList.contains('dock-open');
-    if (isOpen) {
-      dock.classList.remove('dock-open');
-      dock.classList.add('dock-collapsed');
-    } else {
-      dock.classList.add('dock-open');
-      dock.classList.remove('dock-collapsed');
-    }
-  }
+  if (dock) dock.classList.toggle('dock-open');
 };
 
 document.addEventListener('click', (e) => {
@@ -1296,7 +1256,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === '`' || e.key === '~' || e.key === '÷') backtickActive = true;
   if ((e.key === 'Escape' && backtickActive) || (e.key === '`' && e.shiftKey)) {
     e.preventDefault();
-    switchView('admin');
+    switchView('admin'); switchAdminTab('artworks', document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]'));
   }
 });
 window.addEventListener('keyup', (e) => {
@@ -1509,108 +1469,9 @@ function renderAdminSketch2() {
   container.innerHTML = html;
 }
 
-// selectAdminArt handled by artwork manager above
 
-function renderAdminArtLiveEditor() {
-  const art = showcaseArtworks[currentSelectedArtIdx];
-  const box = document.getElementById('adminArtFormFields');
-  if (!art || !box) return;
 
-  // اطمینان از وجود ۴ فاز
-  if (!art.phases || art.phases.length < 4) {
-    art.phases = [
-      { name: 'اتود اولیه و سیلوئت', img: art.image },
-      { name: 'لاین‌آرت فنی و کادر', img: art.image },
-      { name: 'مطالعه نوری و مقداری', img: art.image },
-      { name: 'رندر متریال نهایی', img: art.image }
-    ];
-  }
 
-  let dimLabel = '';
-  if (art.width && art.height) {
-    const r = (art.width / art.height).toFixed(2);
-    dimLabel = `${art.width} × ${art.height} (نسبت ${r})`;
-  }
-
-  box.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      
-      <!-- پیش‌نمایش کادر واقعی اثر بدون کراپ شدن و نه فقط یک مربع -->
-      <div style="background:#04060a; border:1px solid var(--border-subtle); border-radius:12px; padding:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="font-size:11.5px; font-weight:700; color:var(--gold);">پیش‌نمایش کادر واقعی اثر:</span>
-          <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">${dimLabel}</span>
-        </div>
-        <div style="max-height:220px; min-height:130px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center;">
-          <img id="adminArtPreviewImg" src="${art.image}" style="max-width:100%; max-height:220px; object-fit:contain; display:block;" alt="${art.title}" onload="onAdminPreviewImgLoad(this, ${currentSelectedArtIdx})" />
-        </div>
-      </div>
-
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">عنوان کامل اثر</label>
-        <input type="text" value="${art.title}" onchange="updateArtField(${currentSelectedArtIdx}, 'title', this.value)" />
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted);">اسلاگ هاور گالری</label>
-          <input type="text" value="${art.shortSlug}" onchange="updateArtField(${currentSelectedArtIdx}, 'shortSlug', this.value)" />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک</label>
-          <select onchange="updateArtField(${currentSelectedArtIdx}, 'pipelineKey', this.value)">
-            <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر</option>
-            <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>هیولا و موجودات</option>
-            <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
-            <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
-            <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>پراپ و UI</option>
-            <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک و مانگا</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر اصلی کاور</label>
-        <input type="text" value="${art.image}" oninput="handleAdminImageChange(${currentSelectedArtIdx}, this.value)" class="font-mono" />
-      </div>
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">لور داستانی و زمینه</label>
-        <input type="text" value="${art.lore || 'جهان اکستوپیا'}" onchange="updateArtField(${currentSelectedArtIdx}, 'lore', this.value)" />
-      </div>
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">مشخصات فضای رنگی</label>
-        <input type="text" value="${art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB'}" onchange="updateArtField(${currentSelectedArtIdx}, 'colorSpace', this.value)" />
-      </div>
-      
-      <!-- ویرایش تصاویر ۴ فاز مطالعه موردی (Case-Study Phases) -->
-      <div style="padding:10px; border-radius:10px; background:#070a10; border:1px solid var(--border-subtle); margin-top:4px;">
-        <span style="font-size:11px; font-weight:800; color:var(--gold); display:block; margin-bottom:6px;">تصاویر فازهای مطالعه موردی (Case-Study):</span>
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          <div>
-            <label style="font-size:10px; color:var(--text-muted);">فاز ۱ (سیلوئت):</label>
-            <input type="text" value="${art.phases[0]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 0, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
-          </div>
-          <div>
-            <label style="font-size:10px; color:var(--text-muted);">فاز ۲ (لاین‌آرت):</label>
-            <input type="text" value="${art.phases[1]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 1, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
-          </div>
-          <div>
-            <label style="font-size:10px; color:var(--text-muted);">فاز ۳ (والیو/نور):</label>
-            <input type="text" value="${art.phases[2]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 2, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
-          </div>
-          <div>
-            <label style="font-size:10px; color:var(--text-muted);">فاز ۴ (رندر نهایی):</label>
-            <input type="text" value="${art.phases[3]?.img || art.image}" onchange="updateArtPhaseImg(${currentSelectedArtIdx}, 3, this.value)" class="font-mono" style="font-size:11px; padding:6px 10px;" />
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">توضیحات تکمیلی اثر</label>
-        <textarea rows="2" onchange="updateArtField(${currentSelectedArtIdx}, 'desc', this.value)">${art.desc || ''}</textarea>
-      </div>
-      <button onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این اثر از گالری</button>
-    </div>
-  `;
-}
 
 window.handleAdminImageChange = function(idx, newUrl) {
   const url = newUrl.trim();
@@ -1656,60 +1517,9 @@ window.updateArtField = function(idx, field, value) {
   showToast('اثر با موفقیت ویرایش شد.', 'success');
 };
 
-window.adminAddNewArtwork = function() {
-  const newArt = {
-    id: Date.now(),
-    tag: 'character',
-    shortSlug: 'اثر جدید',
-    title: 'کانسپت مستر جدید استودیو',
-    desc: 'طراحی توسعه بصری توسط سید سروش تاج.',
-    pipelineKey: 'sketch1',
-    image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80',
-    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
-    lore: 'جهان اکستوپیا',
-    phases: [
-      { name: 'اتود اولیه و سیلوئت', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'لاین‌آرت فنی', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'سایه‌زنی مقداری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'رندر متریال نهایی', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80' }
-    ]
-  };
-  showcaseArtworks.unshift(newArt);
-  localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-  currentSelectedArtIdx = 0;
-  detectAndApplyArtworkDimensions(newArt, () => {
-    renderShowcaseGrid();
-  });
-  renderAdminSketch2();
-  renderShowcaseGrid();
-  showToast('آرت‌ورک جدید به گالری اضافه شد.', 'success');
-};
 
-window.adminDeleteArtwork = function(idx) {
-  if (!showcaseArtworks || showcaseArtworks.length <= 1) {
-    showToast('حداقل یک اثر باید در گالری باقی بماند.', 'error');
-    return;
-  }
-  if (confirm('آیا از حذف قطعی این اثر از گالری اطمینان دارید؟')) {
-    
-    const deletedId = showcaseArtworks[idx]?.id;
-    if (window.supabaseClient && deletedId) {
-      window.supabaseClient.from('artworks').delete().eq('id', deletedId).then(({ error }) => {
-        if (error) console.warn('Supabase delete error:', error);
-      });
-    }
 
-    showcaseArtworks.splice(idx, 1);
-    try {
-      localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    } catch(e) {}
-    currentSelectedArtIdx = 0;
-    closeAdminArtEditor(); // پنجره بلافاصله بسته می‌شود تا از حذف تصادفی اثر بعدی جلوگیری شود
-    renderAdminSketch2();
-    renderShowcaseGrid();
-    showToast('اثر مورد نظر با موفقیت حذف شد.', 'info');
-  }
-};
+
 
 // مدیریت دارایی‌های دیجیتال (۷ شاخه)
 function renderAdminProductsTab() {
@@ -2020,6 +1830,7 @@ window.exportFullSelfContainedHTML = function() {
 // راه‌اندازی اولیه در زمان لود صفحه
 document.addEventListener('DOMContentLoaded', () => {
   renderShowcaseGrid();
+  syncArtworksFromSupabase();
   selectPipeline('sketch1', document.querySelector('#atelierServiceCards .service-nav-card.active'), false);
   renderProducts();
   renderAcademy();
@@ -2039,10 +1850,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
   const passEl = document.getElementById('setAdminPass');
   if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
-  const cCloudEl = document.getElementById('setCloudinaryCloud');
-  if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'erlvtkx9';
-  const cPresetEl = document.getElementById('setCloudinaryPreset');
-  if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'tajinkart';
 
   // ثبت فرم بریف سفارش
   const orderForm = document.getElementById('commissionOrderForm');
@@ -2090,7 +1897,7 @@ document.addEventListener('DOMContentLoaded', () => {
           closeMemberModal();
           document.getElementById('adminLoginGate').classList.add('hidden');
           document.getElementById('adminWorkspace').classList.remove('hidden');
-          switchView('admin');
+          switchView('admin'); switchAdminTab('artworks', document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]'));
           showToast('مرکز کنترل و پنل مدیریت استودیو گشوده شد.', 'success');
           return;
         } else {
@@ -2181,8 +1988,8 @@ document.addEventListener('DOMContentLoaded', () => {
       siteSettings.tgToken = document.getElementById('setTgToken').value.trim();
       siteSettings.tgChat = document.getElementById('setTgChat').value.trim();
       siteSettings.adminPass = document.getElementById('setAdminPass').value.trim() || 'tajinkart';
-      siteSettings.cloudinaryCloudName = document.getElementById('setCloudinaryCloud')?.value.trim() || 'erlvtkx9';
-      siteSettings.cloudinaryPreset = document.getElementById('setCloudinaryPreset')?.value.trim() || 'tajinkart';
+      siteSettings.cloudinaryCloudName = document.getElementById('setCloudinaryCloud')?.value.trim() || 'tajinkart';
+      siteSettings.cloudinaryPreset = document.getElementById('setCloudinaryPreset')?.value.trim() || 'erlvtkx9';
       localStorage.setItem(KEYS.SETTINGS, JSON.stringify(siteSettings));
       renderProducts();
       selectPipeline(currentSelectedPipeKey, null, false);

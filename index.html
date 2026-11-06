@@ -537,10 +537,7 @@
             <input type="password" id="adminPasswordInput" value="tajinkart" class="font-mono" required />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px;">باز کردن پنل مدیریت</button>
-        
-                
-
-              </form>
+        </form>
       </div>
 
       <div id="adminWorkspace" class="hidden">
@@ -551,7 +548,6 @@
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button onclick="exportSiteDataJSON()" class="btn-gold" style="background:var(--cyan-electric); color:#000;">دانلود بک‌آپ اطلاعات (JSON)</button>
-            <button onclick="exportUpdatedDataJS()" class="btn-gold" style="background:var(--gold); color:#000;">دانلود فایل به‌روز شده data.js (انتشار همگانی)</button>
             <button onclick="exportFullSelfContainedHTML()" class="btn-gold">دانلود سورس به‌روز شده HTML</button>
             <button onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af;">قفل پنل</button>
           </div>
@@ -628,14 +624,14 @@
             </nav>
           </aside>
 
-          <!-- کانتینر اصلی تب‌های ادمین (همه تب‌ها برادر و مستقل از هم) -->
+          <!-- کانتینر اصلی تب‌های ادمین (همه ۶ تب مستقل و خواهر-برادر) -->
           <main class="admin-main-panes-holder">
             <div id="adminTabArtworks">
           <div class="admin-artworks-fullwidth">
             <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
               <div style="margin-bottom:16px;">
                 <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
-                <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید روی کادر + در گرید کلیک کنید یا برای ادیت هر اثر روی کارت آن ضربه بزنید.</span>
+                <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید روی کادر + در گرید کلیک کنید یا برای ادیت هر اثر روی کارت آن ضربه بزنید. (همگام‌سازی ابری به صورت ۱۰۰٪ خودکار انجام می‌شود)</span>
               </div>
               <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
             </div>
@@ -793,7 +789,6 @@
                   </button>
                 </div>
 
-              
                 <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
                 <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -803,11 +798,11 @@
                   <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
                   <div>
                     <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9 یا tajinkart" />
+                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
                   </div>
                   <div>
                     <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
+                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9" />
                   </div>
                 </div>
 
@@ -899,7 +894,7 @@
         <div style="max-height:68vh; overflow-y:auto; padding-left:4px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <h4 style="font-size:14.5px; font-weight:900; color:#fff;">محاسبه‌گر مشخصات و اسکوپ پروژه</h4>
-            
+            <button type="button" onclick="closeModalDirect()" style="color:var(--text-muted); font-size:19px;">✕</button>
           </div>
 
           <!-- گام ۱: مشخصات پایه و کادربندی -->
@@ -995,10 +990,7 @@
         <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:14px; width:100%;">
           ثبت رسمی بریف و ارسال مستقیم به تلگرام مدیر استودیو ←
         </button>
-      
-                
-
-              </form>
+      </form>
     </div>
   </div>
 
@@ -1015,7 +1007,7 @@
         <form id="memberLoginForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
             <label style="font-size:12px; display:block; margin-bottom:5px;">ایمیل یا نام کاربری</label>
-            <input type="text" id="loginEmail" required value="client@novagames.io" class="font-mono" placeholder="user@domain.com" />
+            <input type="text" id="loginEmail" required  class="font-mono" placeholder="user@domain.com" />
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -1023,13 +1015,10 @@
               <!-- لینک فراموشی رمز عبور اضافه شده -->
               <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز عبور؟</button>
             </div>
-            <input type="password" id="loginPass" required value="123456" class="font-mono" placeholder="••••••••" />
+            <input type="password" id="loginPass" required  class="font-mono" placeholder="••••••••" />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">ورود به حساب کاربری</button>
-        
-                
-
-              </form>
+        </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
           <span>هنوز حسابی ندارید؟</span>
           <button type="button" onclick="switchAuthView('signup')" class="auth-tab-link" style="font-weight:700;">ثبت‌نام عضویت</button>
@@ -1060,10 +1049,7 @@
             <input type="password" id="signupPass" required minlength="6" class="font-mono" placeholder="حداقل ۶ کاراکتر" />
           </div>
           <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">تکمیل ثبت‌نام ←</button>
-        
-                
-
-              </form>
+        </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
           <span>حساب دارید؟</span>
           <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">وارد شوید</button>
@@ -1104,10 +1090,7 @@
               ذخیره و تغییر رمز عبور جدید ←
             </button>
           </div>
-        
-                
-
-              </form>
+        </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px;">
           <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">بازگشت به صفحه ورود</button>
         </div>
