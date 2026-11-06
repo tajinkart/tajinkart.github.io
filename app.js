@@ -2262,33 +2262,42 @@ document.addEventListener('DOMContentLoaded', () => {
       const agreeTerms = document.getElementById('signupAgreeTerms')?.checked;
       const agreeAge = document.getElementById('signupAgreeAge')?.checked;
 
-      // ۱. اعتبارسنجی سخت‌گیرانه شماره تماس / تلگرام
-      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-      const isTelegram = phone.startsWith('@') && phone.length >= 4;
-      const isDigitsPhone = /^[0-9+]{10,15}$/.test(cleanPhone);
+      const telegramHandle = document.getElementById('signupTelegram')?.value.trim() || '';
 
-      if (!isTelegram && !isDigitsPhone) {
-        showToast('شماره تماس نامعتبر است! لطفاً شماره موبایل کامل (حداقل ۱۰ رقم مانند 0912...) یا آیدی تلگرام با @ وارد کنید.', 'error');
+      // ۱. اعتبارسنجی ریاضی و دقیق شماره تلفن همراه (دقیقاً ۱۱ رقم و با آغاز 09)
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const isValidMobile = /^09[0-9]{9}$/.test(cleanPhone);
+
+      if (!isValidMobile) {
+        showToast('شماره همراه نامعتبر است! شماره تلفن همراه باید دقیقاً ۱۱ رقم بوده و با 09 آغاز گردد (مثال: 09207702950).', 'error');
         document.getElementById('signupPhone')?.focus();
         return;
       }
 
-      // ۲. اعتبارسنجی طول و یکسان نبودن با مقدار پیش‌فرض
-      if (password.length < 6) {
-        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
+      // ۲. اعتبارسنجی آیدی تلگرام در صورت تمایل به ارسال
+      if (telegramHandle && !telegramHandle.startsWith('@')) {
+        showToast('آیدی تلگرام باید با علامت @ آغاز گردد (مثال: @username).', 'error');
+        document.getElementById('signupTelegram')?.focus();
         return;
       }
 
-      // ۳. تطابق رمز عبور و تکرار آن
+      // ۳. اعتبارسنجی قدرت رمز (ممانعت از پسوردهای ۱ تا ۶ و ارقام ساده)
+      if (password.length < 6 || /^(123456|12345678|111111|000000)$/.test(password) || /^[0-9]+$/.test(password)) {
+        showToast('رمز عبور بسیار ضعیف است! رمز عبور نمی‌تواند صرفاً از ارقام ساده یا ترتیبی تشکیل شود؛ لطفاً از ترکیب حروف و عدد استفاده کنید.', 'error');
+        document.getElementById('signupPass')?.focus();
+        return;
+      }
+
+      // ۴. تطابق رمز عبور و تکرار آن
       if (password !== passwordConfirm) {
         showToast('رمز عبور و تکرار آن یکسان نیستند! لطفاً مجدداً بررسی فرمایید.', 'error');
         document.getElementById('signupPassConfirm')?.focus();
         return;
       }
 
-      // ۴. بررسی تایید قوانین و رده‌بندی سنی ۱۶+
-      if (!agreeTerms || !agreeAge) {
-        showToast('لطفاً تیک پذیرش قوانین استودیو و تایید شرط سنی ۱۶+ را علامت بزنید.', 'error');
+      // ۵. بررسی تایید قوانین و شرایط خدمات استودیو
+      if (!agreeTerms) {
+        showToast('لطفاً تیک مطالعه و پذیرش قوانین و شرایط خدمات استودیو را علامت بزنید.', 'error');
         return;
       }
 
@@ -2707,6 +2716,7 @@ window.closeTermsModal = function() {
 // =========================================================
 // موتور هوشمند سنجش کیفیت و قدرت رمز عبور (Password Strength)
 // =========================================================
+// فرمول استاندارد جهانی سنجش آنتروپی و تنوع رمز عبور
 window.evalPassStrength = function(pass, prefix) {
   const box = document.getElementById(prefix + 'StrengthBox');
   const bar = document.getElementById(prefix + 'StrengthBar');
@@ -2720,38 +2730,64 @@ window.evalPassStrength = function(pass, prefix) {
   }
   box.style.display = 'block';
 
-  let score = 0;
-  if (pass.length >= 6) score += 1;
-  if (pass.length >= 8) score += 1;
-  if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score += 1;
-  if (/[0-9]/.test(pass)) score += 1;
-  if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+  // بررسی الگوهای به‌شدت ناامن و متوالی مانند 123456، aaaaaa، password
+  const isSequential = /^(123456|12345678|abcdef|qwerty|111111|000000|password)/i.test(pass);
+  const isOnlyDigits = /^[0-9]+$/.test(pass);
+  const isOnlyLetters = /^[a-zA-Z]+$/.test(pass);
 
-  if (score <= 1) {
+  // محاسبه تنوع گونه‌های کاراکتری
+  const hasLower = /[a-z]/.test(pass);
+  const hasUpper = /[A-Z]/.test(pass);
+  const hasNumber = /[0-9]/.test(pass);
+  const hasSpecial = /[^A-Za-z0-9]/.test(pass);
+  const varietyCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+
+  // اگر کمتر از ۶ کاراکتر باشد یا فقط عدد/فقط حروف متوالی باشد -> قطعاً ضعیف
+  if (pass.length < 6 || isSequential || (pass.length <= 8 && isOnlyDigits) || (pass.length <= 7 && isOnlyLetters)) {
     bar.style.width = '25%';
     bar.style.background = 'var(--crimson)';
-    text.textContent = 'سطح امنیت: بسیار ضعیف';
+    text.textContent = 'سطح امنیت: بسیار ضعیف و آسیب‌پذیر';
     text.style.color = 'var(--crimson)';
-    if (hint) hint.textContent = 'افزودن عدد و علامت الزامی است';
-  } else if (score === 2) {
+    if (hint) hint.textContent = isOnlyDigits ? 'رمز نباید فقط عدد باشد' : 'ترکیب حروف و علائم اضافه کنید';
+    return;
+  }
+
+  // سطح متوسط: حداقل ۶ تا ۷ کاراکتر با تنوع حداقل ۲ نوع (مثلاً حرف + عدد)
+  if (pass.length >= 6 && varietyCount === 2) {
     bar.style.width = '50%';
     bar.style.background = 'var(--amber)';
     text.textContent = 'سطح امنیت: متوسط';
     text.style.color = 'var(--amber)';
-    if (hint) hint.textContent = 'افزودن حروف بزرگ یا نماد خاص';
-  } else if (score === 3 || score === 4) {
+    if (hint) hint.textContent = 'افزودن حروف بزرگ و نمادها (@#!%)';
+    return;
+  }
+
+  // سطح خوب: حداقل ۸ کاراکتر با تنوع ۳ نوع
+  if (pass.length >= 8 && varietyCount >= 3 && !hasSpecial) {
     bar.style.width = '75%';
     bar.style.background = 'var(--cyan-electric)';
-    text.textContent = 'سطح امنیت: خوب و ایمن';
+    text.textContent = 'سطح امنیت: خوب و استاندارد';
     text.style.color = 'var(--cyan-electric)';
-    if (hint) hint.textContent = 'استاندارد و مناسب';
-  } else {
+    if (hint) hint.textContent = 'برای ارتقا به حداکثر، نماد خاص اضافه کنید';
+    return;
+  }
+
+  // سطح عالی: حداقل ۸ کاراکتر به بالا با تنوع کامل ۴ نوع (کوچک، بزرگ، عدد، نماد)
+  if (pass.length >= 8 && varietyCount >= 3 && hasSpecial) {
     bar.style.width = '100%';
     bar.style.background = 'var(--emerald)';
-    text.textContent = 'سطح امنیت: فوق‌العاده قوی ✓';
+    text.textContent = 'سطح امنیت: فوق‌العاده قوی و نفوذناپذیر ✓';
     text.style.color = 'var(--emerald)';
-    if (hint) hint.textContent = 'حداکثر مقاومت امنیتی';
+    if (hint) hint.textContent = 'بالاترین مقاومت در برابر سرقت';
+    return;
   }
+
+  // حالت پیش‌فرض برای طول بالا
+  bar.style.width = '75%';
+  bar.style.background = 'var(--cyan-electric)';
+  text.textContent = 'سطح امنیت: مناسب';
+  text.style.color = 'var(--cyan-electric)';
+  if (hint) hint.textContent = 'مقاوم و قابل قبول';
 };
 
 
@@ -2761,4 +2797,51 @@ window.openChangePasswordModal = function() {
   if (modal) {
     modal.style.display = 'flex';
   }
+};
+
+
+// بررسی زنده تکراری بودن ایمیل در زمان تایپ
+let emailCheckTimeout = null;
+window.handleLiveEmailCheck = function(emailVal) {
+  const notice = document.getElementById('signupEmailLiveNotice');
+  if (!notice) return;
+  const cleanEmail = (emailVal || '').trim().toLowerCase();
+
+  clearTimeout(emailCheckTimeout);
+  if (!cleanEmail || !cleanEmail.includes('@') || cleanEmail.length < 5) {
+    notice.style.display = 'none';
+    return;
+  }
+
+  // ۱. بررسی فوری در حافظه کلاینت
+  const localExists = siteMembersData.some(m => m.email && m.email.toLowerCase() === cleanEmail);
+  if (localExists) {
+    notice.style.display = 'inline-block';
+    notice.style.color = 'var(--crimson)';
+    notice.textContent = '✕ این ایمیل قبلاً ثبت شده است';
+    return;
+  }
+
+  // ۲. بررسی در جدول سوپابیس با تاخیر ۵۰۰ میلی‌ثانیه برای عدم ارسال درخواست‌های اضافی
+  emailCheckTimeout = setTimeout(async () => {
+    if (window.supabaseClient) {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('members')
+          .select('email')
+          .eq('email', cleanEmail)
+          .maybeSingle();
+
+        if (data && data.email) {
+          notice.style.display = 'inline-block';
+          notice.style.color = 'var(--crimson)';
+          notice.textContent = '✕ این ایمیل قبلاً در استودیو ثبت شده است';
+        } else {
+          notice.style.display = 'inline-block';
+          notice.style.color = 'var(--emerald)';
+          notice.textContent = '✓ ایمیل مجاز و آزاد است';
+        }
+      } catch(e) {}
+    }
+  }, 450);
 };

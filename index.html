@@ -1079,27 +1079,34 @@
             <input type="text" id="signupName" required placeholder="مثال: آریا تهرانی / استودیو پایا" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">آدرس ایمیل معتبر</label>
-            <input type="email" id="signupEmail" required class="font-mono" placeholder="user@gmail.com" />
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-size:12px;">آدرس ایمیل معتبر</label>
+              <span id="signupEmailLiveNotice" style="font-size:10.5px; display:none;"></span>
+            </div>
+            <input type="email" id="signupEmail" required oninput="handleLiveEmailCheck(this.value)" class="font-mono" placeholder="user@gmail.com" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">شماره همراه معتبر (یا آیدی تلگرام با @)</label>
-            <input type="text" id="signupPhone" required class="font-mono" placeholder="مثال: 09123456789 یا @username" />
+            <label style="font-size:12px; display:block; margin-bottom:4px;">شماره تلفن همراه (فقط ارقام ۱۱ رقمی مانند 09123456789)</label>
+            <input type="tel" id="signupPhone" required inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11" class="font-mono" placeholder="09123456789" />
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب (حداقل ۶ کاراکتر)</label>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">آیدی تلگرام (اختیاری جهت هماهنگی بریف)</label>
+            <input type="text" id="signupTelegram" class="font-mono" placeholder="@username" />
+          </div>
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب</label>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="حداقل ۶ کاراکتر ترکیبی" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
             </div>
-            <!-- نوار داینامیک سنجش قدرت رمز عبور -->
+            <!-- نوار هوشمند سنجش قدرت رمز عبور -->
             <div id="signupPassStrengthBox" style="margin-top:6px; display:none;">
               <div style="height:4px; border-radius:4px; background:#1e293b; overflow:hidden; margin-bottom:4px;">
                 <div id="signupPassStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
               </div>
               <div style="display:flex; justify-content:space-between; font-size:10.5px;">
                 <span id="signupPassStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
-                <span id="signupPassStrengthHint" class="font-mono" style="color:var(--text-muted);">حداقل ۶ کاراکتر</span>
+                <span id="signupPassStrengthHint" class="font-mono" style="color:var(--text-muted);">ترکیب حروف و عدد</span>
               </div>
             </div>
           </div>
@@ -1111,15 +1118,11 @@
             </div>
           </div>
 
-          <!-- چک‌باکس قوانین سایت و رده‌بندی سنی ۱۶+ -->
-          <div style="display:flex; flex-direction:column; gap:8px; margin:4px 0 6px; padding:10px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
-            <label style="display:flex; align-items:flex-start; gap:8px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.6;">
-              <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:2px; accent-color:var(--gold); flex-shrink:0;" />
-              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline;">قوانین و شرایط خدمات استودیو</a> و عدم بازفروش لایسنس‌ها را می‌پذیرم.</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; font-size:11.5px; color:#cbd5e1; cursor:pointer;">
-              <input type="checkbox" id="signupAgreeAge" required style="width:16px; height:16px; accent-color:var(--gold); flex-shrink:0;" />
-              <span>تایید می‌کنم دارای حداقل <strong>۱۶ سال سن</strong> می‌باشم (رده‌بندی محتوای فانتزی).</span>
+          <!-- چک‌باکس واحد قوانین و شرایط خدمات استودیو -->
+          <div style="margin:4px 0 6px; padding:11px 12px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
+            <label style="display:flex; align-items:flex-start; gap:9px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.65;">
+              <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:3px; accent-color:var(--gold); flex-shrink:0;" />
+              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-weight:700;">قوانین و شرایط خدمات استودیو</a> (شامل رده‌بندی سنی ۱۶+ و لایسنس دارایی‌ها) را مطالعه نموده و می‌پذیرم.</span>
             </label>
           </div>
 
