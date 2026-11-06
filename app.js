@@ -80,6 +80,12 @@ async function syncArtworksFromSupabase() {
 
     // ۱. اگر کلود آثاری دارد، دیتابیس ابری منبع قطعی حقیقت است
     if (cloudArtworks && cloudArtworks.length > 0) {
+      // پاکسازی قطعی ردیف‌های آزمایشی قدیمی ۱ تا ۸ از سوپابیس
+      const mockRows = cloudArtworks.filter(row => Number(row.id) <= 8);
+      if (mockRows.length > 0) {
+        window.supabaseClient.from('artworks').delete().lte('id', 8).then(() => {});
+      }
+
       // حذف قطعی آثاری که در بلک‌لیست حذف هستند حتی از کلود
       const itemsToPurge = cloudArtworks.filter(row => deletedSet.has(Number(row.id)));
       if (itemsToPurge.length > 0) {
@@ -88,8 +94,8 @@ async function syncArtworksFromSupabase() {
         });
       }
 
-      // فقط آثاری که حذف نشده‌اند نمایش داده شوند
-      const validRows = cloudArtworks.filter(row => !deletedSet.has(Number(row.id)));
+      // فقط آثاری که حذف نشده‌اند و شناسه واقعی دارند (آثار واقعی هنرمند)
+      const validRows = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
 
       showcaseArtworks = validRows.map(row => ({
         id: Number(row.id),

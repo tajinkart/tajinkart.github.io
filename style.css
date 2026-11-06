@@ -410,76 +410,89 @@
       .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 { grid-column: span 12 !important; }
     }
 
+    /* استایل سینمایی و استودیویی تایل‌ها (الگوبرداری از آتلیه‌های تراز اول هالیوود و امیر زند) */
     .mosaic-tile {
       break-inside: avoid;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       position: relative;
       overflow: hidden;
       background: #06080c;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 2px; /* لبه‌های شارپ و معماری برای حذف حس کودکانه و کارت‌های حبابی */
       cursor: pointer;
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
       display: block;
       width: 100%;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
     @media (max-width: 768px) {
-      .mosaic-tile { margin-bottom: 10px; border-radius: 10px; }
+      .mosaic-tile { margin-bottom: 8px; border-radius: 2px; }
     }
     .mosaic-tile:hover {
-      border-color: rgba(250, 204, 21, 0.45);
-    }
-    .tile-center-title {
-      position: absolute;
-      inset: 0;
-      z-index: 15;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      text-align: center;
-      background: rgba(4, 5, 7, 0.85);
-      backdrop-filter: blur(4px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-    .tile-slug {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      font-size: 13.5px;
-      letter-spacing: 0.16em;
-      color: var(--gold);
-      transform: translateY(6px);
-      transition: transform 0.25s ease;
-      direction: ltr;
-    }
-    .tile-divider {
-      width: 20px;
-      height: 2px;
-      background: var(--gold);
-      margin: 8px 0;
-      transition: width 0.25s ease;
-    }
-    .tile-sub { 
-      font-size: 13px; 
-      color: #f1f5f9; 
-      font-weight: 700; 
-      transform: translateY(6px); 
-      transition: transform 0.25s ease; 
-      max-width: 90%;
+      border-color: rgba(250, 204, 21, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 204, 21, 0.12);
+      transform: translateY(-2px);
     }
     .mosaic-tile img {
       width: 100%;
       height: auto;
       display: block;
       object-fit: cover;
-      border-radius: 11px;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      border-radius: 2px;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
     }
-    .mosaic-tile:hover img { transform: scale(1.05); opacity: 0.2; }
-    .mosaic-tile:hover .tile-center-title { opacity: 1; }
+    /* در هاور دیگر اثر سیاه و کدر نمی‌شود، بلکه زوم نرم و شفافیت کامل حفظ می‌شود */
+    .mosaic-tile:hover img {
+      transform: scale(1.025);
+      filter: contrast(1.04) brightness(1.02);
+      opacity: 1;
+    }
+    /* گرادیان سایه سینمایی در پایین کادر به جای ماسک سیاه کل تصویر */
+    .tile-center-title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: auto;
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 30px 14px 12px 14px;
+      text-align: right;
+      background: linear-gradient(to top, rgba(4, 5, 7, 0.94) 0%, rgba(4, 5, 7, 0.65) 60%, transparent 100%);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+    .mosaic-tile:hover .tile-center-title {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tile-center-title .tile-slug {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .tile-center-title .tile-divider {
+      width: 20px;
+      height: 1px;
+      background: rgba(250, 204, 21, 0.6);
+      margin-bottom: 5px;
+    }
+    .tile-center-title .tile-sub {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 500;
+      line-height: 1.35;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+    }
     .mosaic-tile:hover .tile-slug, .mosaic-tile:hover .tile-sub { transform: translateY(0); }
     .mosaic-tile:hover .tile-divider { width: 44px; }
 
