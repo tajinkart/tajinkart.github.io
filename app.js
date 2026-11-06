@@ -74,15 +74,25 @@ function triggerPasswordResetModal() {
     switchAuthView('reset');
     const modal = document.getElementById('memberModal');
     if (modal) {
-      modal.style.display = 'flex';
+      modal.style.setProperty('display', 'flex', 'important');
+    }
+    const resetView = document.getElementById('authViewResetPassword');
+    if (resetView) {
+      resetView.classList.remove('hidden');
     }
     showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
   }
 
+  // تلاش مکرر تا اطمینان از لود کامل المان‌های DOM
+  doOpen();
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(doOpen, 350));
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(doOpen, 100);
+      setTimeout(doOpen, 500);
+    });
   } else {
-    setTimeout(doOpen, 350);
+    setTimeout(doOpen, 200);
+    setTimeout(doOpen, 600);
   }
 }
 
@@ -942,6 +952,7 @@ function renderShowcaseGrid() {
   if (!grid) return;
   grid.innerHTML = showcaseArtworks.map((art, i) => {
     const spanClass = getAutoSpanClass(art);
+    const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
         <div class="tile-center-title">
@@ -949,7 +960,7 @@ function renderShowcaseGrid() {
           <span class="tile-divider"></span>
           <span class="tile-sub">${art.title}</span>
         </div>
-        <img src="${art.image}" loading="lazy" alt="${art.title}" onload="handleImageAutoDetect(this, ${art.id})" />
+        <img src="${art.image}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
     `;
   }).join('');
@@ -1976,12 +1987,9 @@ function renderAdminMemberDetail(m) {
       </div>
     </div>
 
-    <!-- دکمه‌های عملیاتی حذف و ویرایش کاربر در پنل ادمین -->
-    <div style="display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle);">
-      <button type="button" onclick="adminEditMemberEmail(${selectedMemberIdx})" class="btn-secondary" style="flex:1; padding:9px; font-size:11.5px;">
-        ✏️ ویرایش ایمیل
-      </button>
-      <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="flex:1; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
+    <!-- دکمه عملیاتی حذف کاربر در پنل ادمین -->
+    <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+      <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="width:100%; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
         🗑️ حذف این کاربر
       </button>
     </div>
@@ -2640,17 +2648,7 @@ window.adminDeleteMember = function(idx) {
   }
 };
 
-window.adminEditMemberEmail = function(idx) {
-  if (!siteMembersData || !siteMembersData[idx]) return;
-  const m = siteMembersData[idx];
-  const newEmail = prompt(`تغییر آدرس ایمیل برای ${m.name}:`, m.email);
-  if (newEmail && newEmail.trim() && newEmail.includes('@')) {
-    m.email = newEmail.trim().toLowerCase();
-    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
-    renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
-    showToast('ایمیل کاربر به‌روزرسانی شد.', 'success');
-  }
-};
+
 
 window.exportMembersBackupJSON = function() {
   const backupData = {

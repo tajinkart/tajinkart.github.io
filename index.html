@@ -550,14 +550,8 @@
             <h2 class="view-hero-title">مرکز کنترل و پنل مدیریت استودیو</h2>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button onclick="exportSiteDataJSON()" class="btn-gold" style="background:var(--cyan-electric); color:#000;">دانلود بک‌آپ اطلاعات (JSON)</button>
-            <button onclick="exportFullSelfContainedHTML()" class="btn-gold">دانلود سورس به‌روز شده HTML</button>
-            <button onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af;">قفل پنل</button>
+            <button onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px;">قفل پنل</button>
           </div>
-        </div>
-
-        <div style="padding:14px 18px; border-radius:12px; background:rgba(0,240,255,0.06); border:1px solid rgba(0,240,255,0.25); margin-bottom:20px; font-size:12.5px; line-height:1.8;">
-          <strong style="color:var(--cyan-electric);">💡 راهنمای ذخیره‌سازی دائمی:</strong> تغییرات ایجاد شده در مرورگر شما ذخیره می‌شوند. برای ماندگاری همیشگی و مستقل، کلید <strong>«دانلود سورس به‌روز شده HTML»</strong> را بزنید و فایل جدید را جایگزین کنید.
         </div>
 
         <!-- چیدمان داشبورد ادمین: سایدبار عمودی در سمت راست (RTL) و تب‌ها در سمت چپ -->
@@ -725,14 +719,9 @@
                     <button onclick="filterMembersByTier('VIP')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px;">اعضای ویژه (VIP)</button>
                     <button onclick="filterMembersByTier('PRO')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px;">پرو (PRO)</button>
                   </div>
-                  <div style="display:flex; gap:8px;">
-                    <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11px; padding:6px 14px; background:var(--cyan-electric); color:#000;" title="واکشی زنده و بازیابی تمام اعضای ثبت‌شده و خریدهای آنلاین از Supabase">
-                      🔄 همگام‌سازی و بازیابی اعضا از سرور ابری
-                    </button>
-                    <button type="button" onclick="exportMembersBackupJSON()" class="btn-secondary" style="font-size:11px; padding:6px 12px; color:var(--text-muted); border-color:var(--border-subtle);" title="دانلود نسخه پشتیبان رسمی از مشخصات و لایسنس‌های اعضا">
-                      💾 دانلود بک‌آپ (JSON)
-                    </button>
-                  </div>
+                  <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11px; padding:6px 14px; background:var(--cyan-electric); color:#000;" title="واکشی زنده و بازیابی تمام اعضای ثبت‌شده و خریدهای آنلاین از Supabase">
+                    🔄 همگام‌سازی و بازیابی اعضا از سرور ابری
+                  </button>
                 </div>
               </div>
               <div id="adminMembersListContainer"></div>
@@ -749,9 +738,14 @@
 
             <div id="adminTabSettings" class="hidden">
             <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%;">
-              <div style="margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
-                <h3 style="font-size:16px; font-weight:800; color:#fff;">⚙️ تنظیمات سراسری سیستم، نرخ ارز و ربات تلگرام</h3>
-                <span style="font-size:12px; color:var(--text-muted);">مدیریت نرخ تسعیر دلار به تومان، کلیدهای ارتباطی بریف تلگرام و امنیت دسترسی مدیر.</span>
+              <div style="margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                  <h3 style="font-size:16px; font-weight:800; color:#fff;">⚙️ تنظیمات سراسری سیستم، نرخ ارز و ربات تلگرام</h3>
+                  <span style="font-size:12px; color:var(--text-muted);">مدیریت نرخ تسعیر دلار به تومان، کلیدهای ارتباطی بریف تلگرام و امنیت دسترسی مدیر.</span>
+                </div>
+                <button type="button" onclick="exportSiteDataJSON()" class="btn-secondary" style="font-size:11.5px; padding:7px 14px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.3); background:rgba(0,240,255,0.06);" title="دانلود نسخه پشتیبان کامل آفلاین از کلیه اطلاعات و تنظیمات سایت">
+                  💾 دانلود بک‌آپ کامل سایت (JSON)
+                </button>
               </div>
 
               <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
@@ -1038,11 +1032,7 @@
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
               <label style="font-size:12px;">رمز عبور</label>
-              <div style="display:flex; gap:8px;">
-                <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز؟</button>
-                <span style="color:var(--text-muted); font-size:10px;">|</span>
-                <button type="button" onclick="switchAuthView('reset')" class="auth-tab-link" style="font-size:11px; color:var(--gold);" title="اگر روی لینک ایمیل کلیک کرده‌اید، مستقیماً رمز جدید بگذارید">تعیین رمز جدید</button>
-              </div>
+              <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز عبور؟</button>
             </div>
             <div style="position:relative; display:flex; align-items:center;">
               <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" style="padding-left:40px;" />

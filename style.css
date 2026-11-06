@@ -411,19 +411,30 @@
     }
 
     /* استایل سینمایی و استودیویی تایل‌ها (الگوبرداری از آتلیه‌های تراز اول هالیوود و امیر زند) */
+    @keyframes skeletonShimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
     .mosaic-tile {
       break-inside: avoid;
       margin-bottom: 10px;
       position: relative;
       overflow: hidden;
-      background: #06080c;
+      background: linear-gradient(90deg, #06080c 25%, #0f1422 50%, #06080c 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 2.2s infinite ease-in-out;
+      min-height: 180px;
       border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 2px; /* لبه‌های شارپ و معماری برای حذف حس کودکانه و کارت‌های حبابی */
+      border-radius: 2px;
       cursor: pointer;
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
       display: block;
       width: 100%;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+    .mosaic-tile.loaded {
+      animation: none;
+      background: #06080c;
     }
     @media (max-width: 768px) {
       .mosaic-tile { margin-bottom: 8px; border-radius: 2px; }
