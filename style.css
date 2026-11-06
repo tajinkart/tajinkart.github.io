@@ -441,60 +441,63 @@
       border-radius: 2px;
       transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
     }
-    /* در هاور دیگر اثر سیاه و کدر نمی‌شود، بلکه زوم نرم و شفافیت کامل حفظ می‌شود */
+    /* حالت هاور محبوب و کلاسیک: کم شدن شفافیت تصویر با زوم نرم و افکت سینمایی */
     .mosaic-tile:hover img {
-      transform: scale(1.025);
-      filter: contrast(1.04) brightness(1.02);
-      opacity: 1;
+      transform: scale(1.05);
+      opacity: 0.28;
+      filter: contrast(1.06) brightness(0.85);
     }
-    /* گرادیان سایه سینمایی در پایین کادر به جای ماسک سیاه کل تصویر */
+    /* پوشش کامل تایل با زمینه تیره شیشه‌ای و عنوان وسط‌چین لوکس */
     .tile-center-title {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: auto;
+      inset: 0;
       z-index: 15;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 30px 14px 12px 14px;
-      text-align: right;
-      background: linear-gradient(to top, rgba(4, 5, 7, 0.94) 0%, rgba(4, 5, 7, 0.65) 60%, transparent 100%);
+      align-items: center;
+      justify-content: center;
+      padding: 20px 14px;
+      text-align: center;
+      background: rgba(4, 5, 7, 0.78);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
       opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
     }
     .mosaic-tile:hover .tile-center-title {
       opacity: 1;
-      transform: translateY(0);
     }
     .tile-center-title .tile-slug {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 800;
       letter-spacing: 2px;
       color: var(--gold);
-      margin-bottom: 3px;
+      margin-bottom: 6px;
       font-family: 'JetBrains Mono', monospace;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      text-shadow: 0 2px 10px rgba(250, 204, 21, 0.35);
+      transform: translateY(8px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tile-center-title .tile-divider {
-      width: 20px;
-      height: 1px;
-      background: rgba(250, 204, 21, 0.6);
-      margin-bottom: 5px;
+      width: 0;
+      height: 1.5px;
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.8);
+      margin-bottom: 8px;
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tile-center-title .tile-sub {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.92);
-      font-weight: 500;
-      line-height: 1.35;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+      font-size: 13px;
+      color: #ffffff;
+      font-weight: 700;
+      line-height: 1.4;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+      transform: translateY(8px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .mosaic-tile:hover .tile-slug, .mosaic-tile:hover .tile-sub { transform: translateY(0); }
-    .mosaic-tile:hover .tile-divider { width: 44px; }
+    .mosaic-tile:hover .tile-divider { width: 48px; }
 
     /* محفظه‌های مشترک */
     .container {
@@ -2045,4 +2048,25 @@
   body {
     padding-bottom: 25px !important;
   }
+}
+
+/* استایل درگ اند دراپ آثار در پنل ادمین */
+.admin-mosaic-card {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.admin-mosaic-card:active {
+  cursor: grabbing;
+}
+.admin-mosaic-card.dragging-art {
+  opacity: 0.35 !important;
+  transform: scale(0.92) !important;
+  border: 2px dashed var(--gold) !important;
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.4) !important;
+}
+.admin-mosaic-card.drag-over-target {
+  border: 2px solid var(--cyan-electric) !important;
+  box-shadow: 0 0 20px var(--cyan-glow) !important;
+  transform: scale(1.05) !important;
 }

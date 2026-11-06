@@ -1566,7 +1566,7 @@ window.adminAddNewCategory = function() {
   showToast('دسته‌بندی جدید خدمات اضافه شد.', 'success');
 };
 
-// اسکچ ۲: مدیریت گالری آثار (همراه با پیش‌نمایش کادر واقعی و تشخیص خودکار)
+// اسکچ ۲: مدیریت گالری آثار (همراه با چیدمان با درگ اند دراپ و پیش‌نمایش کادر)
 function renderAdminSketch2() {
   const container = document.getElementById('adminMosaicTilesContainer');
   if (!container) return;
@@ -1580,9 +1580,23 @@ function renderAdminSketch2() {
   `;
 
   html += showcaseArtworks.map((art, idx) => `
-    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" onclick="selectAdminArt(${idx})" title="برای ویرایش کلیک کنید">
-      <img src="${art.image}" style="width:100%; height:100%; object-fit:cover;" />
-      <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.85); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+    <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" 
+         id="adminArtCard_${idx}"
+         draggable="true"
+         ondragstart="handleAdminArtDragStart(event, ${idx})"
+         ondragover="handleAdminArtDragOver(event)"
+         ondragenter="handleAdminArtDragEnter(event, ${idx})"
+         ondragleave="handleAdminArtDragLeave(event, ${idx})"
+         ondrop="handleAdminArtDrop(event, ${idx})"
+         ondragend="handleAdminArtDragEnd(event)"
+         onclick="selectAdminArt(${idx})" 
+         title="برای جابجایی بکشید و رها کنید (Drag & Drop) یا برای ویرایش کلیک کنید">
+      <img src="${art.image}" draggable="false" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" alt="${art.title}" />
+      <div style="position:absolute; top:6px; right:6px; padding:3px 7px; border-radius:6px; background:rgba(0,0,0,0.8); color:var(--gold); font-size:10.5px; font-weight:800; border:1px solid rgba(250,204,21,0.3); pointer-events:none; display:flex; align-items:center; gap:3px;">
+        <span>⋮⋮</span>
+        <span>#${idx + 1}</span>
+      </div>
+      <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.88); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none;">
         ${art.shortSlug || art.title}
       </div>
     </div>
@@ -2232,3 +2246,90 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+// =========================================================
+// سیستم هوشمند DRAG & DROP مرتب‌سازی آثار در پنل ادمین
+// =========================================================
+let draggedArtIdx = null;
+
+window.handleAdminArtDragStart = function(e, idx) {
+  draggedArtIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', idx);
+  setTimeout(() => {
+    const el = document.getElementById(`adminArtCard_${idx}`);
+    if (el) el.classList.add('dragging-art');
+  }, 0);
+};
+
+window.handleAdminArtDragOver = function(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+};
+
+window.handleAdminArtDragEnter = function(e, idx) {
+  e.preventDefault();
+  if (idx !== draggedArtIdx) {
+    const el = document.getElementById(`adminArtCard_${idx}`);
+    if (el) el.classList.add('drag-over-target');
+  }
+};
+
+window.handleAdminArtDragLeave = function(e, idx) {
+  const el = document.getElementById(`adminArtCard_${idx}`);
+  if (el) el.classList.remove('drag-over-target');
+};
+
+window.handleAdminArtDrop = function(e, targetIdx) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const targetEl = document.getElementById(`adminArtCard_${targetIdx}`);
+  if (targetEl) targetEl.classList.remove('drag-over-target');
+
+  if (draggedArtIdx === null || draggedArtIdx === targetIdx) return;
+
+  // جابجایی اثر در آرایه آثار گالری
+  const movedItem = showcaseArtworks.splice(draggedArtIdx, 1)[0];
+  showcaseArtworks.splice(targetIdx, 0, movedItem);
+
+  // به‌روزرسانی اندیس ترتیب
+  showcaseArtworks.forEach((art, i) => {
+    art.orderIndex = i;
+  });
+
+  currentSelectedArtIdx = targetIdx;
+  safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+
+  // رندر مجدد گرید ادمین و گالری صفحه اصلی
+  renderAdminSketch2();
+  renderShowcaseGrid();
+  showToast('ترتیب نمایش آثار با موفقیت تغییر یافت!', 'success');
+
+  // همگام‌سازی ابری ترتیب در سوپابیس
+  syncArtworkOrderToSupabase();
+};
+
+window.handleAdminArtDragEnd = function(e) {
+  draggedArtIdx = null;
+  document.querySelectorAll('.admin-mosaic-card').forEach(el => {
+    el.classList.remove('dragging-art', 'drag-over-target');
+  });
+};
+
+async function syncArtworkOrderToSupabase() {
+  if (!window.supabaseClient) return;
+  try {
+    for (let i = 0; i < showcaseArtworks.length; i++) {
+      const art = showcaseArtworks[i];
+      window.supabaseClient
+        .from('artworks')
+        .update({ order_index: i })
+        .eq('id', art.id)
+        .then(() => {});
+    }
+  } catch(err) {
+    console.warn('Sync order to Supabase error:', err);
+  }
+}
