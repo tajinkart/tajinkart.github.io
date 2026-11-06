@@ -6,9 +6,10 @@
 // ۱. شناسایی فوری لینک بازیابی رمز قبل از پاکسازی توکن‌ها توسط کلاینت‌ها
 let isRecoveryFlowDetected = false;
 try {
+  const _href = window.location.href || '';
   const _h = window.location.hash || '';
   const _s = window.location.search || '';
-  if (_h.includes('type=recovery') || _s.includes('type=recovery') || _s.includes('action=reset-password') || (_h.includes('access_token=') && !_h.includes('provider='))) {
+  if (_href.includes('recovery') || _h.includes('recovery') || _s.includes('recovery') || _s.includes('reset') || _href.includes('reset-password') || (_h.includes('access_token=') && !_h.includes('provider=google'))) {
     isRecoveryFlowDetected = true;
     sessionStorage.setItem('tajinkart_recovering_password', 'true');
     console.log('[Early Recovery Flag] Detected password reset link in URL!');
@@ -2745,5 +2746,14 @@ window.evalPassStrength = function(pass, prefix) {
     text.textContent = 'سطح امنیت: فوق‌العاده قوی ✓';
     text.style.color = 'var(--emerald)';
     if (hint) hint.textContent = 'حداکثر مقاومت امنیتی';
+  }
+};
+
+
+window.openChangePasswordModal = function() {
+  switchAuthView('reset');
+  const modal = document.getElementById('memberModal');
+  if (modal) {
+    modal.style.display = 'flex';
   }
 };
