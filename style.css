@@ -2070,3 +2070,31 @@
   box-shadow: 0 0 20px var(--cyan-glow) !important;
   transform: scale(1.05) !important;
 }
+
+/* دکمه ورود و ثبت‌نام سریع با حساب گوگل */
+.btn-google-auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+.btn-google-auth:hover {
+  background: #0f1726;
+  border-color: rgba(66, 133, 244, 0.55);
+  box-shadow: 0 6px 20px rgba(66, 133, 244, 0.25);
+  transform: translateY(-1px);
+}
+.btn-google-auth svg {
+  flex-shrink: 0;
+}

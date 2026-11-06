@@ -2105,6 +2105,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // ۱. اعتبارسنجی قطعی: جلوگیری از ثبت‌نام مجدد با ایمیل تکراری
+      const isDuplicate = siteMembersData.some(m => m.email && m.email.toLowerCase() === email);
+      if (isDuplicate) {
+        showToast('این ایمیل قبلاً ثبت‌نام شده است! لطفاً وارد شوید.', 'error');
+        switchAuthView('login');
+        const loginEmailEl = document.getElementById('loginEmail');
+        if (loginEmailEl) loginEmailEl.value = email;
+        return;
+      }
+
       showToast('در حال ثبت حساب کاربری در سرورهای ابری Supabase...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
@@ -2124,7 +2134,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (error) {
             console.warn('[Supabase SignUp Error]', error);
-            showToast('خطا در ثبت‌نام ابری: ' + (error.message || 'مشکل در برقراری ارتباط'), 'error');
+            if (error.message.includes('already registered') || error.message.includes('already exists') || error.status === 422) {
+              showToast('این ایمیل قبلاً در سیستم ثبت‌نام شده است. لطفاً وارد شوید.', 'error');
+              switchAuthView('login');
+              const loginEmailEl = document.getElementById('loginEmail');
+              if (loginEmailEl) loginEmailEl.value = email;
+            } else {
+              showToast('خطا در ثبت‌نام: ' + (error.message || 'مشکل در برقراری ارتباط'), 'error');
+            }
             return;
           }
 
@@ -2178,35 +2195,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // فرم بازیابی رمز (ارسال لینک بازیابی از طریق Supabase)
+  // فرم بازیابی رمز عبور واقعی از طریق ارسال لینک به جیمیل (Supabase Auth)
   const forgotForm = document.getElementById('forgotPasswordForm');
   if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const iden = document.getElementById('forgotIdentifier')?.value.trim();
-      const newPass = document.getElementById('forgotNewPass')?.value.trim();
+      const iden = document.getElementById('forgotIdentifier')?.value.trim().toLowerCase();
 
-      if (window.supabaseClient && window.supabaseClient.auth && iden && iden.includes('@')) {
+      if (!iden || !iden.includes('@')) {
+        showToast('لطفاً یک آدرس ایمیل معتبر وارد فرمایید.', 'error');
+        return;
+      }
+
+      showToast('در حال ارسال لینک بازیابی به صندوق جیمیل شما...', 'info');
+
+      if (window.supabaseClient && window.supabaseClient.auth) {
         try {
-          const { error } = await window.supabaseClient.auth.resetPasswordForEmail(iden);
-          if (!error) {
-            showToast('لینک امن بازیابی رمز عبور به ایمیل شما ارسال شد.', 'success');
-            switchAuthView('login');
+          const { error } = await window.supabaseClient.auth.resetPasswordForEmail(iden, {
+            redirectTo: window.location.origin + window.location.pathname
+          });
+
+          if (error) {
+            console.warn('[Supabase Reset Pass Error]', error);
+            showToast(error.message || 'خطا در ارسال ایمیل بازیابی.', 'error');
             return;
           }
-        } catch(err) {
-          console.warn('Supabase reset pass error:', err);
+
+          showToast('لینک امن بازیابی با موفقیت به جیمیل شما صادر شد. صندوق ورودی را چک کنید.', 'success');
+          switchAuthView('login');
+          return;
+        } catch (err) {
+          console.warn('[Supabase Reset Exception]', err);
         }
       }
 
-      if (newPass && newPass.length < 6) {
-        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
-        return;
-      }
-      showToast('رمز عبور جدید شما ذخیره شد. اکنون وارد شوید.', 'success');
-      if (document.getElementById('loginPass') && newPass) {
-        document.getElementById('loginPass').value = newPass;
-      }
+      showToast('درخواست شما ثبت شد. در صورت وجود حساب، لینک به جیمیل ارسال می‌شود.', 'info');
       switchAuthView('login');
     });
   }
@@ -2333,3 +2356,27 @@ async function syncArtworkOrderToSupabase() {
     console.warn('Sync order to Supabase error:', err);
   }
 }
+
+
+window.handleGoogleSignIn = async function() {
+  if (!window.supabaseClient || !window.supabaseClient.auth) {
+    showToast('سرویس احراز هویت در دسترس نیست. لطفاً با ایمیل ثبت‌نام کنید.', 'error');
+    return;
+  }
+  showToast('در حال انتقال به صفحه امن ورود گوگل...', 'info');
+  try {
+    const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + window.location.pathname
+      }
+    });
+    if (error) {
+      console.warn('Google sign-in error:', error);
+      showToast('خطا در اتصال به گوگل: ' + error.message, 'error');
+    }
+  } catch (err) {
+    console.error('Google sign-in exception:', err);
+    showToast('امکان اتصال به حساب گوگل وجود ندارد.', 'error');
+  }
+};
