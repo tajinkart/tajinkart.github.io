@@ -33,6 +33,24 @@ function applyLoggedInMember(user) {
   if (labelEl) labelEl.textContent = currentMember.name;
 }
 
+
+// شنونده خودکار لینک بازیابی رمز عبور بازگشتی از ایمیل
+function checkEmailRecoveryFlow() {
+  const hash = window.location.hash || '';
+  const search = window.location.search || '';
+
+  // تشخیص بازگشت از لینک بازیابی رمز سوپابیس
+  if (hash.includes('type=recovery') || search.includes('type=recovery') || hash.includes('access_token=')) {
+    console.log('[Auth Recovery] Detected recovery token from email link!');
+    setTimeout(() => {
+      switchAuthView('reset');
+      const modal = document.getElementById('memberModal');
+      if (modal) modal.style.display = 'flex';
+      showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
+    }, 450);
+  }
+}
+
 async function initSupabaseAuthSession() {
   if (!window.supabaseClient || !window.supabaseClient.auth) return;
   try {
@@ -42,8 +60,14 @@ async function initSupabaseAuthSession() {
       console.log('[Supabase Auth] Active cloud session restored for:', data.session.user.email);
     }
 
-    window.supabaseClient.auth.onAuthStateChange((_event, session) => {
-      if (session && session.user) {
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+      console.log('[Supabase Auth Event]', event);
+      if (event === 'PASSWORD_RECOVERY') {
+        switchAuthView('reset');
+        const modal = document.getElementById('memberModal');
+        if (modal) modal.style.display = 'flex';
+        showToast('لطفاً رمز عبور جدید حسابتان را وارد فرمایید.', 'info');
+      } else if (session && session.user) {
         applyLoggedInMember(session.user);
       }
     });
@@ -1334,17 +1358,16 @@ window.handleMembersIconClick = function() {
 window.closeMemberModal = function() { document.getElementById('memberModal').style.display = 'none'; };
 
 window.switchAuthView = function(viewName) {
-  document.getElementById('authViewLogin').classList.add('hidden');
-  document.getElementById('authViewSignUp').classList.add('hidden');
-  document.getElementById('authViewForgot').classList.add('hidden');
+  const views = ['authViewLogin', 'authViewSignUp', 'authViewForgot', 'authViewResetPassword'];
+  views.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
 
-  if (viewName === 'login') document.getElementById('authViewLogin').classList.remove('hidden');
-  else if (viewName === 'signup') document.getElementById('authViewSignUp').classList.remove('hidden');
-  else if (viewName === 'forgot') {
-    document.getElementById('authViewForgot').classList.remove('hidden');
-    document.getElementById('forgotStep1').classList.remove('hidden');
-    document.getElementById('forgotStep2').classList.add('hidden');
-  }
+  if (viewName === 'login') document.getElementById('authViewLogin')?.classList.remove('hidden');
+  else if (viewName === 'signup') document.getElementById('authViewSignUp')?.classList.remove('hidden');
+  else if (viewName === 'forgot') document.getElementById('authViewForgot')?.classList.remove('hidden');
+  else if (viewName === 'reset') document.getElementById('authViewResetPassword')?.classList.remove('hidden');
 };
 
 window.handleSendResetCode = function() {
@@ -1834,13 +1857,23 @@ function renderAdminMemberDetail(m) {
     <div>
       <h5 style="font-size:12.5px; font-weight:800; margin-bottom:8px; color:#fff;">دارایی‌های دیجیتال و لایسنس‌های فعال:</h5>
       <div style="display:flex; flex-direction:column; gap:6px;">
-        ${m.assetsBought.map(a => `
+        ${(m.assetsBought || []).map(a => `
           <div style="padding:8px 10px; background:#070a10; border-radius:8px; border:1px solid var(--border-subtle); font-size:12px; display:flex; justify-content:space-between; align-items:center;">
             <span>${a}</span>
             <span style="color:var(--emerald); font-size:11px; font-weight:700;">✓ دسترسی فعال</span>
           </div>
         `).join('')}
       </div>
+    </div>
+
+    <!-- دکمه‌های عملیاتی حذف و ویرایش کاربر در پنل ادمین -->
+    <div style="display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+      <button type="button" onclick="adminEditMemberEmail(${selectedMemberIdx})" class="btn-secondary" style="flex:1; padding:9px; font-size:11.5px;">
+        ✏️ ویرایش ایمیل
+      </button>
+      <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="flex:1; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
+        🗑️ حذف این کاربر
+      </button>
     </div>
   `;
 }
@@ -1967,6 +2000,7 @@ window.exportFullSelfContainedHTML = function() {
 document.addEventListener('DOMContentLoaded', () => {
   renderShowcaseGrid();
   initSupabaseAuthSession();
+  checkEmailRecoveryFlow();
   syncArtworksFromSupabase();
   selectPipeline('sketch1', document.querySelector('#atelierServiceCards .service-nav-card.active'), false);
   renderProducts();
@@ -2259,6 +2293,56 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('تنظیمات سراسری ذخیره و نرخ دلار به‌روزرسانی شد!', 'success');
     });
   }
+
+  // فرم ذخیره نهایی رمز عبور جدید پس از ورود از لینک ایمیل
+  const setNewPassForm = document.getElementById('setNewPasswordForm');
+  if (setNewPassForm) {
+    setNewPassForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const p1 = document.getElementById('userNewPassword')?.value.trim();
+      const p2 = document.getElementById('userNewPasswordConfirm')?.value.trim();
+
+      if (!p1 || p1.length < 6) {
+        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
+        return;
+      }
+      if (p1 !== p2) {
+        showToast('تکرار رمز عبور با رمز واردشده مطابقت ندارد!', 'error');
+        return;
+      }
+
+      showToast('در حال ذخیره رمز عبور جدید در سرورهای ابری...', 'info');
+
+      if (window.supabaseClient && window.supabaseClient.auth) {
+        try {
+          const { data, error } = await window.supabaseClient.auth.updateUser({
+            password: p1
+          });
+
+          if (error) {
+            console.warn('[Update Password Error]', error);
+            showToast('خطا در به‌روزرسانی رمز: ' + error.message, 'error');
+            return;
+          }
+
+          if (data && data.user) {
+            applyLoggedInMember(data.user);
+            closeMemberModal();
+            renderMemberDashboard();
+            switchView('member-dashboard');
+            showToast('✓ رمز عبور جدید شما با موفقیت ثبت شد! خوش آمدید.', 'success');
+            // پاکسازی هش آدرس‌بار
+            try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+            return;
+          }
+        } catch (err) {
+          console.error('[Update Password Exception]', err);
+          showToast('خطا در اتصال به سرور جهت تغییر رمز.', 'error');
+        }
+      }
+    });
+  }
+
 });
 
 
@@ -2369,5 +2453,55 @@ window.handleGoogleSignIn = async function() {
   } catch (err) {
     console.error('Google sign-in exception:', err);
     showToast('امکان اتصال به حساب گوگل وجود ندارد.', 'error');
+  }
+};
+
+
+// =========================================================
+// توابع مدیریت و حذف کاربران در پنل ادمین
+// =========================================================
+window.adminDeleteMember = function(idx) {
+  if (!siteMembersData || !siteMembersData[idx]) return;
+  const m = siteMembersData[idx];
+  if (confirm(`آیا از حذف کاربر «${m.name}» (${m.email}) اطمینان دارید؟`)) {
+    siteMembersData.splice(idx, 1);
+    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+    selectedMemberIdx = 0;
+    renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
+    showToast(`کاربر «${m.name}» با موفقیت حذف شد. اکنون می‌توانید با این ایمیل مجدداً تست بزنید.`, 'info');
+  }
+};
+
+window.adminEditMemberEmail = function(idx) {
+  if (!siteMembersData || !siteMembersData[idx]) return;
+  const m = siteMembersData[idx];
+  const newEmail = prompt(`تغییر آدرس ایمیل برای ${m.name}:`, m.email);
+  if (newEmail && newEmail.trim() && newEmail.includes('@')) {
+    m.email = newEmail.trim().toLowerCase();
+    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+    renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
+    showToast('ایمیل کاربر به‌روزرسانی شد.', 'success');
+  }
+};
+
+window.adminClearAllTestMembers = function() {
+  if (confirm('آیا مایلید تمام کاربران تستی ثبت‌شده در مرورگر پاک شوند تا لیست اعضا کاملاً تازه شود؟')) {
+    siteMembersData = [
+      {
+        id: 101,
+        name: 'سید سروش تاج',
+        email: 'soroush@tajinkart.com',
+        contact: '09120000000',
+        tier: 'VIP',
+        balance: '$1,450',
+        withdrawn: '$1,200',
+        assetsBought: ['کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD'],
+        totalSpent: '$420'
+      }
+    ];
+    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+    selectedMemberIdx = 0;
+    renderAdminSketch3('', 'all');
+    showToast('تمام کاربران تستی با موفقیت پاک شدند. اکنون می‌توانید تست تازه انجام دهید.', 'success');
   }
 };
