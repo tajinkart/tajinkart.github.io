@@ -1350,6 +1350,7 @@ async function dispatchTelegramNotification(order) {
     `• *تماس:* ${order.contact}\n` +
     `• *پکیج:* ${order.pkg}\n` +
     `• *فاز:* ${order.phase}\n` +
+    `• *لینک رفرنس:* ${order.refLink || 'ندارد'}\n` +
     `• *توضیحات بریف:* ${order.brief}\n` +
     `• *تعرفه محاسبه‌شده:* ${order.price}`
   );
@@ -2152,6 +2153,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const client = document.getElementById('orderClientName').value.trim();
       const contact = document.getElementById('orderClientContact').value.trim();
+      const refLink = document.getElementById('orderClientRefLink')?.value.trim() || 'ارائه نشده (ریسرچ بصری با استودیو)';
       const phase = document.getElementById('orderPhaseSelect').value;
       const brief = document.getElementById('orderClientBrief').value.trim();
       const priceText = document.getElementById('modalPrice').textContent;
@@ -2160,6 +2162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         id: Date.now(),
         client: client,
         contact: contact,
+        refLink: refLink,
         pkg: activeModalItem.title,
         price: priceText,
         timeline: activeModalItem.timeline,
