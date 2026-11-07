@@ -970,30 +970,11 @@ function renderShowcaseGrid() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
   grid.innerHTML = showcaseArtworks.map((art, i) => {
+    const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
-    const cached = artDimensionCache[art.image];
-
-    // محاسبه نسبت ابعاد هندسی (Aspect Ratio)
-    let r = art.aspectRatio;
-    if (!r && art.width && art.height) r = art.width / art.height;
-    if (!r && cached && cached.ratio) r = cached.ratio;
-    if (!r) {
-      if (art.tag === 'character' || art.tag === 'comic') r = 0.68;
-      else if (art.tag === 'environment') r = 1.77;
-      else if (art.tag === 'props') r = 1.0;
-      else r = 1.35;
-    }
-
-    const growVal = parseFloat(r.toFixed(3));
-    const basisDesktop = Math.round(275 * r);
-    const basisTablet = Math.round(225 * r);
-    const basisMobile = Math.round(180 * r);
-
-    const flexStyle = `style="--tile-grow: ${growVal}; --tile-basis: ${basisDesktop}px; --tile-basis-tablet: ${basisTablet}px; --tile-basis-mobile: ${basisMobile}px;"`;
     const imgSrc = art.image || art.img || '';
-
     return `
-      <div class="mosaic-tile" id="galleryTile_${art.id}" ${flexStyle} onclick="openArtModal(${art.id})">
+      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
         <div class="tile-center-title">
           <span class="tile-slug">/ ${art.shortSlug || art.title} /</span>
           <span class="tile-divider"></span>
@@ -1009,23 +990,16 @@ window.handleImageAutoDetect = function(imgEl, artId) {
   if (!imgEl || !imgEl.naturalWidth || !imgEl.naturalHeight) return;
   const w = imgEl.naturalWidth;
   const h = imgEl.naturalHeight;
-  const r = parseFloat((w / h).toFixed(3));
+  const r = parseFloat((w / h).toFixed(2));
   artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
   const art = showcaseArtworks.find(a => a.id == artId);
-  if (art && (!art.aspectRatio || Math.abs(art.aspectRatio - r) > 0.05)) {
+  if (art && (!art.aspectRatio || Math.abs(art.aspectRatio - r) > 0.08)) {
     art.width = w;
     art.height = h;
     art.aspectRatio = r;
     const tile = document.getElementById(`galleryTile_${art.id}`);
     if (tile) {
-      const growVal = r;
-      const basisDesktop = Math.round(275 * r);
-      const basisTablet = Math.round(225 * r);
-      const basisMobile = Math.round(180 * r);
-      tile.style.setProperty('--tile-grow', growVal);
-      tile.style.setProperty('--tile-basis', `${basisDesktop}px`);
-      tile.style.setProperty('--tile-basis-tablet', `${basisTablet}px`);
-      tile.style.setProperty('--tile-basis-mobile', `${basisMobile}px`);
+      tile.className = `mosaic-tile ${getAutoSpanClass(art)}`;
     }
   }
 };
