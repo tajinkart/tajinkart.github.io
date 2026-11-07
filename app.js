@@ -2071,10 +2071,25 @@ window.addEventListener('keyup', (e) => {
   }
 });
 
-window.logoutAdmin = function() {
-  document.getElementById('adminWorkspace').classList.add('hidden');
-  document.getElementById('adminLoginGate').classList.remove('hidden');
+window.logoutAdmin = async function() {
+  if (window.supabaseClient && window.supabaseClient.auth) {
+    try {
+      await window.supabaseClient.auth.signOut();
+    } catch(e) {
+      console.warn('Admin sign out exception:', e);
+    }
+  }
+  currentMember = null;
+  const labelEl = document.getElementById('rightMemberLabel');
+  if (labelEl) labelEl.textContent = 'حساب اعضا';
+
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  const adminGate = document.getElementById('adminLoginGate');
+  if (adminWorkspace) adminWorkspace.classList.add('hidden');
+  if (adminGate) adminGate.classList.remove('hidden');
+
   switchView('showcase');
+  showToast('از حساب مدیریت خارج شدید و پنل استودیو قفل شد.', 'info', 4000);
 };
 
 // مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
@@ -2982,7 +2997,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // فرم بازیابی رمز عبور واقعی از طریق ارسال لینک به جیمیل (Supabase Auth)
+  // فرم بازیابی رمز عبور با بررسی وجود داشتن ایمیل در سیستم استودیو
   const forgotForm = document.getElementById('forgotPasswordForm');
   if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
@@ -2994,7 +3009,47 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      showToast('در حال صدور لینک امن بازیابی به صندوق جیمیل...', 'info');
+      showToast('در حال بررسی و اعتبارسنجی حساب کاربری...', 'info');
+
+      // ۱. بررسی قطعی وجود داشتن ایمیل در استودیو قبل از صدور درخواست
+      let emailExists = false;
+
+      // بررسی آیا ایمیل مدیر استودیو است
+      if (window.isDirectorEmail && window.isDirectorEmail(iden)) {
+        emailExists = true;
+      }
+
+      // بررسی در دیتابیس ابری سوپابیس (جدول اعضا)
+      if (!emailExists && window.supabaseClient) {
+        try {
+          const { data: memberRow, error: checkErr } = await window.supabaseClient
+            .from('members')
+            .select('email')
+            .eq('email', iden)
+            .maybeSingle();
+
+          if (memberRow && memberRow.email) {
+            emailExists = true;
+          }
+        } catch (dbErr) {
+          console.warn('[Forgot Pass DB Check Exception]', dbErr);
+        }
+      }
+
+      // بررسی در دیتای محلی اعضا
+      if (!emailExists && Array.isArray(siteMembersData)) {
+        if (siteMembersData.some(m => m.email && m.email.toLowerCase() === iden)) {
+          emailExists = true;
+        }
+      }
+
+      // در صورت عدم وجود ایمیل، بلافاصله ارور شفاف و ممانعت از ارسال پیام کاذب
+      if (!emailExists) {
+        showToast('حساب کاربری با این آدرس ایمیل در سیستم یافت نشد! لطفاً ایمیل را بررسی کرده یا ابتدا ثبت‌نام فرمایید.', 'error', 6000);
+        return;
+      }
+
+      showToast('در حال صدور لینک امن بازیابی به ایمیل شما...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -3009,7 +3064,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          showToast('لینک امن بازیابی با موفقیت به جیمیل شما صادر شد. صندوق ورودی را چک کنید.', 'success');
+          showToast('لینک امن بازیابی رمز عبور با موفقیت به ایمیل شما صادر شد. صندوق ورودی (یا اسپم) را بررسی فرمایید.', 'success', 7000);
           switchAuthView('login');
           return;
         } catch (err) {
@@ -3017,8 +3072,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      showToast('درخواست شما ثبت شد. در صورت وجود حساب، لینک به جیمیل ارسال می‌شود.', 'info');
-      switchAuthView('login');
+      showToast('سرویس احراز هویت ابری در دسترس نیست.', 'error');
     });
   }
 
