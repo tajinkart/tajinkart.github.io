@@ -521,6 +521,18 @@ function renderAdminArtModalForm(art, isNew) {
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
         <div>
+          <label style="font-size:11px; color:var(--text-muted);">دسته‌بندی در گالری</label>
+          <select id="editArtCategorySelect">
+            <option value="character" ${(art.tag === 'character' || art.category === 'character') ? 'selected' : ''}>کاراکتر دیزاین</option>
+            <option value="environment" ${(art.tag === 'environment' || art.category === 'environment') ? 'selected' : ''}>کانسپت و فضا</option>
+            <option value="creature" ${(art.tag === 'creature' || art.category === 'creature') ? 'selected' : ''}>موجودات و هیولا</option>
+            <option value="keyframe" ${(art.tag === 'keyframe' || art.category === 'keyframe') ? 'selected' : ''}>کی‌فریم و کاور</option>
+            <option value="props" ${(art.tag === 'props' || art.category === 'props') ? 'selected' : ''}>تجهیزات و پراپ</option>
+            <option value="comic" ${(art.tag === 'comic' || art.category === 'comic') ? 'selected' : ''}>کمیک و وب‌تون</option>
+            <option value="2d" ${(art.tag === '2d' || art.category === '2d') ? 'selected' : ''}>تصویرسازی ۲ بعدی</option>
+          </select>
+        </div>
+        <div>
           <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک به آتلیه</label>
           <select id="editArtPipeSelect">
             <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
@@ -629,6 +641,7 @@ window.handleAdminLocalFileUpload = async function(inputEl) {
 window.confirmSaveArtwork = function() {
   const title = document.getElementById('editArtTitleInput')?.value.trim() || '';
   const slug = document.getElementById('editArtSlugInput')?.value.trim() || '';
+  const cat = document.getElementById('editArtCategorySelect')?.value || 'character';
   const pipe = document.getElementById('editArtPipeSelect')?.value || 'sketch1';
   const lore = document.getElementById('editArtLoreInput')?.value.trim() || 'جهان اکستوپیا';
   const colorSpace = document.getElementById('editArtColorSpaceInput')?.value.trim() || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
@@ -653,7 +666,8 @@ window.confirmSaveArtwork = function() {
       const phaseSecondaryImg = isBase64Img ? '' : img;
       const newArtRecord = {
         id: stagingNewArt.id || Date.now(),
-        tag: stagingNewArt.tag || 'character',
+        tag: cat,
+        category: cat,
         shortSlug: slug || stagingNewArt.shortSlug || title || 'کانسپت جدید',
         title: title || 'کانسپت مستر جدید استودیو',
         desc: desc,
@@ -698,6 +712,8 @@ window.confirmSaveArtwork = function() {
       const art = showcaseArtworks[currentSelectedArtIdx];
       art.title = title || art.title;
       art.shortSlug = slug || art.shortSlug;
+      art.tag = cat;
+      art.category = cat;
       art.pipelineKey = pipe;
       art.image = img;
       art.lore = lore;
@@ -789,8 +805,8 @@ window.renderAdminSettingsTab = function() {
 // سابقه مرورگر و دکمه بازگشت در موبایل (HTML5 History API)
 window.addEventListener('popstate', (event) => {
   const artModal = document.getElementById('artDetailModal');
-  if (artModal && artModal.classList.contains('active')) {
-    closeArtModalDirect();
+  if (artModal && (artModal.classList.contains('active') || artModal.style.display === 'block')) {
+    closeArtModalDirect(false);
     return;
   }
   const zoomModal = document.getElementById('zoomModal');
@@ -969,7 +985,22 @@ function getAutoSpanClass(art) {
 function renderShowcaseGrid() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
-  grid.innerHTML = showcaseArtworks.map((art, i) => {
+
+  const filteredArtworks = (currentGalleryFilter && currentGalleryFilter !== 'all')
+    ? showcaseArtworks.filter(art => (art.tag === currentGalleryFilter || art.category === currentGalleryFilter))
+    : showcaseArtworks;
+
+  if (filteredArtworks.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); width: 100%;">
+        <p style="font-size: 15px; margin-bottom: 12px; color: #fff;">اثری در این دسته‌بندی یافت نشد.</p>
+        <button onclick="filterGalleryByCategory('all', 'همه آثار')" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">نمایش تمام آثار گالری</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filteredArtworks.map((art, i) => {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
     const imgSrc = art.image || art.img || '';
@@ -1016,8 +1047,9 @@ window.openArtModalByIndex = function(idx) {
     modal.classList.add('active');
     modal.style.display = 'block';
     modal.scrollTop = 0;
-    document.body.style.overflow = 'hidden';
   }
+  // ثبت وضعیت در تاریخچه تا دکمه بازگشت (Back) گوشی پنجره را ببندد و از سایت خارج نشود
+  pushModalState('artDetail');
 };
 
 window.openArtModal = function(id) {
@@ -1033,12 +1065,20 @@ window.openArtModal = function(id) {
   }
 };
 
-window.closeArtModalDirect = function() {
+window.closeArtModalDirect = function(updateHistory = true) {
   const modal = document.getElementById('artDetailModal');
   if (modal) {
     modal.classList.remove('active');
     modal.style.display = 'none';
-    document.body.style.overflow = '';
+  }
+  // آزادسازی قطعی و بی‌قیدوشرط اسکرول بدنه و کل صفحه
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+  document.body.style.removeProperty('overflow');
+  document.documentElement.style.removeProperty('overflow');
+
+  if (updateHistory && window.history.state && window.history.state.modalOpen === 'artDetail') {
+    try { window.history.back(); } catch(e) {}
   }
 };
 
@@ -1159,8 +1199,7 @@ window.deepLinkToPipeline = function() {
   showToast('پایپلاین تخصصی سفارش این اثر باز شد.', 'info');
 };
 
-window.closeArtModal = function(e) { if (e.target.id === 'artDetailModal') closeArtModalDirect(); };
-window.closeArtModalDirect = function() { document.getElementById('artDetailModal').classList.remove('active'); };
+// closeArtModalDirect handled uniformly above
 
 // پایپلاین‌های ۶گانه آتلیه
 window.selectPipeline = function(key, cardEl, userClicked) {
@@ -3414,4 +3453,37 @@ window.initAdminTouchSortable = function() {
 window.unlockBodyScroll = function() {
   document.body.style.overflow = '';
   document.body.style.removeProperty('overflow');
+};
+
+
+// مدیریت فهرست شناور دسته‌بندی آثار زیر برند
+let currentGalleryFilter = 'all';
+
+window.toggleCategoryFilterMenu = function(e) {
+  if (e) e.stopPropagation();
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (dropdown) dropdown.classList.toggle('hidden');
+};
+
+document.addEventListener('click', (e) => {
+  const menuWrapper = document.getElementById('floatingGalleryCategoryMenu');
+  if (menuWrapper && !menuWrapper.contains(e.target)) {
+    const dropdown = document.getElementById('categoryFilterDropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+  }
+});
+
+window.filterGalleryByCategory = function(categoryKey, categoryName) {
+  currentGalleryFilter = categoryKey;
+  const labelEl = document.getElementById('currentCategoryPillLabel');
+  if (labelEl) labelEl.textContent = categoryName;
+
+  document.querySelectorAll('.cat-dropdown-item').forEach(item => {
+    item.classList.toggle('active', item.textContent.includes(categoryName));
+  });
+
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  renderShowcaseGrid();
 };
