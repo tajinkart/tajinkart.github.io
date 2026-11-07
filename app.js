@@ -163,7 +163,7 @@ try {
   const _href = window.location.href || '';
   const _h = window.location.hash || '';
   const _s = window.location.search || '';
-  if (_href.includes('recovery') || _h.includes('recovery') || _s.includes('recovery') || _s.includes('reset') || _href.includes('reset-password') || (_h.includes('access_token=') && !_h.includes('provider=google'))) {
+  if (_h.includes('type=recovery') || _s.includes('type=recovery') || _s.includes('action=reset-password') || _href.includes('action=reset-password')) {
     isRecoveryFlowDetected = true;
     sessionStorage.setItem('tajinkart_recovering_password', 'true');
     console.log('[Early Recovery Flag] Detected password reset link in URL!');
@@ -287,6 +287,12 @@ function applyLoggedInMember(user) {
     // کاربر عادی
     closeMemberModal();
     renderMemberDashboard();
+    showToast(`خوش آمدید، ${currentMember.name}! حساب کاربری شما با موفقیت فعال شد. ✨`, 'success', 5000);
+    try {
+      if (window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    } catch(e) {}
   }
 }
 
@@ -326,12 +332,10 @@ function checkEmailRecoveryFlow() {
   const hash = window.location.hash || '';
   const search = window.location.search || '';
 
-  if (isRecoveryFlowDetected || 
-      sessionStorage.getItem('tajinkart_recovering_password') === 'true' || 
-      hash.includes('type=recovery') || 
+  if (hash.includes('type=recovery') || 
       search.includes('type=recovery') || 
-      search.includes('action=reset-password') || 
-      (hash.includes('access_token=') && !hash.includes('provider='))) {
+      search.includes('action=reset-password') ||
+      sessionStorage.getItem('tajinkart_recovering_password') === 'true') {
     console.log('[Auth Recovery] Initiating password reset UI!');
     triggerPasswordResetModal();
   }
