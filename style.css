@@ -2155,107 +2155,120 @@ textarea:-webkit-autofill {
 
 
 /* =========================================================
-   چیدمان گالری منظم، تراز و در یک خط به سبک آرت‌استیشن (ArtStation Aligned Grid)
+   بهینه‌سازی گالری اصلی: چیدمان تمیز میسونری طبیعی (بدون کراپ، بدون حفرات خالی)
    ========================================================= */
 #showcaseGrid {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 14px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  column-count: initial !important;
+  column-count: 4;
+  column-gap: 14px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
 }
-@media (max-width: 1350px) {
-  #showcaseGrid { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+@media (max-width: 1300px) {
+  #showcaseGrid { column-count: 3; column-gap: 12px; }
 }
-@media (max-width: 880px) {
-  #showcaseGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-}
-@media (max-width: 480px) {
-  #showcaseGrid { grid-template-columns: 1fr !important; gap: 10px !important; }
+@media (max-width: 768px) {
+  /* در موبایل: ۲ ستون متقارن و تمیز بدون کشیدگی بیش از حد */
+  #showcaseGrid { column-count: 2 !important; column-gap: 10px !important; }
 }
 
 .mosaic-tile {
-  position: relative !important;
-  aspect-ratio: 16 / 10 !important;
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  background: #07090e !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  cursor: pointer !important;
-  width: 100% !important;
-  margin-bottom: 0 !important;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
+  break-inside: avoid;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  background: #06080c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .mosaic-tile:hover {
-  transform: translateY(-4px) !important;
-  border-color: var(--gold) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85) !important;
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(250, 204, 21, 0.15);
 }
 .mosaic-tile img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-  transition: transform 0.4s ease, opacity 0.3s ease !important;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  transition: transform 0.4s ease;
 }
 .mosaic-tile:hover img {
-  transform: scale(1.04) !important;
+  transform: scale(1.03);
 }
 
 /* =========================================================
-   پنجره نمایش کامل پروژه با اسکرول عمودی به سبک آرت‌استیشن
+   پنجره نمایش کامل پروژه و اسکرول عمودی (Project Detail Viewer)
    ========================================================= */
 .art-detail-modal {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 1500 !important;
-  background: rgba(4, 5, 8, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  display: none !important;
-  overflow-y: auto !important;
-  padding: 0 !important;
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  background: rgba(4, 5, 8, 0.96);
+  backdrop-filter: blur(16px);
+  display: none;
+  overflow-y: auto;
+  padding: 0;
 }
 .art-detail-modal.active {
-  display: block !important;
+  display: block;
 }
 .artstation-project-layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 36px;
-  max-width: 1360px;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 50px 24px 80px;
   min-height: 100vh;
+  box-sizing: border-box;
 }
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
   .artstation-project-layout {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     padding: 60px 16px 80px;
   }
 }
 .artstation-images-stream {
+  flex: 1 1 0%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  min-width: 0;
+  gap: 20px;
 }
-.artstation-images-stream img {
+.artstation-img-card {
+  width: 100%;
+  background: #04060a;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+}
+.artstation-img-card img {
   width: 100%;
   height: auto;
+  max-height: 90vh;
+  object-fit: contain;
   display: block;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  margin: 0 auto;
 }
-.artstation-images-stream .img-caption {
+.artstation-img-card .img-caption {
   font-size: 12px;
   color: var(--text-muted);
   text-align: center;
-  margin-top: -18px;
+  padding: 10px 14px;
+  background: #07090f;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   direction: rtl;
 }
 .artstation-sidebar {
+  flex: 0 0 340px;
+  width: 340px;
   position: sticky;
   top: 30px;
   height: fit-content;
@@ -2267,6 +2280,13 @@ textarea:-webkit-autofill {
   flex-direction: column;
   gap: 16px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  box-sizing: border-box;
+}
+@media (max-width: 992px) {
+  .artstation-sidebar {
+    width: 100%;
+    position: static;
+  }
 }
 .artstation-close-btn {
   position: fixed;
@@ -2323,228 +2343,4 @@ textarea:-webkit-autofill {
 }
 @media (max-width: 768px) {
   .artstation-nav-btn { display: none; }
-}
-
-
-
-
-/* =========================================================
-   گالری هوشمند بر پایه نسبت ابعاد واقعی (Aspect Ratio) بدون وابستگی به تعداد پیکسل
-   دقیقاً مشابه ساختار وب‌سایت امیر زند (amirzand.art) در موبایل و دسکتاپ
-   ========================================================= */
-#showcaseGrid {
-  display: grid !important;
-  grid-template-columns: repeat(12, 1fr) !important;
-  grid-auto-flow: dense !important;
-  gap: 12px !important;
-  width: 100% !important;
-  max-width: 1440px !important;
-  margin: 0 auto !important;
-  padding: 0 16px !important;
-  column-count: initial !important;
-}
-
-/* اسپن‌های هوشمند در دسکتاپ بر پایه نسبت ابعاد */
-.span-col-wide     { grid-column: span 6 !important; } /* عریض و لنداسکیپ: نصف سطر (یا کامل) */
-.span-col-medium   { grid-column: span 6 !important; } /* افقی استاندارد: نصف سطر */
-.span-col-square   { grid-column: span 4 !important; } /* مربعی: یک‌سوم سطر */
-.span-col-portrait { grid-column: span 3 !important; } /* عمودی پرتره و کاور: یک‌چهارم سطر */
-
-@media (max-width: 1100px) {
-  #showcaseGrid {
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 10px !important;
-  }
-  .span-col-wide     { grid-column: span 6 !important; }
-  .span-col-medium   { grid-column: span 3 !important; }
-  .span-col-square   { grid-column: span 3 !important; }
-  .span-col-portrait { grid-column: span 2 !important; }
-}
-
-@media (max-width: 768px) {
-  /* در موبایل دقیقاً مانند amirzand.art (عکس‌های ۴:۳۰ و ۴:۳۱): ۲ ستون متقارن */
-  #showcaseGrid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    grid-auto-flow: dense !important;
-    gap: 8px !important;
-    padding: 0 8px !important;
-  }
-  /* آثار عریض و افقی (مانند سفینه و مناظر افقی امیر زند) تمام عرض موبایل را می‌گیرند */
-  .span-col-wide     { grid-column: span 2 !important; }
-  .span-col-medium   { grid-column: span 2 !important; }
-  /* آثار عمودی و مربعی (مانند کاورها و کاراکترها) در ۲ ستون کنار هم قرار می‌گیرند */
-  .span-col-square   { grid-column: span 1 !important; }
-  .span-col-portrait { grid-column: span 1 !important; }
-}
-
-.mosaic-tile {
-  position: relative !important;
-  aspect-ratio: var(--aspect-ratio, 16 / 10) !important; /* نسبت ابعاد پویا بر اساس ابعاد واقعی خود عکس */
-  border-radius: 6px !important;
-  overflow: hidden !important;
-  background: #07090e !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  cursor: pointer !important;
-  width: 100% !important;
-  margin: 0 !important;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
-}
-.mosaic-tile:hover {
-  transform: translateY(-3px) !important;
-  border-color: var(--gold) !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85) !important;
-}
-.mosaic-tile img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-  transition: transform 0.4s ease, opacity 0.3s ease !important;
-}
-.mosaic-tile:hover img {
-  transform: scale(1.04) !important;
-}
-
-/* =========================================================
-   پنجره نمایش کامل پروژه با استریم عمودی تصاویر (ArtStation Project Viewer)
-   ========================================================= */
-.art-detail-modal {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 1500 !important;
-  background: rgba(4, 5, 8, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  display: none !important;
-  overflow-y: auto !important;
-  padding: 0 !important;
-}
-.art-detail-modal.active {
-  display: block !important;
-}
-.artstation-project-layout {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 36px !important;
-  max-width: 1400px !important;
-  margin: 0 auto !important;
-  padding: 50px 24px 80px !important;
-  min-height: 100vh !important;
-  box-sizing: border-box !important;
-}
-@media (max-width: 1024px) {
-  .artstation-project-layout {
-    flex-direction: column !important;
-    padding: 60px 16px 80px !important;
-  }
-}
-.artstation-images-stream {
-  flex: 1 1 0% !important;
-  min-width: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 24px !important;
-}
-.artstation-img-card {
-  width: 100% !important;
-  background: #04060a !important;
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9) !important;
-}
-.artstation-img-card img {
-  width: 100% !important;
-  height: auto !important;
-  max-height: 88vh !important;
-  object-fit: contain !important;
-  display: block !important;
-  margin: 0 auto !important;
-}
-.artstation-img-card .img-caption {
-  font-size: 12px !important;
-  color: var(--text-muted) !important;
-  text-align: center !important;
-  padding: 10px 14px !important;
-  background: #07090f !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
-  direction: rtl !important;
-}
-.artstation-sidebar {
-  flex: 0 0 340px !important;
-  width: 340px !important;
-  position: sticky !important;
-  top: 30px !important;
-  height: fit-content !important;
-  background: #090c14 !important;
-  border: 1px solid var(--border-subtle) !important;
-  border-radius: 16px !important;
-  padding: 24px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 16px !important;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important;
-  box-sizing: border-box !important;
-}
-@media (max-width: 1024px) {
-  .artstation-sidebar {
-    width: 100% !important;
-    position: static !important;
-    order: -1 !important;
-  }
-}
-.artstation-close-btn {
-  position: fixed !important;
-  top: 18px !important;
-  right: 22px !important;
-  z-index: 1600 !important;
-  width: 42px !important;
-  height: 42px !important;
-  border-radius: 50% !important;
-  background: rgba(15, 20, 31, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #fff !important;
-  font-size: 20px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
-.artstation-close-btn:hover {
-  background: var(--crimson) !important;
-  transform: rotate(90deg) !important;
-}
-.artstation-nav-btn {
-  position: fixed !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  z-index: 1600 !important;
-  width: 48px !important;
-  height: 64px !important;
-  background: rgba(15, 20, 31, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #fff !important;
-  font-size: 32px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  backdrop-filter: blur(8px) !important;
-}
-.artstation-nav-btn:hover {
-  background: rgba(250, 204, 21, 0.2) !important;
-  border-color: var(--gold) !important;
-  color: var(--gold) !important;
-}
-.artstation-nav-btn.prev {
-  left: 14px !important;
-  border-radius: 0 10px 10px 0 !important;
-}
-.artstation-nav-btn.next {
-  right: 14px !important;
-  border-radius: 10px 0 0 10px !important;
-}
-@media (max-width: 768px) {
-  .artstation-nav-btn { display: none !important; }
 }
