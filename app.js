@@ -2291,18 +2291,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // شماره تلفن کاملاً اختیاری است: فقط در صورتی که کاربر شماره وارد کند بررسی می‌شود
       let fullContactNumber = '';
       if (cleanDigits.length > 0) {
-        if (countryCode === '+98') {
-          if (cleanDigits.length !== 10 || !cleanDigits.startsWith('9')) {
-            showToast('شماره همراه نامعتبر است! شماره موبایل ایران باید ۱۰ رقم (بدون صفر اول مانند 9207702950) باشد.', 'error');
-            document.getElementById('signupPhone')?.focus();
-            return;
-          }
-        } else if (countryCode !== 'other') {
-          if (cleanDigits.length < 6 || cleanDigits.length > 14) {
-            showToast('طول شماره تلفن بین‌المللی نامعتبر است.', 'error');
-            document.getElementById('signupPhone')?.focus();
-            return;
-          }
+        if (cleanDigits.length < 7 || cleanDigits.length > 15) {
+          showToast('طول شماره تلفن وارد شده نامعتبر است (باید بین ۷ تا ۱۵ رقم باشد).', 'error');
+          document.getElementById('signupPhone')?.focus();
+          return;
         }
         fullContactNumber = (countryCode === 'other' ? '' : countryCode + ' ') + cleanDigits;
       }
@@ -2787,17 +2779,18 @@ window.renderTermsModal = function() {
   if (!container) return;
 
   const rawText = getStudioTermsContent();
-  const sections = rawText.split(/(?=###\s+)/g);
+  if (!rawText || rawText.trim().length < 20) return;
 
+  const sections = rawText.split(/(?=###\s+)/g);
   let html = '';
   sections.forEach(sec => {
     const trimmed = sec.trim();
     if (!trimmed) return;
 
     if (trimmed.startsWith('###')) {
-      const firstLineEnd = trimmed.indexOf('\n');
-      const title = firstLineEnd !== -1 ? trimmed.substring(3, firstLineEnd).trim() : trimmed.substring(3).trim();
-      const body = firstLineEnd !== -1 ? trimmed.substring(firstLineEnd).trim() : '';
+      const newlineIndex = trimmed.indexOf('\n');
+      const title = newlineIndex !== -1 ? trimmed.substring(3, newlineIndex).trim() : trimmed.substring(3).trim();
+      const body = newlineIndex !== -1 ? trimmed.substring(newlineIndex).trim() : '';
 
       html += `
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
@@ -2806,11 +2799,13 @@ window.renderTermsModal = function() {
         </div>
       `;
     } else {
-      html += `<p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">${trimmed.replace(/\n/g, '<br>')}</p>`;
+      html += `<div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;"><p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">${trimmed.replace(/\n/g, '<br>')}</p></div>`;
     }
   });
 
-  container.innerHTML = html;
+  if (html.trim().length > 0) {
+    container.innerHTML = html;
+  }
 };
 
 // باز کردن مودال قوانین همراه با رندر خودکار آخرین نسخه
@@ -3052,14 +3047,13 @@ window.handleLiveEmailCheck = function(emailVal) {
 
 
 // بررسی زنده و آنی شماره تلفن همراه
-// بررسی زنده و کاملاً اختیاری شماره تلفن همراه
+// بررسی زنده و کاملاً اختیاری شماره تلفن همراه (بدون محدودیت روی ارقام اولیه و بدون ایجاد مانع)
 window.handleLivePhoneCheck = function() {
   const notice = document.getElementById('signupPhoneLiveNotice');
   const phoneInput = document.getElementById('signupPhone');
-  const countryCode = document.getElementById('signupCountryCode')?.value || '+98';
   if (!notice || !phoneInput) return;
 
-  let val = (phoneInput.value || '').trim();
+  const val = (phoneInput.value || '').trim();
   // شماره تلفن کاملاً اختیاری است: اگر خالی بود هیچ اروری نده
   if (val.length === 0) {
     notice.style.display = 'none';
@@ -3067,53 +3061,22 @@ window.handleLivePhoneCheck = function() {
     return;
   }
 
-  // اگر کاربر برای ایران با صفر اول وارد کرد، خودکار صفر را بردار
-  if (countryCode === '+98' && val.startsWith('0')) {
-    val = val.substring(1);
-    phoneInput.value = val;
-  }
-
   notice.style.display = 'block';
 
-  // بررسی شماره تلفن همراه ایران (+98)
-  if (countryCode === '+98') {
-    if (!val.startsWith('9')) {
-      notice.style.color = 'var(--crimson)';
-      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> شماره همراه ایران باید با ۹ آغاز گردد (بدون صفر)';
-      phoneInput.style.borderColor = 'var(--crimson)';
-    } else if (val.length === 10) {
-      notice.style.color = 'var(--emerald)';
-      notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> شماره موبایل ۱۰ رقمی صحیح است';
-      phoneInput.style.borderColor = 'var(--emerald)';
-    } else {
-      notice.style.color = 'var(--crimson)';
-      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> شماره همراه ایران باید ۱۰ رقم باشد (' + val.length + '/10)';
-      phoneInput.style.borderColor = 'var(--crimson)';
-    }
-    return;
-  }
-
-  // بررسی گزینه سایر کشورها
-  if (countryCode === 'other') {
-    notice.style.display = 'none';
-    phoneInput.style.borderColor = 'var(--border-subtle)';
-    return;
-  }
-
-  // بررسی شماره‌های بین‌المللی استاندارد E.164 (بین ۷ تا ۱۴ رقم متناسب با کشور)
-  if (val.length >= 7 && val.length <= 14) {
+  // پذیرش انعطاف‌پذیر انواع شماره‌های بین‌المللی و محلی (بین ۷ تا ۱۵ رقم)
+  if (val.length >= 7 && val.length <= 15) {
     notice.style.color = 'var(--emerald)';
-    notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> شماره بین‌المللی معتبر است';
+    notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> شماره تلفن معتبر است';
     phoneInput.style.borderColor = 'var(--emerald)';
   } else {
     notice.style.color = 'var(--crimson)';
-    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> طول شماره نامعتبر است (' + val.length + ' رقم - استاندارد: ۷ الی ۱۴ رقم)';
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> طول شماره تلفن نامعتبر است (' + val.length + ' رقم - استاندارد: بین ۷ تا ۱۵ رقم)';
     phoneInput.style.borderColor = 'var(--crimson)';
   }
 };
 
 
-// بررسی زنده صحت نام و ممانعت از حروف تکراری چرت و پرت (مانند sss یا 111)
+// بررسی زنده صحت نام کاربری
 window.handleLiveNameCheck = function(nameVal) {
   const notice = document.getElementById('signupNameLiveNotice');
   const nameInput = document.getElementById('signupName');
@@ -3126,23 +3089,11 @@ window.handleLiveNameCheck = function(nameVal) {
     return;
   }
 
-  notice.style.display = 'inline-block';
+  notice.style.display = 'block';
 
-  // بررسی تکرار ۳ کاراکتر مشابه پشت سر هم (مانند sss, aaaa, ...) یا کمتر از ۳ حرف
-  const hasRepeatingChars = /(.)\1{2,}/.test(val);
-  const isValidChars = /^[\u0600-\u06FFa-zA-Z\s\-_0-9]{3,30}$/.test(val);
-
-  if (val.length < 3) {
+  if (val.length < 2) {
     notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ نام حداقل باید ۳ حرف باشد';
-    nameInput.style.borderColor = 'var(--crimson)';
-  } else if (hasRepeatingChars) {
-    notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ نام نامعتبر است (حروف تکراری متوالی)';
-    nameInput.style.borderColor = 'var(--crimson)';
-  } else if (!isValidChars) {
-    notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ فقط حروف فارسی و انگلیسی مجاز است';
+    notice.textContent = '✕ نام حداقل باید ۲ حرف باشد';
     nameInput.style.borderColor = 'var(--crimson)';
   } else {
     notice.style.color = 'var(--emerald)';

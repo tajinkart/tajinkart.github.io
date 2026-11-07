@@ -1214,7 +1214,7 @@
           <div style="margin:4px 0 6px; padding:11px 12px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
             <label style="display:flex; align-items:flex-start; gap:9px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.65;">
               <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:3px; accent-color:var(--gold); flex-shrink:0;" />
-              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-weight:700;">قوانین و شرایط خدمات استودیو</a> (شامل رده‌بندی سنی ۱۶+ و لایسنس دارایی‌ها) را مطالعه نموده و می‌پذیرم.</span>
+              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-weight:700;">قوانین و شرایط خدمات استودیو</a> را مطالعه نموده و می‌پذیرم.</span>
             </label>
           </div>
 
@@ -1307,6 +1307,77 @@
       
       <!-- محتوای داینامیک و قابل ویرایش از پنل ادمین -->
       <div id="termsModalDynamicContent" style="font-size:12.5px; color:#cbd5e1; line-height:1.9; display:flex; flex-direction:column; gap:16px; text-align:justify;">
+        <!-- ۱. اصل صحت اطلاعات و سلب مسئولیت -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱. اصل صحت اطلاعات و سلب مسئولیت اشتباهات کاربر (Accuracy of Information)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">کاربر با ثبت‌نام در وب‌سایت یا ثبت هرگونه سفارش صراحتاً اقرار و ضمانت می‌نماید که کلیه مشخصات هویتی و ارتباطی ارائه‌شده (شامل نام، لقب، آدرس ایمیل و شماره تماس) واقعی، دقیق و متعلق به خود اوست. استودیو تاج‌اینک‌آرت هیچ‌گونه مسئولیتی در قبال تایپ اشتباه آدرس جیمیل، عدم دریافت ایمیل‌های فعال‌سازی، فراموشی رمز عبور، یا از دست رفتن دسترسی به فایل‌ها ناشی از خطای کاربر ندارد و بار حقوقی هرگونه خسارت انحصاراً بر عهده خود کاربر است.</p>
+        </div>
+
+        <!-- ۲. تفکیک قوانین عمومی از قرارداد خرید -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۲. تفکیک قوانین عمومی ورود از قرارداد خرید (ToS vs Commission SLA)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">تایید قوانین در مرحله ثبت‌نام صرفاً به منزله پذیرش مقررات عمومی پلتفرم، سن مجاز (۱۶+ سال) و حفاظت از کلیت مالکیت فکری استودیو است. شروط مالی سنگین نظیر ودیعه ۵۰٪ غیرقابل‌استرداد، ددلاین‌ها، سقف ادیت‌ها و توافقات محرمانگی، منحصراً در لحظه ثبت قطعی فرم سفارش و پیش از پرداخت فعال شده و به امضای طرفین می‌رسد.</p>
+        </div>
+
+        <!-- ۳. شفافیت جغرافیایی و ارتباطات -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۳. شفافیت جغرافیایی، منطقه زمانی و کانال‌های ارتباطی (Regional & Communication Transparency)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت با مدیریت سید سروش تاج به‌صورت مستقل در ایران مستقر بوده و به شکل فریلنس و بین‌المللی با کارفرمایان سراسر جهان همکاری می‌نماید. ساعات کاری رسمی استودیو بر پایه منطقه زمانی ایران (UTC+3:30) تنظیم شده است. در صورت وقوع هرگونه اختلال یا کندی موقت در شبکه زیرساخت اینترنت منطقه‌ای، استودیو از کانال‌های امن و پایدار پشتیبان (شامل تلگرام و ایمیل‌های رمزنگاری‌شده) جهت حفظ پیوستگی ارتباطات استفاده می‌نماید.</p>
+        </div>
+
+        <!-- ۴. روش‌های پرداخت بین‌المللی -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۴. روش‌های پرداخت بین‌المللی و تسویه ارزی (Global Payments & Cryptocurrency)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل تومانی نرخ روز صورت می‌پذیرد.</p>
+        </div>
+
+        <!-- ۵. تضمین اصالت رفرنس‌های مشتری -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۵. تضمین اصالت رفرنس‌های ارسالی مشتری (Client Materials Indemnity)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">مشتری متعهد و ضامن است که تمامی تصاویر، کانسپت‌ها، لوگوها و فایل‌های متنی که به عنوان بریف یا رفرنس به استودیو ارسال می‌کند، یا در مالکیت قانونی اوست یا حق بهره‌برداری از آن‌ها را دارد. در صورت بروز هرگونه ادعای نقض کپی‌رایت توسط اشخاص ثالث علیه استودیو ناشی از مواد ارائه‌شده توسط مشتری، مسئولیت حقوقی و جبران کامل خسارت منحصراً متوجه مشتری خواهد بود.</p>
+        </div>
+
+        <!-- ۶. بند بلاتکلیفی و رهاسازی سفارش -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۶. بند بلاتکلیفی و رهاسازی سفارش (Inactivity & Abandonment Clause)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">پس از ارسال اتودها یا فازهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.</p>
+        </div>
+
+        <!-- ۷. سیاست مدرن هوش مصنوعی -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۷. سیاست مدرن هوش مصنوعی و هدایت هنری (Modern AI Transparency)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت استفاده از فناوری‌های نوین و مدل‌های هوش مصنوعی را به عنوان کپیلوت (دستیار فنی، کدنویسی و تسریع پایپلاین) به کار می‌بندد؛ با این وجود، جهان‌سازی جنسیس، داستان‌ها، نژادها، کاراکترهای اورجینال و هدایت بصری، دستاورد فکری سید سروش تاج است. هرگونه کپی‌برداری تجاری، آموزش مدل‌های اختصاصی (مانند LoRA) جهت بازتولید عامدانه کاراکترهای استودیو، یا جعل هویت تجاری تاج‌اینک‌آرت ممنوع و دارای پیگرد است.</p>
+        </div>
+
+        <!-- ۸. لایسنس دارایی‌ها و ممنوعیت افشا -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۸. لایسنس دارایی‌های دانلودی و ممنوعیت افشا (EULA & Anti-Leak)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">خرید هرگونه دارایی دیجیتال (آرت‌بوک، براش، مدل سه‌بعدی و تکسچر) دسترسی مادام‌العمر شخصی به فایل‌ها و به‌روزرسانی‌های آینده را به خریدار اعطا می‌کند. هرگونه فروش مجدد، اشتراک‌گذاری در کانال‌های عمومی، وب‌سایت‌های تورنت و دانلود غیرمجاز تخلف قطعی بوده و منجر به مسدودسازی دائمی حساب و پیگرد قانونی خواهد شد.</p>
+        </div>
+
+        <!-- ۹. فورس ماژور و زیرساخت ابری -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۹. سلب مسئولیت حوادث قهریه و زیرساخت ابری (Force Majeure)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">سایت بر پایه زیرساخت‌های بین‌المللی GitHub Pages، Supabase و Cloudinary اداره می‌شود. استودیو در قبال اختلالات موقت ناشی از تحریم‌ها، فیلترینگ، قطعی سرورهای بالادستی یا حوادث خارج از کنترل انسانی (فورس ماژور) ضامن خسارت مالی نخواهد بود، هرچند حداکثر تمهیدات جهت حفظ سلامت و بک‌آپ دیتای کاربران اتخاذ شده است.</p>
+        </div>
+
+        <!-- ۱۰. سقف مسئولیت مالی -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۰. سقف مسئولیت مالی و عدم استرداد (Limitation of Liability & No Refund)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">کالاهای دانلودی دیجیتال به دلیل ماهیت دسترسی فوری، پس از خرید غیرقابل‌استرداد هستند. در کلیه دعاوی حقوقی، حداکثر سقف مسئولیت مالی استودیو محدود به همان مبلغ دریافتی از مشتری برای همان سفارش مشخص خواهد بود.</p>
+        </div>
+
+        <!-- ۱۱. حق امضا و نمایش در پورتفولیو -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۱. حق امضا و نمایش در پورتفولیو (Moral Rights & Credit)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت حق نمایش آثار نهایی را در وب‌سایت، شبکه‌های اجتماعی و پورتفولیوی رسمی خود (با ذکر مالکیت تجاری کارفرما) جهت ارتقای برند برای خود محفوظ می‌دارد، مگر آنکه کارفرما پیش از شروع پروژه قرارداد محرمانگی انحصاری (NDA) با هزینه مشخص منعقد کرده باشد.</p>
+        </div>
+
+        <!-- ۱۲. حل اختلاف و داوری -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۲. حل و فصل اختلافات و داوری (Dispute Resolution)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">طرفین متعهد می‌شوند پیش از هرگونه اقدام حقوقی، ظرف مدت ۳۰ روز از طریق مکاتبه رسمی با پشتیبانی استودیو و مذاکره دوستانه نسبت به حل اختلاف اقدام نمایند.</p>
+        </div>
       </div>
 
       <div style="margin-top:24px; text-align:center; border-top:1px solid var(--border-subtle); padding-top:16px;">
