@@ -204,20 +204,90 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
 // سیستم یکپارچه احراز هویت ابری SUPABASE AUTH
 // =========================================================
 function applyLoggedInMember(user) {
-  if (!user) return;
+  if (!user || !user.email) return;
   const meta = user.user_metadata || {};
-  const name = meta.name || user.email.split('@')[0];
+  const emailLower = user.email.toLowerCase().trim();
+  const name = meta.full_name || meta.name || user.email.split('@')[0];
   const phone = meta.phone || '';
+
+  // تشخیص اختصاصی و انحصاری مدیر استودیو (سید سروش تاج با جیمیل رسمی استودیو)
+  const isDirectorAdmin = emailLower === 'tajinkart@gmail.com' || 
+                          emailLower === 'tajinkartstudio@gmail.com' || 
+                          emailLower === 'tajimcard@gmail.com' ||
+                          emailLower === 'soroush@tajinkart.com';
+
+  const tier = isDirectorAdmin ? 'VIP' : (meta.tier || 'STANDARD');
+
   currentMember = {
     id: user.id,
-    name: name,
+    name: isDirectorAdmin ? 'سید سروش تاج' : name,
     email: user.email,
     contact: phone || user.email,
-    tier: meta.tier || 'STANDARD',
+    tier: tier,
     assetsBought: meta.assetsBought || []
   };
+
   const labelEl = document.getElementById('rightMemberLabel');
-  if (labelEl) labelEl.textContent = currentMember.name;
+  if (labelEl) {
+    labelEl.textContent = isDirectorAdmin ? '👑 مدیر استودیو' : currentMember.name;
+  }
+
+  // ۱. ثبت و همگام‌سازی آنی در جدول عمومی members دیتابیس سوپابیس (جهت نمایش در Table Editor)
+  if (window.supabaseClient) {
+    window.supabaseClient.from('members').upsert([{
+      id: user.id,
+      name: currentMember.name,
+      email: user.email,
+      contact: phone || user.email,
+      tier: tier,
+      assets_bought: currentMember.assetsBought
+    }], { onConflict: 'email' }).then(({ error }) => {
+      if (error) console.warn('[Supabase Members Table Sync]', error);
+      else console.log('[Supabase Members Table] User record synchronized successfully in Table Editor!');
+    });
+  }
+
+  // ۲. ثبت در کش محلی اعضای سایت
+  let localMember = siteMembersData.find(m => m.email && m.email.toLowerCase() === emailLower);
+  if (!localMember) {
+    siteMembersData.unshift({
+      id: user.id,
+      name: currentMember.name,
+      email: user.email,
+      contact: phone || user.email,
+      tier: tier,
+      balance: isDirectorAdmin ? '$1,450' : '$0',
+      withdrawn: isDirectorAdmin ? '$1,200' : '$0',
+      assetsBought: [],
+      totalSpent: '$0'
+    });
+    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+  } else if (isDirectorAdmin) {
+    localMember.tier = 'VIP';
+    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+  }
+
+  // ۳. هدایت خودکار به پنل مدیریت در صورت ورود مدیر با اکانت گوگل
+  if (isDirectorAdmin) {
+    closeMemberModal();
+    const adminGate = document.getElementById('adminLoginGate');
+    const adminWorkspace = document.getElementById('adminWorkspace');
+    if (adminGate) adminGate.classList.add('hidden');
+    if (adminWorkspace) adminWorkspace.classList.remove('hidden');
+
+    setTimeout(() => {
+      switchView('admin');
+      const artworksTabBtn = document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]');
+      if (typeof switchAdminTab === 'function') {
+        switchAdminTab('artworks', artworksTabBtn);
+      }
+      showToast('درود بر مدیر استودیو، سید سروش تاج. پنل کنترل استودیو با حساب گوگل باز شد! 👑', 'success', 6000);
+    }, 250);
+  } else {
+    // کاربر عادی
+    closeMemberModal();
+    renderMemberDashboard();
+  }
 }
 
 
