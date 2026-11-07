@@ -298,7 +298,15 @@ function applyLoggedInMember(user) {
     closeMemberModal();
     renderMemberDashboard();
     switchView('member-dashboard');
-    showToast(`خوش آمدید، ${currentMember.name}! حساب کاربری شما با موفقیت فعال شد. ✨`, 'success', 5000);
+
+    const isRecovering = isRecoveryFlowDetected || 
+                         sessionStorage.getItem('tajinkart_recovering_password') === 'true' || 
+                         window.location.hash.includes('type=recovery');
+
+    // سکوت کامل در زمان ریکاوری جهت جلوگیری از پیام‌های متناقض و گیج‌کننده
+    if (!isRecovering) {
+      showToast(`خوش آمدید، ${currentMember.name}! حساب کاربری شما با موفقیت فعال شد. ✨`, 'success', 5000);
+    }
   }
 
   try {
@@ -324,7 +332,7 @@ function triggerPasswordResetModal() {
       resetView.classList.remove('hidden');
     }
     if (!hasShownResetToast) {
-      showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
+      showToast('هویت شما از طریق ایمیل تایید شد. رمز جدید را تعیین کنید یا مستقیماً وارد شوید.', 'info', 6000);
       hasShownResetToast = true;
     }
   }
