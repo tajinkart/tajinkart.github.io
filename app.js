@@ -1,4 +1,109 @@
 
+// ==============================================================================
+// موتور داینامیک دسته‌بندی‌های گالری آثار استودیو (Studio Gallery Categories Engine)
+// ==============================================================================
+const DEFAULT_GALLERY_CATEGORIES = [
+  { id: 'character', title: 'کاراکتر دیزاین' },
+  { id: 'environment', title: 'کانسپت و فضا' },
+  { id: 'creature', title: 'موجودات و هیولا' },
+  { id: 'keyframe', title: 'کی‌فریم و کاور' },
+  { id: 'props', title: 'تجهیزات و پراپ' },
+  { id: 'comic', title: 'کمیک و وب‌تون' },
+  { id: '2d', title: 'تصویرسازی ۲ بعدی' }
+];
+
+let galleryCategories = [];
+try {
+  galleryCategories = JSON.parse(localStorage.getItem('tajinkart_gallery_categories_v1')) || DEFAULT_GALLERY_CATEGORIES;
+} catch(e) {
+  galleryCategories = DEFAULT_GALLERY_CATEGORIES;
+}
+
+window.renderFloatingCategoryDropdown = function() {
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (!dropdown) return;
+
+  let itemsHtml = `
+    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'همه آثار')">
+      <span>همه آثار</span>
+    </div>
+  `;
+
+  galleryCategories.forEach(cat => {
+    const isActive = currentGalleryFilter === cat.id;
+    itemsHtml += `
+      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${cat.title}')">
+        <span>${cat.title}</span>
+      </div>
+    `;
+  });
+
+  dropdown.innerHTML = itemsHtml;
+};
+
+window.renderAdminGalleryCategories = function() {
+  const container = document.getElementById('adminGalleryCategoriesList');
+  if (!container) return;
+
+  container.innerHTML = galleryCategories.map((cat, idx) => `
+    <div style="background:#090d16; border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong style="color:#fff; font-size:12.5px; display:block;">${cat.title}</strong>
+        <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${cat.id}</span>
+      </div>
+      <button type="button" onclick="adminDeleteGalleryCategory('${cat.id}')" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:6px; padding:4px 9px; font-size:11px; cursor:pointer;" title="حذف این دسته">
+        حذف
+      </button>
+    </div>
+  `).join('');
+};
+
+window.adminOpenAddCategoryModal = function() {
+  const title = prompt('عنوان فارسی دسته‌بندی جدید را وارد کنید (مثال: تصویرسازی سه‌بعدی):');
+  if (!title || !title.trim()) return;
+  const cleanTitle = title.trim();
+
+  const id = prompt('شناسه انگلیسی کوتاه دسته‌بندی را وارد کنید (مثال: 3d):', 'cat_' + Date.now().toString().slice(-4));
+  if (!id || !id.trim()) return;
+  const cleanId = id.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+  if (galleryCategories.some(c => c.id === cleanId)) {
+    showToast('این شناسه قبلاً ثبت شده است.', 'error');
+    return;
+  }
+
+  galleryCategories.push({ id: cleanId, title: cleanTitle });
+  safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+  renderAdminGalleryCategories();
+  renderFloatingCategoryDropdown();
+  showToast(`دسته‌بندی «${cleanTitle}» با موفقیت به گالری اضافه شد.`, 'success');
+};
+
+window.adminDeleteGalleryCategory = function(catId) {
+  const cat = galleryCategories.find(c => c.id === catId);
+  const catName = cat ? cat.title : catId;
+  if (!confirm(`آیا از حذف دسته‌بندی «${catName}» اطمینان دارید؟`)) return;
+
+  galleryCategories = galleryCategories.filter(c => c.id !== catId);
+  safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+  renderAdminGalleryCategories();
+  renderFloatingCategoryDropdown();
+  showToast(`دسته‌بندی «${catName}» با موفقیت حذف شد.`, 'info');
+};
+
+window.openChatConsultation = function() {
+  switchView('store');
+  switchStoreTab('commissions', document.querySelector('.store-dual-nav .store-dual-btn'));
+  showToast('بخش مشاوره و ثبت سفارش باز شد. درخواست خود را مطرح نمایید.', 'info');
+};
+
+// اجرای لود اولیه در هنگام آماده شدن صفحه
+document.addEventListener('DOMContentLoaded', () => {
+  renderFloatingCategoryDropdown();
+  renderAdminGalleryCategories();
+});
+
+
 // نگاشت دوطرفه و پیوسته بین پایپلاین تخصصی آتلیه و دسته‌بندی گالری
 const PIPELINE_TO_CATEGORY_MAP = {
   'sketch1': 'character',
@@ -581,13 +686,9 @@ function renderAdminArtModalForm(art, isNew) {
         <div>
           <label style="font-size:11px; color:var(--text-muted);">دسته‌بندی در گالری</label>
           <select id="editArtCategorySelect" onchange="syncAdminPipeFromCategory(this)">
-            <option value="character" ${(art.tag === 'character' || art.category === 'character') ? 'selected' : ''}>کاراکتر دیزاین</option>
-            <option value="environment" ${(art.tag === 'environment' || art.category === 'environment') ? 'selected' : ''}>کانسپت و فضا</option>
-            <option value="creature" ${(art.tag === 'creature' || art.category === 'creature') ? 'selected' : ''}>موجودات و هیولا</option>
-            <option value="keyframe" ${(art.tag === 'keyframe' || art.category === 'keyframe') ? 'selected' : ''}>کی‌فریم و کاور</option>
-            <option value="props" ${(art.tag === 'props' || art.category === 'props') ? 'selected' : ''}>تجهیزات و پراپ</option>
-            <option value="comic" ${(art.tag === 'comic' || art.category === 'comic') ? 'selected' : ''}>کمیک و وب‌تون</option>
-            <option value="2d" ${(art.tag === '2d' || art.category === '2d') ? 'selected' : ''}>تصویرسازی ۲ بعدی</option>
+            ${galleryCategories.map(c => `
+              <option value="${c.id}" ${(art.tag === c.id || art.category === c.id) ? 'selected' : ''}>${c.title}</option>
+            `).join('')}
           </select>
         </div>
         <div>
@@ -846,6 +947,7 @@ window.adminDeleteArtwork = function(idx) {
 };
 
 window.renderAdminSettingsTab = function() {
+  if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
   const rateEl = document.getElementById('setUsdRate');
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
   const tokenEl = document.getElementById('setTgToken');
