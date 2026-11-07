@@ -157,16 +157,14 @@ window.syncAdminPipeFromCategory = function(catSelectEl) {
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
  */
 
-// ۱. شناسایی فوری لینک بازیابی رمز قبل از پاکسازی توکن‌ها توسط کلاینت‌ها
-let isRecoveryFlowDetected = false;
+// ۱. شناسایی دقیق و زنده لینک بازیابی رمز از روی پارامترهای آدرس مرورگر
+let isRecoveryFlowActive = false;
 try {
-  const _href = window.location.href || '';
   const _h = window.location.hash || '';
   const _s = window.location.search || '';
-  if (_h.includes('type=recovery') || _s.includes('type=recovery') || _s.includes('action=reset-password') || _href.includes('action=reset-password')) {
-    isRecoveryFlowDetected = true;
-    sessionStorage.setItem('tajinkart_recovering_password', 'true');
-    console.log('[Early Recovery Flag] Detected password reset link in URL!');
+  if (_h.includes('type=recovery') || _s.includes('type=recovery') || _s.includes('action=reset-password')) {
+    isRecoveryFlowActive = true;
+    console.log('[Auth Recovery] Active password recovery token detected in URL.');
   }
 } catch(e) {}
 
@@ -187,15 +185,38 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
     }
   });
 
-  // شنونده فوری سشن‌ها بدون فوت وقت جهت گرفتن رویداد بازیابی رمز
+  // شنونده متمرکز رویدادهای احراز هویت Supabase
   window.supabaseClient.auth.onAuthStateChange((event, session) => {
-    console.log('[Supabase Immediate Auth Event]', event);
+    console.log('[Supabase Central Auth Event]', event);
     if (event === 'PASSWORD_RECOVERY') {
-      isRecoveryFlowDetected = true;
-      sessionStorage.setItem('tajinkart_recovering_password', 'true');
+      isRecoveryFlowActive = true;
       triggerPasswordResetModal();
-    } else if (session && session.user && !isRecoveryFlowDetected && sessionStorage.getItem('tajinkart_recovering_password') !== 'true') {
-      applyLoggedInMember(session.user);
+      return;
+    }
+
+    if (event === 'SIGNED_OUT') {
+      currentMember = null;
+      const labelEl = document.getElementById('rightMemberLabel');
+      if (labelEl) labelEl.textContent = 'حساب اعضا';
+      const adminGate = document.getElementById('adminLoginGate');
+      const adminWorkspace = document.getElementById('adminWorkspace');
+      if (adminWorkspace) adminWorkspace.classList.add('hidden');
+      if (adminGate) adminGate.classList.remove('hidden');
+      return;
+    }
+
+    if (session && session.user) {
+      if (isRecoveryFlowActive) {
+        // در حالت بازیابی رمز، نشست برای ثبت رمز آماده است اما ویو نباید به ادمین یا داشبورد بپرد
+        applyLoggedInMember(session.user, false);
+      } else {
+        // بررسی اینکه آیا از ریدایرکت گوگل برگشته‌ایم یا خیر
+        const isFromGoogleRedirect = window.location.hash.includes('access_token=') && !window.location.hash.includes('type=recovery');
+        applyLoggedInMember(session.user, isFromGoogleRedirect);
+        if (isFromGoogleRedirect) {
+          try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+        }
+      }
     }
   });
 }
@@ -203,7 +224,7 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
 // =========================================================
 // سیستم یکپارچه احراز هویت ابری SUPABASE AUTH
 // =========================================================
-function applyLoggedInMember(user) {
+function applyLoggedInMember(user, isExplicitLogin = false) {
   if (!user || !user.email) return;
   const meta = user.user_metadata || {};
   const emailLower = user.email.toLowerCase().trim();
@@ -237,7 +258,7 @@ function applyLoggedInMember(user) {
     labelEl.textContent = isDirectorAdmin ? '👑 مدیر استودیو' : currentMember.name;
   }
 
-  // ۱. ثبت و همگام‌سازی آنی در جدول عمومی members دیتابیس سوپابیس (جهت نمایش در Table Editor)
+  // ۱. ثبت و همگام‌سازی آنی در جدول عمومی members دیتابیس سوپابیس
   if (window.supabaseClient) {
     window.supabaseClient.from('members').upsert([{
       id: user.id,
@@ -248,7 +269,7 @@ function applyLoggedInMember(user) {
       assets_bought: currentMember.assetsBought
     }], { onConflict: 'email' }).then(({ error }) => {
       if (error) console.warn('[Supabase Members Table Sync]', error);
-      else console.log('[Supabase Members Table] User record synchronized successfully in Table Editor!');
+      else console.log('[Supabase Members Table] User record synchronized in Table Editor!');
     });
   }
 
@@ -272,55 +293,61 @@ function applyLoggedInMember(user) {
     safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
   }
 
-  // ۳. جداسازی قطعی نقش‌ها و ممانعت از دسترسی کاربر به پنل ادمین
+  // ۳. جداسازی قطعی نقش‌ها و ممانعت ۱۰۰٪ از افشای پنل ادمین
   const adminGate = document.getElementById('adminLoginGate');
   const adminWorkspace = document.getElementById('adminWorkspace');
 
+  // اگر در حال بازیابی رمز هستیم، تحت هیچ شرایطی پنل ادمین باز نشود و پیامی نیاید
+  if (isRecoveryFlowActive) {
+    if (adminWorkspace) adminWorkspace.classList.add('hidden');
+    if (adminGate) adminGate.classList.remove('hidden');
+    return;
+  }
+
   if (isDirectorAdmin) {
-    // باز شدن اختصاصی پنل برای مدیر
+    // باز شدن قفل دسترسی در بک‌گراند
     if (adminGate) adminGate.classList.add('hidden');
     if (adminWorkspace) adminWorkspace.classList.remove('hidden');
-    closeMemberModal();
 
-    setTimeout(() => {
-      switchView('admin');
-      const artworksTabBtn = document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]');
-      if (typeof switchAdminTab === 'function') {
-        switchAdminTab('artworks', artworksTabBtn);
-      }
-      showToast('درود بر مدیر استودیو، سید سروش تاج. پنل کنترل استودیو با حساب گوگل باز شد! 👑', 'success', 6000);
-    }, 250);
+    // تنها اگر ورود صریح بوده (نه رفرش عادی)، پنل باز شود
+    if (isExplicitLogin) {
+      closeMemberModal();
+      setTimeout(() => {
+        switchView('admin');
+        const artworksTabBtn = document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]');
+        if (typeof switchAdminTab === 'function') {
+          switchAdminTab('artworks', artworksTabBtn);
+        }
+        showToast('درود بر مدیر استودیو، سید سروش تاج. پنل کنترل استودیو باز شد! 👑', 'success', 6000);
+      }, 250);
+    }
   } else {
-    // کاربر عادی: قفل قطعی پنل ادمین و هدایت به داشبورد اختصاصی مشتریان
+    // کاربر عادی: قفل قطعی و غیرقابل نفوذ پنل ادمین
     if (adminWorkspace) adminWorkspace.classList.add('hidden');
     if (adminGate) adminGate.classList.remove('hidden');
 
-    closeMemberModal();
-    renderMemberDashboard();
-    switchView('member-dashboard');
-
-    const isRecovering = isRecoveryFlowDetected || 
-                         sessionStorage.getItem('tajinkart_recovering_password') === 'true' || 
-                         window.location.hash.includes('type=recovery');
-
-    // سکوت کامل در زمان ریکاوری جهت جلوگیری از پیام‌های متناقض و گیج‌کننده
-    if (!isRecovering) {
+    // تنها در ورود صریح، به داشبورد هدایت شود
+    if (isExplicitLogin) {
+      closeMemberModal();
+      renderMemberDashboard();
+      switchView('member-dashboard');
       showToast(`خوش آمدید، ${currentMember.name}! حساب کاربری شما با موفقیت فعال شد. ✨`, 'success', 5000);
     }
   }
-
-  try {
-    if (window.location.hash.includes('access_token')) {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-  } catch(e) {}
 }
 
 
-
-// تابع باز کردن قطعی و نفوذناپذیر پنجره تنظیم رمز جدید
+// تابع باز کردن پنجره تنظیم رمز جدید
 let hasShownResetToast = false;
 function triggerPasswordResetModal() {
+  isRecoveryFlowActive = true;
+  
+  // اطمینان قطعی از بسته بودن پنل ادمین
+  const adminGate = document.getElementById('adminLoginGate');
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  if (adminWorkspace) adminWorkspace.classList.add('hidden');
+  if (adminGate) adminGate.classList.remove('hidden');
+
   function doOpen() {
     switchAuthView('reset');
     const modal = document.getElementById('memberModal');
@@ -354,9 +381,8 @@ function checkEmailRecoveryFlow() {
 
   if (hash.includes('type=recovery') || 
       search.includes('type=recovery') || 
-      search.includes('action=reset-password') ||
-      sessionStorage.getItem('tajinkart_recovering_password') === 'true') {
-    console.log('[Auth Recovery] Initiating password reset UI!');
+      search.includes('action=reset-password')) {
+    console.log('[Auth Recovery] Initiating password reset UI from URL token!');
     triggerPasswordResetModal();
   }
 }
@@ -367,26 +393,14 @@ async function initSupabaseAuthSession() {
   try {
     const { data } = await window.supabaseClient.auth.getSession();
     if (data && data.session && data.session.user) {
-      applyLoggedInMember(data.session.user);
+      // رفرش صفحه نباید به اجبار کاربر را به ادمین یا داشبورد بیندازد
+      applyLoggedInMember(data.session.user, false);
       console.log('[Supabase Auth] Active cloud session restored for:', data.session.user.email);
     }
-
-    window.supabaseClient.auth.onAuthStateChange((event, session) => {
-      console.log('[Supabase Auth Event]', event);
-      if (event === 'PASSWORD_RECOVERY') {
-        switchAuthView('reset');
-        const modal = document.getElementById('memberModal');
-        if (modal) modal.style.display = 'flex';
-        showToast('لطفاً رمز عبور جدید حسابتان را وارد فرمایید.', 'info');
-      } else if (session && session.user) {
-        applyLoggedInMember(session.user);
-      }
-    });
   } catch (err) {
     console.warn('[Supabase Auth] Session check error:', err);
   }
 }
-
 
 // تابع کمکی برای ذخیره‌سازی ایمن در LocalStorage (جلوگیری از خطای پر شدن ۵ مگابایتی)
 
@@ -1936,7 +1950,57 @@ window.handleMembersIconClick = function() {
     switchView('member-dashboard');
   }
 };
-window.closeMemberModal = function() { document.getElementById('memberModal').style.display = 'none'; };
+window.closeMemberModal = function() {
+  const resetView = document.getElementById('authViewResetPassword');
+  const isResetActive = resetView && !resetView.classList.contains('hidden');
+  if (isResetActive && isRecoveryFlowActive) {
+    showToast('جهت خروج از این بخش، لطفاً رمز جدید تعیین کنید یا دکمه انصراف را در پایین فرم بزنید.', 'info', 4000);
+    return;
+  }
+  const modal = document.getElementById('memberModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.handleMemberModalBackdropClick = function(event) {
+  if (event.target !== document.getElementById('memberModal')) return;
+  const resetView = document.getElementById('authViewResetPassword');
+  const isResetActive = resetView && !resetView.classList.contains('hidden');
+  if (isResetActive && isRecoveryFlowActive) {
+    const card = document.getElementById('memberModalCard');
+    if (card) {
+      card.style.transform = 'scale(1.02)';
+      card.style.transition = 'transform 0.15s ease';
+      setTimeout(() => { card.style.transform = 'scale(1)'; }, 150);
+    }
+    showToast('جهت تکمیل، لطفاً رمز جدید تعیین فرمایید، با گوگل وارد شوید یا روی دکمه «انصراف» بزنید.', 'info', 4000);
+    return;
+  }
+  closeMemberModal();
+};
+
+window.cancelPasswordReset = async function() {
+  if (confirm('آیا از فرآیند تعیین رمز انصراف می‌دهید؟\nدر این صورت رمز عبور قبلی شما تغییری نخواهد کرد.')) {
+    isRecoveryFlowActive = false;
+    sessionStorage.removeItem('tajinkart_recovering_password');
+    if (window.supabaseClient && window.supabaseClient.auth) {
+      try { await window.supabaseClient.auth.signOut(); } catch(e) {}
+    }
+    currentMember = null;
+    const labelEl = document.getElementById('rightMemberLabel');
+    if (labelEl) labelEl.textContent = 'حساب اعضا';
+
+    const adminGate = document.getElementById('adminLoginGate');
+    const adminWorkspace = document.getElementById('adminWorkspace');
+    if (adminWorkspace) adminWorkspace.classList.add('hidden');
+    if (adminGate) adminGate.classList.remove('hidden');
+
+    const modal = document.getElementById('memberModal');
+    if (modal) modal.style.display = 'none';
+    switchView('showcase');
+    try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+    showToast('فرآیند بازیابی لغو شد.', 'info');
+  }
+};
 
 window.switchAuthView = function(viewName) {
   const views = ['authViewLogin', 'authViewSignUp', 'authViewForgot', 'authViewResetPassword'];
@@ -2707,10 +2771,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           if (data && data.user) {
-            applyLoggedInMember(data.user);
-            closeMemberModal();
-            renderMemberDashboard();
-            switchView('member-dashboard');
+            applyLoggedInMember(data.user, true);
             showToast(`خوش آمدید، ${currentMember.name}`, 'success');
             return;
           }
@@ -3057,10 +3118,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           if (data && data.user) {
+            isRecoveryFlowActive = false;
             sessionStorage.removeItem('tajinkart_recovering_password');
-            isRecoveryFlowDetected = false;
-            applyLoggedInMember(data.user);
             try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+            const modal = document.getElementById('memberModal');
+            if (modal) modal.style.display = 'none';
+            applyLoggedInMember(data.user, true);
+            showToast('رمز عبور جدید با موفقیت ذخیره شد. خوش آمدید!', 'success', 6000);
             return;
           }
         } catch (updateErr) {
