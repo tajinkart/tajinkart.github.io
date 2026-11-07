@@ -1006,36 +1006,30 @@ window.handleImageAutoDetect = function(imgEl, artId) {
 // لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)
 let currentCaseStudyIdx = 0;
 
-window.openArtModal = function(id) {
-  if (!id) return;
-  let art = showcaseArtworks.find(a => String(a.id) === String(id) || a.id == id);
-  if (!art) {
-    try {
-      const allStored = JSON.parse(localStorage.getItem(KEYS.ARTWORKS) || '[]');
-      art = allStored.find(a => String(a.id) === String(id) || a.id == id);
-    } catch(e) {}
-  }
-
-  if (!art && showcaseArtworks.length > 0) {
-    art = showcaseArtworks[0];
-  }
-
-  if (!art) {
-    console.warn('[openArtModal] No artwork found for id:', id);
-    return;
-  }
-
-  const idx = showcaseArtworks.findIndex(a => a.id == art.id);
-  currentCaseStudyIdx = idx !== -1 ? idx : 0;
-
+window.openArtModalByIndex = function(idx) {
+  if (idx < 0 || idx >= showcaseArtworks.length) return;
+  currentCaseStudyIdx = idx;
+  const art = showcaseArtworks[idx];
   renderArtStationProject(art);
-
   const modal = document.getElementById('artDetailModal');
   if (modal) {
     modal.classList.add('active');
     modal.style.display = 'block';
     modal.scrollTop = 0;
     document.body.style.overflow = 'hidden';
+  }
+};
+
+window.openArtModal = function(id) {
+  if (id === undefined || id === null) return;
+  let idx = showcaseArtworks.findIndex(a => String(a.id) === String(id) || a.id == id);
+  if (idx === -1 && typeof id === 'number' && id >= 0 && id < showcaseArtworks.length) {
+    idx = id;
+  }
+  if (idx !== -1) {
+    openArtModalByIndex(idx);
+  } else if (showcaseArtworks.length > 0) {
+    openArtModalByIndex(0);
   }
 };
 
@@ -1475,6 +1469,12 @@ async function dispatchTelegramNotification(order) {
 
 // سوییچ ویوها و هماهنگی ناوبری
 window.switchView = function(vKey) {
+  if (typeof unlockBodyScroll === 'function') unlockBodyScroll();
+  const openArtModal = document.getElementById('artDetailModal');
+  if (openArtModal) {
+    openArtModal.classList.remove('active');
+    openArtModal.style.display = 'none';
+  }
   currentView = vKey;
   document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
   const target = document.getElementById(`view-${vKey}`);
@@ -3407,4 +3407,11 @@ window.initAdminTouchSortable = function() {
       document.querySelectorAll('.admin-mosaic-card').forEach(c => c.classList.remove('drag-over-target'));
     });
   });
+};
+
+
+// تابع قطعی باز کردن اسکرول صفحه در تمام خروج‌ها و بازگشت‌ها
+window.unlockBodyScroll = function() {
+  document.body.style.overflow = '';
+  document.body.style.removeProperty('overflow');
 };
