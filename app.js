@@ -1,3 +1,52 @@
+
+// نگاشت دوطرفه و پیوسته بین پایپلاین تخصصی آتلیه و دسته‌بندی گالری
+const PIPELINE_TO_CATEGORY_MAP = {
+  'sketch1': 'character',
+  'sketch_creature': 'creature',
+  'sketch2': 'environment',
+  'sketch3': 'keyframe',
+  'sketch4': 'props',
+  'sketch5': 'comic',
+  'sketch_2d': '2d',
+  '2d': '2d'
+};
+
+const CATEGORY_TO_PIPELINE_MAP = {
+  'character': 'sketch1',
+  'creature': 'sketch_creature',
+  'environment': 'sketch2',
+  'keyframe': 'sketch3',
+  'props': 'sketch4',
+  'comic': 'sketch5',
+  '2d': 'sketch1'
+};
+
+window.getCategoryFromPipeline = function(pipeKey) {
+  return PIPELINE_TO_CATEGORY_MAP[pipeKey] || 'character';
+};
+
+window.getPipelineFromCategory = function(catKey) {
+  return CATEGORY_TO_PIPELINE_MAP[catKey] || 'sketch1';
+};
+
+window.syncAdminCategoryFromPipe = function(pipeSelectEl) {
+  if (!pipeSelectEl) return;
+  const pipe = pipeSelectEl.value;
+  const catSelect = document.getElementById('editArtCategorySelect');
+  if (catSelect && PIPELINE_TO_CATEGORY_MAP[pipe]) {
+    catSelect.value = PIPELINE_TO_CATEGORY_MAP[pipe];
+  }
+};
+
+window.syncAdminPipeFromCategory = function(catSelectEl) {
+  if (!catSelectEl) return;
+  const cat = catSelectEl.value;
+  const pipeSelect = document.getElementById('editArtPipeSelect');
+  if (pipeSelect && CATEGORY_TO_PIPELINE_MAP[cat]) {
+    pipeSelect.value = CATEGORY_TO_PIPELINE_MAP[cat];
+  }
+};
+
 /**
  * TAJINKART Master Spec Cloud Engine
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
@@ -275,18 +324,27 @@ async function syncArtworksFromSupabase() {
       // فقط آثاری که حذف نشده‌اند و شناسه واقعی دارند (آثار واقعی هنرمند)
       const validRows = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
 
-      showcaseArtworks = validRows.map(row => ({
-        id: Number(row.id),
-        tag: row.tag || 'character',
-        shortSlug: row.short_slug || row.title,
-        title: row.title,
-        desc: row.desc_text || '',
-        pipelineKey: row.pipeline_key || 'sketch1',
-        image: row.image,
-        colorSpace: row.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
-        lore: row.lore || 'جهان اکستوپیا',
-        phases: row.phases || []
-      })).sort((a, b) => b.id - a.id);
+      showcaseArtworks = validRows.map(row => {
+        const pipe = row.pipeline_key || 'sketch1';
+        const mappedCat = row.category || row.tag || PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
+        return {
+          id: Number(row.id),
+          orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
+          tag: mappedCat,
+          category: mappedCat,
+          shortSlug: row.short_slug || row.title,
+          title: row.title,
+          desc: row.desc_text || '',
+          pipelineKey: pipe,
+          image: row.image,
+          colorSpace: row.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+          lore: row.lore || 'جهان اکستوپیا',
+          phases: row.phases || []
+        };
+      }).sort((a, b) => {
+        if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
+        return b.id - a.id;
+      });
 
       safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
       renderShowcaseGrid();
@@ -522,7 +580,7 @@ function renderAdminArtModalForm(art, isNew) {
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
         <div>
           <label style="font-size:11px; color:var(--text-muted);">دسته‌بندی در گالری</label>
-          <select id="editArtCategorySelect">
+          <select id="editArtCategorySelect" onchange="syncAdminPipeFromCategory(this)">
             <option value="character" ${(art.tag === 'character' || art.category === 'character') ? 'selected' : ''}>کاراکتر دیزاین</option>
             <option value="environment" ${(art.tag === 'environment' || art.category === 'environment') ? 'selected' : ''}>کانسپت و فضا</option>
             <option value="creature" ${(art.tag === 'creature' || art.category === 'creature') ? 'selected' : ''}>موجودات و هیولا</option>
@@ -534,7 +592,7 @@ function renderAdminArtModalForm(art, isNew) {
         </div>
         <div>
           <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک به آتلیه</label>
-          <select id="editArtPipeSelect">
+          <select id="editArtPipeSelect" onchange="syncAdminCategoryFromPipe(this)">
             <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
             <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
             <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
@@ -987,7 +1045,14 @@ function renderShowcaseGrid() {
   if (!grid) return;
 
   const filteredArtworks = (currentGalleryFilter && currentGalleryFilter !== 'all')
-    ? showcaseArtworks.filter(art => (art.tag === currentGalleryFilter || art.category === currentGalleryFilter))
+    ? showcaseArtworks.filter(art => {
+        const cat = art.category || art.tag || (art.pipelineKey ? (PIPELINE_TO_CATEGORY_MAP[art.pipelineKey] || 'character') : 'character');
+        const pipe = art.pipelineKey;
+        return cat === currentGalleryFilter || 
+               pipe === currentGalleryFilter || 
+               (PIPELINE_TO_CATEGORY_MAP[pipe] && PIPELINE_TO_CATEGORY_MAP[pipe] === currentGalleryFilter) ||
+               art.tag === currentGalleryFilter;
+      })
     : showcaseArtworks;
 
   if (filteredArtworks.length === 0) {
@@ -1004,12 +1069,12 @@ function renderShowcaseGrid() {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
     const imgSrc = art.image || art.img || '';
+    const slug = art.shortSlug || art.title;
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
-        <div class="tile-center-title">
-          <span class="tile-slug">/ ${art.shortSlug || art.title} /</span>
-          <span class="tile-divider"></span>
-          <span class="tile-sub">${art.title}</span>
+        <div class="tile-bottom-bar">
+          <span class="tile-bottom-slug">/ ${slug} /</span>
+          <span class="tile-bottom-title">${art.title}</span>
         </div>
         <img src="${imgSrc}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
@@ -1557,17 +1622,19 @@ window.switchStoreTab = function(tabKey, btn) {
   if (btn) btn.classList.add('active');
 };
 
-// پارالاکس هیرو سبک ZEN در اسکرول
-window.addEventListener('scroll', () => {
+// پارالاکس هیرو سبک ZEN و مدیریت اسکرول بهینه‌سازی شده با رفرش‌ریت ۶۰/۱۲۰ هرتز
+let scrollTicking = false;
+
+function handleOptimizedScroll() {
   const dock = document.getElementById('rightVerticalNav');
   const topBar = document.getElementById('topCenterBrandBar');
   const hero = document.getElementById('stickyBrandHero');
 
   if (currentView === 'showcase') {
-    const scrolled = window.scrollY;
+    const scrolled = window.scrollY || window.pageYOffset || 0;
 
-    // رفتار محبوب کاربر: داک در بالای صفحه باز است و با اسکرول به پایین جمع می‌شود
-    if (scrolled > 120) {
+    // بارگذاری سریع و بدون معطلی نشان برند و دسته بندی در اولین حرکت اسکرول
+    if (scrolled > 40) {
       if (dock) dock.classList.add('dock-collapsed');
       if (topBar) topBar.classList.add('visible');
     } else {
@@ -1592,16 +1659,24 @@ window.addEventListener('scroll', () => {
           hero.style.opacity = '0.15';
         }
       } else {
-        if (scrolled < 400) {
-          const opacity = Math.max(1 - (scrolled / 320), 0.25);
+        if (scrolled < 300) {
+          const opacity = Math.max(1 - (scrolled / 260), 0.25);
           hero.style.opacity = opacity;
-          hero.style.transform = `translate3d(0, ${scrolled * 0.2}px, 0)`;
         } else {
           hero.style.opacity = '0.25';
-          hero.style.transform = 'translate3d(0, 80px, 0)';
         }
       }
     }
+  }
+}
+
+window.addEventListener('scroll', () => {
+  if (!scrollTicking) {
+    window.requestAnimationFrame(() => {
+      handleOptimizedScroll();
+      scrollTicking = false;
+    });
+    scrollTicking = true;
   }
 }, { passive: true });
 
@@ -3487,3 +3562,52 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
 
   renderShowcaseGrid();
 };
+
+
+// مانیتور و ناظر قطعی اسکرول صفحه: تضمین ۱۰۰٪ عدم قفل شدن اسکرول در کامپیوتر و گوشی
+window.unlockBodyScroll = function() {
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+  document.body.style.removeProperty('overflow');
+  document.documentElement.style.removeProperty('overflow');
+};
+
+// ناظر جهش (MutationObserver) جهت رفع قفل به محض بسته شدن هر لایت‌باکس
+document.addEventListener('DOMContentLoaded', () => {
+  const artModal = document.getElementById('artDetailModal');
+  if (artModal) {
+    const observer = new MutationObserver(() => {
+      if (artModal.style.display === 'none' || !artModal.classList.contains('active')) {
+        unlockBodyScroll();
+      }
+    });
+    observer.observe(artModal, { attributes: true, attributeFilter: ['style', 'class'] });
+  }
+});
+
+// بازگردانی اسکرول هنگام فشردن کلید Escape یا خروج موس یا پنجره
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    unlockBodyScroll();
+  }
+});
+window.addEventListener('focus', () => {
+  const artModal = document.getElementById('artDetailModal');
+  if (!artModal || artModal.style.display === 'none' || !artModal.classList.contains('active')) {
+    unlockBodyScroll();
+  }
+});
+// اضافه کردن فیدبک لمسی سریع (Instant Touch Gold Glow) برای تایل‌های گالری
+document.addEventListener('touchstart', (e) => {
+  const tile = e.target.closest('.mosaic-tile');
+  if (tile) {
+    document.querySelectorAll('.mosaic-tile.touch-active').forEach(t => t.classList.remove('touch-active'));
+    tile.classList.add('touch-active');
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.mosaic-tile.touch-active').forEach(t => t.classList.remove('touch-active'));
+  }, 350);
+}, { passive: true });
