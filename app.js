@@ -373,7 +373,7 @@ function triggerPasswordResetModal() {
       resetView.classList.remove('hidden');
     }
     if (!hasShownResetToast) {
-      showToast('هویت شما از طریق ایمیل تایید شد. رمز جدید را تعیین کنید یا مستقیماً وارد شوید.', 'info', 6000);
+      showToast('هویت شما از طریق ایمیل تایید شد. لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info', 6000);
       hasShownResetToast = true;
     }
   }
@@ -1983,7 +1983,7 @@ window.handleMemberModalBackdropClick = function(event) {
       card.style.transition = 'transform 0.15s ease';
       setTimeout(() => { card.style.transform = 'scale(1)'; }, 150);
     }
-    showToast('جهت تکمیل، لطفاً رمز جدید تعیین فرمایید، با گوگل وارد شوید یا روی دکمه «انصراف» بزنید.', 'info', 4000);
+    showToast('جهت تکمیل، لطفاً رمز عبور جدید را وارد کنید یا روی دکمه «انصراف» بزنید.', 'info', 4000);
     return;
   }
   closeMemberModal();
