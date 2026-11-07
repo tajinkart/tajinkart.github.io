@@ -2342,12 +2342,16 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('[Supabase SignUp Error]', error);
             const msg = (error.message || '').toLowerCase();
             if (msg.includes('already registered') || msg.includes('already exists') || error.status === 422) {
-              showToast('این ایمیل قبلاً در سیستم ثبت‌نام شده است. لطفاً وارد شوید.', 'error');
+              showToast('این آدرس ایمیل قبلاً در استودیو ثبت‌نام شده است. لطفاً وارد حساب خود شوید.', 'error', 6000);
               switchAuthView('login');
               const loginEmailEl = document.getElementById('loginEmail');
               if (loginEmailEl) loginEmailEl.value = email;
+            } else if (msg.includes('rate limit') || msg.includes('over_email_send_rate_limit')) {
+              showToast('تعداد درخواست‌ها بیش از حد مجاز است. لطفاً چند دقیقه دیگر مجدداً تلاش فرمایید.', 'error', 6000);
+            } else if (msg.includes('password should be') || msg.includes('weak password')) {
+              showToast('رمز عبور وارد شده بسیار ضعیف است؛ حداقل ۶ کاراکتر ترکیبی وارد فرمایید.', 'error');
             } else {
-              showToast('خطای سامانه احراز هویت: ' + (error.message || 'ثبت‌نام ناموفق بود'), 'error');
+              showToast('خطا در ثبت‌نام: ' + (error.message || 'ثبت حساب در سرور ابری انجام نشد'), 'error', 6000);
             }
             return;
           }
@@ -2515,10 +2519,46 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      showToast('در حال ذخیره رمز عبور جدید در سرورهای ابری...', 'info');
+      showToast('در حال اعتبارسنجی نشست و ذخیره رمز جدید...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
+          // بررسی و بازیابی نشست امنیتی فعال در صورت باز شدن از لینک ایمیل
+          const { data: sessionData } = await window.supabaseClient.auth.getSession();
+          let currentSession = sessionData?.session;
+
+          if (!currentSession) {
+            // تلاش برای استخراج توکن‌های بازیابی از URL
+            const hash = window.location.hash || '';
+            const search = window.location.search || '';
+            if (search.includes('code=')) {
+              const urlParams = new URLSearchParams(search);
+              const code = urlParams.get('code');
+              if (code && window.supabaseClient.auth.exchangeCodeForSession) {
+                const { data: exData } = await window.supabaseClient.auth.exchangeCodeForSession(code);
+                currentSession = exData?.session;
+              }
+            } else if (hash.includes('access_token=')) {
+              const hashParams = new URLSearchParams(hash.substring(1));
+              const accessToken = hashParams.get('access_token');
+              const refreshToken = hashParams.get('refresh_token');
+              if (accessToken && refreshToken && window.supabaseClient.auth.setSession) {
+                const { data: sData } = await window.supabaseClient.auth.setSession({
+                  access_token: accessToken,
+                  refresh_token: refreshToken
+                });
+                currentSession = sData?.session;
+              }
+            }
+          }
+
+          if (!currentSession) {
+            showToast('نشست امنیتی شما یافت نشد یا منقضی شده است! لطفاً مجدداً از بخش «فراموشی رمز عبور» درخواست لینک جدید فرمایید.', 'error', 7000);
+            sessionStorage.removeItem('tajinkart_recovering_password');
+            isRecoveryFlowDetected = false;
+            return;
+          }
+
           const { data, error } = await window.supabaseClient.auth.updateUser({
             password: p1
           });
@@ -2526,8 +2566,10 @@ document.addEventListener('DOMContentLoaded', () => {
           if (error) {
             console.warn('[Update Password Error]', error);
             const msg = (error.message || '').toLowerCase();
-            if (msg.includes('should be different') || msg.includes('same password')) {
-              showToast('رمز عبور جدید نمی‌تواند با رمز عبور قبلی شما یکسان باشد! لطفاً یک رمز تازه و متفاوت انتخاب فرمایید.', 'error');
+            if (msg.includes('session missing') || msg.includes('auth session missing')) {
+              showToast('لینک بازیابی منقضی شده یا نامعتبر است! لطفاً مجدداً از بخش «فراموشی رمز عبور» لینک جدید دریافت کنید.', 'error', 7000);
+            } else if (msg.includes('should be different') || msg.includes('same password')) {
+              showToast('رمز عبور جدید نمی‌تواند با رمز عبور قبلی یکسان باشد! لطفاً رمز متفاوتی انتخاب فرمایید.', 'error');
             } else {
               showToast('خطا در به‌روزرسانی رمز: ' + (error.message || 'لطفاً دوباره امتحان کنید'), 'error');
             }
@@ -2540,17 +2582,19 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMemberDashboard();
             switchView('member-dashboard');
             showToast('✓ رمز عبور جدید شما با موفقیت ثبت شد! خوش آمدید.', 'success');
-            // پاکسازی نشست بازیابی و بازنشانی آدرس‌بار
             sessionStorage.removeItem('tajinkart_recovering_password');
             isRecoveryFlowDetected = false;
             try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
             return;
           }
-        } catch (err) {
-          console.error('[Update Password Exception]', err);
-          showToast('خطا در اتصال به سرور جهت تغییر رمز.', 'error');
+        } catch (updateErr) {
+          console.warn('[Supabase Password Update Exception]', updateErr);
+          showToast('خطا در ارتباط با سرور احراز هویت. لطفاً مجدداً تلاش فرمایید.', 'error');
+          return;
         }
       }
+
+      showToast('سرویس احراز هویت ابری در دسترس نیست.', 'error');
     });
   }
 
@@ -2966,8 +3010,7 @@ window.openChangePasswordModal = function() {
 };
 
 
-// بررسی زنده ساختار رسمی ایمیل و ممانعت از دامنه‌های ناقص (مانند gmail بدون .com)
-// بررسی زنده ساختار رسمی ایمیل و ممانعت از دامنه‌های ناقص (از ابتدا قرمز تا رسیدن به ساختار کامل)
+// بررسی زنده ساختار رسمی ایمیل (قرمز در صورت نقص یا تکراری بودن، سبز در صورت اعتبار کامل - بدون پیام زرد اضافی)
 let emailCheckTimeout = null;
 window.handleLiveEmailCheck = function(emailVal) {
   const notice = document.getElementById('signupEmailLiveNotice');
@@ -3013,11 +3056,7 @@ window.handleLiveEmailCheck = function(emailVal) {
     return;
   }
 
-  notice.style.color = 'var(--gold)';
-  notice.innerHTML = '⏳ در حال استعلام عدم تکراری بودن در سرور استودیو...';
-  emailInput.style.borderColor = 'var(--gold)';
-
-  // بررسی آنلاین در جدول اعضای سوپابیس
+  // بررسی بی‌صدا در پس‌زمینه بدون نمایش کادر زرد مزاحم
   emailCheckTimeout = setTimeout(async () => {
     if (window.supabaseClient) {
       try {
@@ -3033,16 +3072,20 @@ window.handleLiveEmailCheck = function(emailVal) {
           emailInput.style.borderColor = 'var(--crimson)';
         } else {
           notice.style.color = 'var(--emerald)';
-          notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> ساختار ایمیل صحیح و آزاد است';
+          notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> فرمت ایمیل معتبر و آزاد است';
           emailInput.style.borderColor = 'var(--emerald)';
         }
       } catch(e) {
         notice.style.color = 'var(--emerald)';
-        notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> ساختار ایمیل معتبر است';
+        notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> فرمت ایمیل معتبر است';
         emailInput.style.borderColor = 'var(--emerald)';
       }
+    } else {
+      notice.style.color = 'var(--emerald)';
+      notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> فرمت ایمیل معتبر است';
+      emailInput.style.borderColor = 'var(--emerald)';
     }
-  }, 400);
+  }, 350);
 };
 
 
