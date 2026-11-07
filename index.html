@@ -13,24 +13,12 @@
 </head>
 <body data-view="showcase">
 
-  <!-- ۱. نشان شناور برند در بالا-چپ -->
+  <!-- ۱. نشان شناور برند در بالا-چپ (فقط نام استودیو) -->
   <div id="topCenterBrandBar">
     <button onclick="switchView('showcase')" class="top-center-pill" title="صفحه اصلی">
       <span class="top-dot"></span>
       <span>TAJINKART</span>
     </button>
-
-    <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان TAJINKART در بالا-چپ -->
-    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
-        <span id="currentCategoryPillLabel">همه آثار</span>
-        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
-      </button>
-
-      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-        <!-- به صورت داینامیک از جاوااسکریپت لود می‌شود -->
-      </div>
-    </div>
   </div>
 
   <!-- ۲. داک عمودی ناوبری راست -->
@@ -120,6 +108,59 @@
 
   <!-- بخش ۰: صفحه اول با ترنزیشن نرم سبک ZEN -->
   <section id="view-showcase" class="view-section">
+
+    <!-- فهرست شناور دسته‌بندی آثار منحصراً درون بخش گالری صفحه اول -->
+    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
+        <span id="currentCategoryPillLabel">همه آثار</span>
+        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+      </button>
+
+      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      </div>
+    </div>
+    <div id="stickyBrandHero">
+      <div class="hero-badge">
+        <span>●</span>
+        <span>استودیو کانسپت آرت و توسعه بصری</span>
+      </div>
+      <h1 class="brand-giant-title">TAJINKART</h1>
+      <p class="brand-sub-caption">سید سروش تاج • آرشیو تخصصی کانسپت آرت، طراحی دنیا و تصویرسازی سینمایی</p>
+    </div>
+
+    <div id="artworkCurtain">
+      <div id="showcaseGrid"></div>
+    </div>
+  </section>
+
+  <!-- بخش ۱: استور و میزکار آتلیه -->
+  <section id="view-store" class="view-section hidden">
+    <div class="container">
+      
+      <!-- هدر اصلی فروشگاه با جابجایی چراغ ظرفیت به کنار تیتر اصلی طبق دستور کاربر -->
+      <div class="section-head">
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <h2 class="view-hero-title">فروشگاه دارایی‌های دیجیتال و آتلیه کانسپت</h2>
+          <!-- چراغ کامیشن‌ها دقیقاً در کنار تیتر اصلی قرار گرفت -->
+          <div id="commissionCapacityIndicator" class="comm-capacity-badge" title="ظرفیت پذیرش ماهانه آتلیه استودیو">
+            <span class="capacity-pulse-dot"></span>
+            <span>۲ از ۳ ظرفیت آتلیه رزرو شده</span>
+          </div>
+        </div>
+
+        <div class="store-action-bar">
+          <div class="store-dual-nav">
+            <button onclick="switchStoreTab('commissions', this)" class="store-dual-btn active">سفارش کانسپت اختصاصی (۶ دسته)</button>
+            <button onclick="switchStoreTab('products', this)" class="store-dual-btn">دارایی‌های دیجیتال و فروشگاه</button>
+          </div>
+          <!-- انتخاب واحد پولی زنده (دلار و تومان) -->
+          <div class="currency-toggle-box" title="انتخاب واحد پولی پیش‌فرض">
+            <button id="currBtnUSD" onclick="setCurrencyMode('USD')" class="curr-btn active">$ دلار</button>
+            <button id="currBtnTOMAN" onclick="setCurrencyMode('TOMAN')" class="curr-btn">تومان</button>
+          </div>
+        </div>
+      </div>
 
       <!-- تب ۱: میزکار کمیسیون -->
       <div id="storePaneCommissions">
