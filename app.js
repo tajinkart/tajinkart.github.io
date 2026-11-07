@@ -1070,8 +1070,8 @@ window.renderAdminSettingsTab = function() {
   if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
   const chatEl = document.getElementById('setTgChat');
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
-  const passEl = document.getElementById('setAdminPass');
-  if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
+  const emailEl = document.getElementById('setAdminEmail');
+  if (emailEl) emailEl.value = 'tajinkart@gmail.com';
   const cCloudEl = document.getElementById('setCloudinaryCloud');
   if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'tajinkart';
   const cPresetEl = document.getElementById('setCloudinaryPreset');
@@ -2482,11 +2482,41 @@ window.adminDeleteProduct = function(idx) {
 };
 
 // اسکچ ۳: مدیریت اعضا و گزارش‌های مالی
+// شناسه و پرونده رسمی و ابدی خالق، سازنده و معمار جهان استودیو
+const CREATOR_MASTER_RECORD = {
+  id: 'creator_seyed_soroush_taj',
+  name: 'سید سروش تاج',
+  email: 'tajinkart@gmail.com',
+  contact: 'دفتر مرکزی استودیو (ارتباط مستقیم مدیریت)',
+  tier: 'CREATOR',
+  balance: '$∞ (صاحب امتیاز)',
+  withdrawn: 'فرماندهی استودیو',
+  totalSpent: 'مالکیت ۱۰۰٪ 👑',
+  isCreator: true,
+  assetsBought: [
+    'حق امتیاز کامل پایپلاین‌های شش‌گانه کانسپت آرت',
+    'حق مالکیت تجاری و معنوی جهان‌های TAJINKART',
+    'توسعه بصری و دارایی‌های اورجینال استودیو',
+    'کلید دسترسی کامل ادمین با تایید ۲ مرحله‌ای گوگل'
+  ]
+};
+
+let isCreatorSelected = true;
+
 function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilter) {
   const listEl = document.getElementById('adminMembersListContainer');
   if (!listEl) return;
 
-  let filtered = siteMembersData;
+  let showCreator = false;
+  if (tierFilter === 'all' || tierFilter === 'CREATOR') {
+    if (!filterText || 
+        CREATOR_MASTER_RECORD.name.toLowerCase().includes(filterText.toLowerCase()) || 
+        CREATOR_MASTER_RECORD.email.toLowerCase().includes(filterText.toLowerCase())) {
+      showCreator = true;
+    }
+  }
+
+  let filtered = siteMembersData.filter(m => m.email && m.email.toLowerCase() !== 'tajinkart@gmail.com');
   if (filterText) {
     filtered = filtered.filter(m =>
       m.name.toLowerCase().includes(filterText.toLowerCase()) ||
@@ -2494,27 +2524,62 @@ function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilte
       m.contact.includes(filterText)
     );
   }
-  if (tierFilter !== 'all') {
+  if (tierFilter !== 'all' && tierFilter !== 'CREATOR') {
     filtered = filtered.filter(m => m.tier === tierFilter);
   }
 
-  listEl.innerHTML = filtered.map((m, idx) => `
-    <div class="member-list-item ${idx === selectedMemberIdx ? 'active' : ''}" onclick="selectAdminMember(${idx})">
-      <div>
-        <div style="font-size:13.5px; font-weight:800; color:#fff;">${m.name}</div>
-        <div class="font-mono" style="font-size:11px; color:var(--text-muted); margin-top:2px;">${m.email}</div>
-      </div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span class="tier-tag tier-${m.tier.toLowerCase()}">${m.tier}</span>
-        <span class="font-mono" style="color:var(--gold); font-size:12px; font-weight:800;">${m.totalSpent}</span>
-      </div>
-    </div>
-  `).join('');
+  let htmlStr = '';
 
-  renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0] || siteMembersData[0]);
+  // نمایش کارت فوق‌العاده سلطنتی و انحصاری خالق و سازنده اثر در صدر لیست
+  if (showCreator) {
+    htmlStr += `
+      <div class="member-list-item creator-crown-card ${isCreatorSelected ? 'active' : ''}" onclick="selectAdminCreator()">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 12px rgba(245,158,11,0.5);">👑</div>
+          <div>
+            <div style="font-size:13.5px; font-weight:900; color:#fbbf24;">${CREATOR_MASTER_RECORD.name}</div>
+            <div class="font-mono" style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">${CREATOR_MASTER_RECORD.email}</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="tier-tag tier-creator">خالق اثر 👑</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // نمایش لیست اعضای مشتریان
+  if (tierFilter !== 'CREATOR') {
+    htmlStr += filtered.map((m, idx) => `
+      <div class="member-list-item ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'active' : ''}" onclick="selectAdminMember(${idx})">
+        <div>
+          <div style="font-size:13.5px; font-weight:800; color:#fff;">${m.name}</div>
+          <div class="font-mono" style="font-size:11px; color:var(--text-muted); margin-top:2px;">${m.email}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="tier-tag tier-${m.tier.toLowerCase()}">${m.tier}</span>
+          <span class="font-mono" style="color:var(--gold); font-size:12px; font-weight:800;">${m.totalSpent}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  listEl.innerHTML = htmlStr;
+
+  if (isCreatorSelected) {
+    renderAdminMemberDetail(CREATOR_MASTER_RECORD);
+  } else {
+    renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0] || CREATOR_MASTER_RECORD);
+  }
 }
 
+window.selectAdminCreator = function() {
+  isCreatorSelected = true;
+  renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
+};
+
 window.selectAdminMember = function(idx) {
+  isCreatorSelected = false;
   selectedMemberIdx = idx;
   renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
 };
@@ -2522,6 +2587,55 @@ window.selectAdminMember = function(idx) {
 function renderAdminMemberDetail(m) {
   const col = document.getElementById('adminMemberDetailContent');
   if (!m || !col) return;
+
+  // پرونده رسمی و اختصاصی خالق استودیو
+  if (m.isCreator) {
+    col.innerHTML = `
+      <div style="padding:18px; background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(15,23,42,0.95)); border-radius:14px; border:1px solid #fbbf24; margin-bottom:14px; box-shadow:0 6px 25px rgba(245,158,11,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:20px;">👑</span>
+            <h3 style="font-size:17px; font-weight:900; color:#fbbf24;">${m.name}</h3>
+          </div>
+          <span class="tier-tag tier-creator" style="font-size:11px;">خالق و معمار جهان 👑</span>
+        </div>
+        <div class="font-mono" style="font-size:12px; color:#fff; margin-top:8px;">حساب رسمی گوگل: <span style="color:var(--cyan-electric); font-weight:700;">${m.email}</span> (متصل به 2FA ✓)</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">جایگاه: <span style="color:var(--gold); font-weight:700;">کارگردان هنری و مالک IP استودیو TAJINKART</span></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+        <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid rgba(245,158,11,0.3);">
+          <div style="font-size:11px; color:var(--text-muted);">سطح دسترسی مالی:</div>
+          <div class="font-mono" style="font-size:15px; font-weight:800; color:#fbbf24; margin-top:3px;">صاحب‌امتیاز کل</div>
+        </div>
+        <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid rgba(245,158,11,0.3);">
+          <div style="font-size:11px; color:var(--text-muted);">وضعیت حساب:</div>
+          <div class="font-mono" style="font-size:15px; font-weight:800; color:var(--emerald); margin-top:3px;">مدیر ارشد انحصاری 👑</div>
+        </div>
+      </div>
+
+      <div>
+        <h5 style="font-size:12.5px; font-weight:800; margin-bottom:8px; color:#fff;">اختیارات و مجوزهای انحصاری خالق:</h5>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          ${(m.assetsBought || []).map(a => `
+            <div style="padding:8px 10px; background:#070a10; border-radius:8px; border:1px solid rgba(245,158,11,0.25); font-size:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="color:#fef3c7;">${a}</span>
+              <span style="color:var(--gold); font-size:11px; font-weight:800;">✓ انحصاری مالک</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle); text-align:center;">
+        <span style="font-size:11px; color:var(--text-muted); padding:6px 14px; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); display:inline-block;">
+          🔒 حساب رسمی و غیرقابل تغییر مدیر استودیو
+        </span>
+      </div>
+    `;
+    return;
+  }
+
+  // پرونده اعضای عادی
   const tierColor = m.tier === 'VIP' ? 'var(--gold)' : (m.tier === 'PRO' ? 'var(--cyan-electric)' : '#cbd5e1');
 
   col.innerHTML = `
@@ -2557,7 +2671,6 @@ function renderAdminMemberDetail(m) {
       </div>
     </div>
 
-    <!-- دکمه عملیاتی حذف کاربر در پنل ادمین -->
     <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle);">
       <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="width:100%; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
         🗑️ حذف این کاربر
@@ -2573,7 +2686,7 @@ window.filterAdminMembers = function(val) {
 window.filterMembersByTier = function(tier) {
   currentMemberTierFilter = tier;
   document.querySelectorAll('#adminTabMembers .gallery-filter-btn').forEach(b => b.classList.remove('active'));
-  if (event && event.target) event.target.classList.add('active');
+  if (window.event && window.event.target) window.event.target.classList.add('active');
   renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', tier);
 };
 
@@ -2728,8 +2841,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
   const chatEl = document.getElementById('setTgChat');
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
-  const passEl = document.getElementById('setAdminPass');
-  if (passEl) passEl.value = siteSettings.adminPass || 'tajinkart';
+  const emailEl = document.getElementById('setAdminEmail');
+  if (emailEl) emailEl.value = 'tajinkart@gmail.com';
 
   // ثبت فرم بریف سفارش
   const orderForm = document.getElementById('commissionOrderForm');
@@ -2774,20 +2887,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const em = document.getElementById('loginEmail').value.trim().toLowerCase();
       const pw = document.getElementById('loginPass').value.trim();
 
-      // ورود اختصاصی مدیر استودیو
-      if (em === 'soroush') {
-        if (pw === (siteSettings.adminPass || 'tajinkart')) {
-          closeMemberModal();
-          document.getElementById('adminLoginGate').classList.add('hidden');
-          document.getElementById('adminWorkspace').classList.remove('hidden');
-          switchView('admin'); switchAdminTab('artworks', document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]'));
-          showToast('مرکز کنترل و پنل مدیریت استودیو گشوده شد.', 'success');
-          return;
-        } else {
-          showToast('رمز عبور مدیر استودیو نامعتبر است.', 'error');
-          return;
-        }
-      }
+// ورود مدیر استودیو منحصراً از طریق تایید هویت Google OAuth انجام می‌شود
 
       showToast('در حال تایید هویت و ورود به استودیو...', 'info');
 
@@ -3087,22 +3187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // فرم ورود ادمین
-  const adminForm = document.getElementById('adminLoginForm');
-  if (adminForm) {
-    adminForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const u = document.getElementById('adminUsernameInput').value.trim().toLowerCase();
-      const p = document.getElementById('adminPasswordInput').value.trim();
-      if (u === 'soroush' && p === (siteSettings.adminPass || 'tajinkart')) {
-        document.getElementById('adminLoginGate').classList.add('hidden');
-        document.getElementById('adminWorkspace').classList.remove('hidden');
-        showToast('مرکز کنترل استودیو گشوده شد.', 'success');
-      } else {
-        showToast('اطلاعات ورود مدیر صحیح نیست.', 'error');
-      }
-    });
-  }
+// فرم ورود قدیمی ادمین حذف و با درگاه رسمی گوگل جایگزین شد
 
   // فرم تنظیمات ادمین
   const settingsForm = document.getElementById('adminSettingsForm');
@@ -3112,7 +3197,7 @@ document.addEventListener('DOMContentLoaded', () => {
       siteSettings.usdRate = parseInt(document.getElementById('setUsdRate').value, 10) || 72000;
       siteSettings.tgToken = document.getElementById('setTgToken').value.trim();
       siteSettings.tgChat = document.getElementById('setTgChat').value.trim();
-      siteSettings.adminPass = document.getElementById('setAdminPass').value.trim() || 'tajinkart';
+      // پسورد متنی منسوخ شد
       siteSettings.cloudinaryCloudName = document.getElementById('setCloudinaryCloud')?.value.trim() || 'tajinkart';
       siteSettings.cloudinaryPreset = document.getElementById('setCloudinaryPreset')?.value.trim() || 'erlvtkx9';
       safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
