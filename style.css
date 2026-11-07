@@ -2749,3 +2749,36 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   opacity: 1;
   pointer-events: auto;
 }
+
+
+/* استقرار دقیق منوی دسته‌بندی درست در زیر نشان TAJINKART در بالا-چپ */
+#topCenterBrandBar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+#floatingGalleryCategoryMenu,
+.floating-cat-menu-wrapper {
+  position: relative !important;
+  margin-top: 6px !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  display: block !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* مخفی‌سازی کامل پیل دسته‌بندی در خارج از صفحه اصلی گالری */
+body:not([data-view="showcase"]) #floatingGalleryCategoryMenu,
+body[data-view="store"] #floatingGalleryCategoryMenu,
+body[data-view="genesis"] #floatingGalleryCategoryMenu,
+body[data-view="academy"] #floatingGalleryCategoryMenu,
+body[data-view="society"] #floatingGalleryCategoryMenu,
+body[data-view="admin"] #floatingGalleryCategoryMenu,
+body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
+  display: none !important;
+}

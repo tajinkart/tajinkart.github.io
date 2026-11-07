@@ -13,12 +13,24 @@
 </head>
 <body data-view="showcase">
 
-  <!-- ۱. نشان شناور برند در بالا-چپ (فقط نام استودیو) -->
+  <!-- ۱. نشان شناور برند در بالا-چپ -->
   <div id="topCenterBrandBar">
     <button onclick="switchView('showcase')" class="top-center-pill" title="صفحه اصلی">
       <span class="top-dot"></span>
       <span>TAJINKART</span>
     </button>
+
+    <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان برند TAJINKART -->
+    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
+        <span id="currentCategoryPillLabel">همه آثار</span>
+        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+      </button>
+
+      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      </div>
+    </div>
   </div>
 
   <!-- ۲. داک عمودی ناوبری راست -->
@@ -109,17 +121,7 @@
   <!-- بخش ۰: صفحه اول با ترنزیشن نرم سبک ZEN -->
   <section id="view-showcase" class="view-section">
 
-    <!-- فهرست شناور دسته‌بندی آثار منحصراً درون بخش گالری صفحه اول -->
-    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
-        <span id="currentCategoryPillLabel">همه آثار</span>
-        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
-      </button>
 
-      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
-      </div>
-    </div>
     <div id="stickyBrandHero">
       <div class="hero-badge">
         <span>●</span>
