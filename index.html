@@ -866,8 +866,13 @@
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
     <!-- کلیدهای ناوبری سریع بین پروژه‌ها به سبک آرت‌استیشن -->
-    <button type="button" class="artstation-nav-btn prev" onclick="navigateCaseStudy(-1, event)" title="اثر قبلی (فلش چپ)">‹</button>
-    <button type="button" class="artstation-nav-btn next" onclick="navigateCaseStudy(1, event)" title="اثر بعدی (فلش راست)">›</button>
+    <!-- دکمه‌های ناوبری با فلش‌های رو به بیرون (Outward SVG Arrows) که هرگز توسط موتور راست‌به‌چپ وارونه نمی‌شوند -->
+    <button type="button" class="artstation-nav-btn prev" onclick="navigateCaseStudy(-1, event)" title="اثر قبلی (فلش به سمت بیرون چپ)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button type="button" class="artstation-nav-btn next" onclick="navigateCaseStudy(1, event)" title="اثر بعدی (فلش به سمت بیرون راست)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
     <button type="button" onclick="closeArtModalDirect()" class="artstation-close-btn" title="بستن (Esc)">✕</button>
 
     <div class="artstation-project-layout" onclick="event.stopPropagation()">

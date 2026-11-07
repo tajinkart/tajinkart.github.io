@@ -1844,6 +1844,7 @@ function renderAdminSketch2() {
   html += showcaseArtworks.map((art, idx) => `
     <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" 
          id="adminArtCard_${idx}"
+         data-admin-idx="${idx}"
          draggable="true"
          ondragstart="isDraggingAdminCard = true; handleAdminArtDragStart(event, ${idx})"
          ondragover="handleAdminArtDragOver(event)"
@@ -1852,15 +1853,9 @@ function renderAdminSketch2() {
          ondrop="handleAdminArtDrop(event, ${idx})"
          ondragend="setTimeout(() => { isDraggingAdminCard = false; }, 150); handleAdminArtDragEnd(event)"
          onclick="handleAdminCardClick(event, ${idx})" 
-         title="برای جابجایی از دکمه‌های ◀ ▶ استفاده کنید یا بکشید و رها کنید">
+         title="با انگشت شست یا اشاره نگه دارید تا کارت بلند شود، سپس بکشید و رها کنید">
       <img src="${art.image}" draggable="false" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" alt="${art.title}" />
       
-      <!-- دکمه‌های جابجایی ترتیب سریع و بدون باگ روی تبلت، موبایل و دسکتاپ -->
-      <div style="position:absolute; top:6px; left:6px; display:flex; gap:4px; z-index:20;" onclick="event.stopPropagation()">
-        <button type="button" onclick="moveAdminArtOrder(${idx}, -1)" title="انتقال به عقب" style="background:rgba(0,0,0,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:4px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;">◀</button>
-        <button type="button" onclick="moveAdminArtOrder(${idx}, 1)" title="انتقال به جلو" style="background:rgba(0,0,0,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:4px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;">▶</button>
-      </div>
-
       <div style="position:absolute; top:6px; right:6px; padding:3px 7px; border-radius:6px; background:rgba(0,0,0,0.85); color:var(--gold); font-size:11px; font-weight:800; border:1px solid rgba(250,204,21,0.3); pointer-events:none;">
         #${idx + 1}
       </div>
@@ -1872,6 +1867,7 @@ function renderAdminSketch2() {
   `).join('');
 
   container.innerHTML = html;
+  initAdminTouchSortable();
 }
 
 
@@ -3315,4 +3311,100 @@ let isDraggingAdminCard = false;
 window.handleAdminCardClick = function(e, idx) {
   if (isDraggingAdminCard) return;
   selectAdminArt(idx);
+};
+
+
+// سیستم لمسی تاچ و نگه داشتن (Long-Press Touch Drag & Drop) برای گوشی و تبلت
+let touchDragCard = null;
+let touchDragSourceIdx = null;
+let longPressTimer = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let isTouchDragging = false;
+
+window.initAdminTouchSortable = function() {
+  const container = document.getElementById('adminMosaicTilesContainer');
+  if (!container) return;
+
+  container.querySelectorAll('.admin-mosaic-card').forEach((card) => {
+    // ۱. لمس کارت
+    card.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      isTouchDragging = false;
+      const idx = parseInt(card.getAttribute('data-admin-idx'), 10);
+      touchDragSourceIdx = idx;
+
+      clearTimeout(longPressTimer);
+      // نگه‌داشتن با شست یا اشاره به مدت ۲۴۰ میلی‌ثانیه برای بلند کردن کارت
+      longPressTimer = setTimeout(() => {
+        isTouchDragging = true;
+        touchDragCard = card;
+        card.classList.add('touch-drag-active');
+        if (navigator.vibrate) navigator.vibrate(35); // لرزش ملایم گوشی
+      }, 240);
+    }, { passive: true });
+
+    // ۲. حرکت انگشت
+    card.addEventListener('touchmove', (e) => {
+      if (!isTouchDragging) {
+        const touch = e.touches[0];
+        if (Math.abs(touch.clientX - touchStartX) > 10 || Math.abs(touch.clientY - touchStartY) > 10) {
+          clearTimeout(longPressTimer); // اسکرول معمولی است
+        }
+        return;
+      }
+      e.preventDefault(); // ممانعت از اسکرول صفحه در حین درگ
+      const touch = e.touches[0];
+      
+      card.style.visibility = 'hidden';
+      const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      card.style.visibility = 'visible';
+
+      const targetCard = elemBelow ? elemBelow.closest('.admin-mosaic-card') : null;
+      document.querySelectorAll('.admin-mosaic-card').forEach(c => c.classList.remove('drag-over-target'));
+      if (targetCard && targetCard !== card) {
+        targetCard.classList.add('drag-over-target');
+      }
+    }, { passive: false });
+
+    // ۳. برداشتن انگشت (Drop)
+    card.addEventListener('touchend', (e) => {
+      clearTimeout(longPressTimer);
+      if (!isTouchDragging) return;
+
+      isTouchDragging = false;
+      card.classList.remove('touch-drag-active');
+      document.querySelectorAll('.admin-mosaic-card').forEach(c => c.classList.remove('drag-over-target'));
+
+      const changedTouch = e.changedTouches[0];
+      card.style.visibility = 'hidden';
+      const elemBelow = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
+      card.style.visibility = 'visible';
+
+      const targetCard = elemBelow ? elemBelow.closest('.admin-mosaic-card') : null;
+      if (targetCard && targetCard !== card) {
+        const targetIdx = parseInt(targetCard.getAttribute('data-admin-idx'), 10);
+        if (!isNaN(targetIdx) && targetIdx !== touchDragSourceIdx) {
+          const movedItem = showcaseArtworks.splice(touchDragSourceIdx, 1)[0];
+          showcaseArtworks.splice(targetIdx, 0, movedItem);
+          showcaseArtworks.forEach((a, i) => a.orderIndex = i);
+          safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+          renderAdminSketch2();
+          renderShowcaseGrid();
+          showToast(`✓ چیدمان اثر با موفقیت جابجا شد.`, 'success');
+          syncArtworkOrderToSupabase();
+        }
+      }
+    });
+
+    card.addEventListener('touchcancel', () => {
+      clearTimeout(longPressTimer);
+      isTouchDragging = false;
+      card.classList.remove('touch-drag-active');
+      document.querySelectorAll('.admin-mosaic-card').forEach(c => c.classList.remove('drag-over-target'));
+    });
+  });
 };

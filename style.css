@@ -369,79 +369,47 @@
         /* چیدمان گالری صفحه اول با فرمول هوشمند خودکار ابعاد */
     #showcaseGrid {
       column-count: 4;
-      column-gap: 14px;
+      column-gap: 8px;
       width: 100%;
+      max-width: 1440px;
       margin: 0 auto;
+      padding: 0 8px;
     }
-    @media (max-width: 1400px) {
-      #showcaseGrid { column-count: 4; column-gap: 12px; }
+    @media (max-width: 1350px) {
+      #showcaseGrid { column-count: 4; column-gap: 8px; }
     }
-    @media (max-width: 1100px) {
-      #showcaseGrid { column-count: 3; column-gap: 12px; }
+    @media (max-width: 1050px) {
+      #showcaseGrid { column-count: 3; column-gap: 8px; }
     }
     @media (max-width: 768px) {
-      #showcaseGrid { column-count: 2 !important; column-gap: 10px !important; }
+      /* در تمام تبلت‌ها و گوشی‌ها ۲ ستون متقارن با فاصله فشرده ۶ پیکسل */
+      #showcaseGrid { column-count: 2 !important; column-gap: 6px !important; padding: 0 4px !important; }
     }
     @media (max-width: 480px) {
-      #showcaseGrid { column-count: 1 !important; }
+      /* روی کوچک‌ترین گوشی‌ها نیز همچنان ۲ ستون متقارن و هرگز تک‌خطی نمی‌شود */
+      #showcaseGrid { column-count: 2 !important; column-gap: 6px !important; padding: 0 4px !important; }
     }
 
-    /* فرمول اسپَن خودکار بر اساس ابعاد واقعی اثر */
-    .span-col-wide     { grid-column: span 5; } /* افقی عریض / ۱۶:۹ */
-    .span-col-medium   { grid-column: span 4; } /* افقی استاندارد / ۴:۳ */
-    .span-col-square   { grid-column: span 3; } /* مربعی / ۱:۱ */
-    .span-col-portrait { grid-column: span 2; } /* عمودی پرتره و کاراکتر */
-
-    /* سازگاری کامل با کلاس‌های قبلی */
-    .span-pattern-0, .span-pattern-7 { grid-column: span 5; }
-    .span-pattern-1, .span-pattern-3, .span-pattern-4, .span-pattern-5 { grid-column: span 2; }
-    .span-pattern-2, .span-pattern-6 { grid-column: span 3; }
-
-    @media (max-width: 992px) {
-      
-      .span-col-wide, .span-col-medium, .span-pattern-0, .span-pattern-7 { grid-column: span 6; }
-      .span-col-square, .span-col-portrait, .span-pattern-1, .span-pattern-2, .span-pattern-3, .span-pattern-4, .span-pattern-5, .span-pattern-6 { grid-column: span 6; }
-    }
-    @media (max-width: 576px) {
-      
-      .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
-      .span-col-wide, .span-col-medium, .span-col-square, .span-col-portrait,
-  .span-pattern-0, .span-pattern-1, .span-pattern-2, .span-pattern-3,
-      .span-pattern-4, .span-pattern-5, .span-pattern-6, .span-pattern-7 { grid-column: span 12 !important; }
-    }
-
-    /* استایل سینمایی و استودیویی تایل‌ها (الگوبرداری از آتلیه‌های تراز اول هالیوود و امیر زند) */
-    @keyframes skeletonShimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
     .mosaic-tile {
       break-inside: avoid;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(90deg, #06080c 25%, #0f1422 50%, #06080c 75%);
-      background-size: 200% 100%;
-      animation: skeletonShimmer 2.2s infinite ease-in-out;
-      min-height: 180px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
       cursor: pointer;
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
       display: block;
       width: 100%;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    }
-    .mosaic-tile.loaded {
-      animation: none;
-      background: #06080c;
+      background: transparent;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
     }
     @media (max-width: 768px) {
-      .mosaic-tile { margin-bottom: 8px; border-radius: 2px; }
+      .mosaic-tile { margin-bottom: 6px; border-radius: 3px; }
     }
     .mosaic-tile:hover {
-      border-color: rgba(250, 204, 21, 0.5);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 204, 21, 0.12);
+      border-color: rgba(250, 204, 21, 0.7);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 15px rgba(250, 204, 21, 0.15);
       transform: translateY(-2px);
     }
     .mosaic-tile img {
@@ -449,10 +417,9 @@
       height: auto;
       display: block;
       object-fit: cover;
-      border-radius: 2px;
-      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+      border-radius: 3px;
+      transition: transform 0.4s ease, opacity 0.3s ease;
     }
-    /* حالت هاور محبوب و کلاسیک: کم شدن شفافیت تصویر با زوم نرم و افکت سینمایی */
     .mosaic-tile:hover img {
       transform: scale(1.05);
       opacity: 0.28;
@@ -2295,4 +2262,25 @@ textarea:-webkit-autofill {
 }
 @media (max-width: 768px) {
   .artstation-nav-btn { display: none; }
+}
+
+
+/* استایل تاچ و جابجایی کارت‌های ادمین با انگشت شست و اشاره (Long-press Touch Drag) */
+.admin-mosaic-card {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: pan-y;
+}
+.admin-mosaic-card.touch-drag-active {
+  transform: scale(1.08) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 15px 40px rgba(250, 204, 21, 0.6) !important;
+  z-index: 999 !important;
+  opacity: 0.92 !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+.admin-mosaic-card.drag-over-target {
+  border-color: var(--cyan-electric) !important;
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.5) !important;
+  transform: scale(0.96) !important;
 }
