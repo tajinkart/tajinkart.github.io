@@ -2109,3 +2109,46 @@
 .btn-google-auth svg {
   flex-shrink: 0;
 }
+
+
+/* جلوگیری قاطع از سفید شدن پس‌زمینه کادرها توسط Autofill مرورگرهای کروم و ادج */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #06080c inset !important;
+  -webkit-text-fill-color: var(--text-main, #f1f5f9) !important;
+  caret-color: var(--text-main, #f1f5f9) !important;
+  border-color: var(--border-subtle, rgba(255,255,255,0.12)) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* استایل تمیز و هماهنگ برای سلکتور کشورها و شماره تماس */
+.intl-phone-wrapper {
+  display: flex;
+  gap: 8px;
+  direction: ltr !important;
+  align-items: center;
+}
+.intl-phone-wrapper select {
+  width: 145px;
+  min-width: 140px;
+  padding: 11px 8px;
+  font-size: 12px;
+  text-align: left;
+  direction: ltr !important;
+  background: #06080c;
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.intl-phone-wrapper input {
+  flex: 1;
+  text-align: left;
+  direction: ltr !important;
+}

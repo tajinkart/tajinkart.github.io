@@ -610,6 +610,15 @@
                 </div>
               </button>
 
+              <!-- ۷. منشور و قوانین استودیو -->
+              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
+                <span class="admin-nav-icon">⚖️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۷. منشور و قوانین استودیو</span>
+                  <span class="admin-nav-sub">ویرایش زنده ToS، لایسنس و شرایط</span>
+                </div>
+              </button>
+
               <!-- ۶. تنظیمات سراسری و تلگرام -->
               <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
                 <span class="admin-nav-icon">⚙️</span>
@@ -736,7 +745,39 @@
           </div>
         </div>
 
-            <div id="adminTabSettings" class="hidden">
+            <!-- ۷. زبانه مدیریت و ویرایشگر منشور قوانین استودیو (Terms & Legal Editor) -->
+        <div id="adminTabTerms" class="hidden">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div>
+              <h3 style="font-size:17px; font-weight:900; color:var(--gold);">ویرایشگر زنده منشور قوانین، لایسنس و شرایط استودیو</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">متن منشور حقوقی استودیو را مستقیماً ویرایش و منتشر کنید؛ بدون نیاز به دستکاری کدهای سایت.</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" onclick="resetStudioTermsToDefault()" class="btn-outline" style="padding:8px 14px; font-size:12px;">
+                🔄 بازنشانی به متن پیش‌فرض
+              </button>
+              <button type="button" onclick="openTermsModal()" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+                👁️ پیش‌نمایش در سایت
+              </button>
+              <button type="button" onclick="saveStudioTerms()" class="btn-gold" style="padding:8px 18px; font-size:12px;">
+                💾 ذخیره و انتشار آنی قوانین
+              </button>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:18px;">
+            <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:#e2e8f0;">
+              متن کامل منشور و ضوابط حقوقی استودیو (پشتیبانی از قالب‌بندی متنی، سرفصل‌ها و پاراگراف‌ها):
+            </label>
+            <textarea id="adminTermsContentInput" style="width:100%; height:450px; font-size:13px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-muted);">
+              <span>💡 نکات: تغییرات بلافاصله پس از فشردن دکمه «ذخیره و انتشار» در تمامی پنجره‌های قوانین سایت و پورتال ثبت‌نام به‌روزرسانی می‌شوند.</span>
+              <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ با موفقیت ذخیره شد</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminTabSettings" class="hidden">
             <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%;">
               <div style="margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div>
@@ -1073,44 +1114,78 @@
           <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
         </div>
 
-        <form id="memberSignUpForm" style="display:flex; flex-direction:column; gap:12px;">
+        <form id="memberSignUpForm" style="display:flex; flex-direction:column; gap:14px;">
+          <!-- ۱. فیلد نام یا لقب نمایشی -->
           <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="font-size:12px;">نام یا لقب نمایشی شما در استودیو</label>
-              <span id="signupNameLiveNotice" style="font-size:10.5px; display:none;"></span>
-            </div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">نام یا لقب نمایشی شما در استودیو</label>
             <input type="text" id="signupName" required minlength="3" oninput="handleLiveNameCheck(this.value)" placeholder="مثال: آریا تهرانی یا نام مستعار معتبر" />
+            <div id="signupNameLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
           </div>
+
+          <!-- ۲. فیلد ایمیل معتبر با اعتبارسنجی زنده در زیر کادر -->
           <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="font-size:12px;">آدرس ایمیل معتبر (جهت بازیابی رمز و لایسنس)</label>
-              <span id="signupEmailLiveNotice" style="font-size:10.5px; display:none;"></span>
-            </div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">آدرس جیمیل یا ایمیل معتبر (شناسه اصلی حساب و بازیابی)</label>
             <input type="email" id="signupEmail" required oninput="handleLiveEmailCheck(this.value)" class="font-mono" placeholder="username@gmail.com" />
+            <div id="signupEmailLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
           </div>
+
+          <!-- ۳. فیلد شماره همراه اختیاری با لیست کامل پیش‌شماره‌های بین‌المللی -->
           <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="font-size:12px;">شماره تلفن همراه (جهت احراز هویت خریدار در پشتیبانی)</label>
-              <span id="signupPhoneLiveNotice" style="font-size:10.5px; display:none;"></span>
-            </div>
-            <!-- فیلد استاندارد بین‌المللی با کد کشور بدون گزینه‌های نامفهوم -->
-            <div style="display:flex; gap:8px; direction:ltr;">
-              <select id="signupCountryCode" onchange="handleLivePhoneCheck()" style="width:105px; padding:11px 8px; font-size:12px; text-align:left; direction:ltr; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px;">
-                <option value="+98" selected>🇮🇷 +98</option>
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+49">🇩🇪 +49</option>
-                <option value="+971">🇦🇪 +971</option>
-                <option value="+90">🇹🇷 +90</option>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">شماره تلفن همراه <span style="color:var(--text-muted); font-size:11px;">(اختیاری - جهت اطلاع‌رسانی پیامکی و پشتیبانی سریع)</span></label>
+            <div class="intl-phone-wrapper">
+              <select id="signupCountryCode" onchange="handleLivePhoneCheck()">
+                <option value="+98" selected>🇮🇷 Iran (+98)</option>
+                <option value="+971">🇦🇪 UAE (+971)</option>
+                <option value="+90">🇹🇷 Turkey (+90)</option>
+                <option value="+964">🇮🇶 Iraq (+964)</option>
+                <option value="+93">🇦🇫 Afghanistan (+93)</option>
+                <option value="+374">🇦🇲 Armenia (+374)</option>
+                <option value="+994">🇦🇿 Azerbaijan (+994)</option>
+                <option value="+1">🇺🇸 USA / Canada (+1)</option>
+                <option value="+44">🇬🇧 UK (+44)</option>
+                <option value="+49">🇩🇪 Germany (+49)</option>
+                <option value="+33">🇫🇷 France (+33)</option>
+                <option value="+39">🇮🇹 Italy (+39)</option>
+                <option value="+31">🇳🇱 Netherlands (+31)</option>
+                <option value="+46">🇸🇪 Sweden (+46)</option>
+                <option value="+41">🇨🇭 Switzerland (+41)</option>
+                <option value="+61">🇦🇺 Australia (+61)</option>
+                <option value="+81">🇯🇵 Japan (+81)</option>
+                <option value="+82">🇰🇷 South Korea (+82)</option>
+                <option value="+86">🇨🇳 China (+86)</option>
+                <option value="+91">🇮🇳 India (+91)</option>
+                <option value="+7">🇷🇺 Russia (+7)</option>
+                <option value="+966">🇸🇦 Saudi Arabia (+966)</option>
+                <option value="+974">🇶🇦 Qatar (+974)</option>
+                <option value="+965">🇰🇼 Kuwait (+965)</option>
+                <option value="+968">🇴🇲 Oman (+968)</option>
+                <option value="+973">🇧🇭 Bahrain (+973)</option>
+                <option value="+92">🇵🇰 Pakistan (+92)</option>
+                <option value="+992">🇹🇯 Tajikistan (+992)</option>
+                <option value="+993">🇹🇲 Turkmenistan (+993)</option>
+                <option value="+998">🇺🇿 Uzbekistan (+998)</option>
+                <option value="+55">🇧🇷 Brazil (+55)</option>
+                <option value="+60">🇲🇾 Malaysia (+60)</option>
+                <option value="+65">🇸🇬 Singapore (+65)</option>
+                <option value="+64">🇳🇿 New Zealand (+64)</option>
+                <option value="+47">🇳🇴 Norway (+47)</option>
+                <option value="+45">🇩🇰 Denmark (+45)</option>
+                <option value="+358">🇫🇮 Finland (+358)</option>
+                <option value="+43">🇦🇹 Austria (+43)</option>
+                <option value="+32">🇧🇪 Belgium (+32)</option>
+                <option value="+48">🇵🇱 Poland (+48)</option>
+                <option value="+380">🇺🇦 Ukraine (+380)</option>
+                <option value="+995">🇬🇪 Georgia (+995)</option>
+                <option value="other">🌐 Other / سایر</option>
               </select>
-              <input type="tel" id="signupPhone" required inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleLivePhoneCheck();" class="font-mono" placeholder="9123456789" style="flex:1; text-align:left; direction:ltr;" />
+              <input type="tel" id="signupPhone" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleLivePhoneCheck();" class="font-mono" placeholder="9123456789 (اختیاری)" />
             </div>
-            <span style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:3px;">
-              شماره همراه را بدون صفر اول وارد نمایید (مثال برای ایران: 9123456789)
-            </span>
+            <div id="signupPhoneLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
           </div>
+
+          <!-- ۴. رمز عبور و تکرار -->
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور حساب</label>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">رمز عبور حساب</label>
             <div style="position:relative; display:flex; align-items:center;">
               <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="حداقل ۶ کاراکتر ترکیبی" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
@@ -1126,15 +1201,16 @@
               </div>
             </div>
           </div>
+
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">تکرار رمز عبور</label>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">تکرار رمز عبور</label>
             <div style="position:relative; display:flex; align-items:center;">
               <input type="password" id="signupPassConfirm" required minlength="6" class="font-mono" placeholder="تکرار دقیق رمز عبور" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('signupPassConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
             </div>
           </div>
 
-          <!-- چک‌باکس واحد قوانین و شرایط خدمات استودیو -->
+          <!-- ۵. چک‌باکس واحد قوانین و شرایط خدمات استودیو -->
           <div style="margin:4px 0 6px; padding:11px 12px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
             <label style="display:flex; align-items:flex-start; gap:9px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.65;">
               <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:3px; accent-color:var(--gold); flex-shrink:0;" />
@@ -1222,35 +1298,22 @@
   
   <!-- پنجره اختصاصی قوانین و شرایط خدمات استودیو (Terms & Legal Modal) -->
   <div id="termsModal" style="position:fixed; inset:0; z-index:2200; background:rgba(3,4,7,0.94); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:18px;">
-    <div style="max-width:620px; width:100%; max-height:85vh; background:var(--bg-panel); border:1px solid var(--gold); border-radius:20px; padding:26px; overflow-y:auto; box-shadow:0 25px 70px rgba(0,0,0,0.95); position:relative;">
+    <div style="max-width:680px; width:100%; max-height:85vh; background:var(--bg-panel); border:1px solid var(--gold); border-radius:20px; padding:28px 24px 22px; overflow-y:auto; box-shadow:0 25px 70px rgba(0,0,0,0.95); position:relative;">
       <button type="button" onclick="closeTermsModal()" class="modal-corner-close-btn" title="بستن">✕</button>
-      <h3 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:6px;">منشور حقوقی و شرایط خدمات TAJINKART</h3>
-      <span class="font-mono" style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:16px;">TERMS OF SERVICE & COMMERCIAL LICENSING</span>
+      <div style="border-bottom:1px solid var(--border-subtle); padding-bottom:12px; margin-bottom:16px;">
+        <h3 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:4px;">منشور حقوقی و شرایط خدمات TAJINKART</h3>
+        <span class="font-mono" style="font-size:11px; color:var(--text-muted); display:block;">MASTER TERMS OF SERVICE & STUDIO POLICIES</span>
+      </div>
       
-      <div style="font-size:12.5px; color:#cbd5e1; line-height:1.85; display:flex; flex-direction:column; gap:14px; text-align:justify;">
-        <div>
-          <strong style="color:#fff;">۱. مالکیت فکری و لایسنس دارایی‌ها:</strong>
-          کلیه آثار، سورس‌فایل‌ها و کانسپت‌ها متعلق به سید سروش تاج و استودیو تاج‌اینک‌آرت است. خرید هر محصول به منزله اعطای لایسنس استفاده تجاری غیرانحصاری در بازی یا اثر نهایی خریدار است و بازفروش یا بازنشر فایل خام سورس اکیداً ممنوع می‌باشد.
-        </div>
-        <div>
-          <strong style="color:#fff;">۲. ودیعه ۵۰٪ سفارش‌های آتلیه:</strong>
-          پیش‌پرداخت ۵۰٪ جهت رزرو ظرفیت آتلیه و آغاز اتودهای اولیه دریافت می‌گردد و به دلیل تخصیص زمان طراح، غیرقابل‌استرداد است.
-        </div>
-        <div>
-          <strong style="color:#fff;">۳. منع صریح آموزش هوش مصنوعی (Anti-AI):</strong>
-          استفاده از تصاویر، کانسپت‌ها و متون لور این استودیو جهت آموزش مدل‌های هوش مصنوعی مولد اکیداً ممنوع و دارای پیگرد حقوقی است.
-        </div>
-        <div>
-          <strong style="color:#fff;">۴. رده‌بندی سنی محتوا (16+):</strong>
-          تمامی کاربران با ثبت‌نام تایید می‌نمایند دارای حداقل ۱۶ سال سن بوده و با تم‌های دارک‌فانتزی استودیو آشنایی کامل دارند.
-        </div>
+      <!-- محتوای داینامیک و قابل ویرایش از پنل ادمین -->
+      <div id="termsModalDynamicContent" style="font-size:12.5px; color:#cbd5e1; line-height:1.9; display:flex; flex-direction:column; gap:16px; text-align:justify;">
       </div>
 
-      <div style="margin-top:22px; text-align:center;">
-        <button type="button" onclick="closeTermsModal()" class="btn-gold" style="width:100%; padding:11px;">متوجه شدم و می‌پذیرم</button>
+      <div style="margin-top:24px; text-align:center; border-top:1px solid var(--border-subtle); padding-top:16px;">
+        <button type="button" onclick="closeTermsModal()" class="btn-gold" style="width:100%; padding:12px;">متوجه شدم و می‌پذیرم</button>
       </div>
     </div>
-  </div>
+  </div>v>
 
   <div id="toastContainer"></div>
 

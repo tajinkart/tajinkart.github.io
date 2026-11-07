@@ -1544,7 +1544,7 @@ window.logoutAdmin = function() {
 
 // مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
 window.switchAdminTab = function(tabKey, btn) {
-  const tabs = ['artworks', 'pipelines', 'products', 'members', 'orders', 'settings'];
+  const tabs = ['artworks', 'pipelines', 'products', 'members', 'orders', 'settings', 'terms'];
   tabs.forEach(t => {
     const el = document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
     if (el) el.classList.toggle('hidden', t !== tabKey);
@@ -1560,6 +1560,7 @@ window.switchAdminTab = function(tabKey, btn) {
   if (tabKey === 'members') renderAdminSketch3();
   if (tabKey === 'orders') renderAdminLists();
   if (tabKey === 'settings') renderAdminSettingsTab();
+  if (tabKey === 'terms') renderAdminTerms();
 };
 
 function renderAdminSketch1() {
@@ -2287,21 +2288,24 @@ document.addEventListener('DOMContentLoaded', () => {
         cleanDigits = cleanDigits.substring(1);
       }
 
-      // ۱. اعتبارسنجی بین‌المللی شماره تلفن همراه
-      if (countryCode === '+98') {
-        if (cleanDigits.length !== 10 || !cleanDigits.startsWith('9')) {
-          showToast('شماره همراه نامعتبر است! شماره موبایل ایران باید ۱۰ رقم (بدون صفر اول مانند 9207702950) باشد.', 'error');
-          document.getElementById('signupPhone')?.focus();
-          return;
+      // شماره تلفن کاملاً اختیاری است: فقط در صورتی که کاربر شماره وارد کند بررسی می‌شود
+      let fullContactNumber = '';
+      if (cleanDigits.length > 0) {
+        if (countryCode === '+98') {
+          if (cleanDigits.length !== 10 || !cleanDigits.startsWith('9')) {
+            showToast('شماره همراه نامعتبر است! شماره موبایل ایران باید ۱۰ رقم (بدون صفر اول مانند 9207702950) باشد.', 'error');
+            document.getElementById('signupPhone')?.focus();
+            return;
+          }
+        } else if (countryCode !== 'other') {
+          if (cleanDigits.length < 6 || cleanDigits.length > 14) {
+            showToast('طول شماره تلفن بین‌المللی نامعتبر است.', 'error');
+            document.getElementById('signupPhone')?.focus();
+            return;
+          }
         }
-      } else {
-        if (cleanDigits.length < 6 || cleanDigits.length > 14) {
-          showToast('طول شماره تلفن بین‌المللی نامعتبر است.', 'error');
-          document.getElementById('signupPhone')?.focus();
-          return;
-        }
+        fullContactNumber = (countryCode === 'other' ? '' : countryCode + ' ') + cleanDigits;
       }
-      const fullContactNumber = (countryCode === 'other' ? '' : countryCode + ' ') + cleanDigits;
 
       // ۲. اعتبارسنجی قدرت رمز
       if (password.length < 6 || /^(123456|12345678|111111|000000)$/.test(password) || /^[0-9]+$/.test(password)) {
@@ -2392,7 +2396,12 @@ document.addEventListener('DOMContentLoaded', () => {
             closeMemberModal();
             renderMemberDashboard();
             switchView('member-dashboard');
-            showToast('حساب کاربری شما با موفقیت ایجاد شد! خوش آمدید.', 'success');
+            const isConfirmed = !!(data.user.email_confirmed_at || data.user.confirmed_at || data.session);
+            if (!isConfirmed) {
+              showToast('حساب ایجاد شد! جهت تایید هویت و صدور لایسنس، لطفاً لینک ارسالی به ایمیل خود را تایید نمایید.', 'warning', 8000);
+            } else {
+              showToast('حساب کاربری شما با موفقیت ایجاد شد! خوش آمدید.', 'success');
+            }
             return;
           }
         } catch (authErr) {
@@ -2725,8 +2734,89 @@ window.togglePasswordVisibility = function(inputId, btnEl) {
   }
 };
 
+
+// =========================================================
+// سامانه مدیریت پویا و زنده منشور قوانین، لایسنس و شرایط استودیو
+// =========================================================
+
+const DEFAULT_STUDIO_TERMS = `### ۱. اصل صحت اطلاعات و سلب مسئولیت اشتباهات کاربر (Accuracy of Information)
+کاربر با ثبت‌نام در وب‌سایت یا ثبت هرگونه سفارش صراحتاً اقرار و ضمانت می‌نماید که کلیه مشخصات هویتی و ارتباطی ارائه‌شده (شامل نام، لقب، آدرس ایمیل و شماره تماس) واقعی، دقیق و متعلق به خود اوست. استودیو تاج‌اینک‌آرت هیچ‌گونه مسئولیتی در قبال تایپ اشتباه آدرس جیمیل، عدم دریافت ایمیل‌های فعال‌سازی، فراموشی رمز عبور، یا از دست رفتن دسترسی به فایل‌ها ناشی از خطای کاربر ندارد و بار حقوقی هرگونه خسارت انحصاراً بر عهده خود کاربر است.
+
+### ۲. تفکیک قوانین عمومی ورود از قرارداد خرید (ToS vs Commission SLA)
+تایید قوانین در مرحله ثبت‌نام صرفاً به منزله پذیرش مقررات عمومی پلتفرم، سن مجاز (۱۶+ سال) و حفاظت از کلیت مالکیت فکری استودیو است. شروط مالی سنگین نظیر ودیعه ۵۰٪ غیرقابل‌استرداد، ددلاین‌ها، سقف ادیت‌ها و توافقات محرمانگی، منحصراً در لحظه ثبت قطعی فرم سفارش و پیش از پرداخت فعال شده و به امضای طرفین می‌رسد.
+
+### ۳. شفافیت جغرافیایی، منطقه زمانی و کانال‌های ارتباطی (Regional & Communication Transparency)
+استودیو تاج‌اینک‌آرت با مدیریت سید سروش تاج به‌صورت مستقل در ایران مستقر بوده و به شکل فریلنس و بین‌المللی با کارفرمایان سراسر جهان همکاری می‌نماید. ساعات کاری رسمی استودیو بر پایه منطقه زمانی ایران (UTC+3:30) تنظیم شده است. در صورت وقوع هرگونه اختلال یا کندی موقت در شبکه زیرساخت اینترنت منطقه‌ای، استودیو از کانال‌های امن و پایدار پشتیبان (شامل تلگرام و ایمیل‌های رمزنگاری‌شده) جهت حفظ پیوستگی ارتباطات استفاده می‌نماید.
+
+### ۴. روش‌های پرداخت بین‌المللی و تسویه ارزی (Global Payments & Cryptocurrency)
+سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل تومانی نرخ روز صورت می‌پذیرد.
+
+### ۵. تضمین اصالت رفرنس‌های ارسالی مشتری (Client Materials Indemnity)
+مشتری متعهد و ضامن است که تمامی تصاویر، کانسپت‌ها، لوگوها و فایل‌های متنی که به عنوان بریف یا رفرنس به استودیو ارسال می‌کند، یا در مالکیت قانونی اوست یا حق بهره‌برداری از آن‌ها را دارد. در صورت بروز هرگونه ادعای نقض کپی‌رایت توسط اشخاص ثالث علیه استودیو ناشی از مواد ارائه‌شده توسط مشتری، مسئولیت حقوقی و جبران کامل خسارت منحصراً متوجه مشتری خواهد بود.
+
+### ۶. بند بلاتکلیفی و رهاسازی سفارش (Inactivity & Abandonment Clause)
+پس از ارسال اتودها یا فازهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.
+
+### ۷. سیاست مدرن هوش مصنوعی و هدایت هنری (Modern AI Transparency)
+استودیو تاج‌اینک‌آرت استفاده از فناوری‌های نوین و مدل‌های هوش مصنوعی را به عنوان کپیلوت (دستیار فنی، کدنویسی و تسریع پایپلاین) به کار می‌بندد؛ با این وجود، جهان‌سازی جنسیس، داستان‌ها، نژادها، کاراکترهای اورجینال و هدایت بصری، دستاورد فکری سید سروش تاج است. هرگونه کپی‌برداری تجاری، آموزش مدل‌های اختصاصی (مانند LoRA) جهت بازتولید عامدانه کاراکترهای استودیو، یا جعل هویت تجاری تاج‌اینک‌آرت ممنوع و دارای پیگرد است.
+
+### ۸. لایسنس دارایی‌های دانلودی و ممنوعیت افشا (EULA & Anti-Leak)
+خرید هرگونه دارایی دیجیتال (آرت‌بوک، براش، مدل سه‌بعدی و تکسچر) دسترسی مادام‌العمر شخصی به فایل‌ها و به‌روزرسانی‌های آینده را به خریدار اعطا می‌کند. هرگونه فروش مجدد، اشتراک‌گذاری در کانال‌های عمومی، وب‌سایت‌های تورنت و دانلود غیرمجاز تخلف قطعی بوده و منجر به مسدودسازی دائمی حساب و پیگرد قانونی خواهد شد.
+
+### ۹. سلب مسئولیت حوادث قهریه و زیرساخت ابری (Force Majeure)
+سایت بر پایه زیرساخت‌های بین‌المللی GitHub Pages، Supabase و Cloudinary اداره می‌شود. استودیو در قبال اختلالات موقت ناشی از تحریم‌ها، فیلترینگ، قطعی سرورهای بالادستی یا حوادث خارج از کنترل انسانی (فورس ماژور) ضامن خسارت مالی نخواهد بود، هرچند حداکثر تمهیدات جهت حفظ سلامت و بک‌آپ دیتای کاربران اتخاذ شده است.
+
+### ۱۰. سقف مسئولیت مالی و عدم استرداد (Limitation of Liability & No Refund)
+کالاهای دانلودی دیجیتال به دلیل ماهیت دسترسی فوری، پس از خرید غیرقابل‌استرداد هستند. در کلیه دعاوی حقوقی، حداکثر سقف مسئولیت مالی استودیو محدود به همان مبلغ دریافتی از مشتری برای همان سفارش مشخص خواهد بود.
+
+### ۱۱. حق امضا و نمایش در پورتفولیو (Moral Rights & Credit)
+استودیو تاج‌اینک‌آرت حق نمایش آثار نهایی را در وب‌سایت، شبکه‌های اجتماعی و پورتفولیوی رسمی خود (با ذکر مالکیت تجاری کارفرما) جهت ارتقای برند برای خود محفوظ می‌دارد، مگر آنکه کارفرما پیش از شروع پروژه قرارداد محرمانگی انحصاری (NDA) با هزینه مشخص منعقد کرده باشد.
+
+### ۱۲. حل و فصل اختلافات و داوری (Dispute Resolution)
+طرفین متعهد می‌شوند پیش از هرگونه اقدام حقوقی، ظرف مدت ۳۰ روز از طریق مکاتبه رسمی با پشتیبانی استودیو و مذاکره دوستانه نسبت به حل اختلاف اقدام نمایند.`;
+
+// واکشی متن ذخیره‌شده یا پیش‌فرض
+window.getStudioTermsContent = function() {
+  const saved = localStorage.getItem('tajinkart_studio_terms');
+  return saved && saved.trim().length > 30 ? saved : DEFAULT_STUDIO_TERMS;
+};
+
+// رندرینگ محتوای قوانین در مودال به صورت بلاک‌های شیک و خوانا
+window.renderTermsModal = function() {
+  const container = document.getElementById('termsModalDynamicContent');
+  if (!container) return;
+
+  const rawText = getStudioTermsContent();
+  const sections = rawText.split(/(?=###\s+)/g);
+
+  let html = '';
+  sections.forEach(sec => {
+    const trimmed = sec.trim();
+    if (!trimmed) return;
+
+    if (trimmed.startsWith('###')) {
+      const firstLineEnd = trimmed.indexOf('\n');
+      const title = firstLineEnd !== -1 ? trimmed.substring(3, firstLineEnd).trim() : trimmed.substring(3).trim();
+      const body = firstLineEnd !== -1 ? trimmed.substring(firstLineEnd).trim() : '';
+
+      html += `
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">${title}</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">${body.replace(/\n/g, '<br>')}</p>
+        </div>
+      `;
+    } else {
+      html += `<p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">${trimmed.replace(/\n/g, '<br>')}</p>`;
+    }
+  });
+
+  container.innerHTML = html;
+};
+
+// باز کردن مودال قوانین همراه با رندر خودکار آخرین نسخه
 window.openTermsModal = function(e) {
   if (e && e.preventDefault) e.preventDefault();
+  renderTermsModal();
   const modal = document.getElementById('termsModal');
   if (modal) modal.style.display = 'flex';
 };
@@ -2735,6 +2825,63 @@ window.closeTermsModal = function() {
   const modal = document.getElementById('termsModal');
   if (modal) modal.style.display = 'none';
 };
+
+// رندرینگ بخش ویرایشگر قوانین در پنل ادمین
+window.renderAdminTerms = function() {
+  const textarea = document.getElementById('adminTermsContentInput');
+  if (textarea) {
+    textarea.value = getStudioTermsContent();
+  }
+};
+
+// ذخیره تغییرات قوانین توسط ادمین در حافظه محلی و دیتابیس ابری
+window.saveStudioTerms = async function() {
+  const textarea = document.getElementById('adminTermsContentInput');
+  if (!textarea) return;
+
+  const newContent = textarea.value.trim();
+  if (newContent.length < 20) {
+    showToast('متن قوانین نمی‌تواند خالی یا کمتر از ۲۰ کاراکتر باشد.', 'error');
+    return;
+  }
+
+  localStorage.setItem('tajinkart_studio_terms', newContent);
+
+  // تلاش برای ذخیره ابری در سوپابیس در صورت وجود
+  if (window.supabaseClient) {
+    try {
+      await window.supabaseClient.from('studio_settings').upsert([{
+        key: 'studio_terms',
+        value: newContent,
+        updated_at: new Date().toISOString()
+      }], { onConflict: 'key' });
+    } catch(e) {
+      console.warn('[Supabase Terms Save]', e);
+    }
+  }
+
+  const notice = document.getElementById('termsSaveNotice');
+  if (notice) {
+    notice.style.display = 'inline';
+    setTimeout(() => { notice.style.display = 'none'; }, 3000);
+  }
+
+  renderTermsModal();
+  showToast('منشور قوانین و لایسنس استودیو با موفقیت ذخیره و در سایت منتشر شد!', 'success');
+};
+
+// بازنشانی متن به استاندارد رسمی
+window.resetStudioTermsToDefault = function() {
+  if (!confirm('آیا از بازنشانی متن منشور قوانین به نسخه رسمی استاندارد (Master Spec) اطمینان دارید؟')) return;
+  const textarea = document.getElementById('adminTermsContentInput');
+  if (textarea) {
+    textarea.value = DEFAULT_STUDIO_TERMS;
+  }
+  localStorage.removeItem('tajinkart_studio_terms');
+  renderTermsModal();
+  showToast('متن قوانین به نسخه پیش‌فرض بازگردانی شد. جهت اعمال دکمه ذخیره را بزنید.', 'info');
+};
+
 
 
 // =========================================================
@@ -2825,6 +2972,7 @@ window.openChangePasswordModal = function() {
 
 
 // بررسی زنده ساختار رسمی ایمیل و ممانعت از دامنه‌های ناقص (مانند gmail بدون .com)
+// بررسی زنده ساختار رسمی ایمیل و ممانعت از دامنه‌های ناقص (از ابتدا قرمز تا رسیدن به ساختار کامل)
 let emailCheckTimeout = null;
 window.handleLiveEmailCheck = function(emailVal) {
   const notice = document.getElementById('signupEmailLiveNotice');
@@ -2839,28 +2987,40 @@ window.handleLiveEmailCheck = function(emailVal) {
     return;
   }
 
-  notice.style.display = 'inline-block';
+  notice.style.display = 'block';
 
   // اعتبارسنجی سینتکس کامل ایمیل با پسوند دامنه رسمی حداقل ۲ حرفی (.com, .ir, .net, ...)
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(cleanEmail)) {
     notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ فرمت ایمیل ناقص است (مثال: user@gmail.com)';
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> فرمت ایمیل هنوز ناقص است (مثال: user@gmail.com)';
     emailInput.style.borderColor = 'var(--crimson)';
     return;
+  }
+
+  // تشخیص هوشمند جا افتادن حرف آخر در دامنه‌های معروف (مانند gmail.co یا yahoo.co)
+  const commonTypos = ['@gmail.co', '@yahoo.co', '@hotmail.co', '@outlook.co'];
+  for (const typo of commonTypos) {
+    if (cleanEmail.endsWith(typo)) {
+      notice.style.color = 'var(--crimson)';
+      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> پسوند دامنه ناقص به نظر می‌رسد! آیا منظورتان ' + typo + 'm بود؟';
+      emailInput.style.borderColor = 'var(--crimson)';
+      return;
+    }
   }
 
   // بررسی عدم تکراری بودن در حافظه کلاینت
   const localExists = siteMembersData.some(m => m.email && m.email.toLowerCase() === cleanEmail);
   if (localExists) {
     notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ این ایمیل قبلاً در استودیو ثبت شده است';
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> این ایمیل قبلاً در استودیو ثبت شده است';
     emailInput.style.borderColor = 'var(--crimson)';
     return;
   }
 
   notice.style.color = 'var(--gold)';
-  notice.textContent = '⏳ در حال بررسی در سرور ابری...';
+  notice.innerHTML = '⏳ در حال استعلام عدم تکراری بودن در سرور استودیو...';
+  emailInput.style.borderColor = 'var(--gold)';
 
   // بررسی آنلاین در جدول اعضای سوپابیس
   emailCheckTimeout = setTimeout(async () => {
@@ -2874,16 +3034,17 @@ window.handleLiveEmailCheck = function(emailVal) {
 
         if (data && data.email) {
           notice.style.color = 'var(--crimson)';
-          notice.textContent = '✕ این ایمیل قبلاً در سیستم ثبت‌نام شده است';
+          notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> این ایمیل قبلاً در سیستم ثبت‌نام شده است';
           emailInput.style.borderColor = 'var(--crimson)';
         } else {
           notice.style.color = 'var(--emerald)';
-          notice.textContent = '✓ ایمیل معتبر و آزاد است';
+          notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> ساختار ایمیل صحیح و آزاد است';
           emailInput.style.borderColor = 'var(--emerald)';
         }
       } catch(e) {
         notice.style.color = 'var(--emerald)';
-        notice.textContent = '✓ فرمت ایمیل معتبر است';
+        notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> ساختار ایمیل معتبر است';
+        emailInput.style.borderColor = 'var(--emerald)';
       }
     }
   }, 400);
@@ -2891,6 +3052,7 @@ window.handleLiveEmailCheck = function(emailVal) {
 
 
 // بررسی زنده و آنی شماره تلفن همراه
+// بررسی زنده و کاملاً اختیاری شماره تلفن همراه
 window.handleLivePhoneCheck = function() {
   const notice = document.getElementById('signupPhoneLiveNotice');
   const phoneInput = document.getElementById('signupPhone');
@@ -2898,46 +3060,54 @@ window.handleLivePhoneCheck = function() {
   if (!notice || !phoneInput) return;
 
   let val = (phoneInput.value || '').trim();
-  // اگر کاربر با صفر اول وارد کرد، خودکار صفر را بردار
-  if (countryCode === '+98' && val.startsWith('0')) {
-    val = val.substring(1);
-    phoneInput.value = val;
-  }
-
+  // شماره تلفن کاملاً اختیاری است: اگر خالی بود هیچ اروری نده
   if (val.length === 0) {
     notice.style.display = 'none';
     phoneInput.style.borderColor = 'var(--border-subtle)';
     return;
   }
 
-  notice.style.display = 'inline-block';
+  // اگر کاربر برای ایران با صفر اول وارد کرد، خودکار صفر را بردار
+  if (countryCode === '+98' && val.startsWith('0')) {
+    val = val.substring(1);
+    phoneInput.value = val;
+  }
 
-  // بررسی دقیق شماره تلفن همراه ایران (+98)
+  notice.style.display = 'block';
+
+  // بررسی شماره تلفن همراه ایران (+98)
   if (countryCode === '+98') {
     if (!val.startsWith('9')) {
       notice.style.color = 'var(--crimson)';
-      notice.textContent = '✕ شماره باید با ۹ آغاز گردد (بدون صفر)';
+      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> شماره همراه ایران باید با ۹ آغاز گردد (بدون صفر)';
       phoneInput.style.borderColor = 'var(--crimson)';
     } else if (val.length === 10) {
       notice.style.color = 'var(--emerald)';
-      notice.textContent = '✓ شماره موبایل ۱۰ رقمی صحیح است';
+      notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> شماره موبایل ۱۰ رقمی صحیح است';
       phoneInput.style.borderColor = 'var(--emerald)';
     } else {
       notice.style.color = 'var(--crimson)';
-      notice.textContent = `✕ شماره باید ۱۰ رقم باشد (${val.length}/10)`;
+      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> شماره همراه ایران باید ۱۰ رقم باشد (' + val.length + '/10)';
       phoneInput.style.borderColor = 'var(--crimson)';
     }
     return;
   }
 
-  // بررسی شماره‌های بین‌المللی استاندارد E.164 (بین ۷ تا ۱۲ رقم متناسب با کشور)
-  if (val.length >= 7 && val.length <= 12) {
+  // بررسی گزینه سایر کشورها
+  if (countryCode === 'other') {
+    notice.style.display = 'none';
+    phoneInput.style.borderColor = 'var(--border-subtle)';
+    return;
+  }
+
+  // بررسی شماره‌های بین‌المللی استاندارد E.164 (بین ۷ تا ۱۴ رقم متناسب با کشور)
+  if (val.length >= 7 && val.length <= 14) {
     notice.style.color = 'var(--emerald)';
-    notice.textContent = '✓ شماره معتبر است';
+    notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> شماره بین‌المللی معتبر است';
     phoneInput.style.borderColor = 'var(--emerald)';
   } else {
     notice.style.color = 'var(--crimson)';
-    notice.textContent = `✕ طول شماره نامعتبر است (${val.length} رقم)`;
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> طول شماره نامعتبر است (' + val.length + ' رقم - استاندارد: ۷ الی ۱۴ رقم)';
     phoneInput.style.borderColor = 'var(--crimson)';
   }
 };
@@ -2978,5 +3148,32 @@ window.handleLiveNameCheck = function(nameVal) {
     notice.style.color = 'var(--emerald)';
     notice.textContent = '✓ نام معتبر است';
     nameInput.style.borderColor = 'var(--emerald)';
+  }
+};
+
+
+// تابع ارسال مجدد لینک تایید ایمیل به کاربر در صورت عدم تایید اولیه
+window.resendConfirmationEmail = async function(emailAddress) {
+  if (!window.supabaseClient) {
+    showToast('سامانه ابری سوپابیس در دسترس نیست.', 'error');
+    return;
+  }
+  const email = emailAddress || (window.currentUser && window.currentUser.email);
+  if (!email) {
+    showToast('آدرس ایمیلی جهت ارسال مجدد یافت نشد.', 'error');
+    return;
+  }
+  try {
+    const { error } = await window.supabaseClient.auth.resend({
+      type: 'signup',
+      email: email
+    });
+    if (error) {
+      showToast('خطا در ارسال مجدد ایمیل: ' + error.message, 'error');
+    } else {
+      showToast('لینک تایید جدید با موفقیت به ' + email + ' ارسال گردید.', 'success', 5000);
+    }
+  } catch(e) {
+    showToast('خطای شبکه در ارسال ایمیل تایید.', 'error');
   }
 };
