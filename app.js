@@ -226,19 +226,7 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
 // =========================================================
 window.isDirectorEmail = function(email) {
   if (!email || typeof email !== 'string') return false;
-  return email.toLowerCase().trim() === 'tajimcard@gmail.com';
-};
-
-// تابع تشخیص زنده جیمیل در فرم فراموشی رمز عبور
-window.checkForgotEmailProvider = function(val) {
-  const box = document.getElementById('forgotGmailQuickBox');
-  if (!box) return;
-  const v = (val || '').toLowerCase().trim();
-  if (v.endsWith('@gmail.com') || v.endsWith('@googlemail.com')) {
-    box.classList.remove('hidden');
-  } else {
-    box.classList.add('hidden');
-  }
+  return email.toLowerCase().trim() === 'tajinkart@gmail.com';
 };
 
 function applyLoggedInMember(user, isExplicitLogin = false) {
@@ -248,7 +236,7 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
   const name = meta.full_name || meta.name || user.email.split('@')[0];
   const phone = meta.phone || '';
 
-  // تشخیص دقیق و ۱۰۰٪ انحصاری مدیر ارشد استودیو (تنها و منحصراً tajimcard@gmail.com)
+  // تشخیص دقیق و ۱۰۰٪ انحصاری مدیر ارشد استودیو (تنها و منحصراً tajinkart@gmail.com)
   const isDirectorAdmin = window.isDirectorEmail(emailLower);
 
   const isGoogleUser = !!(user.app_metadata && user.app_metadata.provider === 'google') || 
