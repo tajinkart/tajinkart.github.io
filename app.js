@@ -1171,12 +1171,12 @@ function renderShowcaseGrid() {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
     const imgSrc = art.image || art.img || '';
-    const slug = art.shortSlug || art.title;
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
-        <div class="tile-bottom-bar">
-          <span class="tile-bottom-slug">/ ${slug} /</span>
-          <span class="tile-bottom-title">${art.title}</span>
+        <div class="tile-center-title">
+          <span class="tile-slug">/ ${art.shortSlug || art.title} /</span>
+          <span class="tile-divider"></span>
+          <span class="tile-sub">${art.title}</span>
         </div>
         <img src="${imgSrc}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
@@ -1701,7 +1701,9 @@ window.switchView = function(vKey) {
     dock.classList.remove('dock-open');
   }
 
+  const catMenu = document.getElementById('floatingGalleryCategoryMenu');
   if (vKey === 'showcase') {
+    if (catMenu) catMenu.style.display = 'block';
     renderShowcaseGrid();
     if (homeBtn) homeBtn.classList.add('hidden');
     if (window.scrollY <= 140) {
@@ -1711,6 +1713,8 @@ window.switchView = function(vKey) {
       if (topBar) topBar.classList.add('visible');
     }
   } else {
+    const catMenu = document.getElementById('floatingGalleryCategoryMenu');
+    if (catMenu) catMenu.style.display = 'none';
     if (homeBtn) homeBtn.classList.remove('hidden');
     if (topBar) topBar.classList.add('visible');
   }

@@ -2496,3 +2496,148 @@ textarea:-webkit-autofill {
   color: #fff;
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
 }
+
+
+/* ==============================================================================
+   بازگردانی دقیق هاور کلاسیک آثار و جلوه هایلایت نوری بر اساس تم هر بخش
+   ============================================================================== */
+
+/* بازگردانی دقیق تایل‌های گالری با اوپاسیتی 0.28 و نمایش عنوان در وسط روی هاور */
+.mosaic-tile {
+  break-inside: avoid;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  background: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s !important;
+}
+@media (max-width: 768px) {
+  .mosaic-tile { margin-bottom: 6px; border-radius: 3px; }
+}
+.mosaic-tile:hover {
+  border-color: rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 15px rgba(250, 204, 21, 0.15) !important;
+  transform: translateY(-2px);
+}
+.mosaic-tile img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: 3px;
+  transition: transform 0.4s ease, opacity 0.3s ease !important;
+}
+.mosaic-tile:hover img {
+  transform: scale(1.04) !important;
+  opacity: 0.28 !important;
+  filter: contrast(1.06) brightness(0.85) !important;
+}
+
+.tile-center-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: rgba(2, 4, 8, 0.75);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: 5;
+}
+.mosaic-tile:hover .tile-center-title {
+  opacity: 1;
+}
+.tile-slug {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 6px;
+  direction: ltr;
+}
+.tile-divider {
+  width: 24px;
+  height: 1.5px;
+  background: rgba(250, 204, 21, 0.5);
+  margin-bottom: 6px;
+}
+.tile-sub {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.4;
+}
+
+/* اصلاح نشان «همه آثار»: عدم وجود کادر زرد دائمی و روشن شدن هایلایت نوری در هاور */
+.top-center-pill {
+  width: 138px !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.25s ease !important;
+}
+.top-center-pill:hover {
+  border-color: var(--gold) !important;
+  box-shadow: 0 6px 22px rgba(250, 204, 21, 0.45) !important;
+  transform: translateY(-1px) !important;
+}
+
+.floating-cat-pill {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 138px !important;
+  box-sizing: border-box !important;
+  background: rgba(10, 14, 22, 0.94) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 999px !important;
+  padding: 5px 12px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+.floating-cat-pill:hover {
+  border-color: var(--gold) !important;
+  box-shadow: 0 6px 22px rgba(250, 204, 21, 0.45) !important;
+  background: rgba(15, 20, 32, 0.98) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* هایلایت نوری زیر دکمه‌های داک بر اساس رنگ اختصاصی هر تم در هاور */
+.right-exp-btn.gold-theme:hover {
+  box-shadow: 0 6px 20px rgba(250, 204, 21, 0.45) !important;
+  border-color: var(--gold) !important;
+}
+.right-exp-btn.cyan-theme:hover {
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.45) !important;
+  border-color: var(--cyan-electric) !important;
+}
+.right-exp-btn.crimson-theme:hover {
+  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.45) !important;
+  border-color: var(--crimson) !important;
+}
+.right-exp-btn.purple-theme:hover {
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45) !important;
+  border-color: var(--violet) !important;
+}
+.right-exp-btn.emerald-theme:hover {
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45) !important;
+  border-color: var(--emerald) !important;
+}
