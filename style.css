@@ -2750,18 +2750,135 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   pointer-events: auto;
 }
 
-/* ==============================================================================
-   اصلاح ساختار بالا-چپ و داک بازشونده موبایل با جزئیات کامل
-   ============================================================================== */
 
-/* قرارگیری کاملاً هماهنگ پیل دسته‌بندی در زیر نشان برند در بالا-چپ */
-.floating-cat-menu-wrapper {
-  position: relative !important;
-  margin-top: 6px !important;
-  display: block !important;
+/* ==============================================================================
+   موقعیت نهایی پیل دسته‌بندی آثار: سمت چپ پایین (Bottom-Left Floating Pill)
+   ============================================================================== */
+#floatingGalleryCategoryMenu {
+  position: fixed !important;
+  bottom: 24px !important;
+  top: auto !important;
+  left: 20px !important;
+  right: auto !important;
+  z-index: 100 !important;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: opacity 0.22s ease-out, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
 }
 
-/* مخفی‌سازی کامل پیل دسته‌بندی در خارج از صفحه اول */
+@media (max-width: 768px) {
+  #floatingGalleryCategoryMenu {
+    bottom: 20px !important;
+    top: auto !important;
+    left: 14px !important;
+    right: auto !important;
+  }
+}
+
+#floatingGalleryCategoryMenu.visible {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* باز شدن منوی کشویی به سمت بالا (Upward Dropdown) */
+.floating-cat-dropdown {
+  position: absolute !important;
+  bottom: calc(100% + 8px) !important;
+  top: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  min-width: 170px !important;
+  background: #090c14 !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  padding: 6px !important;
+  box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.9) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  z-index: 110 !important;
+}
+
+.floating-cat-dropdown.hidden {
+  display: none !important;
+}
+
+
+/* ==============================================================================
+   استقرار دقیق منوی دسته‌بندی درست در زیر نشان TAJINKART در بالا-چپ
+   ============================================================================== */
+#topCenterBrandBar {
+  position: fixed !important;
+  top: 18px !important;
+  left: 20px !important;
+  right: auto !important;
+  z-index: 85 !important;
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+  transition: opacity 0.18s ease-out, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+@media (max-width: 768px) {
+  #topCenterBrandBar {
+    top: 12px !important;
+    left: 12px !important;
+    right: auto !important;
+  }
+}
+
+#topCenterBrandBar.visible {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* پیل دسته‌بندی درست زیر نشان برند */
+#floatingGalleryCategoryMenu,
+.floating-cat-menu-wrapper {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  margin-top: 6px !important;
+  display: block !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* باز شدن منوی کشویی به سمت پایین */
+.floating-cat-dropdown {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  min-width: 170px !important;
+  background: #090c14 !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  padding: 6px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  z-index: 100 !important;
+}
+
+.floating-cat-dropdown.hidden {
+  display: none !important;
+}
+
+/* مخفی‌سازی کامل پیل دسته‌بندی در خارج از صفحه اصلی گالری */
 body:not([data-view="showcase"]) #floatingGalleryCategoryMenu,
 body[data-view="store"] #floatingGalleryCategoryMenu,
 body[data-view="genesis"] #floatingGalleryCategoryMenu,
@@ -2770,79 +2887,4 @@ body[data-view="society"] #floatingGalleryCategoryMenu,
 body[data-view="admin"] #floatingGalleryCategoryMenu,
 body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   display: none !important;
-}
-
-/* اصلاح کامل باز شدن منوی سه نقطه / آیکون‌های سمت راست در موبایل */
-@media (max-width: 768px) {
-  /* حالت بسته: فقط آیکون منوی مستر نمایش داده می‌شود */
-  #rightVerticalNav {
-    position: fixed !important;
-    top: 14px !important;
-    right: 14px !important;
-    left: auto !important;
-    z-index: 9999 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 6px !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  #rightVerticalNav.dock-collapsed .right-exp-btn {
-    display: none !important;
-  }
-
-  /* وقتی کاربر روی منو می‌زند (حالت باز): یک منوی شیک کشویی با عنوان و توضیحات باز می‌شود */
-  #rightVerticalNav.dock-open {
-    background: rgba(8, 11, 18, 0.96) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: 18px !important;
-    padding: 10px 12px !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9) !important;
-    width: 220px !important;
-    max-width: calc(100vw - 32px) !important;
-    align-items: stretch !important;
-  }
-
-  #rightVerticalNav.dock-open .right-exp-btn {
-    display: flex !important;
-    width: 100% !important;
-    min-width: unset !important;
-    height: 44px !important;
-    padding: 6px 12px !important;
-    border-radius: 12px !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 10px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    margin-top: 4px !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transform: none !important;
-  }
-
-  #rightVerticalNav.dock-open .right-exp-label {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    text-align: right !important;
-    direction: rtl !important;
-    flex: 1 !important;
-  }
-
-  #rightVerticalNav.dock-open .right-exp-title {
-    font-size: 12px !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    display: block !important;
-  }
-
-  #rightVerticalNav.dock-open .right-exp-sub {
-    font-size: 10px !important;
-    color: #94a3b8 !important;
-    display: block !important;
-  }
 }
