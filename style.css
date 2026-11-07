@@ -2214,9 +2214,10 @@ textarea:-webkit-autofill {
 .mosaic-tile img {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
+  object-fit: contain !important; /* جلوگیری ۱۰۰٪ قطعی از کات شدن یا بریدگی حاشیه‌های اثر */
   display: block !important;
   border-radius: 6px !important;
+  background: #05070c !important;
   transition: transform 0.4s ease !important;
 }
 

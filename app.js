@@ -1871,19 +1871,26 @@ function renderAdminSketch2() {
     <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" 
          id="adminArtCard_${idx}"
          draggable="true"
-         ondragstart="handleAdminArtDragStart(event, ${idx})"
+         ondragstart="isDraggingAdminCard = true; handleAdminArtDragStart(event, ${idx})"
          ondragover="handleAdminArtDragOver(event)"
          ondragenter="handleAdminArtDragEnter(event, ${idx})"
          ondragleave="handleAdminArtDragLeave(event, ${idx})"
          ondrop="handleAdminArtDrop(event, ${idx})"
-         ondragend="handleAdminArtDragEnd(event)"
-         onclick="selectAdminArt(${idx})" 
-         title="برای جابجایی بکشید و رها کنید (Drag & Drop) یا برای ویرایش کلیک کنید">
+         ondragend="setTimeout(() => { isDraggingAdminCard = false; }, 150); handleAdminArtDragEnd(event)"
+         onclick="handleAdminCardClick(event, ${idx})" 
+         title="برای جابجایی از دکمه‌های ◀ ▶ استفاده کنید یا بکشید و رها کنید">
       <img src="${art.image}" draggable="false" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" alt="${art.title}" />
-      <div style="position:absolute; top:6px; right:6px; padding:3px 7px; border-radius:6px; background:rgba(0,0,0,0.8); color:var(--gold); font-size:10.5px; font-weight:800; border:1px solid rgba(250,204,21,0.3); pointer-events:none; display:flex; align-items:center; gap:3px;">
-        <span>⋮⋮</span>
-        <span>#${idx + 1}</span>
+      
+      <!-- دکمه‌های جابجایی ترتیب سریع و بدون باگ روی تبلت، موبایل و دسکتاپ -->
+      <div style="position:absolute; top:6px; left:6px; display:flex; gap:4px; z-index:20;" onclick="event.stopPropagation()">
+        <button type="button" onclick="moveAdminArtOrder(${idx}, -1)" title="انتقال به عقب" style="background:rgba(0,0,0,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:4px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;">◀</button>
+        <button type="button" onclick="moveAdminArtOrder(${idx}, 1)" title="انتقال به جلو" style="background:rgba(0,0,0,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:4px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;">▶</button>
       </div>
+
+      <div style="position:absolute; top:6px; right:6px; padding:3px 7px; border-radius:6px; background:rgba(0,0,0,0.85); color:var(--gold); font-size:11px; font-weight:800; border:1px solid rgba(250,204,21,0.3); pointer-events:none;">
+        #${idx + 1}
+      </div>
+      
       <div style="position:absolute; bottom:0; inset-inline:0; padding:6px 8px; background:rgba(0,0,0,0.88); font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none;">
         ${art.shortSlug || art.title}
       </div>
@@ -3308,4 +3315,30 @@ window.resendConfirmationEmail = async function(emailAddress) {
   } catch(e) {
     showToast('خطای شبکه در ارسال ایمیل تایید.', 'error');
   }
+};
+
+
+// تابع جابجایی سریع و بدون نقص ترتیب آثار با دکمه‌های فلش (مخصوص تبلت، گوشی و کامپیوتر)
+window.moveAdminArtOrder = function(fromIdx, direction) {
+  const toIdx = fromIdx + direction;
+  if (toIdx < 0 || toIdx >= showcaseArtworks.length) return;
+
+  const movedItem = showcaseArtworks.splice(fromIdx, 1)[0];
+  showcaseArtworks.splice(toIdx, 0, movedItem);
+
+  showcaseArtworks.forEach((art, i) => {
+    art.orderIndex = i;
+  });
+
+  safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+  renderAdminSketch2();
+  renderShowcaseGrid();
+  showToast(`اثر «${movedItem.shortSlug || movedItem.title}» به جایگاه ${toIdx + 1} منتقل شد.`, 'success');
+  syncArtworkOrderToSupabase();
+};
+
+let isDraggingAdminCard = false;
+window.handleAdminCardClick = function(e, idx) {
+  if (isDraggingAdminCard) return;
+  selectAdminArt(idx);
 };
