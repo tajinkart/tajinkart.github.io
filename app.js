@@ -1006,13 +1006,34 @@ window.handleImageAutoDetect = function(imgEl, artId) {
 let currentCaseStudyIdx = 0;
 
 window.openArtModal = function(id) {
-  const idx = showcaseArtworks.findIndex(a => a.id === id);
-  if (idx === -1) return;
-  currentCaseStudyIdx = idx;
-  renderArtStationProject(showcaseArtworks[idx]);
+  if (!id) return;
+  // جستجوی انعطاف‌پذیر بر اساس عدد یا رشته
+  let art = showcaseArtworks.find(a => a.id == id || String(a.id) === String(id));
+  if (!art) {
+    try {
+      const allStored = JSON.parse(localStorage.getItem(KEYS.ARTWORKS) || '[]');
+      art = allStored.find(a => a.id == id || String(a.id) === String(id));
+    } catch(e) {}
+  }
+
+  if (!art && showcaseArtworks.length > 0) {
+    art = showcaseArtworks[0];
+  }
+
+  if (!art) {
+    console.warn('[openArtModal] No artwork found for id:', id);
+    return;
+  }
+
+  const idx = showcaseArtworks.findIndex(a => a.id == art.id);
+  currentCaseStudyIdx = idx !== -1 ? idx : 0;
+
+  renderArtStationProject(art);
+
   const modal = document.getElementById('artDetailModal');
   if (modal) {
     modal.classList.add('active');
+    modal.style.display = 'block';
     modal.scrollTop = 0;
     document.body.style.overflow = 'hidden';
   }
@@ -1022,6 +1043,7 @@ window.closeArtModalDirect = function() {
   const modal = document.getElementById('artDetailModal');
   if (modal) {
     modal.classList.remove('active');
+    modal.style.display = 'none';
     document.body.style.overflow = '';
   }
 };
@@ -1036,21 +1058,24 @@ window.navigateCaseStudy = function(direction, e) {
   if (e) e.stopPropagation();
   if (!showcaseArtworks || showcaseArtworks.length === 0) return;
   currentCaseStudyIdx = (currentCaseStudyIdx + direction + showcaseArtworks.length) % showcaseArtworks.length;
-  renderArtStationProject(showcaseArtworks[currentCaseStudyIdx]);
-  const modal = document.getElementById('artDetailModal');
-  if (modal) modal.scrollTop = 0;
+  const nextArt = showcaseArtworks[currentCaseStudyIdx];
+  if (nextArt) {
+    renderArtStationProject(nextArt);
+    const modal = document.getElementById('artDetailModal');
+    if (modal) modal.scrollTop = 0;
+  }
 };
 
 function renderArtStationProject(art) {
   if (!art) return;
   activeCaseStudyArt = art;
 
-  // ۱. جزئیات سایدبار
+  // ۱. اطلاعات سایدبار
   const titleEl = document.getElementById('artDetailTitle');
-  if (titleEl) titleEl.textContent = art.title;
+  if (titleEl) titleEl.textContent = art.title || 'کانسپت بدون عنوان';
 
   const descEl = document.getElementById('artDetailDesc');
-  if (descEl) descEl.textContent = art.desc;
+  if (descEl) descEl.textContent = art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
 
   const colorSpaceEl = document.getElementById('caseStudyColorSpace');
   if (colorSpaceEl) colorSpaceEl.textContent = art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
@@ -1066,19 +1091,26 @@ function renderArtStationProject(art) {
   const stream = document.getElementById('caseStudyImagesStream');
   if (!stream) return;
 
-  let streamHtml = `
-    <div>
-      <img src="${art.image}" alt="${art.title}" loading="eager" />
-    </div>
-  `;
+  const mainSrc = art.image || art.img || (art.phases && art.phases[0] && (art.phases[0].img || art.phases[0].image)) || '';
+  let streamHtml = '';
 
+  if (mainSrc) {
+    streamHtml += `
+      <div class="artstation-img-card">
+        <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" />
+      </div>
+    `;
+  }
+
+  // تصاویر فازها و اتودها در زیر تصویر اصلی به صورت اسکرولی عمودی
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
-      if (p.img && p.img !== art.image) {
+      const pSrc = p.img || p.image;
+      if (pSrc && pSrc !== mainSrc) {
         streamHtml += `
-          <div>
-            <img src="${p.img}" alt="${p.name || art.title}" loading="lazy" />
-            <div class="img-caption">${p.name || `فاز ${pIdx + 1}`}</div>
+          <div class="artstation-img-card">
+            <img src="${pSrc}" alt="${p.name || art.title}" loading="lazy" />
+            <div class="img-caption">${p.name || `فاز ${pIdx + 1} • اتود و بررسی جزئیات`}</div>
           </div>
         `;
       }
@@ -1091,7 +1123,7 @@ function renderArtStationProject(art) {
 // گوش دادن به کلیدهای کیبورد برای ناوبری
 window.addEventListener('keydown', (e) => {
   const modal = document.getElementById('artDetailModal');
-  if (modal && modal.classList.contains('active')) {
+  if (modal && (modal.classList.contains('active') || modal.style.display === 'block')) {
     if (e.key === 'Escape') closeArtModalDirect();
     if (e.key === 'ArrowLeft') navigateCaseStudy(1);
     if (e.key === 'ArrowRight') navigateCaseStudy(-1);
