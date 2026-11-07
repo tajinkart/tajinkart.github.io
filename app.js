@@ -224,6 +224,23 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
 // =========================================================
 // سیستم یکپارچه احراز هویت ابری SUPABASE AUTH
 // =========================================================
+window.isDirectorEmail = function(email) {
+  if (!email || typeof email !== 'string') return false;
+  return email.toLowerCase().trim() === 'tajimcard@gmail.com';
+};
+
+// تابع تشخیص زنده جیمیل در فرم فراموشی رمز عبور
+window.checkForgotEmailProvider = function(val) {
+  const box = document.getElementById('forgotGmailQuickBox');
+  if (!box) return;
+  const v = (val || '').toLowerCase().trim();
+  if (v.endsWith('@gmail.com') || v.endsWith('@googlemail.com')) {
+    box.classList.remove('hidden');
+  } else {
+    box.classList.add('hidden');
+  }
+};
+
 function applyLoggedInMember(user, isExplicitLogin = false) {
   if (!user || !user.email) return;
   const meta = user.user_metadata || {};
@@ -231,11 +248,8 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
   const name = meta.full_name || meta.name || user.email.split('@')[0];
   const phone = meta.phone || '';
 
-  // تشخیص دقیق و انحصاری مدیر ارشد استودیو
-  const isDirectorAdmin = emailLower === 'tajinkart@gmail.com' || 
-                          emailLower === 'tajinkartstudio@gmail.com' || 
-                          emailLower === 'tajimcard@gmail.com' ||
-                          emailLower === 'soroush@tajinkart.com';
+  // تشخیص دقیق و ۱۰۰٪ انحصاری مدیر ارشد استودیو (تنها و منحصراً tajimcard@gmail.com)
+  const isDirectorAdmin = window.isDirectorEmail(emailLower);
 
   const isGoogleUser = !!(user.app_metadata && user.app_metadata.provider === 'google') || 
                        (user.identities && user.identities.some(i => i.provider === 'google'));
@@ -1927,10 +1941,7 @@ window.handleMembersIconClick = function() {
   }
 
   const emailLower = (currentMember.email || '').toLowerCase().trim();
-  const isDirector = emailLower === 'tajinkart@gmail.com' || 
-                     emailLower === 'tajinkartstudio@gmail.com' || 
-                     emailLower === 'tajimcard@gmail.com' ||
-                     emailLower === 'soroush@tajinkart.com';
+  const isDirector = window.isDirectorEmail(emailLower);
 
   if (isDirector) {
     // مدیر استودیو مستقیماً به پنل مدیریت هدایت می‌شود
@@ -2571,9 +2582,7 @@ window.updateOrderStatus = function(idx, newStatus) {
 
 function renderMemberDashboard() {
   if (!currentMember) return;
-  const isDirector = (currentMember.email || '').toLowerCase().trim() === 'tajinkart@gmail.com' ||
-                     (currentMember.email || '').toLowerCase().trim() === 'tajinkartstudio@gmail.com' ||
-                     (currentMember.email || '').toLowerCase().trim() === 'soroush@tajinkart.com';
+  const isDirector = window.isDirectorEmail(currentMember.email);
 
   document.getElementById('dashMemberName').innerHTML = isDirector ? 'سید سروش تاج <span style="font-size:11px; color:var(--gold); font-weight:800; border:1px solid rgba(250,204,21,0.35); padding:2px 8px; border-radius:999px;">مدیر استودیو 👑</span>' : currentMember.name;
   
@@ -3238,7 +3247,10 @@ window.handleGoogleSignIn = async function() {
     const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + window.location.pathname
+        redirectTo: window.location.origin + window.location.pathname,
+        queryParams: {
+          prompt: 'select_account'
+        }
       }
     });
     if (error) {
