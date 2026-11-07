@@ -210,10 +210,14 @@ if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.c
         // در حالت بازیابی رمز، نشست برای ثبت رمز آماده است اما ویو نباید به ادمین یا داشبورد بپرد
         applyLoggedInMember(session.user, false);
       } else {
-        // بررسی اینکه آیا از ریدایرکت گوگل برگشته‌ایم یا خیر
-        const isFromGoogleRedirect = window.location.hash.includes('access_token=') && !window.location.hash.includes('type=recovery');
+        // تشخیص قطعی ورود تازه از طریق گوگل (چه توکن هنوز در هش باشد چه کلاینت آن را پردازش کرده باشد)
+        const isFromGoogleRedirect = sessionStorage.getItem('tajinkart_google_signing_in') === 'true' ||
+                                     event === 'SIGNED_IN' ||
+                                     (window.location.hash.includes('access_token=') && !window.location.hash.includes('type=recovery'));
+        
+        sessionStorage.removeItem('tajinkart_google_signing_in');
         applyLoggedInMember(session.user, isFromGoogleRedirect);
-        if (isFromGoogleRedirect) {
+        if (window.location.hash.includes('access_token=')) {
           try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
         }
       }
@@ -260,38 +264,40 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
     labelEl.textContent = isDirectorAdmin ? '👑 مدیر استودیو' : currentMember.name;
   }
 
-  // ۱. ثبت و همگام‌سازی آنی در جدول عمومی members دیتابیس سوپابیس
-  if (window.supabaseClient) {
-    window.supabaseClient.from('members').upsert([{
-      id: user.id,
-      name: currentMember.name,
-      email: user.email,
-      contact: phone || user.email,
-      tier: tier,
-      assets_bought: currentMember.assetsBought
-    }], { onConflict: 'email' }).then(({ error }) => {
-      if (error) console.warn('[Supabase Members Table Sync]', error);
-      else console.log('[Supabase Members Table] User record synchronized in Table Editor!');
-    });
-  }
+  // ثبت در لیست اعضا و مشتریان (تنها برای کاربران عادی؛ مدیر ارشد هرگز به عنوان کاربر عادی ثبت نمی‌شود)
+  if (!isDirectorAdmin) {
+    if (window.supabaseClient) {
+      window.supabaseClient.from('members').upsert([{
+        id: user.id,
+        name: currentMember.name,
+        email: user.email,
+        contact: phone || user.email,
+        tier: tier,
+        assets_bought: currentMember.assetsBought
+      }], { onConflict: 'email' }).then(({ error }) => {
+        if (error) console.warn('[Supabase Members Table Sync]', error);
+        else console.log('[Supabase Members Table] User record synchronized in Table Editor!');
+      });
+    }
 
-  // ۲. ثبت در کش محلی اعضای سایت
-  let localMember = siteMembersData.find(m => m.email && m.email.toLowerCase() === emailLower);
-  if (!localMember) {
-    siteMembersData.unshift({
-      id: user.id,
-      name: currentMember.name,
-      email: user.email,
-      contact: phone || user.email,
-      tier: tier,
-      balance: isDirectorAdmin ? '$1,450' : '$0',
-      withdrawn: isDirectorAdmin ? '$1,200' : '$0',
-      assetsBought: [],
-      totalSpent: '$0'
-    });
-    safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
-  } else if (isDirectorAdmin) {
-    localMember.tier = 'VIP';
+    let localMember = siteMembersData.find(m => m.email && m.email.toLowerCase() === emailLower);
+    if (!localMember) {
+      siteMembersData.unshift({
+        id: user.id,
+        name: currentMember.name,
+        email: user.email,
+        contact: phone || user.email,
+        tier: tier,
+        balance: '$0',
+        withdrawn: '$0',
+        assetsBought: [],
+        totalSpent: '$0'
+      });
+      safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
+    }
+  } else {
+    // پاکسازی اکانت مدیر از لیست اعضای عادی در صورت وجود قبلی
+    siteMembersData = siteMembersData.filter(m => m.email && m.email.toLowerCase() !== 'tajinkart@gmail.com');
     safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
   }
 
@@ -1916,12 +1922,23 @@ document.addEventListener('click', (e) => {
 });
 
 // احراز هویت اعضا و بازیابی رمز
-window.handleMembersIconClick = function() {
+window.handleMembersIconClick = async function() {
   const dock = document.getElementById('rightVerticalNav');
   if (dock) {
     dock.classList.add('dock-collapsed');
     dock.classList.remove('dock-open');
   }
+
+  // در صورتی که سشن در کلاینت باشد اما هنوز لود نشده باشد، بازیابی فوری
+  if (!currentMember && window.supabaseClient && window.supabaseClient.auth) {
+    try {
+      const { data } = await window.supabaseClient.auth.getSession();
+      if (data && data.session && data.session.user) {
+        applyLoggedInMember(data.session.user, false);
+      }
+    } catch(e) {}
+  }
+
   if (!currentMember) {
     switchAuthView('login');
     document.getElementById('memberModal').style.display = 'flex';
@@ -3232,6 +3249,7 @@ window.handleGoogleSignIn = async function() {
   }
   showToast('در حال انتقال به صفحه امن ورود گوگل...', 'info');
   try {
+    sessionStorage.setItem('tajinkart_google_signing_in', 'true');
     const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
