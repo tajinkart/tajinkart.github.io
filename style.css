@@ -2152,3 +2152,175 @@ textarea:-webkit-autofill {
   text-align: left;
   direction: ltr !important;
 }
+
+
+/* =========================================================
+   چیدمان گالری منظم، تراز و در یک خط به سبک آرت‌استیشن (ArtStation Aligned Grid)
+   ========================================================= */
+#showcaseGrid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 14px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  column-count: initial !important;
+}
+@media (max-width: 1350px) {
+  #showcaseGrid { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+}
+@media (max-width: 880px) {
+  #showcaseGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+}
+@media (max-width: 480px) {
+  #showcaseGrid { grid-template-columns: 1fr !important; gap: 10px !important; }
+}
+
+.mosaic-tile {
+  position: relative !important;
+  aspect-ratio: 16 / 10 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: #07090e !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+.mosaic-tile:hover {
+  transform: translateY(-4px) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85) !important;
+}
+.mosaic-tile img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  transition: transform 0.4s ease, opacity 0.3s ease !important;
+}
+.mosaic-tile:hover img {
+  transform: scale(1.04) !important;
+}
+
+/* =========================================================
+   پنجره نمایش کامل پروژه با اسکرول عمودی به سبک آرت‌استیشن
+   ========================================================= */
+.art-detail-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1500 !important;
+  background: rgba(4, 5, 8, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  display: none !important;
+  overflow-y: auto !important;
+  padding: 0 !important;
+}
+.art-detail-modal.active {
+  display: block !important;
+}
+.artstation-project-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 36px;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 50px 24px 80px;
+  min-height: 100vh;
+}
+@media (max-width: 1024px) {
+  .artstation-project-layout {
+    grid-template-columns: 1fr;
+    padding: 60px 16px 80px;
+  }
+}
+.artstation-images-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+.artstation-images-stream img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+}
+.artstation-images-stream .img-caption {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: -18px;
+  direction: rtl;
+}
+.artstation-sidebar {
+  position: sticky;
+  top: 30px;
+  height: fit-content;
+  background: #090c14;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+.artstation-close-btn {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 1600;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(15, 20, 31, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.artstation-close-btn:hover {
+  background: var(--crimson);
+  transform: rotate(90deg);
+}
+.artstation-nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1600;
+  width: 48px;
+  height: 64px;
+  background: rgba(15, 20, 31, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+.artstation-nav-btn:hover {
+  background: rgba(250, 204, 21, 0.2);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.artstation-nav-btn.prev {
+  left: 14px;
+  border-radius: 0 10px 10px 0;
+}
+.artstation-nav-btn.next {
+  right: 14px;
+  border-radius: 10px 0 0 10px;
+}
+@media (max-width: 768px) {
+  .artstation-nav-btn { display: none; }
+}

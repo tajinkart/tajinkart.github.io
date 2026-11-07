@@ -865,45 +865,39 @@
 
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
-    <div class="case-study-window" onclick="event.stopPropagation()">
-      <button type="button" onclick="closeArtModalDirect()" class="modal-corner-close-btn" title="بستن">✕</button>
-      <div class="case-study-stage-box">
-        <div class="case-main-preview">
-          <img id="caseStudyMainImg" src="" alt="پیش‌نمایش مرحله اثر" />
-          <span id="caseStudyPhaseBadge" class="case-phase-badge">فاز ۱ • اتود اولیه و سیلوئت</span>
-        </div>
-        <div>
-          <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:6px; font-weight:700;">فازهای مرحله‌به‌مرحله خلق کانسپت:</span>
-          <div id="caseStudyPhasesSwitcher" class="case-phases-switcher"></div>
-        </div>
+    <!-- کلیدهای ناوبری سریع بین پروژه‌ها به سبک آرت‌استیشن -->
+    <button type="button" class="artstation-nav-btn prev" onclick="navigateCaseStudy(-1, event)" title="اثر قبلی (فلش چپ)">‹</button>
+    <button type="button" class="artstation-nav-btn next" onclick="navigateCaseStudy(1, event)" title="اثر بعدی (فلش راست)">›</button>
+    <button type="button" onclick="closeArtModalDirect()" class="artstation-close-btn" title="بستن (Esc)">✕</button>
+
+    <div class="artstation-project-layout" onclick="event.stopPropagation()">
+      <!-- ستون اصلی: جریان عمودی تصاویر پروژه با امکان اسکرول به پایین -->
+      <div class="artstation-images-stream" id="caseStudyImagesStream">
+        <!-- تصاویر به صورت خودکار و تمام‌عرض تزریق می‌شوند -->
       </div>
 
-      <div style="display:flex; flex-direction:column; justify-content:space-between;">
+      <!-- ستون کناری: شناسنامه کامل پروژه، لور و سفارش سریع در پایپلاین -->
+      <aside class="artstation-sidebar">
         <div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span id="artDetailCategory" class="font-mono" style="color:var(--iris); font-size:11.5px; letter-spacing:0.12em;">/ CASE STUDY LOG /</span>
-            <button onclick="closeArtModalDirect()" style="color:var(--text-muted); font-size:20px;">✕</button>
-          </div>
-          <h3 id="artDetailTitle" style="font-size:19px; font-weight:900; color:#fff; margin-top:8px; line-height:1.4;"></h3>
-          <p id="artDetailDesc" style="font-size:12.5px; color:var(--text-muted); margin-top:10px; line-height:1.75;"></p>
-
-          <div style="margin-top:14px; padding:12px; border-radius:12px; background:#06080c; border:1px solid var(--border-subtle); font-size:11.5px; display:flex; flex-direction:column; gap:6px;">
-            <div><strong style="color:#fff;">پایپلاین تولید:</strong> <span id="caseStudyPipeName" style="color:var(--gold);">طراحی کاراکتر و شخصیت</span></div>
-            <div><strong style="color:#fff;">فضای رنگی و مستر:</strong> <span id="caseStudyColorSpace" class="font-mono" style="color:var(--cyan-electric);">مستر 4K / ۱۶ بیتی ProPhoto RGB</span></div>
-            <div><strong style="color:#fff;">لور و زمینه داستانی:</strong> <span id="caseStudyLore" style="color:#cbd5e1;">جهان اکستوپیا</span></div>
-          </div>
+          <span id="artDetailCategory" class="font-mono" style="color:var(--iris); font-size:11px; letter-spacing:0.12em; display:block; margin-bottom:6px;">/ CONCEPT PROJECT /</span>
+          <h2 id="artDetailTitle" style="font-size:22px; font-weight:900; color:#fff; line-height:1.35; margin-bottom:12px;"></h2>
+          <p id="artDetailDesc" style="font-size:12.5px; color:#94a3b8; line-height:1.8; margin-bottom:16px;"></p>
         </div>
 
-        <div style="margin-top:18px;">
-          <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:12px; font-size:12.5px;">
-            سفارش اثر مشابه در پایپلاین آتلیه ←
-          </button>
+        <div style="background:#05070c; border:1px solid var(--border-subtle); border-radius:12px; padding:14px; font-size:12px; display:flex; flex-direction:column; gap:8px;">
+          <div><strong style="color:#fff;">پایپلاین تولید:</strong> <span id="caseStudyPipeName" style="color:var(--gold); font-weight:700;"></span></div>
+          <div><strong style="color:#fff;">فضای رنگی و مستر:</strong> <span id="caseStudyColorSpace" class="font-mono" style="color:var(--cyan-electric); font-size:11px;">مستر 4K / ۱۶ بیتی ProPhoto RGB</span></div>
+          <div><strong style="color:#fff;">لور و زمینه داستانی:</strong> <span id="caseStudyLore" style="color:#cbd5e1;">جهان اکستوپیا</span></div>
         </div>
-      </div>
+
+        <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; margin-top:8px;">
+          سفارش اثر مشابه در این پایپلاین ←
+        </button>
+      </aside>
     </div>
   </div>
 
-    <!-- مدال محاسبه‌گر لحظه‌ای سفارش و موتور داینامیک قیمت‌گذاری (Interactive Wizard Accordion) -->
+  <!-- مدال محاسبه‌گر لحظه‌ای سفارش و موتور داینامیک قیمت‌گذاری (Interactive Wizard Accordion) -->
   <div id="zoomModal" class="zoom-modal" onclick="closeModal(event)">
     <div class="zoom-window wizard-modal-window" onclick="event.stopPropagation()">
       <button type="button" onclick="closeModalDirect()" class="modal-corner-close-btn" title="بستن">✕</button>
@@ -1384,7 +1378,7 @@
         <button type="button" onclick="closeTermsModal()" class="btn-gold" style="width:100%; padding:12px;">متوجه شدم و می‌پذیرم</button>
       </div>
     </div>
-  </div>v>
+  </div>
 
   <div id="toastContainer"></div>
 

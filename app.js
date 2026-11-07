@@ -69,6 +69,7 @@ function applyLoggedInMember(user) {
 
 
 // تابع باز کردن قطعی و نفوذناپذیر پنجره تنظیم رمز جدید
+let hasShownResetToast = false;
 function triggerPasswordResetModal() {
   function doOpen() {
     switchAuthView('reset');
@@ -80,19 +81,19 @@ function triggerPasswordResetModal() {
     if (resetView) {
       resetView.classList.remove('hidden');
     }
-    showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
+    if (!hasShownResetToast) {
+      showToast('لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info');
+      hasShownResetToast = true;
+    }
   }
 
-  // تلاش مکرر تا اطمینان از لود کامل المان‌های DOM
   doOpen();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(doOpen, 100);
-      setTimeout(doOpen, 500);
     });
   } else {
-    setTimeout(doOpen, 200);
-    setTimeout(doOpen, 600);
+    setTimeout(doOpen, 150);
   }
 }
 
@@ -883,6 +884,20 @@ window.setCurrencyMode = function(mode) {
 window.showToast = function(msg, type = 'gold') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
+
+  // جلوگیری از تکرار پیام‌های مشابه
+  const existingToasts = container.querySelectorAll('.toast-msg');
+  for (const t of existingToasts) {
+    if (t.textContent.includes(msg)) {
+      return;
+    }
+  }
+
+  // حداکثر ۲ اعلان همزمان
+  if (existingToasts.length >= 2) {
+    existingToasts[0].remove();
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast-msg ${type}`;
   let icon = '⚡';
@@ -896,7 +911,7 @@ window.showToast = function(msg, type = 'gold') {
     toast.style.transform = 'translateY(15px)';
     toast.style.transition = 'all 0.3s ease';
     setTimeout(() => toast.remove(), 350);
-  }, 6500);
+  }, 4500);
 };
 
 
@@ -988,42 +1003,100 @@ window.handleImageAutoDetect = function(imgEl, artId) {
   }
 };
 // لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)
+let currentCaseStudyIdx = 0;
+
 window.openArtModal = function(id) {
-  const art = showcaseArtworks.find(a => a.id === id);
-  if (!art) return;
-  activeCaseStudyArt = art;
-  activeCaseStudyPhaseIdx = 0;
-
-  document.getElementById('artDetailTitle').textContent = art.title;
-  document.getElementById('artDetailDesc').textContent = art.desc;
-  document.getElementById('caseStudyColorSpace').textContent = art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
-  document.getElementById('caseStudyLore').textContent = art.lore || 'جهان اکستوپیا';
-
-  const pipeData = PIPELINE_DATA[art.pipelineKey] || PIPELINE_DATA['sketch1'];
-  document.getElementById('caseStudyPipeName').textContent = pipeData.topSub;
-
-  renderCaseStudyPhasesSwitcher();
-  updateCaseStudyPhaseView();
-
-  document.getElementById('artDetailModal').classList.add('active');
+  const idx = showcaseArtworks.findIndex(a => a.id === id);
+  if (idx === -1) return;
+  currentCaseStudyIdx = idx;
+  renderArtStationProject(showcaseArtworks[idx]);
+  const modal = document.getElementById('artDetailModal');
+  if (modal) {
+    modal.classList.add('active');
+    modal.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+  }
 };
 
-function renderCaseStudyPhasesSwitcher() {
-  const switcher = document.getElementById('caseStudyPhasesSwitcher');
-  if (!switcher || !activeCaseStudyArt) return;
-  const phases = activeCaseStudyArt.phases || [
-    { name: 'اتود اولیه و سیلوئت', img: activeCaseStudyArt.image },
-    { name: 'لاین‌آرت فنی و کادر', img: activeCaseStudyArt.image },
-    { name: 'مطالعه نوری و مقداری', img: activeCaseStudyArt.image },
-    { name: 'رندر متریال نهایی', img: activeCaseStudyArt.image }
-  ];
+window.closeArtModalDirect = function() {
+  const modal = document.getElementById('artDetailModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+};
 
-  switcher.innerHTML = phases.map((p, idx) => `
-    <button type="button" onclick="setCaseStudyPhase(${idx})" class="case-phase-btn ${idx === activeCaseStudyPhaseIdx ? 'active' : ''}">
-      ${p.name}
-    </button>
-  `).join('');
+window.closeArtModal = function(e) {
+  if (e.target && e.target.id === 'artDetailModal') {
+    closeArtModalDirect();
+  }
+};
+
+window.navigateCaseStudy = function(direction, e) {
+  if (e) e.stopPropagation();
+  if (!showcaseArtworks || showcaseArtworks.length === 0) return;
+  currentCaseStudyIdx = (currentCaseStudyIdx + direction + showcaseArtworks.length) % showcaseArtworks.length;
+  renderArtStationProject(showcaseArtworks[currentCaseStudyIdx]);
+  const modal = document.getElementById('artDetailModal');
+  if (modal) modal.scrollTop = 0;
+};
+
+function renderArtStationProject(art) {
+  if (!art) return;
+  activeCaseStudyArt = art;
+
+  // ۱. جزئیات سایدبار
+  const titleEl = document.getElementById('artDetailTitle');
+  if (titleEl) titleEl.textContent = art.title;
+
+  const descEl = document.getElementById('artDetailDesc');
+  if (descEl) descEl.textContent = art.desc;
+
+  const colorSpaceEl = document.getElementById('caseStudyColorSpace');
+  if (colorSpaceEl) colorSpaceEl.textContent = art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
+
+  const loreEl = document.getElementById('caseStudyLore');
+  if (loreEl) loreEl.textContent = art.lore || 'جهان اکستوپیا';
+
+  const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[art.pipelineKey]) ? PIPELINE_DATA[art.pipelineKey] : { topSub: 'طراحی کاراکتر و کانسپت' };
+  const pipeNameEl = document.getElementById('caseStudyPipeName');
+  if (pipeNameEl) pipeNameEl.textContent = pipeData.topSub;
+
+  // ۲. استریم عمودی تصاویر به سبک آرت‌استیشن
+  const stream = document.getElementById('caseStudyImagesStream');
+  if (!stream) return;
+
+  let streamHtml = `
+    <div>
+      <img src="${art.image}" alt="${art.title}" loading="eager" />
+    </div>
+  `;
+
+  if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
+    art.phases.forEach((p, pIdx) => {
+      if (p.img && p.img !== art.image) {
+        streamHtml += `
+          <div>
+            <img src="${p.img}" alt="${p.name || art.title}" loading="lazy" />
+            <div class="img-caption">${p.name || `فاز ${pIdx + 1}`}</div>
+          </div>
+        `;
+      }
+    });
+  }
+
+  stream.innerHTML = streamHtml;
 }
+
+// گوش دادن به کلیدهای کیبورد برای ناوبری
+window.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('artDetailModal');
+  if (modal && modal.classList.contains('active')) {
+    if (e.key === 'Escape') closeArtModalDirect();
+    if (e.key === 'ArrowLeft') navigateCaseStudy(1);
+    if (e.key === 'ArrowRight') navigateCaseStudy(-1);
+  }
+});
 
 window.setCaseStudyPhase = function(idx) {
   activeCaseStudyPhaseIdx = idx;
