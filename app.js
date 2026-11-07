@@ -1171,10 +1171,17 @@ function renderShowcaseGrid() {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
     const imgSrc = art.image || art.img || '';
+
+    // جلوگیری از تکرار عبارت یکسان در اسلاگ و عنوان
+    let slug = art.shortSlug || '';
+    if (!slug || slug === art.title) {
+      slug = art.tag ? art.tag.toUpperCase() : 'CONCEPT';
+    }
+
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
         <div class="tile-center-title">
-          <span class="tile-slug">/ ${art.shortSlug || art.title} /</span>
+          <span class="tile-slug">/ ${slug} /</span>
           <span class="tile-divider"></span>
           <span class="tile-sub">${art.title}</span>
         </div>
@@ -1675,6 +1682,7 @@ async function dispatchTelegramNotification(order) {
 
 // سوییچ ویوها و هماهنگی ناوبری
 window.switchView = function(vKey) {
+  document.body.setAttribute('data-view', vKey);
   if (typeof unlockBodyScroll === 'function') unlockBodyScroll();
   const openArtModal = document.getElementById('artDetailModal');
   if (openArtModal) {
@@ -1691,11 +1699,6 @@ window.switchView = function(vKey) {
   const homeBtn = document.getElementById('rightDockHomeBtn');
 
   // آپدیت وضعیت دکمه‌های ناوبری موبایل
-  document.querySelectorAll('#mobileBottomNav .mob-nav-btn').forEach((btn, idx) => {
-    const keys = ['showcase', 'store', 'genesis', 'academy', 'member-dashboard'];
-    btn.classList.toggle('active', keys[idx] === vKey);
-  });
-
   if (dock) {
     dock.classList.add('dock-collapsed');
     dock.classList.remove('dock-open');
@@ -1743,12 +1746,16 @@ function handleOptimizedScroll() {
     if (scrolled > 40) {
       if (dock) dock.classList.add('dock-collapsed');
       if (topBar) topBar.classList.add('visible');
+      const catMenu = document.getElementById('floatingGalleryCategoryMenu');
+      if (catMenu) catMenu.classList.add('visible');
     } else {
       if (dock) {
         dock.classList.remove('dock-collapsed');
         dock.classList.remove('dock-open');
       }
       if (topBar) topBar.classList.remove('visible');
+      const catMenu = document.getElementById('floatingGalleryCategoryMenu');
+      if (catMenu) catMenu.classList.remove('visible');
     }
 
     if (hero) {

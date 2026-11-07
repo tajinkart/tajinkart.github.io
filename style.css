@@ -2641,3 +2641,111 @@ textarea:-webkit-autofill {
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45) !important;
   border-color: var(--emerald) !important;
 }
+
+/* ==============================================================================
+   هماهنگی کامل و یکسان نشان TAJINKART و پیل دسته‌بندی زیر آن
+   ============================================================================== */
+
+/* در حالت عادی: هر دو دقیقاً دارای کادر باریک طلایی یکسان و پس‌زمینه شیشه‌ای تیره */
+.top-center-pill,
+.floating-cat-pill {
+  width: 138px !important;
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  background: rgba(9, 12, 18, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(250, 204, 21, 0.35) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8) !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.top-center-pill {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.16em !important;
+  direction: ltr !important;
+  gap: 10px !important;
+}
+
+.floating-cat-pill {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  gap: 6px !important;
+}
+
+/* در حالت هاور موس: کادر طلایی پررنگ و درخشش زرد زیر هر دو روشن می‌شود */
+.top-center-pill:hover,
+.floating-cat-pill:hover {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.55), 0 8px 25px rgba(0, 0, 0, 0.9) !important;
+  transform: translateY(-1px) scale(1.02) !important;
+  background: rgba(15, 20, 32, 0.98) !important;
+}
+
+/* مخفی‌سازی قطعی و ۱۰۰٪ پیل دسته‌بندی در تمام صفحات غیر از گالری صفحه اول */
+body:not([data-view="showcase"]) #floatingGalleryCategoryMenu,
+body[data-view="store"] #floatingGalleryCategoryMenu,
+body[data-view="genesis"] #floatingGalleryCategoryMenu,
+body[data-view="academy"] #floatingGalleryCategoryMenu,
+body[data-view="society"] #floatingGalleryCategoryMenu,
+body[data-view="admin"] #floatingGalleryCategoryMenu,
+body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
+  display: none !important;
+}
+
+/* تضمین اوپاسیتی صفر عنوان روی آثار در حالت عادی و فعال شدن فقط با هاور موس */
+.mosaic-tile .tile-center-title {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s !important;
+}
+
+.mosaic-tile:hover .tile-center-title {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.mosaic-tile img {
+  opacity: 1 !important;
+  transition: transform 0.4s ease, opacity 0.35s ease !important;
+}
+
+.mosaic-tile:hover img {
+  opacity: 0.28 !important;
+  transform: scale(1.04) !important;
+  filter: contrast(1.06) brightness(0.85) !important;
+}
+
+
+/* موقعیت‌یابی مستقل فهرست شناور دسته‌بندی آثار درون بخش گالری */
+#floatingGalleryCategoryMenu {
+  position: fixed;
+  top: 64px;
+  left: 20px;
+  z-index: 85;
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+  transition: opacity 0.18s ease-out, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+@media (max-width: 768px) {
+  #floatingGalleryCategoryMenu {
+    top: 56px !important;
+    left: 12px !important;
+  }
+}
+#floatingGalleryCategoryMenu.visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}

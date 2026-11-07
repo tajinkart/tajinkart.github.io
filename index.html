@@ -11,49 +11,14 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body data-view="showcase">
 
-  <!-- ۱. نشان شناور برند در بالا-چپ -->
+  <!-- ۱. نشان شناور برند در بالا-چپ (فقط نام استودیو) -->
   <div id="topCenterBrandBar">
     <button onclick="switchView('showcase')" class="top-center-pill" title="صفحه اصلی">
       <span class="top-dot"></span>
       <span>TAJINKART</span>
     </button>
-
-    <!-- فهرست شناور دسته‌بندی آثار زیر نشان برند TAJINKART (هم‌اندازه دقیق با کادر زرد لوکس) -->
-    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
-        <span id="currentCategoryPillLabel">همه آثار</span>
-        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
-      </button>
-
-      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-        <div class="cat-dropdown-item active" onclick="filterGalleryByCategory('all', 'همه آثار')">
-          <span>همه آثار</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('character', 'کاراکتر دیزاین')">
-          <span>کاراکتر دیزاین</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('environment', 'کانسپت و فضا')">
-          <span>کانسپت و فضا</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('creature', 'موجودات و هیولا')">
-          <span>موجودات و هیولا</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('keyframe', 'کی‌فریم و کاور')">
-          <span>کی‌فریم و کاور</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('props', 'تجهیزات و پراپ')">
-          <span>تجهیزات و پراپ</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('comic', 'کمیک و وب‌تون')">
-          <span>کمیک و وب‌تون</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('2d', 'تصویرسازی ۲ بعدی')">
-          <span>تصویرسازی ۲ بعدی</span>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ۲. داک عمودی ناوبری راست -->
@@ -143,6 +108,18 @@
 
   <!-- بخش ۰: صفحه اول با ترنزیشن نرم سبک ZEN -->
   <section id="view-showcase" class="view-section">
+
+    <!-- فهرست شناور دسته‌بندی آثار منحصراً درون بخش گالری صفحه اول -->
+    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
+        <span id="currentCategoryPillLabel">همه آثار</span>
+        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+      </button>
+
+      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      </div>
+    </div>
     <div id="stickyBrandHero">
       <div class="hero-badge">
         <span>●</span>
