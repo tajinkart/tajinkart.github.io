@@ -3724,3 +3724,14 @@ document.addEventListener('touchend', () => {
     document.querySelectorAll('.mosaic-tile.touch-active').forEach(t => t.classList.remove('touch-active'));
   }, 350);
 }, { passive: true });
+
+
+// بستن خودکار منوی موبایل هنگام کلیک بیرون
+document.addEventListener('click', (e) => {
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock && dock.classList.contains('dock-open')) {
+    if (!dock.contains(e.target)) {
+      dock.classList.remove('dock-open');
+    }
+  }
+});
