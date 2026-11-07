@@ -2031,17 +2031,6 @@ window.switchAuthView = function(viewName) {
   else if (viewName === 'reset') document.getElementById('authViewResetPassword')?.classList.remove('hidden');
 };
 
-window.handleSendResetCode = function() {
-  const iden = document.getElementById('forgotIdentifier').value.trim();
-  if (!iden) {
-    showToast('لطفاً ایمیل یا شماره همراه خود را وارد کنید.', 'error');
-    return;
-  }
-  document.getElementById('forgotStep1').classList.add('hidden');
-  document.getElementById('forgotStep2').classList.remove('hidden');
-  showToast('کد تایید ۶ رقمی به ایمیل/شماره شما صادر گردید.', 'info');
-};
-
 window.logoutMemberAccount = async function() {
   if (window.supabaseClient && window.supabaseClient.auth) {
     try {
