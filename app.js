@@ -210,11 +210,14 @@ function applyLoggedInMember(user) {
   const name = meta.full_name || meta.name || user.email.split('@')[0];
   const phone = meta.phone || '';
 
-  // تشخیص اختصاصی و انحصاری مدیر استودیو (سید سروش تاج با جیمیل رسمی استودیو)
+  // تشخیص دقیق و انحصاری مدیر ارشد استودیو
   const isDirectorAdmin = emailLower === 'tajinkart@gmail.com' || 
                           emailLower === 'tajinkartstudio@gmail.com' || 
                           emailLower === 'tajimcard@gmail.com' ||
                           emailLower === 'soroush@tajinkart.com';
+
+  const isGoogleUser = !!(user.app_metadata && user.app_metadata.provider === 'google') || 
+                       (user.identities && user.identities.some(i => i.provider === 'google'));
 
   const tier = isDirectorAdmin ? 'VIP' : (meta.tier || 'STANDARD');
 
@@ -224,6 +227,8 @@ function applyLoggedInMember(user) {
     email: user.email,
     contact: phone || user.email,
     tier: tier,
+    isDirector: isDirectorAdmin,
+    isGoogleUser: isGoogleUser,
     assetsBought: meta.assetsBought || []
   };
 
@@ -267,13 +272,15 @@ function applyLoggedInMember(user) {
     safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
   }
 
-  // ۳. هدایت خودکار به پنل مدیریت در صورت ورود مدیر با اکانت گوگل
+  // ۳. جداسازی قطعی نقش‌ها و ممانعت از دسترسی کاربر به پنل ادمین
+  const adminGate = document.getElementById('adminLoginGate');
+  const adminWorkspace = document.getElementById('adminWorkspace');
+
   if (isDirectorAdmin) {
-    closeMemberModal();
-    const adminGate = document.getElementById('adminLoginGate');
-    const adminWorkspace = document.getElementById('adminWorkspace');
+    // باز شدن اختصاصی پنل برای مدیر
     if (adminGate) adminGate.classList.add('hidden');
     if (adminWorkspace) adminWorkspace.classList.remove('hidden');
+    closeMemberModal();
 
     setTimeout(() => {
       switchView('admin');
@@ -284,16 +291,21 @@ function applyLoggedInMember(user) {
       showToast('درود بر مدیر استودیو، سید سروش تاج. پنل کنترل استودیو با حساب گوگل باز شد! 👑', 'success', 6000);
     }, 250);
   } else {
-    // کاربر عادی
+    // کاربر عادی: قفل قطعی پنل ادمین و هدایت به داشبورد اختصاصی مشتریان
+    if (adminWorkspace) adminWorkspace.classList.add('hidden');
+    if (adminGate) adminGate.classList.remove('hidden');
+
     closeMemberModal();
     renderMemberDashboard();
+    switchView('member-dashboard');
     showToast(`خوش آمدید، ${currentMember.name}! حساب کاربری شما با موفقیت فعال شد. ✨`, 'success', 5000);
-    try {
-      if (window.location.hash.includes('access_token')) {
-        window.history.replaceState(null, '', window.location.pathname);
-      }
-    } catch(e) {}
   }
+
+  try {
+    if (window.location.hash.includes('access_token')) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  } catch(e) {}
 }
 
 
@@ -1886,12 +1898,34 @@ window.handleMembersIconClick = function() {
     dock.classList.add('dock-collapsed');
     dock.classList.remove('dock-open');
   }
-  if (currentMember) {
-    renderMemberDashboard();
-    switchView('member-dashboard');
-  } else {
+  if (!currentMember) {
     switchAuthView('login');
     document.getElementById('memberModal').style.display = 'flex';
+    return;
+  }
+
+  const emailLower = (currentMember.email || '').toLowerCase().trim();
+  const isDirector = emailLower === 'tajinkart@gmail.com' || 
+                     emailLower === 'tajinkartstudio@gmail.com' || 
+                     emailLower === 'tajimcard@gmail.com' ||
+                     emailLower === 'soroush@tajinkart.com';
+
+  if (isDirector) {
+    // مدیر استودیو مستقیماً به پنل مدیریت هدایت می‌شود
+    const adminGate = document.getElementById('adminLoginGate');
+    const adminWorkspace = document.getElementById('adminWorkspace');
+    if (adminGate) adminGate.classList.add('hidden');
+    if (adminWorkspace) adminWorkspace.classList.remove('hidden');
+    switchView('admin');
+    if (typeof switchAdminTab === 'function') {
+      const artworksTabBtn = document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]');
+      switchAdminTab('artworks', artworksTabBtn);
+    }
+    showToast('پنل مدیریت استودیو باز شد.', 'info');
+  } else {
+    // کاربر عادی به داشبورد کاربری خود می‌رود
+    renderMemberDashboard();
+    switchView('member-dashboard');
   }
 };
 window.closeMemberModal = function() { document.getElementById('memberModal').style.display = 'none'; };
@@ -2465,9 +2499,31 @@ window.updateOrderStatus = function(idx, newStatus) {
 
 function renderMemberDashboard() {
   if (!currentMember) return;
-  document.getElementById('dashMemberName').textContent = currentMember.name;
-  document.getElementById('dashMemberEmail').textContent = currentMember.email;
+  const isDirector = (currentMember.email || '').toLowerCase().trim() === 'tajinkart@gmail.com' ||
+                     (currentMember.email || '').toLowerCase().trim() === 'tajinkartstudio@gmail.com' ||
+                     (currentMember.email || '').toLowerCase().trim() === 'soroush@tajinkart.com';
+
+  document.getElementById('dashMemberName').innerHTML = isDirector ? 'سید سروش تاج <span style="font-size:11px; color:var(--gold); font-weight:800; border:1px solid rgba(250,204,21,0.35); padding:2px 8px; border-radius:999px;">مدیر استودیو 👑</span>' : currentMember.name;
+  
+  const googleBadge = currentMember.isGoogleUser ? ' <span style="color:var(--emerald); font-size:11px; font-weight:700;">(متصل به Google ✓)</span>' : '';
+  document.getElementById('dashMemberEmail').innerHTML = currentMember.email + googleBadge;
   document.getElementById('dashMemberContact').textContent = currentMember.contact || 'ارتباط استودیو';
+
+  const passBtn = document.getElementById('dashChangePassBtn');
+  if (passBtn) {
+    if (currentMember.isGoogleUser) {
+      passBtn.innerHTML = '🔑 ایجاد رمز عبور مستقل (اختیاری)';
+      passBtn.title = 'شما با حساب امن گوگل وارد شده‌اید؛ در صورت تمایل می‌توانید یک رمز مستقل نیز تعریف فرمایید.';
+    } else {
+      passBtn.innerHTML = '🔑 تغییر رمز عبور';
+      passBtn.title = 'تغییر یا بازنشانی رمز عبور این حساب';
+    }
+  }
+
+  const adminBtn = document.getElementById('dashAdminPanelBtn');
+  if (adminBtn) {
+    adminBtn.classList.toggle('hidden', !isDirector);
+  }
 
   const oBox = document.getElementById('memberOrdersContainer');
   const userOrders = ordersList.filter(o => o.client.toLowerCase() === currentMember.name.toLowerCase() || o.contact === currentMember.email || o.contact === currentMember.contact);
@@ -2993,13 +3049,9 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           if (data && data.user) {
-            applyLoggedInMember(data.user);
-            closeMemberModal();
-            renderMemberDashboard();
-            switchView('member-dashboard');
-            showToast('✓ رمز عبور جدید شما با موفقیت ثبت شد! خوش آمدید.', 'success');
             sessionStorage.removeItem('tajinkart_recovering_password');
             isRecoveryFlowDetected = false;
+            applyLoggedInMember(data.user);
             try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
             return;
           }
