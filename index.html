@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=8.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-view="showcase">
@@ -567,7 +567,7 @@
             <h2 class="view-hero-title">مرکز کنترل و پنل مدیریت استودیو</h2>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px;">قفل پنل</button>
+            <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="خروج کامل از حساب و قفل پنل">قفل پنل</button>
           </div>
         </div>
 
@@ -1440,8 +1440,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js"></script>
-  <script src="app.js" defer></script>
+  <script src="data.js?v=8.0"></script>
+  <script src="app.js?v=8.0" defer></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

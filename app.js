@@ -2072,13 +2072,24 @@ window.addEventListener('keyup', (e) => {
 });
 
 window.logoutAdmin = async function() {
-  if (window.supabaseClient && window.supabaseClient.auth) {
-    try {
+  try {
+    if (window.supabaseClient && window.supabaseClient.auth) {
       await window.supabaseClient.auth.signOut();
-    } catch(e) {
-      console.warn('Admin sign out exception:', e);
     }
+  } catch(e) {
+    console.warn('Admin sign out exception:', e);
   }
+
+  // پاکسازی قطعی تمام توکن‌های احراز هویت سوپابیس در حافظه مرورگر کامپیوتر
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('sb-') || k.includes('supabase') || k.includes('auth-token')) {
+        localStorage.removeItem(k);
+      }
+    });
+    sessionStorage.clear();
+  } catch(e) {}
+
   currentMember = null;
   const labelEl = document.getElementById('rightMemberLabel');
   if (labelEl) labelEl.textContent = 'حساب اعضا';
