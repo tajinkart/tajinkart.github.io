@@ -972,14 +972,22 @@ function renderShowcaseGrid() {
   grid.innerHTML = showcaseArtworks.map((art, i) => {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
+    const cached = artDimensionCache[art.image];
+    let ratioStyle = '';
+    if (art.width && art.height) {
+      ratioStyle = `style="--aspect-ratio: ${art.width} / ${art.height};"`;
+    } else if (cached && cached.width && cached.height) {
+      ratioStyle = `style="--aspect-ratio: ${cached.width} / ${cached.height};"`;
+    }
+    const imgSrc = art.image || art.img || '';
     return `
-      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
+      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" ${ratioStyle} onclick="openArtModal(${art.id})">
         <div class="tile-center-title">
-          <span class="tile-slug">/ ${art.shortSlug} /</span>
+          <span class="tile-slug">/ ${art.shortSlug || art.title} /</span>
           <span class="tile-divider"></span>
           <span class="tile-sub">${art.title}</span>
         </div>
-        <img src="${art.image}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
+        <img src="${imgSrc}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
     `;
   }).join('');
@@ -991,14 +999,15 @@ window.handleImageAutoDetect = function(imgEl, artId) {
   const h = imgEl.naturalHeight;
   const r = parseFloat((w / h).toFixed(2));
   artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
-  const art = showcaseArtworks.find(a => a.id === artId);
-  if (art && (!art.aspectRatio || Math.abs(art.aspectRatio - r) > 0.08)) {
+  const art = showcaseArtworks.find(a => a.id == artId);
+  if (art) {
     art.width = w;
     art.height = h;
     art.aspectRatio = r;
     const tile = document.getElementById(`galleryTile_${art.id}`);
     if (tile) {
       tile.className = `mosaic-tile ${getAutoSpanClass(art)}`;
+      tile.style.setProperty('--aspect-ratio', `${w} / ${h}`);
     }
   }
 };
@@ -1007,12 +1016,11 @@ let currentCaseStudyIdx = 0;
 
 window.openArtModal = function(id) {
   if (!id) return;
-  // جستجوی انعطاف‌پذیر بر اساس عدد یا رشته
-  let art = showcaseArtworks.find(a => a.id == id || String(a.id) === String(id));
+  let art = showcaseArtworks.find(a => String(a.id) === String(id) || a.id == id);
   if (!art) {
     try {
       const allStored = JSON.parse(localStorage.getItem(KEYS.ARTWORKS) || '[]');
-      art = allStored.find(a => a.id == id || String(a.id) === String(id));
+      art = allStored.find(a => String(a.id) === String(id) || a.id == id);
     } catch(e) {}
   }
 
@@ -1087,7 +1095,7 @@ function renderArtStationProject(art) {
   const pipeNameEl = document.getElementById('caseStudyPipeName');
   if (pipeNameEl) pipeNameEl.textContent = pipeData.topSub;
 
-  // ۲. استریم عمودی تصاویر به سبک آرت‌استیشن
+  // ۲. استریم عمودی تصاویر پروژه با اطمینان از نمایش قطعی
   const stream = document.getElementById('caseStudyImagesStream');
   if (!stream) return;
 
@@ -1098,6 +1106,13 @@ function renderArtStationProject(art) {
     streamHtml += `
       <div class="artstation-img-card">
         <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" />
+      </div>
+    `;
+  } else {
+    streamHtml += `
+      <div class="artstation-img-card" style="padding:60px 20px; text-align:center; color:var(--text-muted);">
+        <span style="font-size:36px; display:block; margin-bottom:12px;">🎨</span>
+        تصویر با کیفیت این اثر در حال آماده‌سازی و همگام‌سازی ابری است.
       </div>
     `;
   }

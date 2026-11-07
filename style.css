@@ -2326,35 +2326,61 @@ textarea:-webkit-autofill {
 }
 
 
+
+
 /* =========================================================
-   گالری تراز، ۲ ستونه در موبایل و ۴ ستونه در دسکتاپ به سبک amirzand.art
+   گالری هوشمند بر پایه نسبت ابعاد واقعی (Aspect Ratio) بدون وابستگی به تعداد پیکسل
+   دقیقاً مشابه ساختار وب‌سایت امیر زند (amirzand.art) در موبایل و دسکتاپ
    ========================================================= */
 #showcaseGrid {
   display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-columns: repeat(12, 1fr) !important;
+  grid-auto-flow: dense !important;
   gap: 12px !important;
   width: 100% !important;
+  max-width: 1440px !important;
   margin: 0 auto !important;
+  padding: 0 16px !important;
   column-count: initial !important;
 }
-@media (max-width: 1250px) {
+
+/* اسپن‌های هوشمند در دسکتاپ بر پایه نسبت ابعاد */
+.span-col-wide     { grid-column: span 6 !important; } /* عریض و لنداسکیپ: نصف سطر (یا کامل) */
+.span-col-medium   { grid-column: span 6 !important; } /* افقی استاندارد: نصف سطر */
+.span-col-square   { grid-column: span 4 !important; } /* مربعی: یک‌سوم سطر */
+.span-col-portrait { grid-column: span 3 !important; } /* عمودی پرتره و کاور: یک‌چهارم سطر */
+
+@media (max-width: 1100px) {
   #showcaseGrid {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(6, 1fr) !important;
     gap: 10px !important;
   }
+  .span-col-wide     { grid-column: span 6 !important; }
+  .span-col-medium   { grid-column: span 3 !important; }
+  .span-col-square   { grid-column: span 3 !important; }
+  .span-col-portrait { grid-column: span 2 !important; }
 }
-@media (max-width: 820px) {
-  /* دقیقاً مشابه وب‌سایت امیر زند در موبایل: ۲ ستون متقارن با مارجین تمیز */
+
+@media (max-width: 768px) {
+  /* در موبایل دقیقاً مانند amirzand.art (عکس‌های ۴:۳۰ و ۴:۳۱): ۲ ستون متقارن */
   #showcaseGrid {
     grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-flow: dense !important;
     gap: 8px !important;
+    padding: 0 8px !important;
   }
+  /* آثار عریض و افقی (مانند سفینه و مناظر افقی امیر زند) تمام عرض موبایل را می‌گیرند */
+  .span-col-wide     { grid-column: span 2 !important; }
+  .span-col-medium   { grid-column: span 2 !important; }
+  /* آثار عمودی و مربعی (مانند کاورها و کاراکترها) در ۲ ستون کنار هم قرار می‌گیرند */
+  .span-col-square   { grid-column: span 1 !important; }
+  .span-col-portrait { grid-column: span 1 !important; }
 }
 
 .mosaic-tile {
   position: relative !important;
-  aspect-ratio: 3 / 4 !important; /* نسبت پرتره و کانسپت آرکیتکچر تم ورتیکال آرت‌استیشن */
-  border-radius: 8px !important;
+  aspect-ratio: var(--aspect-ratio, 16 / 10) !important; /* نسبت ابعاد پویا بر اساس ابعاد واقعی خود عکس */
+  border-radius: 6px !important;
   overflow: hidden !important;
   background: #07090e !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -2364,9 +2390,9 @@ textarea:-webkit-autofill {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
 .mosaic-tile:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-3px) !important;
   border-color: var(--gold) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85) !important;
 }
 .mosaic-tile img {
   width: 100% !important;
