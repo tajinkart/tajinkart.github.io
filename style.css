@@ -1846,7 +1846,7 @@
   border: 1px solid var(--iris);
   border-radius: 20px;
   width: 100%;
-  max-width: 580px;
+  max-width: 880px;
   max-height: 90vh;
   overflow-y: auto;
   padding: 24px;
@@ -3354,22 +3354,30 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   opacity: 1;
 }
 
-/* حذف کامل هرگونه مات شدن و هاور در دستگاه‌های لمسی موبایل هنگام زوم و تاچ */
-@media (hover: none), (max-width: 992px) {
-  .tile-center-title,
-  .mosaic-tile:hover .tile-center-title,
-  .mosaic-tile:active .tile-center-title {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
+/* نمایش شفاف و شیک عنوان اثر در هاور و لمس (کاملاً بدون مات‌شدگی و با وضوح ۱۰۰٪) */
+.tile-center-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: rgba(3, 4, 7, 0.75) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: none;
+  z-index: 5;
 }
-.mosaic-tile.tile-pinching .tile-center-title {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
+.mosaic-tile:hover .tile-center-title,
+.mosaic-tile:active .tile-center-title,
+.mosaic-tile.touch-active .tile-center-title {
+  opacity: 1 !important;
+  display: flex !important;
+  visibility: visible !important;
 }
 
 /* دراور شیک و کشویی مقاصد انتشار چندکاناله (Omnichannel Social Drawer) */

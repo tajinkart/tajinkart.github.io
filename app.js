@@ -703,9 +703,74 @@ const AVAILABLE_PLATFORMS = [
   { id: 'linkedin', name: 'لینکدین', icon: '💼', placeholder: 'متن بیزینس و کاربرد تجاری اثر در لینکدین...' }
 ];
 
+function renderPhaseSocialDrawerContent(p, idx) {
+  p.socials = p.socials || {};
+  p.socialCaptions = p.socialCaptions || {};
+  if (p.socialTelegram !== undefined && p.socials.telegram === undefined) {
+    p.socials.telegram = Boolean(p.socialTelegram);
+  }
+  const currentSelectedTab = p.activeSocialTab || 'telegram';
+  const activePlat = AVAILABLE_PLATFORMS.find(item => item.id === currentSelectedTab) || AVAILABLE_PLATFORMS[0];
+  const isCurrentPlatChecked = Boolean(p.socials[activePlat.id]);
+
+  return `
+    <!-- ستون ۱: لیست عمودی شیک و قابل اسکرول پلتفرم‌ها (طرح منوی تاج‌اینک‌آرت) -->
+    <div class="phase-social-menu-scroll">
+      ${AVAILABLE_PLATFORMS.map(plat => {
+        const isSelected = (currentSelectedTab === plat.id);
+        const isChecked = Boolean(p.socials && p.socials[plat.id]);
+        return `
+          <div class="phase-social-menu-item ${isSelected ? 'active' : ''}" onclick="selectPhaseSocialTab(${idx}, '${plat.id}')">
+            <div style="display:flex; align-items:center; gap:7px;">
+              <span style="font-size:14px;">${plat.icon}</span>
+              <span style="font-size:11px; font-weight:${isSelected ? '800' : '600'}; color:${isSelected ? 'var(--gold)' : '#e2e8f0'};">${plat.name}</span>
+            </div>
+            <input type="checkbox" onclick="event.stopPropagation()" onchange="togglePhaseSocialPlatform(${idx}, '${plat.id}', this.checked)" ${isChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer; width:15px; height:15px;" title="فعال/غیرفعال کردن ارسال به ${plat.name}" />
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- ستون ۲: باکس تنظیمات و متن کاملاً اختصاصی پلتفرم انتخاب شده -->
+    <div style="background:#04060c; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; flex-wrap:wrap; gap:6px;">
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:18px;">${activePlat.icon}</span>
+          <span style="font-size:12.5px; font-weight:800; color:var(--gold);">تنظیمات و متن اختصاصی ${activePlat.name}</span>
+        </div>
+        <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer; color:${isCurrentPlatChecked ? 'var(--gold)' : 'var(--text-muted)'}; background:rgba(255,255,255,0.04); padding:4px 10px; border-radius:6px; border:1px solid ${isCurrentPlatChecked ? 'rgba(250,204,21,0.3)' : 'rgba(255,255,255,0.08)'};">
+          <input type="checkbox" onchange="togglePhaseSocialPlatform(${idx}, '${activePlat.id}', this.checked)" ${isCurrentPlatChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+          <span style="font-weight:700;">ارسال این شیت به ${activePlat.name}</span>
+        </label>
+      </div>
+
+      <div>
+        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن / کپشن اختصاصی برای ${activePlat.name}:</label>
+        <textarea rows="3" placeholder="${activePlat.placeholder}" oninput="setPhaseSocialCaption(${idx}, '${activePlat.id}', this.value)" style="font-size:11.5px; padding:8px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a14; width:100%; box-sizing:border-box;">${(p.socialCaptions && p.socialCaptions[activePlat.id]) || ''}</textarea>
+      </div>
+
+      <!-- تنظیمات انحصاری برای تلگرام -->
+      ${activePlat.id === 'telegram' ? `
+        <div style="background:rgba(0,240,255,0.04); border:1px dashed rgba(0,240,255,0.25); border-radius:8px; padding:10px 12px; margin-top:2px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11.5px; color:var(--cyan-electric); font-weight:700;">
+            <input type="checkbox" onchange="setPhaseTelegramButton(${idx}, this.checked)" ${p.tgIncludeButton ? 'checked' : ''} style="accent-color:var(--cyan-electric); cursor:pointer; width:16px; height:16px;" />
+            <span>افزودن دکمه شیشه‌ای لینک مستقیم به همین اثر در سایت (انحصاری همین اثر)</span>
+          </label>
+          <p style="font-size:10px; color:var(--text-muted); margin:4px 0 0 24px;">در صورت غیرفعال بودن، پیام تلگرام بدون هیچ دکمه‌ای در زیر پست ارسال می‌شود.</p>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
 window.selectPhaseSocialTab = function(phaseIdx, platId) {
   if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
   stagingProjectPhases[phaseIdx].activeSocialTab = platId;
+  const drawerEl = document.getElementById(`phaseSocialDrawer_${phaseIdx}`);
+  if (drawerEl) {
+    drawerEl.innerHTML = renderPhaseSocialDrawerContent(stagingProjectPhases[phaseIdx], phaseIdx);
+    return;
+  }
   renderAdminStagingPhasesOnly();
 };
 
@@ -715,7 +780,23 @@ window.togglePhaseSocialPlatform = function(phaseIdx, platId, isChecked) {
   p.socials = p.socials || {};
   p.socials[platId] = isChecked;
   if (platId === 'telegram') p.socialTelegram = isChecked;
-  renderAdminStagingPhasesOnly();
+
+  // بروزرسانی بج آکاردئون درجا بدون بازسازی کل ساختار
+  const badgeEl = document.getElementById(`phaseSocialBadge_${phaseIdx}`);
+  if (badgeEl) {
+    const activeSocials = [];
+    AVAILABLE_PLATFORMS.forEach(item => {
+      if (p.socials[item.id]) activeSocials.push(item.name);
+    });
+    badgeEl.textContent = activeSocials.length > 0 ? `${activeSocials.length} شبکه فعال (${activeSocials.join('، ')})` : 'توزیع خودکار: خاموش';
+    badgeEl.style.color = activeSocials.length > 0 ? 'var(--gold)' : 'var(--text-muted)';
+    badgeEl.style.background = activeSocials.length > 0 ? 'rgba(250,204,21,0.12)' : 'rgba(255,255,255,0.05)';
+  }
+
+  const drawerEl = document.getElementById(`phaseSocialDrawer_${phaseIdx}`);
+  if (drawerEl) {
+    drawerEl.innerHTML = renderPhaseSocialDrawerContent(p, phaseIdx);
+  }
 };
 
 window.setPhaseSocialCaption = function(phaseIdx, platId, text) {
@@ -729,181 +810,6 @@ window.setPhaseTelegramButton = function(phaseIdx, isChecked) {
   if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
   stagingProjectPhases[phaseIdx].tgIncludeButton = isChecked;
 };
-
-let isCreatingNewArt = false;
-let stagingNewArt = null;
-
-window.openCreateArtworkModal = function() {
-  isCreatingNewArt = true;
-  stagingNewArt = {
-    id: Date.now(),
-    tag: 'character',
-    shortSlug: '',
-    title: '',
-    desc: '',
-    pipelineKey: 'sketch1',
-    image: '',
-    phases: [
-      {
-        name: 'کاور و شیت اصلی اثر',
-        img: '',
-        image: '',
-        pipelineKey: 'sketch1',
-        subcategory: 'طراحی و اجرای استاندارد',
-        desc: '',
-        customCaption: '',
-        socialTelegram: false
-      }
-    ]
-  };
-
-  const titleEl = document.getElementById('adminArtEditorModalTitle');
-  if (titleEl) titleEl.textContent = '✨ افزودن اثر جدید به گالری';
-
-  renderAdminArtModalForm(stagingNewArt, true);
-  document.getElementById('adminArtLiveEditorCol').classList.add('active');
-  pushModalState('adminEditor');
-};
-
-window.selectAdminArt = function(idx) {
-  isCreatingNewArt = false;
-  currentSelectedArtIdx = idx;
-  const art = showcaseArtworks[idx];
-  if (!art) return;
-
-  const titleEl = document.getElementById('adminArtEditorModalTitle');
-  if (titleEl) titleEl.textContent = `ویرایش آرت‌ورک: ${art.shortSlug || art.title}`;
-
-  renderAdminArtModalForm(art, false);
-  document.getElementById('adminArtLiveEditorCol').classList.add('active');
-  pushModalState('adminEditor');
-};
-
-window.closeAdminArtEditor = function() {
-  const modal = document.getElementById('adminArtLiveEditorCol');
-  if (modal) modal.classList.remove('active');
-  isCreatingNewArt = false;
-  stagingNewArt = null;
-};
-
-window.closeAdminArtEditorDirect = function(e) {
-  if (e.target.id === 'adminArtLiveEditorCol') {
-    closeAdminArtEditor();
-  }
-};
-
-let stagingProjectPhases = [];
-
-function renderAdminArtModalForm(art, isNew) {
-  const box = document.getElementById('adminArtFormFields');
-  if (!box || !art) return;
-
-  // آماده‌سازی لیست تصاویر و شیت‌های پروژه
-  stagingProjectPhases = [];
-  if (Array.isArray(art.phases) && art.phases.length > 0) {
-    stagingProjectPhases = JSON.parse(JSON.stringify(art.phases));
-  } else if (art.image) {
-    stagingProjectPhases.push({
-      name: art.title || 'تصویر کاور اصلی',
-      img: art.image,
-      image: art.image,
-      pipelineKey: art.pipelineKey || 'sketch1',
-      subcategory: 'طراحی و اجرای استاندارد',
-      desc: '',
-      socialTelegram: true
-    });
-  } else {
-    stagingProjectPhases.push({
-      name: 'کاور و شیت اصلی اثر',
-      img: '',
-      image: '',
-      pipelineKey: 'sketch1',
-      subcategory: 'طراحی و اجرای استاندارد',
-      desc: '',
-      customCaption: '',
-      socialTelegram: false
-    });
-  }
-
-  box.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:14px;">
-      
-      <!-- گام ۱: تیتر و داستان کلی کانسپت -->
-      <div style="background:#04060a; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
-        <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13px; font-weight:900; color:var(--gold);">📌 گام ۱: عنوان و داستان کانسپت</span>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان کامل اثر</label>
-            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
-          </div>
-          <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
-            <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
-          </div>
-        </div>
-
-        <div>
-          <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
-          <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
-        </div>
-      </div>
-
-      <!-- گام ۲: تصاویر و شیت‌های پروژه (مدیریت یکپارچه) -->
-      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:16px;">
-        <div style="margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصاویر و شیت‌های پروژه:</span>
-          <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصویر کاور و شیت‌های اثر را بارگذاری کنید. در انتهای شیت‌ها می‌توانید با دکمه زیر شیت جدید اضافه کنید.</p>
-        </div>
-
-        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:12px;">
-          ${renderStagingPhasesHtml()}
-        </div>
-
-        <!-- دکمه افزودن شیت در انتهای باندل شیت‌ها -->
-        <div style="margin-top:14px;">
-          <button type="button" onclick="addStagingPhase()" class="btn-secondary" style="width:100%; padding:11px 16px; font-size:12px; font-weight:800; border:1px dashed var(--cyan-electric); color:var(--cyan-electric); background:rgba(0,240,255,0.04); display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px;">
-            <span style="font-size:16px;">➕</span>
-            <span>افزودن شیت تکمیلی به این اثر</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- تنظیمات نهایی سفارش پکیج کامل -->
-      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.28); border-radius:12px; padding:12px 14px;">
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
-          <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--gold); cursor:pointer;" />
-          فعال‌سازی سفارش به عنوان پکیج کامل پروداکشن (Production Pack) در انتهای اثر
-        </label>
-      </div>
-
-      <!-- دکمه‌های عملیاتی -->
-      <div style="margin-top:4px; display:flex; flex-direction:column; gap:8px;">
-        ${isNew ? `
-          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
-            ✓ تایید و افزودن قطعی به گالری
-          </button>
-          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
-            انصراف و لغو
-          </button>
-        ` : `
-          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
-            ✓ ذخیره تغییرات پروژه
-          </button>
-          <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
-            حذف این اثر از گالری
-          </button>
-          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
-            بستن بدون تغییر
-          </button>
-        `}
-      </div>
-
-    </div>
-  `;
-}
 
 function renderStagingPhasesHtml() {
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
@@ -927,11 +833,7 @@ function renderStagingPhasesHtml() {
     if (p.socialTelegram !== undefined && p.socials.telegram === undefined) {
       p.socials.telegram = Boolean(p.socialTelegram);
     }
-    const currentSelectedTab = p.activeSocialTab || 'telegram';
-    const activePlat = AVAILABLE_PLATFORMS.find(item => item.id === currentSelectedTab) || AVAILABLE_PLATFORMS[0];
-    const isCurrentPlatChecked = Boolean(p.socials[activePlat.id]);
 
-    // شمارش پلتفرم‌های فعال اختصاصی برای این شیت
     const activeSocials = [];
     AVAILABLE_PLATFORMS.forEach(item => {
       if (p.socials[item.id]) activeSocials.push(item.name);
@@ -1013,11 +915,11 @@ function renderStagingPhasesHtml() {
         <textarea rows="2" placeholder="توضیحات تخصصی این فاز (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
 
         <!-- مقاصد انتشار چندکاناله استودیو (دراور شیک و اسکرول‌پذیر با باکس متن کاملاً اختصاصی هر شبکه) -->
-        <details style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:12px; padding:10px 14px; margin-top:2px;">
+        <details id="phaseSocialDetails_${idx}" ontoggle="stagingProjectPhases[${idx}].isSocialOpen = this.open" ${p.isSocialOpen ? 'open' : ''} style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:12px; padding:10px 14px; margin-top:2px;">
           <summary style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; list-style:none; user-select:none; outline:none;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:11.5px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار در شبکه‌ها (توزیع اختصاصی این شیت):</span>
-              <span class="font-mono" style="font-size:9.5px; color:${activeSocials.length > 0 ? 'var(--gold)' : 'var(--text-muted)'}; background:${activeSocials.length > 0 ? 'rgba(250,204,21,0.12)' : 'rgba(255,255,255,0.05)'}; padding:2px 8px; border-radius:4px;">
+              <span id="phaseSocialBadge_${idx}" class="font-mono" style="font-size:9.5px; color:${activeSocials.length > 0 ? 'var(--gold)' : 'var(--text-muted)'}; background:${activeSocials.length > 0 ? 'rgba(250,204,21,0.12)' : 'rgba(255,255,255,0.05)'}; padding:2px 8px; border-radius:4px;">
                 ${activeSocials.length > 0 ? `${activeSocials.length} شبکه فعال (${activeSocials.join('، ')})` : 'توزیع خودکار: خاموش'}
               </span>
             </div>
@@ -1027,55 +929,8 @@ function renderStagingPhasesHtml() {
             </span>
           </summary>
 
-          <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);" class="phase-social-drawer-layout">
-            
-            <!-- ستون ۱: لیست عمودی شیک و قابل اسکرول پلتفرم‌ها (طرح منوی تاج‌اینک‌آرت) -->
-            <div class="phase-social-menu-scroll">
-              ${AVAILABLE_PLATFORMS.map(plat => {
-                const isSelected = (currentSelectedTab === plat.id);
-                const isChecked = Boolean(p.socials && p.socials[plat.id]);
-                return `
-                  <div class="phase-social-menu-item ${isSelected ? 'active' : ''}" onclick="selectPhaseSocialTab(${idx}, '${plat.id}')">
-                    <div style="display:flex; align-items:center; gap:7px;">
-                      <span style="font-size:14px;">${plat.icon}</span>
-                      <span style="font-size:11px; font-weight:${isSelected ? '800' : '600'}; color:${isSelected ? 'var(--gold)' : '#e2e8f0'};">${plat.name}</span>
-                    </div>
-                    <input type="checkbox" onclick="event.stopPropagation()" onchange="togglePhaseSocialPlatform(${idx}, '${plat.id}', this.checked)" ${isChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer; width:15px; height:15px;" title="فعال/غیرفعال کردن ارسال به ${plat.name}" />
-                  </div>
-                `;
-              }).join('')}
-            </div>
-
-            <!-- ستون ۲: باکس تنظیمات و متن کاملاً اختصاصی پلتفرم انتخاب شده -->
-            <div style="background:#04060c; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:10px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; flex-wrap:wrap; gap:6px;">
-                <div style="display:flex; align-items:center; gap:7px;">
-                  <span style="font-size:18px;">${activePlat.icon}</span>
-                  <span style="font-size:12.5px; font-weight:800; color:var(--gold);">تنظیمات و متن اختصاصی ${activePlat.name}</span>
-                </div>
-                <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer; color:${isCurrentPlatChecked ? 'var(--gold)' : 'var(--text-muted)'}; background:rgba(255,255,255,0.04); padding:4px 10px; border-radius:6px; border:1px solid ${isCurrentPlatChecked ? 'rgba(250,204,21,0.3)' : 'rgba(255,255,255,0.08)'};">
-                  <input type="checkbox" onchange="togglePhaseSocialPlatform(${idx}, '${activePlat.id}', this.checked)" ${isCurrentPlatChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                  <span style="font-weight:700;">ارسال این شیت به ${activePlat.name}</span>
-                </label>
-              </div>
-
-              <div>
-                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن / کپشن اختصاصی برای ${activePlat.name}:</label>
-                <textarea rows="3" placeholder="${activePlat.placeholder}" onchange="setPhaseSocialCaption(${idx}, '${activePlat.id}', this.value.trim())" style="font-size:11.5px; padding:8px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a14; width:100%; box-sizing:border-box;">${(p.socialCaptions && p.socialCaptions[activePlat.id]) || ''}</textarea>
-              </div>
-
-              <!-- تنظیمات انحصاری برای تلگرام -->
-              ${activePlat.id === 'telegram' ? `
-                <div style="background:rgba(0,240,255,0.04); border:1px dashed rgba(0,240,255,0.25); border-radius:8px; padding:10px 12px; margin-top:2px;">
-                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11.5px; color:var(--cyan-electric); font-weight:700;">
-                    <input type="checkbox" onchange="setPhaseTelegramButton(${idx}, this.checked)" ${p.tgIncludeButton ? 'checked' : ''} style="accent-color:var(--cyan-electric); cursor:pointer; width:16px; height:16px;" />
-                    <span>افزودن دکمه شیشه‌ای لینک مستقیم به همین اثر در سایت (انحصاری همین اثر)</span>
-                  </label>
-                  <p style="font-size:10px; color:var(--text-muted); margin:4px 0 0 24px;">در صورت غیرفعال بودن، پیام تلگرام بدون هیچ دکمه‌ای در زیر پست ارسال می‌شود.</p>
-                </div>
-              ` : ''}
-            </div>
-
+          <div id="phaseSocialDrawer_${idx}" style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);" class="phase-social-drawer-layout">
+            ${renderPhaseSocialDrawerContent(p, idx)}
           </div>
         </details>
       </div>
@@ -1263,10 +1118,7 @@ window.confirmSaveArtwork = async function() {
       renderAdminSketch2();
       showToast('تغییرات پروژه با موفقیت ذخیره شد!', 'success');
 
-      const tgPhases = assembledPhases.filter(p => (p.socials?.telegram === true || p.socialTelegram === true));
-      for (const ph of tgPhases) {
-        await broadcastArtworkPhaseToTelegram(art, ph);
-      }
+      // در زمان ویرایش اثر، به درخواست مدیر استودیو هیچ پیامی به شبکه‌ها یا تلگرام ارسال نمی‌شود تا تکراری نباشد.
 
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').update({
@@ -5138,133 +4990,6 @@ window.goToPipelineFromDrawer = function() {
 };
 
 // =========================================================
-// موتور فوق‌پیشرفته زوم فنری سبک اینستاگرام در موبایل (Instagram Elastic Spring Pinch)
-// =========================================================
-(function initInstagramPinchZoom() {
-  let activeTarget = null;
-  let initialDist = 0;
-  let initialMidX = 0;
-  let initialMidY = 0;
-  let currentScale = 1;
-  let currentTranslateX = 0;
-  let currentTranslateY = 0;
-  let isPinching = false;
-
-  function getDistance(t1, t2) {
-    const dx = t1.clientX - t2.clientX;
-    const dy = t1.clientY - t2.clientY;
-    return Math.hypot(dx, dy);
-  }
-
-  function getMidpoint(t1, t2) {
-    return {
-      x: (t1.clientX + t2.clientX) / 2,
-      y: (t1.clientY + t2.clientY) / 2
-    };
-  }
-
-  document.addEventListener('touchstart', function(e) {
-    if (e.touches && e.touches.length === 2) {
-      const img = e.target.closest('.elastic-pinch-target') || 
-                  (e.target.tagName === 'IMG' && e.target.closest('.artstation-img-card') ? e.target : null) ||
-                  (e.target.tagName === 'IMG' && e.target.closest('.mosaic-tile') ? e.target : null);
-      if (img) {
-        if (e.cancelable) e.preventDefault();
-        activeTarget = img;
-        isPinching = true;
-        initialDist = getDistance(e.touches[0], e.touches[1]);
-        const mid = getMidpoint(e.touches[0], e.touches[1]);
-        initialMidX = mid.x;
-        initialMidY = mid.y;
-
-        const parentTile = img.closest('.mosaic-tile');
-        if (parentTile) {
-          parentTile.classList.add('tile-pinching');
-        }
-        const backdrop = document.getElementById('instagramPinchBackdrop');
-        if (backdrop) backdrop.classList.add('active');
-
-        const rect = img.getBoundingClientRect();
-        const originX = ((mid.x - rect.left) / rect.width) * 100;
-        const originY = ((mid.y - rect.top) / rect.height) * 100;
-        activeTarget.style.transformOrigin = `${originX}% ${originY}%`;
-        activeTarget.style.transition = 'none';
-        activeTarget.style.zIndex = '100000';
-        activeTarget.style.position = 'relative';
-        activeTarget.classList.add('elastic-pinch-active');
-      }
-    }
-  }, { passive: false });
-
-  document.addEventListener('touchmove', function(e) {
-    if (isPinching && activeTarget && e.touches && e.touches.length === 2) {
-      if (e.cancelable) e.preventDefault();
-      const currentDist = getDistance(e.touches[0], e.touches[1]);
-      if (initialDist > 0) {
-        let rawScale = currentDist / initialDist;
-        if (rawScale < 1) {
-          rawScale = 1 - (1 - rawScale) * 0.35;
-        } else if (rawScale > 2.5) {
-          rawScale = 2.5 + (rawScale - 2.5) * 0.2;
-        }
-        currentScale = Math.max(0.85, Math.min(rawScale, 2.75));
-
-        const currentMid = getMidpoint(e.touches[0], e.touches[1]);
-        currentTranslateX = (currentMid.x - initialMidX) * 0.8;
-        currentTranslateY = (currentMid.y - initialMidY) * 0.8;
-
-        activeTarget.style.transform = `scale(${currentScale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
-      }
-    }
-  }, { passive: false });
-
-  function endPinch() {
-    if (activeTarget) {
-      const target = activeTarget;
-      const parentTile = target.closest('.mosaic-tile');
-      const backdrop = document.getElementById('instagramPinchBackdrop');
-      if (backdrop) backdrop.classList.remove('active');
-
-      target.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease';
-      target.style.transform = 'scale(1) translate(0px, 0px)';
-      target.classList.remove('elastic-pinch-active');
-
-      setTimeout(() => {
-        if (target) {
-          target.style.transition = '';
-          target.style.transform = '';
-          target.style.transformOrigin = '';
-          target.style.zIndex = '';
-          target.style.position = '';
-        }
-        if (parentTile) {
-          parentTile.classList.remove('tile-pinching');
-        }
-      }, 350);
-
-      activeTarget = null;
-      isPinching = false;
-      initialDist = 0;
-      currentScale = 1;
-      currentTranslateX = 0;
-      currentTranslateY = 0;
-    }
-  }
-
-  document.addEventListener('touchend', function(e) {
-    if (isPinching && (!e.touches || e.touches.length < 2)) {
-      endPinch();
-    }
-  }, { passive: false });
-
-  document.addEventListener('touchcancel', function(e) {
-    if (isPinching) {
-      endPinch();
-    }
-  }, { passive: false });
-})();
-
-
 // =========================================================
 // بهینه‌سازی اختصاصی مینی‌اپلیکیشن تلگرام (Telegram Mini App Ready)
 // =========================================================
