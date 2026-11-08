@@ -811,6 +811,13 @@ function renderAdminArtModalForm(art, isNew) {
           <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
           <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
         </div>
+
+        <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.25); border-radius:10px; padding:10px 12px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
+            <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--gold);" />
+            فعال‌سازی سفارش به عنوان پکیج کامل پروداکشن (Production Pack) در انتهای اثر
+          </label>
+        </div>
       </div>
 
       <!-- گام ۲: تصویر کاور اصلی پروژه -->
@@ -1091,6 +1098,7 @@ window.confirmSaveArtwork = function() {
         shortSlug: slug || stagingNewArt.shortSlug || title || 'کانسپت جدید',
         title: title || 'کانسپت مستر جدید استودیو',
         desc: desc,
+      isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
         pipelineKey: pipe,
         image: img,
         lore: lore,
@@ -1454,14 +1462,39 @@ function renderShowcaseGrid() {
       slug = art.tag ? art.tag.toUpperCase() : 'CONCEPT';
     }
 
+    let tileImg = imgSrc;
+    let targetPhaseIdx = 0;
+
+    // تایل داینامیک: اگر دسته‌بندی خاصی فیلتر شده و شیت دوم یا سوم به آن تعلق دارد، تایل همان شیت را نشان می‌دهد
+    if (currentGalleryFilter && currentGalleryFilter !== 'all' && art.phases && Array.isArray(art.phases)) {
+      const matchIdx = art.phases.findIndex(p => {
+        const pPipe = p.pipelineKey;
+        const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
+        const pSub = p.subcategory || '';
+        if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
+        if (currentGalleryFilter === 'environment' && (pSub.includes('محیط') || pSub.includes('فضا') || pSub.includes('معماری'))) return true;
+        if (currentGalleryFilter === 'character' && (pSub.includes('کاراکتر') || pSub.includes('شخصیت') || pSub.includes('مسکات') || pSub.includes('Mascot'))) return true;
+        if (currentGalleryFilter === 'creature' && (pSub.includes('موجود') || pSub.includes('هیولا') || pSub.includes('باس'))) return true;
+        if (currentGalleryFilter === 'keyframe' && (pSub.includes('کی‌فریم') || pSub.includes('کاور') || pSub.includes('اسپلش'))) return true;
+        if (currentGalleryFilter === 'props' && (pSub.includes('پراپ') || pSub.includes('سلاح') || pSub.includes('UI'))) return true;
+        if (currentGalleryFilter === 'comic' && (pSub.includes('کمیک') || pSub.includes('استوری‌بورد'))) return true;
+        return false;
+      });
+
+      if (matchIdx !== -1 && (art.phases[matchIdx].img || art.phases[matchIdx].image)) {
+        tileImg = art.phases[matchIdx].img || art.phases[matchIdx].image;
+        targetPhaseIdx = matchIdx + 1;
+      }
+    }
+
     return `
-      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModal(${art.id})">
+      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         <div class="tile-center-title">
           <span class="tile-slug">/ ${slug} /</span>
           <span class="tile-divider"></span>
           <span class="tile-sub">${art.title}</span>
         </div>
-        <img src="${imgSrc}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
+        <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
     `;
   }).join('');
@@ -1487,8 +1520,48 @@ window.handleImageAutoDetect = function(imgEl, artId) {
 // لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)
 let currentCaseStudyIdx = 0;
 
+
+window.closeAllFloatingDrawersAndMenus = function() {
+  const catMenu = document.getElementById('floatingCategoryDropdown');
+  if (catMenu) catMenu.classList.remove('active');
+  const mobileDrawer = document.getElementById('mobileNavDrawer');
+  if (mobileDrawer) mobileDrawer.classList.remove('active');
+  const searchBar = document.getElementById('gallerySearchBar');
+  if (searchBar) searchBar.classList.remove('active');
+  const phaseDrawer = document.getElementById('phaseScopeDrawerOverlay');
+  if (phaseDrawer) phaseDrawer.classList.remove('active');
+};
+
+window.openArtModalWithPhase = function(id, targetPhaseIdx = 0) {
+  closeAllFloatingDrawersAndMenus();
+  let idx = showcaseArtworks.findIndex(a => String(a.id) === String(id) || a.id == id);
+  if (idx === -1 && typeof id === 'number') idx = id;
+  if (idx < 0 || idx >= showcaseArtworks.length) idx = 0;
+
+  openArtModalByIndex(idx);
+
+  if (targetPhaseIdx > 0) {
+    setTimeout(() => {
+      const items = document.querySelectorAll('.project-stream-item');
+      if (items[targetPhaseIdx]) {
+        items[targetPhaseIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 250);
+  }
+};
+
+window.orderProjectPack = function(artId) {
+  const art = showcaseArtworks.find(a => String(a.id) === String(artId) || a.id == artId);
+  closeArtModalDirect();
+  switchView('store');
+  const pipeKey = art ? (art.pipelineKey || 'sketch1') : 'sketch1';
+  selectPipeline(pipeKey);
+  showToast('پکیج کامل پروداکشن این اثر در محاسبه‌گر آتلیه بارگذاری شد.', 'success', 4500);
+};
+
 window.openArtModalByIndex = function(idx) {
   if (idx < 0 || idx >= showcaseArtworks.length) return;
+  closeAllFloatingDrawersAndMenus();
   currentCaseStudyIdx = idx;
   const art = showcaseArtworks[idx];
   renderArtStationProject(art);
@@ -1554,105 +1627,96 @@ function renderArtStationProject(art) {
   if (!art) return;
   activeCaseStudyArt = art;
 
-  // ۱. اطلاعات سایدبار و داستان روایی
-  const titleEl = document.getElementById('artDetailTitle');
-  if (titleEl) titleEl.textContent = art.title || 'کانسپت بدون عنوان';
-
-  const descEl = document.getElementById('artDetailDesc');
-  if (descEl) descEl.textContent = art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
-
-  const loreEl = document.getElementById('caseStudyLore');
-  if (loreEl) loreEl.textContent = art.lore || 'جهان اکستوپیا';
-
-  const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[art.pipelineKey]) ? PIPELINE_DATA[art.pipelineKey] : { topSub: 'طراحی کاراکتر و کانسپت' };
-  const pipeNameEl = document.getElementById('caseStudyPipeName');
-  if (pipeNameEl) pipeNameEl.textContent = pipeData.topSub;
-
-  // ۲. استریم عمودی تصاویر پروژه با قابلیت زوم کلیکی و لمسی به سبک آرت‌استیشن
   const stream = document.getElementById('caseStudyImagesStream');
   if (!stream) return;
 
-  const mainSrc = art.image || art.img || (art.phases && art.phases[0] && (art.phases[0].img || art.phases[0].image)) || '';
-  let streamHtml = '';
-
-  const mainTitle = art.title || 'کانسپت مستر استودیو';
+  const mainTitle = art.title || 'کانسپت بدون عنوان';
   const mainDesc = art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
   const mainPipe = art.pipelineKey || 'sketch1';
+  const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[mainPipe]) ? PIPELINE_DATA[mainPipe] : { topSub: 'آتلیه کانسپت آرت' };
   const mainPipeName = pipeData.topSub;
   const artLore = art.lore || 'جهان اکستوپیا';
 
-  // کارت معرفی کلی پروژه در بالای استریم موبایل
+  let streamHtml = '';
+
+  // ۱. سرتیتر یکپارچه و مجلل اثر (در بالای استریم برای همه دستگاه‌ها)
   streamHtml += `
-    <div class="mobile-project-overview-header">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-        <span class="font-mono" style="font-size:10.5px; color:var(--gold); font-weight:800;">/ کانسپت آرت و طراحی اختصاصی /</span>
-        <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${mainPipeName}</span>
+    <div class="unified-project-header">
+      <h1 class="project-header-title">${mainTitle}</h1>
+      <p class="project-header-desc">${mainDesc}</p>
+      <div class="project-header-meta-row">
+        <span class="project-header-lore-tag">#${escapeQuotes(artLore)}</span>
+        <span class="font-mono" style="font-size:11px; color:var(--gold); font-weight:800;">/ ${mainPipeName} /</span>
       </div>
-      <h2 style="font-size:18px; font-weight:900; color:#fff; margin:4px 0 8px;">${mainTitle}</h2>
-      <p style="font-size:12px; color:#cbd5e1; line-height:1.8; margin:0 0 10px; text-align:justify;">${mainDesc}</p>
-      <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-        <span><strong style="color:#fff;">جهان روایی:</strong> <span style="color:var(--cyan-electric); font-weight:700;">${artLore}</span></span>
-        <span style="font-size:10.5px; color:var(--gold);">💡 ضربه روی عکس: مشخصات هر فاز</span>
-      </div>
-      <button type="button" onclick="goToPipelineFromDrawer('${mainPipe}')" class="btn-gold" style="width:100%; padding:11px; font-size:12px; font-weight:800;">
-        سفارش این پروژه در آتلیه ←
-      </button>
     </div>
   `;
 
+  // ۲. استخراج لیست یکپارچه تصاویر
+  const mainSrc = art.image || art.img || (art.phases && art.phases[0] && (art.phases[0].img || art.phases[0].image)) || '';
+  let imageList = [];
+
   if (mainSrc) {
-    streamHtml += `
-      <div class="artstation-img-card project-stream-item" 
-           data-title="${escapeQuotes(mainTitle)}" 
-           data-phase="/ ۰۱ • اثر اصلی و کانسپت نهایی /" 
-           data-desc="${escapeQuotes(mainDesc)}"
-           data-pipe="${mainPipe}"
-           data-sub="">
-        <img src="${mainSrc}" alt="${mainTitle}" loading="eager" class="elastic-pinch-target" onclick="handleImageClick(this, '${escapeQuotes(mainTitle)}', '${mainPipe}', '${escapeQuotes(mainDesc)}', '', event)" />
-        <div class="mobile-minimal-sheet-bar" onclick="openPhaseScopeDrawer('${escapeQuotes(mainTitle)}', '${mainPipe}', '${escapeQuotes(mainDesc)}', '')">
-          <span style="color:var(--gold); font-weight:800;">۰۱ • اثر اصلی و کانسپت نهایی</span>
-          <span style="color:var(--cyan-electric); font-size:11px;">مشاهده مشخصات فاز ↗</span>
-        </div>
-      </div>
-    `;
-  } else {
-    streamHtml += `
-      <div class="artstation-img-card" style="padding:60px 20px; text-align:center; color:var(--text-muted);">
-        <span style="font-size:36px; display:block; margin-bottom:12px;">🎨</span>
-        تصویر با کیفیت این اثر در حال آماده‌سازی و همگام‌سازی ابری است.
-      </div>
-    `;
+    imageList.push({
+      src: mainSrc,
+      name: mainTitle,
+      phaseNum: '۰۱',
+      desc: mainDesc,
+      pipe: mainPipe,
+      sub: ''
+    });
   }
 
-  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها
-  let totalPhaseCount = 1;
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
-        totalPhaseCount++;
-        const phaseName = p.name || `شیت پروژه • فاز ${pIdx + 1}`;
-        const phaseDesc = p.desc || p.description || p.note || `فاز مکمل پروداکشن: بررسی فرم‌ها، آناتومی و جزئیات طراحی مربوط به این بخش.`;
-        const phasePipe = p.pipelineKey || art.pipelineKey || 'sketch1';
+        const phaseName = p.name || `شیت پروژه • فاز ${imageList.length + 1}`;
+        const phaseDesc = p.desc || p.description || p.note || '';
+        const phasePipe = p.pipelineKey || mainPipe;
         const phaseSub = p.subcategory || '';
-        const pipeName = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[phasePipe]) ? PIPELINE_DATA[phasePipe].topSub : 'آتلیه طراحی';
-
-        streamHtml += `
-          <div class="artstation-img-card project-stream-item" 
-               data-title="${escapeQuotes(phaseName)}" 
-               data-phase="/ ۰${totalPhaseCount} • ${escapeQuotes(phaseName)} /" 
-               data-desc="${escapeQuotes(phaseDesc)}"
-               data-pipe="${phasePipe}"
-               data-sub="${escapeQuotes(phaseSub)}">
-            <img src="${pSrc}" alt="${phaseName}" loading="lazy" class="elastic-pinch-target" onclick="handleImageClick(this, '${escapeQuotes(phaseName)}', '${phasePipe}', '${escapeQuotes(phaseDesc)}', '${escapeQuotes(phaseSub)}', event)" />
-            <div class="mobile-minimal-sheet-bar" onclick="openPhaseScopeDrawer('${escapeQuotes(phaseName)}', '${phasePipe}', '${escapeQuotes(phaseDesc)}', '${escapeQuotes(phaseSub)}')">
-              <span style="color:var(--gold); font-weight:800;">۰${totalPhaseCount} • ${phaseName}</span>
-              <span style="color:var(--cyan-electric); font-size:11px;">مشاهده مشخصات فاز ↗</span>
-            </div>
-          </div>
-        `;
+        imageList.push({
+          src: pSrc,
+          name: phaseName,
+          phaseNum: (imageList.length + 1 < 10 ? `۰${imageList.length + 1}` : `${imageList.length + 1}`),
+          desc: phaseDesc,
+          pipe: phasePipe,
+          sub: phaseSub
+        });
       }
     });
+  }
+
+  // رندر تک‌تک فریم‌های استریم عمودی همراه با یادداشت‌های فنی بین تصاویر
+  imageList.forEach((item, idx) => {
+    const pipeInfo = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[item.pipe]) ? PIPELINE_DATA[item.pipe].topSub : 'آتلیه طراحی';
+    streamHtml += `
+      <div class="artstation-img-card project-stream-item" 
+           data-index="${idx}"
+           data-title="${escapeQuotes(item.name)}">
+        <img src="${item.src}" alt="${item.name}" loading="${idx === 0 ? 'eager' : 'lazy'}" class="elastic-pinch-target" />
+        <div class="stream-phase-note">
+          <div class="stream-phase-header">
+            <span class="stream-phase-title">${item.phaseNum} • ${item.name}</span>
+            <span class="stream-phase-pipe font-mono">${pipeInfo}${item.sub ? ` • ${item.sub}` : ''}</span>
+          </div>
+          ${item.desc ? `<p class="stream-phase-desc">${item.desc}</p>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  // ۳. کارت باوقار سفارش پکیج کامل در انتهای اثر (در صورت فعال بودن در اثر)
+  if (art.isProductionPack !== false) {
+    streamHtml += `
+      <div class="production-pack-card">
+        <span class="pack-badge font-mono">/ COMPLETE PRODUCTION PACK /</span>
+        <h3 class="pack-title">سفارش پکیج کامل این پروژه</h3>
+        <p class="pack-desc">تولید کامل این زنجیره کانسپت (شامل تمامی اتودها، مدل‌شیت‌ها و فضاسازی‌های این اثر) به صورت یکپارچه با فرمول تعرفه آتلیه.</p>
+        <button type="button" onclick="orderProjectPack('${art.id}')" class="btn-gold pack-order-btn">
+          سفارش این پکیج در محاسبه‌گر آتلیه ←
+        </button>
+      </div>
+    `;
   }
 
   stream.innerHTML = streamHtml;
@@ -1871,6 +1935,7 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
   activeModalItem = {
     title: title,
     desc: desc,
+      isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
     price: price,
     img: img,
     timeline: timeline || '۵ تا ۷ روز کاری',
@@ -4561,7 +4626,9 @@ window.goToPipelineFromDrawer = function() {
 
   document.addEventListener('touchstart', function(e) {
     if (e.touches && e.touches.length === 2) {
-      const img = e.target.closest('.elastic-pinch-target') || (e.target.tagName === 'IMG' && e.target.closest('.artstation-img-card') ? e.target : null);
+      const img = e.target.closest('.elastic-pinch-target') || 
+                  (e.target.tagName === 'IMG' && e.target.closest('.artstation-img-card') ? e.target : null) ||
+                  (e.target.tagName === 'IMG' && e.target.closest('.mosaic-tile') ? e.target : null);
       if (img) {
         if (e.cancelable) e.preventDefault();
         activeTarget = img;
