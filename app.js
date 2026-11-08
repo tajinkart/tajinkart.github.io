@@ -2104,7 +2104,7 @@ window.switchAdminTab = function(tabKey, btn) {
     b.classList.toggle('active', b.getAttribute('data-tab') === tabKey);
   });
 
-  if (tabKey === 'artworks') renderAdminSketch2();
+  if (tabKey === 'artworks') { renderAdminSketch2(); if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories(); }
   if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
