@@ -763,30 +763,12 @@ function renderAdminArtModalForm(art, isNew) {
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:14px;">
       
-      <!-- گام ۱: شناسنامه، کاور اصلی و توضیحات کل پروژه -->
+      <!-- گام ۱: تیتر، شناسنامه روایی و داستان کلی پروژه -->
       <div style="background:#04060a; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13px; font-weight:900; color:var(--gold);">📌 گام ۱: مشخصات کلی، کاور و داستان اثر</span>
-          <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">
-            ${art.image ? 'کاور فعال' : 'هنوز عکسی انتخاب نشده'}
-          </span>
+          <span style="font-size:13px; font-weight:900; color:var(--gold);">📌 گام ۱: تیتر، جهان روایی و داستان کلی کانسپت</span>
+          <span class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">مرحله شناسنامه اثر</span>
         </div>
-
-        <div style="max-height:220px; min-height:120px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative;">
-          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:220px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش کاور" />
-          <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:16px;">
-            <span>📷</span>
-            <span>تصویر کاور را از حافظه سیستم انتخاب کنید یا لینک وب بگذارید.</span>
-          </div>
-        </div>
-
-        <div style="display:flex; gap:8px;">
-          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px;">
-            📁 انتخاب عکس کاور از کامپیوتر یا گوشی
-          </button>
-          <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
-        </div>
-        <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="یا درج لینک وب کاور: https://..." class="font-mono" style="font-size:11.5px;" />
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <div>
@@ -809,7 +791,7 @@ function renderAdminArtModalForm(art, isNew) {
             </select>
           </div>
           <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین آتلیه</label>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین اصلی آتلیه</label>
             <select id="editArtPipeSelect" onchange="syncAdminCategoryFromPipe(this)">
               <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
               <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
@@ -826,19 +808,45 @@ function renderAdminArtModalForm(art, isNew) {
         </div>
 
         <div>
-          <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
+          <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
           <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
         </div>
       </div>
 
-      <!-- گام ۲: سایر شیت‌ها و واریاسیون‌های پروژه (ArtStation Multi-Image) -->
-      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:16px;">
+      <!-- گام ۲: تصویر کاور اصلی پروژه -->
+      <div style="background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+          <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">🖼️ گام ۲: انتخاب و آپلود تصویر کاور اصلی</span>
+          <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--gold);">
+            ${art.image ? 'کاور فعال' : 'هنوز عکسی انتخاب نشده'}
+          </span>
+        </div>
+
+        <div style="max-height:220px; min-height:120px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative;">
+          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:220px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش کاور" />
+          <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:16px;">
+            <span>📷</span>
+            <span>تصویر کاور را از حافظه سیستم انتخاب کنید یا لینک وب بگذارید.</span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px; font-weight:800;">
+            📁 انتخاب عکس کاور از کامپیوتر یا گوشی
+          </button>
+          <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
+        </div>
+        <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="یا درج لینک وب کاور: https://..." class="font-mono" style="font-size:11.5px;" />
+      </div>
+
+      <!-- گام ۳: سایر شیت‌ها و واریاسیون‌های پروژه (ArtStation Multi-Image) -->
+      <div style="background:#05070d; border:1px solid rgba(168,85,247,0.35); border-radius:14px; padding:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
           <div>
-            <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: سایر شیت‌ها و فازهای پروژه (اسکرول عمودی ArtStation):</span>
+            <span style="font-size:13px; font-weight:900; color:#c084fc;">📑 گام ۳: سایر شیت‌ها و فازهای پروژه (اسکرول عمودی ArtStation):</span>
             <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">اتودها، شیت‌های سه‌نما، کلوزآپ‌ها یا جزییاتی که زیر کاور اصلی باز می‌شوند.</p>
           </div>
-          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
+          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:#c084fc; color:#c084fc; font-weight:700;">
             + افزودن تصویر به پروژه
           </button>
           <input type="file" id="adminAddPhaseFileInput" accept="image/*" style="display:none;" onchange="handleAdminAddPhaseUpload(this)" />
@@ -1395,12 +1403,33 @@ function renderShowcaseGrid() {
 
   const filteredArtworks = (currentGalleryFilter && currentGalleryFilter !== 'all')
     ? showcaseArtworks.filter(art => {
+        // ۱. بررسی تطابق مستقیم دسته‌بندی و پایپلاین کاور اصلی پروژه
         const cat = art.category || art.tag || (art.pipelineKey ? (PIPELINE_TO_CATEGORY_MAP[art.pipelineKey] || 'character') : 'character');
         const pipe = art.pipelineKey;
-        return cat === currentGalleryFilter || 
-               pipe === currentGalleryFilter || 
-               (PIPELINE_TO_CATEGORY_MAP[pipe] && PIPELINE_TO_CATEGORY_MAP[pipe] === currentGalleryFilter) ||
-               art.tag === currentGalleryFilter;
+        const mainMatch = cat === currentGalleryFilter || 
+                          pipe === currentGalleryFilter || 
+                          (PIPELINE_TO_CATEGORY_MAP[pipe] && PIPELINE_TO_CATEGORY_MAP[pipe] === currentGalleryFilter) ||
+                          art.tag === currentGalleryFilter;
+        if (mainMatch) return true;
+
+        // ۲. فیلتر عمیق شیت‌ها و فازهای الحاقی (Deep Supplemental Phase Matching):
+        // حتی اگر اثر در شاخه کاراکتر باشد اما شیت دوم/سوم آن فضاسازی یا پراپ باشد، در دسته‌بندی مربوطه کشف می‌شود
+        if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
+          return art.phases.some(p => {
+            const pPipe = p.pipelineKey;
+            const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
+            const pSub = p.subcategory || '';
+            if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
+            if (currentGalleryFilter === 'environment' && (pSub.includes('محیط') || pSub.includes('فضا') || pSub.includes('معماری'))) return true;
+            if (currentGalleryFilter === 'character' && (pSub.includes('کاراکتر') || pSub.includes('شخصیت') || pSub.includes('مسکات') || pSub.includes('Mascot'))) return true;
+            if (currentGalleryFilter === 'creature' && (pSub.includes('موجود') || pSub.includes('هیولا') || pSub.includes('باس'))) return true;
+            if (currentGalleryFilter === 'keyframe' && (pSub.includes('کی‌فریم') || pSub.includes('کاور') || pSub.includes('اسپلش'))) return true;
+            if (currentGalleryFilter === 'props' && (pSub.includes('پراپ') || pSub.includes('سلاح') || pSub.includes('UI'))) return true;
+            if (currentGalleryFilter === 'comic' && (pSub.includes('کمیک') || pSub.includes('استوری‌بورد'))) return true;
+            return false;
+          });
+        }
+        return false;
       })
     : showcaseArtworks;
 
