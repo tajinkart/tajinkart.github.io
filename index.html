@@ -143,7 +143,7 @@
 
     <!-- بخش درباره استودیو و بیوگرافی مدیر هنری (در انتهای گالری صفحه اول) -->
     <div id="showcaseStudioAboutSection" style="max-width:1100px; margin:40px auto 70px; padding:0 16px;">
-      <div style="background:radial-gradient(circle at 80% 20%, rgba(250,204,21,0.06) 0%, rgba(6,8,13,0.95) 70%); border:1px solid rgba(250,204,21,0.25); border-radius:18px; padding:36px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; overflow:hidden;">
+      <div style="background:#06080d; background-image:radial-gradient(circle at 80% 20%, rgba(250,204,21,0.08) 0%, #06080d 75%); border:1px solid rgba(250,204,21,0.25); border-radius:18px; padding:36px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; overflow:hidden;">
         
         <div class="about-studio-grid" style="display:grid; grid-template-columns:1fr 320px; gap:32px; align-items:center;">
           <div>
@@ -726,20 +726,37 @@
               <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
             </div>
 
-            <!-- مدیریت کامل دسته‌بندی‌های گالری آثار (مستقر در تب آثار هنری) -->
-            <div style="margin-top:20px; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.25); border-radius:18px; padding:20px; width:100%;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-                <div>
-                  <h4 style="font-size:15px; font-weight:800; color:var(--gold);">📂 دسته‌بندی‌های گالری آثار</h4>
-                  <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">امکان تعریف دسته‌بندی جدید یا حذف دسته‌ها با اعمال بلادرنگ بر روی پیل گالری صفحه اول و فرم ویرایش آثار.</p>
+            <!-- مدیریت فشرده، ارگونومیک و مدرن دسته‌بندی‌های گالری با پالت رنگی نئون -->
+            <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0;">🏷️ دسته‌بندی‌های گالری و پالت رنگی نئون</h4>
+                  <span id="adminCategoryCountBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,240,255,0.2);">۷ دسته فعال</span>
                 </div>
-                <button type="button" onclick="adminOpenAddCategoryModal()" class="btn-gold" style="font-size:11.5px; padding:7px 14px;">
+                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px;">
                   + افزودن دسته‌بندی جدید
                 </button>
               </div>
 
-              <div id="adminGalleryCategoriesList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:10px;">
-                <!-- دسته‌بندی‌ها به صورت داینامیک لود می‌شوند -->
+              <!-- ردیف اینلاین و سریع ایجاد دسته جدید با انتخاب رنگ -->
+              <div id="adminInlineAddCategoryRow" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
+                <input type="text" id="adminNewCatTitle" placeholder="عنوان فارسی (مثال: تصویرسازی سه‌بعدی)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:160px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
+                <input type="text" id="adminNewCatId" placeholder="شناسه انگلیسی (مثال: 3d)" class="font-mono" style="font-size:11px; padding:6px 10px; width:130px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:var(--cyan-electric); direction:ltr;" />
+                <div style="display:flex; align-items:center; gap:6px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; padding:4px 8px;">
+                  <span style="font-size:10.5px; color:var(--text-muted);">رنگ نئون:</span>
+                  <input type="color" id="adminNewCatColor" value="#38bdf8" style="width:22px; height:22px; border:none; padding:0; background:transparent; cursor:pointer;" />
+                </div>
+                <button type="button" onclick="adminSubmitNewCategoryInline()" class="btn-gold" style="font-size:11px; padding:6px 14px;">
+                  ✓ ثبت دسته
+                </button>
+                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
+                  انصراف
+                </button>
+              </div>
+
+              <!-- لیست افقی و فشرده دسته‌بندی‌ها به شکل پیل‌های شیک -->
+              <div id="adminGalleryCategoriesList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <!-- داینامیک توسط renderAdminGalleryCategories پر می‌شود -->
               </div>
             </div>
 
@@ -880,215 +897,318 @@
         </div>
 
         <div id="adminTabSettings" class="hidden">
-            <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%;">
-              <div style="margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%; box-sizing:border-box;">
+              
+              <!-- هدر مرکز کنترل استودیو -->
+              <div style="margin-bottom:18px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div>
-                  <h3 style="font-size:16px; font-weight:800; color:#fff;">⚙️ تنظیمات سراسری سیستم، نرخ ارز و ربات تلگرام</h3>
-                  <span style="font-size:12px; color:var(--text-muted);">مدیریت نرخ تسعیر دلار به تومان، کلیدهای ارتباطی بریف تلگرام و امنیت دسترسی مدیر.</span>
+                  <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">🏛️ مرکز کنترل هویت، برندینگ و پیکربندی استودیو TAJINKART</h3>
+                  <span style="font-size:12px; color:var(--text-muted);">مدیریت مستقل نشان استودیو، فاویکون مرورگر، شعار رسمی، شبکه‌های اجتماعی و ربات تلگرام.</span>
                 </div>
-                <button type="button" onclick="exportSiteDataJSON()" class="btn-secondary" style="font-size:11.5px; padding:7px 14px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.3); background:rgba(0,240,255,0.06);" title="دانلود نسخه پشتیبان کامل آفلاین از کلیه اطلاعات و تنظیمات سایت">
-                  💾 دانلود بک‌آپ کامل سایت (JSON)
+              </div>
+
+              <!-- زیربرگه‌ها (۲ ساب‌تب مجزا) -->
+              <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
+                <button type="button" id="adminSettingsSubTabBtn-identity" onclick="switchSettingsSubTab('identity')" class="settings-subtab-btn active" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                  <span>🎨 هویت، برندینگ و محتوای سایت</span>
+                </button>
+                <button type="button" id="adminSettingsSubTabBtn-social" onclick="switchSettingsSubTab('social')" class="settings-subtab-btn" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                  <span>📡 شبکه‌های اجتماعی و اتصالات</span>
                 </button>
               </div>
 
-              <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+              <form id="adminSettingsForm" onsubmit="event.preventDefault();">
                 
-                <!-- کارت ۰: مدیریت نشان و فاویکون رسمی استودیو (استایل موزاییک با پیش‌نمایش و ضربدر حذف) -->
-                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 نشان و آیکون رسمی استودیو (Crest & Favicon)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">BRAND CREST</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">لوگوی رسمی استودیو را در این کادر بیندازید (Drag & Drop) یا از سیستم انتخاب کنید.</p>
+                <!-- ساب‌تب ۱: هویت، محتوا و برندینگ -->
+                <div id="adminSettingsSubTab-identity" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+                  
+                  <!-- کارت ۱-الف: نشان و آیکون رسمی هدر استودیو (کاملاً مستقل) -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 نشان هدر استودیو (Header Master Crest)</span>
+                      <span class=font-mono style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">HEADER CREST</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">این نشان مستقیماً در بالای نام TAJINKART در صفحه اصلی سایت نمایش داده می‌شود.</p>
 
-                  <!-- بخش کارت موزاییک نشان استودیو همراه با ضربدر حذف و پیش‌نمایش -->
-                  <div id="adminLogoCardContainer">
-                    
-                    <!-- حالت فعال: نمایش تصویر با کادر تیره، دکمه ضربدر قرمز و پیش‌نمایش بزرگ -->
-                    <div id="adminLogoActiveCard" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
-                      <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.15); padding:2px 8px; border-radius:4px;">
-                          🦅 نشان بارگذاری‌شده استودیو
-                        </span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                          <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
-                            🔄 تغییر فایل
-                          </button>
-                          <button type="button" onclick="removeStudioLogo()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف نشان (ضربدر)">
-                            ✕
-                          </button>
+                    <!-- بخش کارت موزاییک نشان استودیو همراه با ضربدر حذف و پیش‌نمایش -->
+                    <div id="adminLogoCardContainer">
+                      <!-- حالت فعال -->
+                      <div id="adminLogoActiveCard" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.15); padding:2px 8px; border-radius:4px;">
+                            🦅 نشان فعال استودیو
+                          </span>
+                          <div style="display:flex; align-items:center; gap:8px;">
+                            <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
+                              🔄 تغییر فایل
+                            </button>
+                            <button type="button" onclick="removeStudioLogo()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف نشان (ضربدر)">
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style="position:relative; width:100%; max-height:200px; min-height:130px; background:#020306; border-radius:8px; border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; padding:10px;">
+                          <img id="adminLogoPreviewImg" src="" alt="نشان استودیو" style="max-width:100%; max-height:180px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 0 20px rgba(250,204,21,0.35));" />
                         </div>
                       </div>
 
-                      <div style="position:relative; width:100%; max-height:220px; min-height:140px; background:#020306; border-radius:8px; border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; padding:10px;">
-                        <img id="adminLogoPreviewImg" src="" alt="نشان استودیو" style="max-width:100%; max-height:200px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 0 20px rgba(250,204,21,0.35));" />
+                      <!-- حالت خالی: زون انتخاب و درگ اند دراپ -->
+                      <div id="adminLogoEmptyDropzone" 
+                           onclick="document.getElementById('adminLogoFileInput').click()"
+                           ondragover="handleLogoDragOver(event)"
+                           ondragleave="handleLogoDragLeave(event)"
+                           ondrop="handleLogoDrop(event)"
+                           style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
+                        <div style="font-size:32px; margin-bottom:6px;">🦅</div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انداختن نشان استودیو</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP (پیش‌نمایش آنی)</div>
                       </div>
                     </div>
+                    <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
 
-                    <!-- حالت خالی: زون انتخاب و درگ اند دراپ -->
-                    <div id="adminLogoEmptyDropzone" 
-                         onclick="document.getElementById('adminLogoFileInput').click()"
-                         ondragover="handleLogoDragOver(event)"
-                         ondragleave="handleLogoDragLeave(event)"
-                         ondrop="handleLogoDrop(event)"
-                         style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
-                      <div style="font-size:32px; margin-bottom:6px;">🦅</div>
-                      <div style="font-size:12.5px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انداختن نشان استودیو</div>
-                      <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP (پیش‌نمایش آنی)</div>
-                    </div>
-
-                  </div>
-                  <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
-
-                  <!-- بخش فاویکون اختصاصی تب مرورگر -->
-                  <div>
-                    <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">آیکون اختصاصی تب مرورگر (Favicon):</label>
-                    <div style="display:flex; align-items:center; gap:10px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:8px 12px;">
-                      <div id="adminFaviconPreviewBox" style="width:36px; height:36px; border-radius:6px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <img id="adminFaviconPreviewImg" src="" style="width:24px; height:24px; object-fit:contain; display:none;" alt="فاویکون" />
-                        <span id="adminFaviconEmptyIcon" style="font-size:16px;">🌐</span>
-                      </div>
-                      <div style="flex:1;">
-                        <input type="text" id="adminFaviconInput" placeholder="آدرس تصویر یا انتخاب فایل فاویکون..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
-                      </div>
-                      <button type="button" onclick="document.getElementById('adminFaviconFileInput').click()" class="btn-secondary" style="font-size:11px; padding:6px 12px; flex-shrink:0; cursor:pointer;">
-                        انتخاب فایل
-                      </button>
-                      <input type="file" id="adminFaviconFileInput" accept="image/*" style="display:none;" onchange="handleAdminFaviconUpload(this)" />
-                    </div>
-                  </div>
-
-                  <!-- دکمه تایید و ثبت قطعی تنظیمات نشان -->
-                  <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800; cursor:pointer;">
-                    ✓ ثبت و تایید نشان و فاویکون استودیو
-                  </button>
-                </div>
-
-                <!-- کارت ۱: نرخ تسعیر ارز -->
-                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--gold);">💵 مدیریت نرخ تسعیر ارز</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">CURRENCY</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیه قیمت‌های آتلیه و فروشگاه بر اساس این نرخ به تومان تبدیل می‌شوند.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نرخ برابری هر دلار (تومان):</label>
-                    <input type="number" id="setUsdRate" class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800;" placeholder="72000" required />
-                  </div>
-                </div>
-
-                <!-- کارت ۲: ربات تلگرام با قابلیت ثبت مستقیم و چند کانال -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">🤖 اتصال ربات تلگرام استودیو (@tajinkart_bot)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.12);">ACTIVE BOT</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">توکن ربات و کانال‌های مقصد را وارد کرده و با دکمه اختصاصی زیر مستقیماً ذخیره کنید.</p>
-                  
-                  <div>
-                    <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token از BotFather):</label>
-                    <input type="text" id="setTgToken" placeholder="مثال: 7123456789:AAFlq..." class="font-mono" style="font-size:11.5px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
-                  </div>
-
-                  <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                      <label style="font-size:11px; color:var(--cyan-electric); font-weight:700;">کانال‌ها یا چت‌های مقصد ارسال:</label>
-                      <button type="button" onclick="addTgChannelField()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
-                        + افزودن کانال / چت دیگر
-                      </button>
-                    </div>
-                    <div id="telegramChannelsList" style="display:flex; flex-direction:column; gap:8px;"></div>
-                    <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">می‌توانید آیدی کانال عمومی (مانند tajinkart@) یا شناسه عددی چت را وارد کنید.</p>
-                  </div>
-
-                  <div>
-                    <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">متن پیش‌فرض ثابت در انتهای پیام‌های تلگرام (فوتر / امضای سراسری):</label>
-                    <textarea id="setTgDefaultFooter" rows="2" placeholder="متنی که می‌خواهید همیشه به صورت پیش‌فرض در انتهای پیام‌های تلگرام به عنوان فوتر/امضا قرار بگیرد (اختیاری)..." style="font-size:11.5px; line-height:1.6; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;"></textarea>
-                  </div>
-
-                  <div style="margin-top:6px;">
-                    <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800;">
-                      ✓ ثبت و ذخیره تنظیمات تلگرام
+                    <!-- دکمه تایید و ثبت نشان استودیو -->
+                    <button type="button" onclick="saveStudioLogoSetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ثبت و تایید نشان هدر استودیو
                     </button>
                   </div>
+
+                  <!-- کارت ۱-ب: فاویکون اختصاصی تب مرورگر (کاملاً جدا و مستقل) -->
+                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:800; color:var(--cyan-electric);">🌐 فاویکون تب مرورگر (Browser Tab Favicon)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">TAB ICON</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">آیکون کوچک تب مرورگر که در کنار عنوان صفحه نمایش داده می‌شود (مستقل از لوگوی هدر).</p>
+
+                    <!-- کادر پیش‌نمایش و آپلود فاویکون -->
+                    <div id="adminFaviconCardContainer">
+                      <!-- حالت فعال فاویکون -->
+                      <div id="adminFaviconActiveCard" style="display:none; background:#04060a; border:1px solid rgba(0,240,255,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--cyan-electric); background:rgba(0,240,255,0.15); padding:2px 8px; border-radius:4px;">
+                            🌐 فاویکون فعال مرورگر
+                          </span>
+                          <div style="display:flex; align-items:center; gap:8px;">
+                            <button type="button" onclick="document.getElementById('adminFaviconFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
+                              🔄 تغییر فایل
+                            </button>
+                            <button type="button" onclick="removeStudioFavicon()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف فاویکون (ضربدر)">
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- شبیه‌ساز تب مرورگر -->
+                        <div style="background:#020306; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+                          <div id="adminFaviconPreviewBox" style="width:32px; height:32px; border-radius:6px; background:#0b0f19; border:1px solid rgba(0,240,255,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <img id="adminFaviconPreviewImg" src="" style="width:22px; height:22px; object-fit:contain; display:none;" alt="فاویکون" />
+                            <span id="adminFaviconEmptyIcon" style="font-size:16px;">🌐</span>
+                          </div>
+                          <div>
+                            <span style="font-size:11px; color:#fff; font-weight:700; display:block;">TAJINKART | استودیو کانسپت آرت</span>
+                            <span class="font-mono" style="font-size:10px; color:var(--text-muted);">tajinkart.github.io</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- حالت خالی فاویکون -->
+                      <div id="adminFaviconEmptyDropzone"
+                           onclick="document.getElementById('adminFaviconFileInput').click()"
+                           style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(0,240,255,0.4); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
+                        <div style="font-size:32px; margin-bottom:6px;">🌐</div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">انتخاب یا انداختن آیکون فاویکون مرورگر</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">ابعاد پیشنهادی: 32x32 یا 64x64 پیکسل (PNG یا ICO)</div>
+                      </div>
+                    </div>
+                    
+                    <input type="text" id="adminFaviconInput" placeholder="یا وارد کردن آدرس مستقیم فاویکون..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
+                    <input type="file" id="adminFaviconFileInput" accept="image/*" style="display:none;" onchange="handleAdminFaviconUpload(this)" />
+
+                    <!-- دکمه تایید و ثبت فاویکون -->
+                    <button type="button" onclick="saveStudioFaviconSetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ثبت و تایید فاویکون تب مرورگر
+                    </button>
+                  </div>
+
+                  <!-- کارت ۱-ج: شعار رسمی استودیو و عنوان مدیر -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13px; font-weight:800; color:var(--gold);">✨ شعار رسمی و عنوان مدیر استودیو</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">SLOGAN</span>
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">شعار اصلی صفحه اول (Slogan Bar):</label>
+                      <input type="text" id="setStudioSloganInput" class="font-mono" style="color:var(--gold); font-size:13px; font-weight:800; text-transform:uppercase; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box;" placeholder="FROM INK TO UNIVERSE" value="FROM INK TO UNIVERSE" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان رسمی مدیر در هدر و درباره ما:</label>
+                      <input type="text" id="setStudioDirectorTitleInput" style="font-size:12px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="سید سروش تاج • مدیر استودیو و طراح ارشد کانسپت آرت و دنیاسازی (Worldbuilder)" value="سید سروش تاج • مدیر استودیو و طراح ارشد کانسپت آرت و دنیاسازی (Worldbuilder)" />
+                    </div>
+                    <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ذخیره شعار و عنوان استودیو
+                    </button>
+                  </div>
+
+                  <!-- کارت ۱-د: مدیریت نرخ تسعیر ارز -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13px; font-weight:800; color:var(--gold);">💵 مدیریت نرخ تسعیر ارز</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">CURRENCY</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیه قیمت‌های آتلیه و فروشگاه بر اساس این نرخ به تومان تبدیل می‌شوند.</p>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نرخ برابری هر دلار (تومان):</label>
+                      <input type="number" id="setUsdRate" class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box;" placeholder="72000" required />
+                    </div>
+                    <button type="button" onclick="saveStudioCurrencySetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer; margin-top:4px;">
+                      ✓ ثبت نرخ تبدیل ارز
+                    </button>
+                  </div>
+
+                  <!-- کارت ۱-هـ: شناسه رسمی و دارایی‌های انحصاری خالق اثر و مدیر استودیو (انتقال‌یافته از اعضا) -->
+                  <div style="background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(10,14,24,0.95)); border:1.5px solid rgba(245,158,11,0.45); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px; grid-column:1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                      <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:24px;">👑</span>
+                        <div>
+                          <span style="font-size:14px; font-weight:900; color:#fbbf24; display:block;">سید سروش تاج (خالق اثر و مدیر ارشد استودیو)</span>
+                          <span class="font-mono" style="font-size:11px; color:var(--cyan-electric);">tajinkart@gmail.com</span>
+                        </div>
+                      </div>
+                      <span class="tier-tag tier-creator" style="padding:4px 12px; font-size:11px;">مالکیت ۱۰۰٪ تجاری و معنوی 👑</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin-top:6px;">
+                      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🗝️ حق امتیاز پایپلاین‌ها</span>
+                        <span style="font-size:11px; color:#cbd5e1;">مالکیت کامل شش پایپلاین کانسپت آرت و استودیو</span>
+                      </div>
+                      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🌌 جهان‌های روایی TAJINKART</span>
+                        <span style="font-size:11px; color:#cbd5e1;">حق کپی‌رایت انحصاری جهان‌های اکستوپیا، آرکان و نیواورس</span>
+                      </div>
+                      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🛡️ امنیت و فرماندهی ابری</span>
+                        <span style="font-size:11px; color:#cbd5e1;">دسترسی روت ادمین با تایید ۲ مرحله‌ای گوگل کلود</span>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
 
+                <!-- ساب‌تب ۲: شبکه‌های اجتماعی، ربات تلگرام و اتصالات (در ابتدا مخفی) -->
+                <div id="adminSettingsSubTab-social" style="display:none; flex-direction:column; gap:20px;">
+                  
+                  <!-- کارت ۲-الف: ربات تلگرام استودیو -->
+                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">🤖 اتصال ربات تلگرام استودیو (@tajinkart_bot)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.12);">ACTIVE BOT</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">توکن ربات و کانال‌های مقصد را وارد کرده و با دکمه اختصاصی زیر مستقیماً ذخیره کنید.</p>
+                    
+                    <div>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token از BotFather):</label>
+                      <input type="text" id="setTgToken" placeholder="مثال: 7123456789:AAFlq..." class="font-mono" style="font-size:11.5px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
 
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label style="font-size:11px; color:var(--cyan-electric); font-weight:700;">کانال‌ها یا چت‌های مقصد ارسال:</label>
+                        <button type="button" onclick="addTgChannelField()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
+                          + افزودن کانال / چت دیگر
+                        </button>
+                      </div>
+                      <div id="telegramChannelsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                      <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">می‌توانید آیدی کانال عمومی (مانند tajinkart@) یا شناسه عددی چت را وارد کنید.</p>
+                    </div>
 
-                <!-- کارت ۴: اتصال فضای ابری مدیا (Cloudinary) -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
+                    <div>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">متن پیش‌فرض ثابت در انتهای پیام‌های تلگرام (فوتر / امضای سراسری):</label>
+                      <textarea id="setTgDefaultFooter" rows="2" placeholder="متنی که می‌خواهید همیشه به صورت پیش‌فرض در انتهای پیام‌های تلگرام به عنوان فوتر/امضا قرار بگیرد (اختیاری)..." style="font-size:11.5px; line-height:1.6; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;"></textarea>
+                    </div>
+
+                    <div style="margin-top:6px;">
+                      <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800;">
+                        ✓ ثبت و ذخیره تنظیمات تلگرام
+                      </button>
+                    </div>
                   </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                    <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px;" placeholder="tajinkart" />
+
+                  <!-- کارت ۲-ب: فضای ابری تصاویر (Cloudinary) -->
+                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
+                      <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="tajinkart" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
+                      <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="erlvtkx9" />
+                    </div>
                   </div>
-                  <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                    <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px;" placeholder="erlvtkx9" />
+
+                  <!-- کارت ۲-ج: مرکز اتوماسیون ۱۲ شبکه اجتماعی (POSSE Hub) -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13px; font-weight:800; color:var(--gold);">📡 مرکز توزیع خودکار سراسری (POSSE 12-Network Hub)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.12);">OMNICHANNEL READY</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیدهای ارتباطی و توکن‌های پلتفرم‌ها جهت ارسال خودکار فایل‌های اصلی، آلبوم‌ها و ویدیوها.</p>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎨 ArtStation / Cara API Token:</label>
+                        <input type="password" id="setArtstationCreds" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="Bearer tok_..." />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📌 Pinterest Access Token & Board:</label>
+                        <input type="password" id="setPinterestToken" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="pina_..." />
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🤖 Reddit Client ID & Secret:</label>
+                        <input type="text" id="setRedditCreds" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="client_id:client_secret" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📷 Instagram & Threads Meta Token:</label>
+                        <input type="password" id="setMetaToken" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="EAAG..." />
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🐦 Twitter (X) API Key & Secret:</label>
+                        <input type="password" id="setTwitterKey" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="api_key:secret" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🦋 Bluesky Identifier & App Password:</label>
+                        <input type="text" id="setBlueskyCreds" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="handle.bsky.social:app-pass" />
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📹 YouTube API Key (Shorts):</label>
+                        <input type="password" id="setYoutubeKey" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="AIzaSy..." />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎮 Discord Webhook URL:</label>
+                        <input type="text" id="setDiscordWebhook" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="https://discord.com/api/webhooks/..." />
+                      </div>
+                    </div>
                   </div>
+
                 </div>
-
-                <!-- کارت ۵: مرکز اتوماسیون و کلیدهای ارتباطی ۱۲ شبکه (POSSE Multi-Channel Hub) -->
-                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--gold);">📡 مرکز توزیع خودکار سراسری (POSSE 12-Network Hub)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.12);">OMNICHANNEL READY</span>
-                  </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیدهای ارتباطی و توکن‌های پلتفرم‌ها جهت ارسال خودکار فایل‌های اصلی، آلبوم‌ها و ویدیوها.</p>
-
-                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎨 ArtStation / Cara API Token:</label>
-                      <input type="password" id="setArtstationCreds" class="font-mono" style="font-size:11px;" placeholder="Bearer tok_..." />
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📌 Pinterest Access Token & Board:</label>
-                      <input type="password" id="setPinterestToken" class="font-mono" style="font-size:11px;" placeholder="pina_..." />
-                    </div>
-                  </div>
-
-                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🤖 Reddit Client ID & Secret:</label>
-                      <input type="text" id="setRedditCreds" class="font-mono" style="font-size:11px;" placeholder="client_id:client_secret" />
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📷 Instagram & Threads Meta Token:</label>
-                      <input type="password" id="setMetaToken" class="font-mono" style="font-size:11px;" placeholder="EAAG..." />
-                    </div>
-                  </div>
-
-                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🐦 Twitter (X) API Key & Secret:</label>
-                      <input type="password" id="setTwitterKey" class="font-mono" style="font-size:11px;" placeholder="api_key:secret" />
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🦋 Bluesky Identifier & App Password:</label>
-                      <input type="text" id="setBlueskyCreds" class="font-mono" style="font-size:11px;" placeholder="handle.bsky.social:app-pass" />
-                    </div>
-                  </div>
-
-                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📹 YouTube API Key (Shorts):</label>
-                      <input type="password" id="setYoutubeKey" class="font-mono" style="font-size:11px;" placeholder="AIzaSy..." />
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎮 Discord Webhook URL:</label>
-                      <input type="text" id="setDiscordWebhook" class="font-mono" style="font-size:11px;" placeholder="https://discord.com/api/webhooks/..." />
-                    </div>
-                  </div>
-                </div>
-
 
               </form>
-
-
 
             </div>
           </div>

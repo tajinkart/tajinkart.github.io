@@ -322,18 +322,18 @@ let academyCourses = [
   }
 ];
 
-let ordersList = JSON.parse(localStorage.getItem(KEYS.ORDERS)) || [
-  {
-    id: 501,
-    client: 'استودیو نوا',
-    contact: '۰۹۱۲۰۰۰۰۰۰۰',
-    pkg: 'مدل‌شیت ارتوگرافیک و حالات چهره',
-    phase: 'فاز ۳: رندر مستر نهایی سینمایی + فایل لایه‌باز PSD',
-    brief: 'کاراکتر روگ سایبرپانک با شنل تیره و قطعات بیومکانیکال زره',
-    status: 'در حال تولید',
-    price: '80'
+let ordersList = [];
+try {
+  const _storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS));
+  if (Array.isArray(_storedOrders)) {
+    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'استودیو نوا' && !String(o.client).includes('نوا'));
   }
-];
+} catch(e) {
+  ordersList = [];
+}
+try {
+  localStorage.setItem(KEYS.ORDERS, JSON.stringify(ordersList));
+} catch(e) {}
 
 let comicPages = [
   'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',

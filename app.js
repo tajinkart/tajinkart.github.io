@@ -3,18 +3,22 @@
 // موتور داینامیک دسته‌بندی‌های گالری آثار استودیو (Studio Gallery Categories Engine)
 // ==============================================================================
 const DEFAULT_GALLERY_CATEGORIES = [
-  { id: 'character', title: 'کاراکتر دیزاین' },
-  { id: 'environment', title: 'کانسپت و فضا' },
-  { id: 'creature', title: 'موجودات و هیولا' },
-  { id: 'keyframe', title: 'کی‌فریم و کاور' },
-  { id: 'props', title: 'تجهیزات و پراپ' },
-  { id: 'comic', title: 'کمیک و وب‌تون' },
-  { id: '2d', title: 'تصویرسازی ۲ بعدی' }
+  { id: 'character', title: 'کاراکتر دیزاین', color: '#facc15' },
+  { id: 'environment', title: 'کانسپت و فضا', color: '#38bdf8' },
+  { id: 'creature', title: 'موجودات و هیولا', color: '#10b981' },
+  { id: 'keyframe', title: 'کی‌فریم و کاور', color: '#f43f5e' },
+  { id: 'props', title: 'تجهیزات و پراپ', color: '#a855f7' },
+  { id: 'comic', title: 'کمیک و وب‌تون', color: '#fb923c' },
+  { id: '2d', title: 'تصویرسازی ۲ بعدی', color: '#ec4899' }
 ];
 
 let galleryCategories = [];
 try {
   galleryCategories = JSON.parse(localStorage.getItem('tajinkart_gallery_categories_v1')) || DEFAULT_GALLERY_CATEGORIES;
+  const palette = ['#facc15', '#38bdf8', '#10b981', '#f43f5e', '#a855f7', '#fb923c', '#ec4899', '#94a3b8'];
+  galleryCategories.forEach((cat, idx) => {
+    if (!cat.color) cat.color = palette[idx % palette.length];
+  });
 } catch(e) {
   galleryCategories = DEFAULT_GALLERY_CATEGORIES;
 }
@@ -25,15 +29,22 @@ window.renderFloatingCategoryDropdown = function() {
 
   let itemsHtml = `
     <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'همه آثار')">
-      <span>همه آثار</span>
+      <span style="display:flex; align-items:center; gap:8px;">
+        <span style="width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
+        <span>همه آثار</span>
+      </span>
     </div>
   `;
 
   galleryCategories.forEach(cat => {
     const isActive = currentGalleryFilter === cat.id;
+    const color = cat.color || '#38bdf8';
     itemsHtml += `
       <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${cat.title}')">
-        <span>${cat.title}</span>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <span style="width:7px; height:7px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color};"></span>
+          <span>${cat.title}</span>
+        </span>
       </div>
     `;
   });
@@ -44,39 +55,82 @@ window.renderFloatingCategoryDropdown = function() {
 window.renderAdminGalleryCategories = function() {
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
+  const badge = document.getElementById('adminCategoryCountBadge');
+  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
 
-  container.innerHTML = galleryCategories.map((cat, idx) => `
-    <div style="background:#090d16; border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <strong style="color:#fff; font-size:12.5px; display:block;">${cat.title}</strong>
-        <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${cat.id}</span>
+  container.innerHTML = galleryCategories.map((cat) => {
+    const color = cat.color || '#38bdf8';
+    return `
+      <div class="admin-cat-pill" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid ${color}44; border-radius:20px; padding:6px 12px; box-shadow:0 0 10px ${color}15;">
+        <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
+        <span style="font-size:12px; font-weight:700; color:#fff;">${cat.title}</span>
+        <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">${cat.id}</span>
+        
+        <div style="position:relative; display:inline-flex; align-items:center;" title="تغییر رنگ نئون این دسته">
+          <input type="color" value="${color}" onchange="adminUpdateCategoryColor('${cat.id}', this.value)" style="width:18px; height:18px; padding:0; border:none; border-radius:4px; cursor:pointer; background:transparent;" />
+        </div>
+
+        <button type="button" onclick="adminDeleteGalleryCategory('${cat.id}')" style="background:none; border:none; color:var(--crimson); font-size:14px; cursor:pointer; padding:0 2px; line-height:1; display:flex; align-items:center;" title="حذف این دسته">✕</button>
       </div>
-      <button type="button" onclick="adminDeleteGalleryCategory('${cat.id}')" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:6px; padding:4px 9px; font-size:11px; cursor:pointer;" title="حذف این دسته">
-        حذف
-      </button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 };
 
-window.adminOpenAddCategoryModal = function() {
-  const title = prompt('عنوان فارسی دسته‌بندی جدید را وارد کنید (مثال: تصویرسازی سه‌بعدی):');
-  if (!title || !title.trim()) return;
-  const cleanTitle = title.trim();
+window.adminToggleAddCategoryForm = function() {
+  const row = document.getElementById('adminInlineAddCategoryRow');
+  if (!row) return;
+  const isHidden = row.style.display === 'none';
+  row.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) {
+    document.getElementById('adminNewCatTitle')?.focus();
+  }
+};
 
-  const id = prompt('شناسه انگلیسی کوتاه دسته‌بندی را وارد کنید (مثال: 3d):', 'cat_' + Date.now().toString().slice(-4));
-  if (!id || !id.trim()) return;
-  const cleanId = id.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+window.adminSubmitNewCategoryInline = function() {
+  const titleEl = document.getElementById('adminNewCatTitle');
+  const idEl = document.getElementById('adminNewCatId');
+  const colorEl = document.getElementById('adminNewCatColor');
 
-  if (galleryCategories.some(c => c.id === cleanId)) {
-    showToast('این شناسه قبلاً ثبت شده است.', 'error');
+  const title = titleEl ? titleEl.value.trim() : '';
+  let id = idEl ? idEl.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '') : '';
+  const color = colorEl ? colorEl.value : '#38bdf8';
+
+  if (!title) {
+    showToast('لطفاً عنوان فارسی دسته را وارد کنید.', 'error');
+    return;
+  }
+  if (!id) {
+    id = 'cat_' + Date.now().toString().slice(-4);
+  }
+  if (galleryCategories.some(c => c.id === id)) {
+    showToast('این شناسه انگلیسی قبلاً ثبت شده است.', 'error');
     return;
   }
 
-  galleryCategories.push({ id: cleanId, title: cleanTitle });
+  galleryCategories.push({ id, title, color });
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+  
+  if (titleEl) titleEl.value = '';
+  if (idEl) idEl.value = '';
+  adminToggleAddCategoryForm();
+
   renderAdminGalleryCategories();
   renderFloatingCategoryDropdown();
-  showToast(`دسته‌بندی «${cleanTitle}» با موفقیت به گالری اضافه شد.`, 'success');
+  showToast(`دسته‌بندی «${title}» با موفقیت افزوده شد.`, 'success', 3500);
+};
+
+window.adminUpdateCategoryColor = function(catId, newColor) {
+  const cat = galleryCategories.find(c => c.id === catId);
+  if (cat) {
+    cat.color = newColor;
+    safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+    renderAdminGalleryCategories();
+    renderFloatingCategoryDropdown();
+    if (currentGalleryFilter === catId) {
+      filterGalleryByCategory(catId, cat.title);
+    }
+    showToast(`رنگ دسته‌بندی «${cat.title}» به‌روزرسانی شد.`, 'success', 2500);
+  }
 };
 
 window.adminDeleteGalleryCategory = function(catId) {
@@ -88,7 +142,7 @@ window.adminDeleteGalleryCategory = function(catId) {
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   renderAdminGalleryCategories();
   renderFloatingCategoryDropdown();
-  showToast(`دسته‌بندی «${catName}» با موفقیت حذف شد.`, 'info');
+  showToast(`دسته‌بندی «${catName}» حذف شد.`, 'info');
 };
 
 window.openChatConsultation = function() {
@@ -2835,26 +2889,8 @@ function handleOptimizedScroll() {
     }
 
     if (hero) {
-      if (window.innerWidth > 768) {
-        if (scrolled < 650) {
-          const ratio = Math.min(scrolled / 500, 1);
-          const scale = 1 - (ratio * 0.08);
-          const translateY = scrolled * 0.28;
-          const opacity = Math.max(1 - (ratio * 0.75), 0.15);
-          hero.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
-          hero.style.opacity = opacity;
-        } else {
-          hero.style.transform = 'translate3d(0, 140px, 0) scale(0.92)';
-          hero.style.opacity = '0.15';
-        }
-      } else {
-        if (scrolled < 300) {
-          const opacity = Math.max(1 - (scrolled / 260), 0.25);
-          hero.style.opacity = opacity;
-        } else {
-          hero.style.opacity = '0.25';
-        }
-      }
+      hero.style.transform = '';
+      hero.style.opacity = '';
     }
   }
 }
@@ -3450,27 +3486,19 @@ const CREATOR_MASTER_RECORD = {
   ]
 };
 
-let isCreatorSelected = true;
+let isCreatorSelected = false;
+let selectedMemberIdx = 0;
 
 function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilter) {
   const listEl = document.getElementById('adminMembersListContainer');
   if (!listEl) return;
-
-  let showCreator = false;
-  if (tierFilter === 'all' || tierFilter === 'CREATOR') {
-    if (!filterText || 
-        CREATOR_MASTER_RECORD.name.toLowerCase().includes(filterText.toLowerCase()) || 
-        CREATOR_MASTER_RECORD.email.toLowerCase().includes(filterText.toLowerCase())) {
-      showCreator = true;
-    }
-  }
 
   let filtered = siteMembersData.filter(m => m.email && m.email.toLowerCase() !== 'tajinkart@gmail.com');
   if (filterText) {
     filtered = filtered.filter(m =>
       m.name.toLowerCase().includes(filterText.toLowerCase()) ||
       m.email.toLowerCase().includes(filterText.toLowerCase()) ||
-      m.contact.includes(filterText)
+      (m.contact && m.contact.includes(filterText))
     );
   }
   if (tierFilter !== 'all' && tierFilter !== 'CREATOR') {
@@ -3479,25 +3507,7 @@ function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilte
 
   let htmlStr = '';
 
-  // نمایش کارت فوق‌العاده سلطنتی و انحصاری خالق و سازنده اثر در صدر لیست
-  if (showCreator) {
-    htmlStr += `
-      <div class="member-list-item creator-crown-card ${isCreatorSelected ? 'active' : ''}" onclick="selectAdminCreator()">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 12px rgba(245,158,11,0.5);">👑</div>
-          <div>
-            <div style="font-size:13.5px; font-weight:900; color:#fbbf24;">${CREATOR_MASTER_RECORD.name}</div>
-            <div class="font-mono" style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px;">${CREATOR_MASTER_RECORD.email}</div>
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="tier-tag tier-creator">خالق اثر 👑</span>
-        </div>
-      </div>
-    `;
-  }
-
-  // نمایش لیست اعضای مشتریان
+  // ۱. نمایش کاربران و مشتریان واقعی در اولویت اول لیست
   if (tierFilter !== 'CREATOR') {
     htmlStr += filtered.map((m, idx) => `
       <div class="member-list-item ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'active' : ''}" onclick="selectAdminMember(${idx})">
@@ -3506,11 +3516,32 @@ function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilte
           <div class="font-mono" style="font-size:11px; color:var(--text-muted); margin-top:2px;">${m.email}</div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <span class="tier-tag tier-${m.tier.toLowerCase()}">${m.tier}</span>
-          <span class="font-mono" style="color:var(--gold); font-size:12px; font-weight:800;">${m.totalSpent}</span>
+          <span class="tier-tag tier-${m.tier ? m.tier.toLowerCase() : 'member'}">${m.tier || 'عضو'}</span>
+          <span class="font-mono" style="color:var(--gold); font-size:12px; font-weight:800;">${m.totalSpent || '$0'}</span>
         </div>
       </div>
     `).join('');
+  }
+
+  // ۲. انتقال کارت خالق اثر (سید سروش تاج) به انتهای لیست به عنوان فرماندهی استودیو
+  if (tierFilter === 'all' || tierFilter === 'CREATOR') {
+    htmlStr += `
+      <div style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(245,158,11,0.3);">
+        <div style="font-size:10.5px; color:var(--gold); font-weight:700; margin-bottom:6px; padding-right:4px;">مدیر و خالق اثر:</div>
+        <div class="member-list-item creator-crown-card ${isCreatorSelected ? 'active' : ''}" onclick="selectAdminCreator()">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 0 10px rgba(245,158,11,0.5);">👑</div>
+            <div>
+              <div style="font-size:13px; font-weight:900; color:#fbbf24;">${CREATOR_MASTER_RECORD.name}</div>
+              <div class="font-mono" style="font-size:10.5px; color:rgba(255,255,255,0.7); margin-top:1px;">${CREATOR_MASTER_RECORD.email}</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="tier-tag tier-creator">خالق اثر 👑</span>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   listEl.innerHTML = htmlStr;
@@ -4996,6 +5027,21 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
   const labelEl = document.getElementById('currentCategoryPillLabel');
   if (labelEl) labelEl.textContent = categoryName;
 
+  const pillBtn = document.getElementById('currentCategoryPillBtn');
+  if (pillBtn) {
+    if (categoryKey === 'all') {
+      pillBtn.style.borderColor = 'var(--gold)';
+      pillBtn.style.boxShadow = '0 0 14px rgba(250, 204, 21, 0.4)';
+      if (labelEl) labelEl.style.color = 'var(--gold)';
+    } else {
+      const cat = galleryCategories.find(c => c.id === categoryKey);
+      const color = (cat && cat.color) ? cat.color : '#38bdf8';
+      pillBtn.style.borderColor = color;
+      pillBtn.style.boxShadow = `0 0 16px ${color}66`;
+      if (labelEl) labelEl.style.color = color;
+    }
+  }
+
   document.querySelectorAll('.cat-dropdown-item').forEach(item => {
     item.classList.toggle('active', item.textContent.includes(categoryName));
   });
@@ -5227,86 +5273,130 @@ window.updateStudioLiveStatus = function() {
 };
 
 // ==============================================================================
-// مدیریت داینامیک لوگو و نشان استودیو با درگ اند دراپ در تنظیمات ادمین
 // ==============================================================================
+// مرکز کنترل هویت استودیو: تفکیک کامل نشان هدر، فاویکون مرورگر، شعار و ساب‌تب‌ها
+// ==============================================================================
+
+window.switchSettingsSubTab = function(subTabId) {
+  const identityBtn = document.getElementById('adminSettingsSubTabBtn-identity');
+  const socialBtn = document.getElementById('adminSettingsSubTabBtn-social');
+  const identitySec = document.getElementById('adminSettingsSubTab-identity');
+  const socialSec = document.getElementById('adminSettingsSubTab-social');
+
+  if (subTabId === 'identity') {
+    if (identityBtn) identityBtn.classList.add('active');
+    if (socialBtn) socialBtn.classList.remove('active');
+    if (identitySec) identitySec.style.display = 'grid';
+    if (socialSec) socialSec.style.display = 'none';
+  } else {
+    if (socialBtn) socialBtn.classList.add('active');
+    if (identityBtn) identityBtn.classList.remove('active');
+    if (identitySec) identitySec.style.display = 'none';
+    if (socialSec) socialSec.style.display = 'flex';
+  }
+};
+
 window.updateStudioLogoDisplay = function() {
-  const logoUrl = siteSettings.studioLogoUrl || "";
-  const favUrl = siteSettings.faviconUrl || logoUrl || "";
+  const logoUrl = siteSettings.studioLogoUrl || '';
+  const favUrl = siteSettings.faviconUrl || '';
   
-  const headerContainer = document.getElementById("brandCrestContainer");
-  const headerImg = document.getElementById("brandCrestImg");
-  const activeCard = document.getElementById("adminLogoActiveCard");
-  const emptyDropzone = document.getElementById("adminLogoEmptyDropzone");
-  const previewImg = document.getElementById("adminLogoPreviewImg");
+  // ۱. نشان رسمی هدر استودیو و درباره ما
+  const headerContainer = document.getElementById('brandCrestContainer');
+  const headerImg = document.getElementById('brandCrestImg');
+  const logoActiveCard = document.getElementById('adminLogoActiveCard');
+  const logoEmptyDropzone = document.getElementById('adminLogoEmptyDropzone');
+  const logoPreviewImg = document.getElementById('adminLogoPreviewImg');
 
-  const aboutCrestImg = document.getElementById("aboutStudioCrestImg");
-  const aboutCrestPlaceholder = document.getElementById("aboutStudioCrestPlaceholder");
-
-  const favPreviewImg = document.getElementById("adminFaviconPreviewImg");
-  const favEmptyIcon = document.getElementById("adminFaviconEmptyIcon");
-  const favInput = document.getElementById("adminFaviconInput");
-  const siteFavicon = document.getElementById("siteFavicon");
+  const aboutCrestImg = document.getElementById('aboutStudioCrestImg');
+  const aboutCrestPlaceholder = document.getElementById('aboutStudioCrestPlaceholder');
 
   if (logoUrl) {
-    if (headerContainer && headerImg) {
-      headerImg.src = logoUrl;
-      headerContainer.style.display = "flex";
-    }
-    if (activeCard && emptyDropzone && previewImg) {
-      previewImg.src = logoUrl;
-      activeCard.style.display = "flex";
-      emptyDropzone.style.display = "none";
-    }
-    if (aboutCrestImg && aboutCrestPlaceholder) {
+    if (headerContainer) headerContainer.style.display = 'flex';
+    if (headerImg) headerImg.src = logoUrl;
+    if (logoActiveCard) logoActiveCard.style.display = 'flex';
+    if (logoEmptyDropzone) logoEmptyDropzone.style.display = 'none';
+    if (logoPreviewImg) logoPreviewImg.src = logoUrl;
+
+    if (aboutCrestImg) {
       aboutCrestImg.src = logoUrl;
-      aboutCrestImg.style.display = "block";
-      aboutCrestPlaceholder.style.display = "none";
+      aboutCrestImg.style.display = 'block';
     }
+    if (aboutCrestPlaceholder) aboutCrestPlaceholder.style.display = 'none';
   } else {
-    if (headerContainer) headerContainer.style.display = "none";
-    if (activeCard && emptyDropzone) {
-      activeCard.style.display = "none";
-      emptyDropzone.style.display = "block";
-    }
-    if (aboutCrestImg && aboutCrestPlaceholder) {
-      aboutCrestImg.style.display = "none";
-      aboutCrestPlaceholder.style.display = "block";
-    }
+    if (headerContainer) headerContainer.style.display = 'none';
+    if (headerImg) headerImg.src = '';
+    if (logoActiveCard) logoActiveCard.style.display = 'none';
+    if (logoEmptyDropzone) logoEmptyDropzone.style.display = 'block';
+    if (logoPreviewImg) logoPreviewImg.src = '';
+
+    if (aboutCrestImg) aboutCrestImg.style.display = 'none';
+    if (aboutCrestPlaceholder) aboutCrestPlaceholder.style.display = 'flex';
   }
 
+  // ۲. فاویکون مرورگر (کاملاً جداگانه و بدون تداخل با لوگو)
+  const siteFavicon = document.getElementById('siteFavicon');
+  const favActiveCard = document.getElementById('adminFaviconActiveCard');
+  const favEmptyDropzone = document.getElementById('adminFaviconEmptyDropzone');
+  const favPreviewImg = document.getElementById('adminFaviconPreviewImg');
+  const favEmptyIcon = document.getElementById('adminFaviconEmptyIcon');
+  const favInput = document.getElementById('adminFaviconInput');
+
   if (favUrl) {
+    if (siteFavicon) siteFavicon.href = favUrl;
+    if (favActiveCard) favActiveCard.style.display = 'flex';
+    if (favEmptyDropzone) favEmptyDropzone.style.display = 'none';
     if (favPreviewImg) {
       favPreviewImg.src = favUrl;
-      favPreviewImg.style.display = "block";
+      favPreviewImg.style.display = 'inline-block';
     }
-    if (favEmptyIcon) favEmptyIcon.style.display = "none";
-    if (favInput && siteSettings.faviconUrl) favInput.value = siteSettings.faviconUrl;
-    if (siteFavicon) siteFavicon.href = favUrl;
+    if (favEmptyIcon) favEmptyIcon.style.display = 'none';
+    if (favInput) favInput.value = favUrl;
   } else {
-    if (favPreviewImg) favPreviewImg.style.display = "none";
-    if (favEmptyIcon) favEmptyIcon.style.display = "inline-block";
-    if (favInput) favInput.value = "";
-    if (siteFavicon) siteFavicon.href = "";
+    if (siteFavicon) siteFavicon.href = '';
+    if (favActiveCard) favActiveCard.style.display = 'none';
+    if (favEmptyDropzone) favEmptyDropzone.style.display = 'block';
+    if (favPreviewImg) favPreviewImg.style.display = 'none';
+    if (favEmptyIcon) favEmptyIcon.style.display = 'inline-block';
+    if (favInput) favInput.value = '';
+  }
+
+  // ۳. به‌روزرسانی شعار و عنوان مدیر
+  const sloganBar = document.querySelector('#stickyBrandHero .brand-slogan-bar');
+  if (sloganBar && siteSettings.slogan) {
+    sloganBar.textContent = siteSettings.slogan;
+  }
+  const sloganInput = document.getElementById('setStudioSloganInput');
+  if (sloganInput && siteSettings.slogan) {
+    sloganInput.value = siteSettings.slogan;
+  }
+
+  const subCaption = document.querySelector('#stickyBrandHero .brand-sub-caption');
+  if (subCaption && siteSettings.directorTitle) {
+    subCaption.textContent = siteSettings.directorTitle;
+  }
+  const titleInput = document.getElementById('setStudioDirectorTitleInput');
+  if (titleInput && siteSettings.directorTitle) {
+    titleInput.value = siteSettings.directorTitle;
   }
 };
 
 window.handleLogoDragOver = function(e) {
   e.preventDefault();
   e.stopPropagation();
-  const dropzone = document.getElementById("adminLogoEmptyDropzone");
+  const dropzone = document.getElementById('adminLogoEmptyDropzone');
   if (dropzone) {
-    dropzone.style.borderColor = "var(--cyan-electric)";
-    dropzone.style.background = "rgba(0, 240, 255, 0.08)";
+    dropzone.style.borderColor = 'var(--cyan-electric)';
+    dropzone.style.background = 'rgba(0, 240, 255, 0.08)';
   }
 };
 
 window.handleLogoDragLeave = function(e) {
   e.preventDefault();
   e.stopPropagation();
-  const dropzone = document.getElementById("adminLogoEmptyDropzone");
+  const dropzone = document.getElementById('adminLogoEmptyDropzone');
   if (dropzone) {
-    dropzone.style.borderColor = "rgba(250, 204, 21, 0.5)";
-    dropzone.style.background = "rgba(0, 0, 0, 0.55)";
+    dropzone.style.borderColor = 'rgba(250, 204, 21, 0.5)';
+    dropzone.style.background = 'rgba(0, 0, 0, 0.55)';
   }
 };
 
@@ -5326,16 +5416,13 @@ window.handleAdminLogoUpload = function(inputEl) {
 };
 
 function previewAndStageStudioLogo(file) {
-  showToast("در حال بارگذاری نشان استودیو...", "info", 1500);
+  showToast('در حال بارگذاری نشان استودیو...', 'info', 1500);
   const reader = new FileReader();
   reader.onload = async (e) => {
     const dataUrl = e.target.result;
     siteSettings.studioLogoUrl = dataUrl;
-    if (!siteSettings.faviconUrl) {
-      siteSettings.faviconUrl = dataUrl;
-    }
     window.updateStudioLogoDisplay();
-    showToast("پیش‌نمایش نشان ظاهر شد! برای ثبت دائم، دکمه «✓ ثبت و تایید نشان» را بزنید.", "success", 4500);
+    showToast('پیش‌نمایش نشان هدر ظاهر شد! برای ثبت دائم دکمه «✓ ثبت و تایید نشان هدر استودیو» را بزنید.', 'success', 4500);
 
     try {
       const compressed = await compressImageForStorage(file, 600, 600, 0.92);
@@ -5347,36 +5434,71 @@ function previewAndStageStudioLogo(file) {
   reader.readAsDataURL(file);
 }
 
+window.saveStudioLogoSetting = function() {
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast('نشان رسمی هدر استودیو با موفقیت ثبت و ذخیره شد! ✓', 'success', 4000);
+};
+
+window.removeStudioLogo = function() {
+  siteSettings.studioLogoUrl = '';
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast('نشان هدر استودیو با موفقیت حذف شد (ضربدر).', 'info', 3000);
+};
+
 window.handleAdminFaviconUpload = function(inputEl) {
   if (inputEl && inputEl.files && inputEl.files[0]) {
     const reader = new FileReader();
     reader.onload = (e) => {
       siteSettings.faviconUrl = e.target.result;
       window.updateStudioLogoDisplay();
-      showToast("پیش‌نمایش فاویکون آماده شد! برای ثبت دائم روی دکمه ثبت کلیک کنید.", "info", 3500);
+      showToast('پیش‌نمایش فاویکون مرورگر ظاهر شد! برای ثبت دائم روی دکمه ثبت کلیک کنید.', 'info', 3500);
     };
     reader.readAsDataURL(inputEl.files[0]);
   }
 };
 
-window.saveStudioBrandingSettings = function() {
-  const favInput = document.getElementById("adminFaviconInput");
+window.saveStudioFaviconSetting = function() {
+  const favInput = document.getElementById('adminFaviconInput');
   if (favInput && favInput.value.trim()) {
     siteSettings.faviconUrl = favInput.value.trim();
   }
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast("نشان رسمی استودیو و فاویکون مرورگر با موفقیت ثبت و ذخیره شد! ✓", "success", 5000);
+  showToast('فاویکون اختصاصی مرورگر با موفقیت ثبت شد! ✓', 'success', 4000);
 };
 
-window.removeStudioLogo = function() {
-  siteSettings.studioLogoUrl = "";
-  siteSettings.faviconUrl = "";
+window.removeStudioFavicon = function() {
+  siteSettings.faviconUrl = '';
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast("نشان و فاویکون استودیو با موفقیت حذف شد (ضربدر).", "info", 3000);
+  showToast('فاویکون تب مرورگر با موفقیت حذف شد (ضربدر).', 'info', 3000);
 };
 
+window.saveStudioBrandingSettings = function() {
+  const sloganInput = document.getElementById('setStudioSloganInput');
+  if (sloganInput && sloganInput.value.trim()) {
+    siteSettings.slogan = sloganInput.value.trim();
+  }
+  const titleInput = document.getElementById('setStudioDirectorTitleInput');
+  if (titleInput && titleInput.value.trim()) {
+    siteSettings.directorTitle = titleInput.value.trim();
+  }
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast('شعار و عنوان رسمی مدیر استودیو با موفقیت ذخیره شد! ✓', 'success', 4000);
+};
+
+window.saveStudioCurrencySetting = function() {
+  const rateInput = document.getElementById('setUsdRate');
+  if (rateInput && rateInput.value) {
+    siteSettings.usdRate = Number(rateInput.value);
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+    renderAllPrices();
+    showToast(`نرخ تسعیر دلار به ${siteSettings.usdRate.toLocaleString('fa-IR')} تومان ثبت شد.`, 'success', 3500);
+  }
+};
 // =========================================================
 // بهینه‌سازی اختصاصی مینی‌اپلیکیشن تلگرام (Telegram Mini App Ready)
 // =========================================================
@@ -5423,139 +5545,3 @@ window.updateStudioLiveStatus = function() {
 };
 
 // ==============================================================================
-// مدیریت داینامیک لوگو و نشان استودیو با درگ اند دراپ در تنظیمات ادمین
-// ==============================================================================
-window.updateStudioLogoDisplay = function() {
-  const logoUrl = siteSettings.studioLogoUrl || "";
-  const favUrl = siteSettings.faviconUrl || logoUrl || "";
-  
-  const headerContainer = document.getElementById("brandCrestContainer");
-  const headerImg = document.getElementById("brandCrestImg");
-  const previewBox = document.getElementById("adminLogoPreviewBox");
-  const previewImg = document.getElementById("adminLogoPreviewImg");
-  const placeholder = document.getElementById("adminLogoPlaceholder");
-
-  const favPreviewImg = document.getElementById("adminFaviconPreviewImg");
-  const favEmptyIcon = document.getElementById("adminFaviconEmptyIcon");
-  const favInput = document.getElementById("adminFaviconInput");
-  const siteFavicon = document.getElementById("siteFavicon");
-
-  if (logoUrl) {
-    if (headerContainer && headerImg) {
-      headerImg.src = logoUrl;
-      headerContainer.style.display = "flex";
-    }
-    if (previewBox && previewImg) {
-      previewImg.src = logoUrl;
-      previewBox.style.display = "block";
-    }
-    if (placeholder) placeholder.style.display = "none";
-  } else {
-    if (headerContainer) headerContainer.style.display = "none";
-    if (previewBox) previewBox.style.display = "none";
-    if (placeholder) placeholder.style.display = "block";
-  }
-
-  if (favUrl) {
-    if (favPreviewImg) {
-      favPreviewImg.src = favUrl;
-      favPreviewImg.style.display = "block";
-    }
-    if (favEmptyIcon) favEmptyIcon.style.display = "none";
-    if (favInput && siteSettings.faviconUrl) favInput.value = siteSettings.faviconUrl;
-    if (siteFavicon) siteFavicon.href = favUrl;
-  } else {
-    if (favPreviewImg) favPreviewImg.style.display = "none";
-    if (favEmptyIcon) favEmptyIcon.style.display = "inline-block";
-    if (favInput) favInput.value = "";
-    if (siteFavicon) siteFavicon.href = "";
-  }
-};
-
-window.handleLogoDragOver = function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  const dropzone = document.getElementById("adminLogoDropzone");
-  if (dropzone) {
-    dropzone.style.borderColor = "var(--cyan-electric)";
-    dropzone.style.background = "rgba(0, 240, 255, 0.08)";
-  }
-};
-
-window.handleLogoDragLeave = function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  const dropzone = document.getElementById("adminLogoDropzone");
-  if (dropzone) {
-    dropzone.style.borderColor = "rgba(250, 204, 21, 0.5)";
-    dropzone.style.background = "rgba(0, 0, 0, 0.55)";
-  }
-};
-
-window.handleLogoDrop = function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  window.handleLogoDragLeave(e);
-  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-    previewAndStageStudioLogo(e.dataTransfer.files[0]);
-  }
-};
-
-window.handleAdminLogoUpload = function(inputEl) {
-  if (inputEl && inputEl.files && inputEl.files[0]) {
-    previewAndStageStudioLogo(inputEl.files[0]);
-  }
-};
-
-function previewAndStageStudioLogo(file) {
-  showToast("در حال پردازش پیش‌نمایش نشان استودیو...", "info", 1500);
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const dataUrl = e.target.result;
-    siteSettings.studioLogoUrl = dataUrl;
-    if (!siteSettings.faviconUrl) {
-      siteSettings.faviconUrl = dataUrl;
-    }
-    window.updateStudioLogoDisplay();
-    showToast("پیش‌نمایش نشان استودیو آماده شد! برای ثبت دائم، روی «✓ ذخیره و تثبیت نشان و فاویکون» کلیک کنید.", "success", 4500);
-
-    // بهینه‌سازی پس‌زمینه با فشرده‌سازی باکیفیت
-    try {
-      const compressed = await compressImageForStorage(file, 600, 600, 0.92);
-      if (compressed) {
-        siteSettings.studioLogoUrl = compressed;
-      }
-    } catch(ign) {}
-  };
-  reader.readAsDataURL(file);
-}
-
-window.handleAdminFaviconUpload = function(inputEl) {
-  if (inputEl && inputEl.files && inputEl.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      siteSettings.faviconUrl = e.target.result;
-      window.updateStudioLogoDisplay();
-      showToast("پیش‌نمایش فاویکون آماده شد! برای ثبت دائم، روی دکمه ذخیره کلیک کنید.", "info", 3500);
-    };
-    reader.readAsDataURL(inputEl.files[0]);
-  }
-};
-
-window.saveStudioBrandingSettings = function() {
-  const favInput = document.getElementById("adminFaviconInput");
-  if (favInput && favInput.value.trim()) {
-    siteSettings.faviconUrl = favInput.value.trim();
-  }
-  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  window.updateStudioLogoDisplay();
-  showToast("نشان رسمی استودیو و فاویکون مرورگر با موفقیت ثبت و ذخیره شد! ✓", "success", 5000);
-};
-
-window.removeStudioLogo = function() {
-  siteSettings.studioLogoUrl = "";
-  siteSettings.faviconUrl = "";
-  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  window.updateStudioLogoDisplay();
-  showToast("نشان و فاویکون استودیو حذف شدند.", "info", 3000);
-};
