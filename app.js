@@ -703,10 +703,15 @@ window.openCreateArtworkModal = function() {
     colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
     lore: 'جهان اکستوپیا',
     phases: [
-      { name: 'اتود اولیه و سیلوئت', img: '' },
-      { name: 'لاین‌آرت فنی و کادر', img: '' },
-      { name: 'مطالعه نوری و مقداری', img: '' },
-      { name: 'رندر متریال نهایی', img: '' }
+      {
+        name: 'کاور و شیت اصلی اثر',
+        img: '',
+        image: '',
+        pipelineKey: 'sketch1',
+        subcategory: 'طراحی و اجرای استاندارد',
+        desc: '',
+        socialTelegram: true
+      }
     ]
   };
 
@@ -751,7 +756,7 @@ function renderAdminArtModalForm(art, isNew) {
   const box = document.getElementById('adminArtFormFields');
   if (!box || !art) return;
 
-  // آماده‌سازی لیست یکپارچه کل تصاویر پروژه
+  // آماده‌سازی لیست تصاویر و شیت‌های پروژه
   stagingProjectPhases = [];
   if (Array.isArray(art.phases) && art.phases.length > 0) {
     stagingProjectPhases = JSON.parse(JSON.stringify(art.phases));
@@ -761,8 +766,19 @@ function renderAdminArtModalForm(art, isNew) {
       img: art.image,
       image: art.image,
       pipelineKey: art.pipelineKey || 'sketch1',
-      subcategory: '',
-      desc: ''
+      subcategory: 'طراحی و اجرای استاندارد',
+      desc: '',
+      socialTelegram: true
+    });
+  } else {
+    stagingProjectPhases.push({
+      name: 'کاور و شیت اصلی اثر',
+      img: '',
+      image: '',
+      pipelineKey: 'sketch1',
+      subcategory: 'طراحی و اجرای استاندارد',
+      desc: '',
+      socialTelegram: true
     });
   }
 
@@ -796,16 +812,15 @@ function renderAdminArtModalForm(art, isNew) {
       <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
           <div>
-            <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصاویر و شیت‌های پروژه (اسکرول عمودی ArtStation):</span>
-            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصاویر پروژه را اینجا اضافه کنید. اولین تصویر به صورت خودکار به عنوان کاور اصلی در گالری نمایش داده می‌شود.</p>
+            <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصویر کاور و شیت‌های پروژه:</span>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصویر کاور و شیت‌های اثر را بارگذاری کنید. اثر با یک شیت آغاز می‌شود و می‌توانید شیت‌های تکمیلی نیز اضافه کنید.</p>
           </div>
-          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800;">
-            + افزودن تصویر به پروژه
+          <button type="button" onclick="addStagingPhase()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800; border:none; cursor:pointer;">
+            + افزودن شیت تکمیلی به پروژه
           </button>
-          <input type="file" id="adminAddPhaseFileInput" accept="image/*" style="display:none;" onchange="handleAdminAddPhaseUpload(this)" />
         </div>
 
-        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:10px;">
+        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:12px;">
           ${renderStagingPhasesHtml()}
         </div>
       </div>
@@ -821,20 +836,20 @@ function renderAdminArtModalForm(art, isNew) {
       <!-- دکمه‌های عملیاتی -->
       <div style="margin-top:4px; display:flex; flex-direction:column; gap:8px;">
         ${isNew ? `
-          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
+          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
             ✓ تایید و افزودن قطعی به گالری
           </button>
-          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px;">
+          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
             انصراف و لغو
           </button>
         ` : `
-          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
+          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
             ✓ ذخیره تغییرات پروژه
           </button>
-          <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3);">
+          <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
             حذف این اثر از گالری
           </button>
-          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px;">
+          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
             بستن بدون تغییر
           </button>
         `}
@@ -847,7 +862,7 @@ function renderAdminArtModalForm(art, isNew) {
 function renderStagingPhasesHtml() {
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
     return `<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#04060a; border-radius:10px; border:1px dashed rgba(255,255,255,0.15);">
-      هنوز تصویری برای این پروژه اضافه نشده است. روی دکمه «+ افزودن تصویر به پروژه» کلیک کنید.
+      هیچ شیتی وجود ندارد. روی دکمه «+ افزودن شیت تکمیلی به پروژه» کلیک کنید.
     </div>`;
   }
 
@@ -858,21 +873,52 @@ function renderStagingPhasesHtml() {
     const subcats = (pipelines[pipeKey] && pipelines[pipeKey].subcategories) ? pipelines[pipeKey].subcategories : ['طراحی و اجرای استاندارد'];
     const currentSub = p.subcategory || subcats[0] || '';
     const isCover = (idx === 0);
+    const hasImage = Boolean(p.img || p.image);
+    const imgSrc = p.img || p.image || '';
 
     return `
-      <div style="display:flex; flex-direction:column; gap:8px; background:#04060a; border:1px solid ${isCover ? 'rgba(250,204,21,0.45)' : 'rgba(0,240,255,0.25)'}; border-radius:12px; padding:12px;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <img src="${p.img || p.image}" style="width:52px; height:52px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.15);" alt="تصویر فاز" />
-          <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="font-mono" style="font-size:10px; padding:2px 8px; border-radius:4px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.15)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'};">
-                ${isCover ? '🖼️ کاور پیش‌فرض پروژه (عکس اول)' : `شیت شماره ${idx + 1}`}
-              </span>
+      <div style="display:flex; flex-direction:column; gap:10px; background:#04060a; border:1px solid ${isCover ? 'rgba(250,204,21,0.5)' : 'rgba(0,240,255,0.3)'}; border-radius:12px; padding:14px;">
+        
+        <!-- ردیف بالای کارت: عنوان شیت و مدیریت تصویر -->
+        ${hasImage ? `
+          <div style="display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.5); padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+            <img src="${imgSrc}" style="width:68px; height:68px; object-fit:cover; border-radius:8px; border:1px solid ${isCover ? 'var(--gold)' : 'var(--cyan-electric)'}; flex-shrink:0;" alt="تصویر شیت" />
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+                <span class="font-mono" style="font-size:10px; padding:2px 8px; border-radius:4px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.18)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'};">
+                  ${isCover ? '🖼️ کاور اصلی و تصویر نمایش داده‌شده در گالری' : `شیت تکمیلی شماره ${idx + 1}`}
+                </span>
+                <button type="button" onclick="document.getElementById('phaseFileInput_${idx}').click()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:rgba(255,255,255,0.2); cursor:pointer;">
+                  🔄 تغییر تصویر
+                </button>
+                <input type="file" id="phaseFileInput_${idx}" accept="image/*" style="display:none;" onchange="handlePhaseImageUpload(${idx}, this)" />
+              </div>
+              <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این فاز / شیت..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:6px 10px; margin:0;" />
             </div>
-            <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این فاز (مثال: مدل‌شیت سه‌نما / طراحی مسکات)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:6px 10px; margin:0;" />
+            ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:22px; padding:4px 8px; cursor:pointer; background:transparent; border:none;" title="حذف این شیت">✕</button>` : ''}
           </div>
-          <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:20px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
-        </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; gap:8px; background:rgba(250,204,21,0.03); border:1px dashed ${isCover ? 'rgba(250,204,21,0.6)' : 'rgba(0,240,255,0.5)'}; border-radius:10px; padding:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span class="font-mono" style="font-size:10.5px; padding:2px 8px; border-radius:4px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.15)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'};">
+                ${isCover ? '🖼️ کاور اصلی و تصویر نمایش داده‌شده در گالری' : `شیت شماره ${idx + 1}`}
+              </span>
+              ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:20px; padding:2px 6px; cursor:pointer; background:transparent; border:none;" title="حذف این شیت">✕</button>` : ''}
+            </div>
+
+            <div onclick="document.getElementById('phaseFileInput_${idx}').click()" style="cursor:pointer; background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:16px; text-align:center; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+              <div style="font-size:26px; margin-bottom:4px;">📁</div>
+              <div style="font-size:12.5px; font-weight:800; color:var(--gold);">کلیک کنید تا تصویر ${isCover ? 'کاور اصلی اثر' : 'این شیت'} را از سیستم انتخاب و بارگذاری کنید</div>
+              <div style="font-size:10px; color:var(--text-muted); margin-top:3px;">پشتیبانی از JPG, PNG, WEBP با ذخیره‌سازی ابری و بهینه‌سازی خودکار</div>
+            </div>
+            <input type="file" id="phaseFileInput_${idx}" accept="image/*" style="display:none;" onchange="handlePhaseImageUpload(${idx}, this)" />
+
+            <div>
+              <label style="font-size:10.5px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان این شیت:</label>
+              <input type="text" value="${p.name || ''}" placeholder="عنوان شیت (مثال: تصویر نهایی اثر)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:6px 10px; margin:0;" />
+            </div>
+          </div>
+        `}
 
         <!-- انتخاب مستقل پایپلاین و زیرشاخه اختصاصی برای این فریم مشخص -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
@@ -905,7 +951,6 @@ function renderStagingPhasesHtml() {
           </div>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px; font-size:11px;">
-            <!-- ۱. پلتفرم‌های تخصصی پورتفولیو و آرت -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialArtStation = this.checked" ${p.socialArtStation ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🎨 آرت‌استیشن</span>
@@ -918,8 +963,6 @@ function renderStagingPhasesHtml() {
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialPinterest = this.checked" ${p.socialPinterest ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>📌 پینترست</span>
             </label>
-
-            <!-- ۲. اینستاگرام، تردز و ویدیوی ریلز -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialInstagram = this.checked" ${p.socialInstagram ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>📷 اینستاگرام (پست)</span>
@@ -932,8 +975,6 @@ function renderStagingPhasesHtml() {
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialThreads = this.checked" ${p.socialThreads ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🧵 تردز (Threads)</span>
             </label>
-
-            <!-- ۳. ردیت، توییتر و بلواسکای -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReddit = this.checked" ${p.socialReddit ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🤖 ردیت (Reddit)</span>
@@ -946,8 +987,6 @@ function renderStagingPhasesHtml() {
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialBluesky = this.checked" ${p.socialBluesky ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🦋 بلواسکای</span>
             </label>
-
-            <!-- ۴. ویدیو، پیام‌رسان و بیزینس -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialShorts = this.checked" ${p.socialShorts ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>📹 یوتیوب شورتس</span>
@@ -971,6 +1010,25 @@ function renderStagingPhasesHtml() {
   }).join('');
 }
 
+window.addStagingPhase = function() {
+  const nextNum = stagingProjectPhases.length + 1;
+  const defPipe = stagingProjectPhases[0]?.pipelineKey || 'sketch1';
+  const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
+  const defSub = (pipelines[defPipe] && pipelines[defPipe].subcategories) ? pipelines[defPipe].subcategories[0] : 'طراحی و اجرای استاندارد';
+
+  stagingProjectPhases.push({
+    name: `شیت تکمیلی ${nextNum}`,
+    img: '',
+    image: '',
+    pipelineKey: defPipe,
+    subcategory: defSub,
+    desc: '',
+    socialTelegram: true
+  });
+  const container = document.getElementById('adminProjectPhasesList');
+  if (container) container.innerHTML = renderStagingPhasesHtml();
+};
+
 window.handlePhasePipelineChange = function(idx, newPipe) {
   if (!stagingProjectPhases || !stagingProjectPhases[idx]) return;
   stagingProjectPhases[idx].pipelineKey = newPipe;
@@ -982,103 +1040,56 @@ window.handlePhasePipelineChange = function(idx, newPipe) {
 };
 
 window.removeStagingPhase = function(idx) {
-  stagingProjectPhases.splice(idx, 1);
+  if (stagingProjectPhases.length <= 1) {
+    stagingProjectPhases[0].img = '';
+    stagingProjectPhases[0].image = '';
+    stagingProjectPhases[0].name = 'کاور و شیت اصلی اثر';
+  } else {
+    stagingProjectPhases.splice(idx, 1);
+  }
   const container = document.getElementById('adminProjectPhasesList');
   if (container) container.innerHTML = renderStagingPhasesHtml();
 };
 
-window.handleAdminAddPhaseUpload = async function(inputEl) {
+window.handlePhaseImageUpload = async function(idx, inputEl) {
   if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
-  showToast('در حال آپلود و افزودن تصویر پروژه...', 'info');
-
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64Data = e.target.result;
-    let finalUrl = base64Data;
-
-    try {
-      const cCloud = siteSettings.cloudinaryCloudName || 'tajinkart';
-      const cPreset = siteSettings.cloudinaryPreset || 'erlvtkx9';
-      const formData = new FormData();
-      formData.append('file', base64Data);
-      formData.append('upload_preset', cPreset);
-
-      const resp = await fetch(`https://api.cloudinary.com/v1_1/${cCloud}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      const resJson = await resp.json();
-      if (resJson.secure_url) {
-        finalUrl = resJson.secure_url;
-      }
-    } catch(err) {
-      console.warn('Phase upload warning:', err);
-    }
-
-    stagingProjectPhases.push({
-      name: `شیت تکمیلی ${stagingProjectPhases.length + 1}`,
-      img: finalUrl,
-      image: finalUrl
-    });
-
-    const container = document.getElementById('adminProjectPhasesList');
-    if (container) container.innerHTML = renderStagingPhasesHtml();
-    showToast('تصویر به پروژه اضافه شد!', 'success');
-  };
-  reader.readAsDataURL(file);
-};
-
-window.handleAdminImageLiveChange = function(url) {
-  const cleanUrl = url.trim();
-  const previewImg = document.getElementById('adminArtPreviewImg');
-  const emptyPlaceholder = document.getElementById('adminArtEmptyPreviewPlaceholder');
-  const ratioText = document.getElementById('adminArtPreviewRatioText');
-
-  if (isCreatingNewArt && stagingNewArt) {
-    stagingNewArt.image = cleanUrl;
-  } else if (showcaseArtworks[currentSelectedArtIdx]) {
-    showcaseArtworks[currentSelectedArtIdx].image = cleanUrl;
-  }
-
-  if (cleanUrl) {
-    if (previewImg) {
-      previewImg.src = cleanUrl;
-      previewImg.style.display = 'block';
-    }
-    if (emptyPlaceholder) emptyPlaceholder.style.display = 'none';
-    if (ratioText) ratioText.textContent = 'تصویر وارد شد';
-  } else {
-    if (previewImg) previewImg.style.display = 'none';
-    if (emptyPlaceholder) emptyPlaceholder.style.display = 'flex';
-    if (ratioText) ratioText.textContent = 'هنوز عکسی انتخاب نشده';
-  }
-};
-
-window.handleAdminLocalFileUpload = async function(inputEl) {
-  if (!inputEl.files || !inputEl.files[0]) return;
-  const file = inputEl.files[0];
-  showToast('در حال آپلود و ذخیره در فضای ابری Cloudinary...', 'info');
+  showToast('در حال بارگذاری و پردازش تصویر...', 'info', 2500);
 
   try {
-    const cloudUrl = await uploadFileToCloudinary(file);
+    let cloudUrl = await uploadFileToCloudinary(file);
     if (cloudUrl) {
-      handleAdminImageLiveChange(cloudUrl);
-      const urlInput = document.getElementById('editArtImageInput');
-      if (urlInput) urlInput.value = cloudUrl;
-      showToast('تصویر با موفقیت در فضای ابری کلودیناری ذخیره شد و لینک جهانی دریافت کرد!', 'success');
+      if (stagingProjectPhases[idx]) {
+        stagingProjectPhases[idx].img = cloudUrl;
+        stagingProjectPhases[idx].image = cloudUrl;
+      }
+      const container = document.getElementById('adminProjectPhasesList');
+      if (container) container.innerHTML = renderStagingPhasesHtml();
+      showToast('تصویر با موفقیت در فضای ابری کلودیناری بارگذاری شد!', 'success');
       return;
     }
 
-    showToast('کلودیناری هنوز وصل نشده؛ در حال بهینه‌سازی خودکار HD برای سوپابیس...', 'info');
-    const compressedBase64 = await compressImageForStorage(file, 1200, 1200, 0.78);
-    handleAdminImageLiveChange(compressedBase64);
-    const urlInput = document.getElementById('editArtImageInput');
-    if (urlInput) urlInput.value = compressedBase64;
-    showToast('تصویر با کیفیت HD آماده و همگام با دیتابیس سوپابیس شد.', 'success');
+    const compressed = await compressImageForStorage(file, 1600, 1600, 0.82);
+    if (stagingProjectPhases[idx]) {
+      stagingProjectPhases[idx].img = compressed;
+      stagingProjectPhases[idx].image = compressed;
+    }
+    const container = document.getElementById('adminProjectPhasesList');
+    if (container) container.innerHTML = renderStagingPhasesHtml();
+    showToast('تصویر با کیفیت عالی آماده و ذخیره شد.', 'success');
   } catch (err) {
-    console.error('Upload failed:', err);
-    showToast('خطا در بارگذاری تصویر. لطفاً دوباره امتحان کنید.', 'error');
+    console.error('Phase upload error:', err);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (stagingProjectPhases[idx]) {
+        stagingProjectPhases[idx].img = e.target.result;
+        stagingProjectPhases[idx].image = e.target.result;
+      }
+      const container = document.getElementById('adminProjectPhasesList');
+      if (container) container.innerHTML = renderStagingPhasesHtml();
+      showToast('تصویر بارگذاری شد.', 'success');
+    };
+    reader.readAsDataURL(file);
   }
 };
 
@@ -1093,20 +1104,22 @@ window.confirmSaveArtwork = function() {
     return;
   }
 
-  const primaryPhase = stagingProjectPhases[0];
+  // بررسی وجود حداقل یک تصویر معتبر
+  const validPhases = stagingProjectPhases.filter(p => Boolean(p.img || p.image));
+  if (validPhases.length === 0) {
+    showToast('لطفاً تصویر کاور اصلی اثر را انتخاب و بارگذاری کنید.', 'error', 5000);
+    return;
+  }
+
+  const primaryPhase = validPhases[0];
   const img = primaryPhase.img || primaryPhase.image || '';
   const pipe = primaryPhase.pipelineKey || 'sketch1';
   const cat = PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
   const lore = 'جهان اکستوپیا';
   const colorSpace = 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
 
-  if (!img) {
-    showToast('تصویر معتبری برای کاور پروژه یافت نشد.', 'error');
-    return;
-  }
-
   try {
-    const assembledPhases = JSON.parse(JSON.stringify(stagingProjectPhases));
+    const assembledPhases = JSON.parse(JSON.stringify(validPhases));
 
     if (isCreatingNewArt && stagingNewArt) {
       const newArtRecord = {
@@ -1114,11 +1127,12 @@ window.confirmSaveArtwork = function() {
         tag: cat,
         category: cat,
         shortSlug: slug || stagingNewArt.shortSlug || title || 'کانسپت جدید',
-        title: title || 'کانسپت مستر جدید استودیو',
+        title: title || 'کانسپت جدید استودیو',
         desc: desc,
-      isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
+        isProductionPack: isPack,
         pipelineKey: pipe,
         image: img,
+        colorSpace: colorSpace,
         lore: lore,
         phases: assembledPhases
       };
@@ -1129,8 +1143,8 @@ window.confirmSaveArtwork = function() {
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
-      showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
-      // مخابره خودکار به تلگرام در صورت فعال بودن تیک
+      showToast('اثر جدید با موفقیت به گالری اضافه شد!', 'success');
+
       if (assembledPhases.some(p => p.socialTelegram)) {
         broadcastArtworkToTelegram(newArtRecord);
       }
@@ -1149,7 +1163,7 @@ window.confirmSaveArtwork = function() {
           phases: newArtRecord.phases
         }]).then(({ error }) => {
           if (error) console.warn('Supabase insert error:', error);
-          else showToast('اثر جدید در دیتابیس ابری ثبت و در تمام جهان همگام شد!', 'success');
+          else showToast('اثر جدید در دیتابیس ابری ثبت و همگام شد!', 'success');
         });
       }
     } else if (showcaseArtworks[currentSelectedArtIdx]) {
@@ -1169,7 +1183,8 @@ window.confirmSaveArtwork = function() {
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
-      showToast(`تغییرات پروژه ذخیره شد! مقاصد توزیع برای ${assembledPhases.length} شیت آماده اتصال است.`, 'success', 5000);
+      showToast('تغییرات پروژه با موفقیت ذخیره شد!', 'success');
+
       if (assembledPhases.some(p => p.socialTelegram)) {
         broadcastArtworkToTelegram(art);
       }
@@ -2305,6 +2320,50 @@ window.saveTelegramSettingsDirect = function() {
   showToast('تنظیمات ربات و کانال‌های تلگرام با موفقیت ثبت و ذخیره شد! ✓', 'success', 4000);
 };
 
+
+window.autoDetectTelegramChannelId = async function() {
+  const token = document.getElementById('setTgToken')?.value.trim() || siteSettings.tgToken;
+  if (!token) {
+    showToast('لطفاً ابتدا توکن ربات تلگرام را وارد کنید.', 'error', 4500);
+    return;
+  }
+
+  showToast('در حال استعلام و شناسایی خودکار کانال‌های متصل به ربات...', 'info', 3000);
+
+  try {
+    const resp = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+    const data = await resp.json();
+
+    if (!data.ok) {
+      showToast(`خطای تلگرام: ${data.description || 'توکن نامعتبر است'}`, 'error', 5000);
+      return;
+    }
+
+    const detected = [];
+    const seen = new Set();
+
+    (data.result || []).forEach(u => {
+      const ch = u.my_chat_member?.chat || u.channel_post?.chat || u.message?.chat;
+      if (ch && ch.id && !seen.has(ch.id)) {
+        seen.add(ch.id);
+        detected.push({ id: String(ch.id), title: ch.title || ch.username || ch.first_name || 'کانال' });
+      }
+    });
+
+    if (detected.length > 0) {
+      siteSettings.tgChannels = detected.map(d => d.id);
+      siteSettings.tgChat = detected[0].id;
+      renderAdminTgChannelsList();
+      saveTelegramSettingsDirect();
+      showToast(`کانال «${detected[0].title}» با شناسه عددی ${detected[0].id} شناسایی و ذخیره شد! 🎉`, 'success', 6000);
+    } else {
+      showToast('کانال یافت نشد! لطفاً یک پیام دلخواه داخل کانال بفرستید، سپس دوباره این دکمه را بزنید.', 'info', 7000);
+    }
+  } catch(e) {
+    showToast('خطا در ارتباط با سرور تلگرام (بررسی فیلترشکن).', 'error', 5000);
+  }
+};
+
 window.testTelegramConnection = async function() {
   const token = document.getElementById('setTgToken')?.value.trim() || siteSettings.tgToken;
   const channelInputs = document.querySelectorAll('.tg-channel-input');
@@ -2330,7 +2389,27 @@ window.testTelegramConnection = async function() {
   let successCount = 0;
   let lastError = '';
 
-  for (const chat of channels) {
+  for (let chat of channels) {
+    // اگر کاربر به جای شناسه عددی، لینک دعوت t.me/+ پیست کرده باشد، خودکار تلاش می‌کنیم از getUpdates شناسه‌اش را حل کنیم
+    if (chat.includes('t.me/') || chat.includes('telegram.me/')) {
+      try {
+        const uResp = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+        const uData = await uResp.json();
+        if (uData.ok && Array.isArray(uData.result)) {
+          for (let i = uData.result.length - 1; i >= 0; i--) {
+            const fCh = uData.result[i].my_chat_member?.chat || uData.result[i].channel_post?.chat || uData.result[i].message?.chat;
+            if (fCh && fCh.id) {
+              chat = String(fCh.id);
+              siteSettings.tgChannels[0] = chat;
+              siteSettings.tgChat = chat;
+              renderAdminTgChannelsList();
+              saveTelegramSettingsDirect();
+              break;
+            }
+          }
+        }
+      } catch(ignore) {}
+    }
     try {
       const testMsg = `👑 *تست اتصال موفق وب‌سایت TAJINKART*\n\n` +
                       `ربات رسمی *@tajinkart_bot* با موفقیت به وب‌سایت استودیو متصل گردید.\n` +
@@ -2392,9 +2471,54 @@ window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
     `👑 *طراح دنیا و مدیر استودیو:* سید سروش تاج\n` +
     `🔗 [مشاهده کامل پروژه در آتلیه TAJINKART](https://tajinkart.github.io/?art=${art.id})`;
 
-  for (const chat of channels) {
+  for (let chat of channels) {
+    // اگر کاربر به جای شناسه عددی، لینک دعوت t.me/+ پیست کرده باشد، خودکار تلاش می‌کنیم از getUpdates شناسه‌اش را حل کنیم
+    if (chat.includes('t.me/') || chat.includes('telegram.me/')) {
+      try {
+        const uResp = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+        const uData = await uResp.json();
+        if (uData.ok && Array.isArray(uData.result)) {
+          for (let i = uData.result.length - 1; i >= 0; i--) {
+            const fCh = uData.result[i].my_chat_member?.chat || uData.result[i].channel_post?.chat || uData.result[i].message?.chat;
+            if (fCh && fCh.id) {
+              chat = String(fCh.id);
+              siteSettings.tgChannels[0] = chat;
+              siteSettings.tgChat = chat;
+              renderAdminTgChannelsList();
+              saveTelegramSettingsDirect();
+              break;
+            }
+          }
+        }
+      } catch(ignore) {}
+    }
     try {
-      if (photoUrl && photoUrl.startsWith('http')) {
+      if (photoUrl && photoUrl.startsWith('data:image')) {
+        // ارسال تصویر Base64 به عنوان فایل باینری فرم‌دیتا به تلگرام
+        const byteString = atob(photoUrl.split(',')[1]);
+        const mimeString = photoUrl.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
+        const fd = new FormData();
+        fd.append('chat_id', chat);
+        fd.append('photo', blob, 'artwork.jpg');
+        fd.append('caption', caption);
+        fd.append('parse_mode', 'Markdown');
+        fd.append('reply_markup', JSON.stringify({
+          inline_keyboard: [[
+            { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
+            { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
+          ]]
+        }));
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          body: fd
+        });
+      } else if (photoUrl && photoUrl.startsWith('http')) {
         await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2402,6 +2526,22 @@ window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
             chat_id: chat,
             photo: photoUrl,
             caption: caption,
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [[
+                { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
+                { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
+              ]]
+            }
+          })
+        });
+      } else {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chat,
+            text: caption,
             parse_mode: 'Markdown',
             reply_markup: {
               inline_keyboard: [[
