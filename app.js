@@ -805,10 +805,17 @@ function renderPhaseSocialDrawerContent(p, idx) {
           <span style="font-size:18px;">${activePlat.icon}</span>
           <span style="font-size:12.5px; font-weight:800; color:var(--gold);">تنظیمات و متن اختصاصی ${activePlat.name}</span>
         </div>
-        <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer; color:${isCurrentPlatChecked ? 'var(--gold)' : 'var(--text-muted)'}; background:rgba(255,255,255,0.04); padding:4px 10px; border-radius:6px; border:1px solid ${isCurrentPlatChecked ? 'rgba(250,204,21,0.3)' : 'rgba(255,255,255,0.08)'};">
-          <input type="checkbox" onchange="togglePhaseSocialPlatform(${idx}, '${activePlat.id}', this.checked)" ${isCurrentPlatChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-          <span style="font-weight:700;">ارسال این شیت به ${activePlat.name}</span>
-        </label>
+        <div>
+          ${isCurrentPlatChecked ? `
+            <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.12); padding:3px 10px; border-radius:6px; border:1px solid rgba(250,204,21,0.3);">
+              <span style="font-size:8px;">●</span> فعال برای انتشار
+            </span>
+          ` : `
+            <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:var(--text-muted); background:rgba(255,255,255,0.04); padding:3px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
+              <span style="font-size:8px;">○</span> غیرفعال (از فهرست منو فعال کنید)
+            </span>
+          `}
+        </div>
       </div>
 
       <div>
