@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.6.0">
+  <link rel="stylesheet" href="style.css?v=12.7.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -855,40 +855,81 @@
         </div>
 
             <div id="adminTabMembers" class="hidden">
-          <div class="admin-sketch3-layout">
-            <!-- ستون چپ: مشخصات دارایی‌ها، مبلغ برداشت شده/خریدها، رنگ‌بندی بر اساس رنک -->
-            <div id="adminMemberDetailCol" style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); position:sticky; top:90px;">
-              <h4 style="font-size:15px; font-weight:800; color:var(--gold); margin-bottom:12px;">مشخصات دارایی‌ها و صفحه رسمی کاربر</h4>
-              <div id="adminMemberDetailContent">
-                <p style="font-size:12px; color:var(--text-muted);">کاربری را از لیست انتخاب کنید تا دارایی‌ها، سطح دسترسی و گزارش مالی نمایش داده شود.</p>
+          <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+              <div>
+                <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric); margin:0 0 4px;">👥 مدیریت کاربران، اعضا و تعاملات</h3>
+                <span style="font-size:12px; color:var(--text-muted);">مشاهده مشخصات کاربران ثبت‌نام‌شده، سوابق ورود و ارتباط مستقیم کارفرمایان.</span>
               </div>
+              <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800;" title="واکشی زنده و همگام‌سازی کاربران ثبت‌شده از دیتابیس ابری Supabase">
+                🔄 همگام‌سازی اعضا از دیتابیس ابری
+              </button>
             </div>
 
-            <!-- ستون راست: جستجو اسم، تقسیم‌بندی بر اساس دارایی و لیست کاربران -->
-            <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
-              <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
-                <input type="text" id="adminMemberSearchInput" placeholder="🔍 جستجوی اسم کاربر، ایمیل یا شماره..." oninput="filterAdminMembers(this.value)" />
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                  <div style="display:flex; gap:6px;">
-                    <button type="button" onclick="filterMembersByTier('all')" class="gallery-filter-btn active" style="padding:4px 10px; font-size:11px;">همه اعضا</button>
-                    <button type="button" onclick="filterMembersByTier('CREATOR')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px; color:#fbbf24; border-color:rgba(245,158,11,0.5); font-weight:800;">خالق اثر 👑</button>
-                    <button type="button" onclick="filterMembersByTier('VIP')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px;">اعضای ویژه (VIP)</button>
-                    <button type="button" onclick="filterMembersByTier('PRO')" class="gallery-filter-btn" style="padding:4px 10px; font-size:11px;">پرو (PRO)</button>
-                  </div>
-                  <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11px; padding:6px 14px; background:var(--cyan-electric); color:#000;" title="واکشی زنده و بازیابی تمام اعضای ثبت‌شده و خریدهای آنلاین از Supabase">
-                    🔄 همگام‌سازی و بازیابی اعضا از سرور ابری
-                  </button>
+            <div class="admin-members-grid-v2">
+              
+              <!-- ستون اول (سمت راست در RTL): لیست باریک و جمع‌وجور کاربران -->
+              <div style="background:#06080d; border:1px solid var(--border-subtle); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <input type="text" id="adminMemberSearchInput" placeholder="🔍 جستجوی کاربر (نام، ایمیل)..." style="font-size:11.5px; padding:8px 12px; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" oninput="filterAdminMembers(this.value)" />
+                </div>
+                <div id="adminMembersListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:650px; overflow-y:auto; padding-left:4px;"></div>
+              </div>
+
+              <!-- ستون دوم (سمت چپ): پرونده کامل تعاملات، لاگ و مشخصات کاربر انتخابی -->
+              <div id="adminMemberDetailCol" style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:20px; position:sticky; top:90px;">
+                <div id="adminMemberDetailContent">
+                  <p style="font-size:12.5px; color:var(--text-muted);">یک کاربر را از فهرست سمت راست انتخاب کنید تا پرونده، فعالیت‌ها و بریف‌های وی نمایش داده شود.</p>
                 </div>
               </div>
-              <div id="adminMembersListContainer"></div>
+
             </div>
+
           </div>
         </div>
 
             <div id="adminTabOrders" class="hidden">
-          <div style="padding:20px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
-            <h3 style="font-size:16px; font-weight:800; margin-bottom:14px;">سفارش‌ها و درخواست‌های دریافتی استودیو</h3>
-            <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:10px;"></div>
+          <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+              <div>
+                <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">📦 سفارش‌ها و گزارش مالی جامع استودیو</h3>
+                <span style="font-size:12px; color:var(--text-muted);">پایش زنده وضعیت سفارش‌های کمیسیون، تسویه‌حساب‌ها و حجم مالی پروژه‌ها.</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:11px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="همگام‌سازی زنده با جدول orders در دیتابیس Supabase">
+                  🔄 واکشی زنده سفارش‌ها از کلود
+                </button>
+              </div>
+            </div>
+
+            <!-- کارت‌های شاخص‌های کلیدی مالی و سفارش‌ها (Financial & Order KPIs) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:22px;">
+              <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:var(--gold); font-weight:700; display:block;">💵 مجموع حجم مالی پروژه‌ها:</span>
+                <span id="kpiGrossVolume" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">$۰</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">برآورد ارزی کل سفارش‌های ثبت‌شده</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block;">⚡ پروژه‌های در حال تولید آتلیه:</span>
+                <span id="kpiActiveProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:var(--cyan-electric); display:block; margin-top:4px;">۰ پروژه</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">در مراحل اتود، مدل‌شیت و رندر</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:#10b981; font-weight:700; display:block;">✓ پروژه‌های تسویه‌شده و تحویل:</span>
+                <span id="kpiCompletedProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:#10b981; display:block; margin-top:4px;">۰ تحویل</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">ارسال سورس نهایی PSD و لایسنس</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block;">📝 کل بریف‌های ثبت‌شده:</span>
+                <span id="kpiTotalOrdersCount" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">۰ بریف</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">پایگاه داده ابری و محلی</span>
+              </div>
+            </div>
+
+            <!-- فهرست سفارش‌های استودیو -->
+            <h4 style="font-size:14px; font-weight:800; color:#fff; margin-bottom:12px;">فهرست سفارش‌ها و بریف‌های کارفرمایان:</h4>
+            <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:12px;"></div>
           </div>
         </div>
 
@@ -1895,8 +1936,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=12.6.0"></script>
-  <script src="app.js?v=12.6.0"></script>
+  <script src="data.js?v=12.7.0"></script>
+  <script src="app.js?v=12.7.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

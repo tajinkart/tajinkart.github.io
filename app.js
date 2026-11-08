@@ -1721,21 +1721,38 @@ window.renderShowcaseGrid = function() {
     }
 
     // محاسبه پالت نئونی اختصاصی بر اساس شیت نمایش‌داده‌شده
-    const neonMap = {
-      'character': { border: '#facc15', glow: 'rgba(250, 204, 21, 0.65)', soft: 'rgba(250, 204, 21, 0.25)' },
-      'sketch1': { border: '#facc15', glow: 'rgba(250, 204, 21, 0.65)', soft: 'rgba(250, 204, 21, 0.25)' },
-      'creature': { border: '#ef4444', glow: 'rgba(239, 68, 68, 0.72)', soft: 'rgba(239, 68, 68, 0.28)' },
-      'sketch_creature': { border: '#ef4444', glow: 'rgba(239, 68, 68, 0.72)', soft: 'rgba(239, 68, 68, 0.28)' },
-      'environment': { border: '#00f0ff', glow: 'rgba(0, 240, 255, 0.72)', soft: 'rgba(0, 240, 255, 0.28)' },
-      'sketch2': { border: '#00f0ff', glow: 'rgba(0, 240, 255, 0.72)', soft: 'rgba(0, 240, 255, 0.28)' },
-      'keyframe': { border: '#c084fc', glow: 'rgba(192, 132, 252, 0.75)', soft: 'rgba(192, 132, 252, 0.3)' },
-      'sketch3': { border: '#c084fc', glow: 'rgba(192, 132, 252, 0.75)', soft: 'rgba(192, 132, 252, 0.3)' },
-      'props': { border: '#fbbf24', glow: 'rgba(251, 191, 36, 0.72)', soft: 'rgba(251, 191, 36, 0.28)' },
-      'sketch4': { border: '#fbbf24', glow: 'rgba(251, 191, 36, 0.72)', soft: 'rgba(251, 191, 36, 0.28)' },
-      'comic': { border: '#38bdf8', glow: 'rgba(56, 189, 248, 0.72)', soft: 'rgba(56, 189, 248, 0.28)' },
-      'sketch5': { border: '#38bdf8', glow: 'rgba(56, 189, 248, 0.72)', soft: 'rgba(56, 189, 248, 0.28)' }
+    // تبدیل کد رنگ هگز به آر‌جی‌بی با آلفا برای هاله نوری هالوژنی پشت تایل
+    function hexToRgbaStr(hex, alpha) {
+      if (!hex) return `rgba(250, 204, 21, ${alpha})`;
+      hex = hex.replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      const r = parseInt(hex.substring(0, 2), 16) || 250;
+      const g = parseInt(hex.substring(2, 4), 16) || 204;
+      const b = parseInt(hex.substring(4, 6), 16) || 21;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // استخراج رنگ نئون کاملاً پویا از پالت رنگ دسته‌بندی‌های استودیو
+    let catHex = '#facc15';
+    if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+      if (currentGalleryFilter && currentGalleryFilter !== 'all') {
+        const activeFilterCat = galleryCategories.find(c => c.id === currentGalleryFilter);
+        if (activeFilterCat && activeFilterCat.color) {
+          catHex = activeFilterCat.color;
+        }
+      } else {
+        const directCat = galleryCategories.find(c => c.id === activeKey || c.id === (PIPELINE_TO_CATEGORY_MAP[activeKey] || ''));
+        if (directCat && directCat.color) {
+          catHex = directCat.color;
+        }
+      }
+    }
+
+    const neon = {
+      border: catHex,
+      glow: hexToRgbaStr(catHex, 0.8),
+      soft: hexToRgbaStr(catHex, 0.35)
     };
-    const neon = neonMap[activeKey] || neonMap['character'];
 
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
@@ -3489,68 +3506,41 @@ const CREATOR_MASTER_RECORD = {
 let isCreatorSelected = false;
 selectedMemberIdx = 0;
 
-function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilter) {
+function renderAdminSketch3(filterText = '') {
   const listEl = document.getElementById('adminMembersListContainer');
   if (!listEl) return;
 
   let filtered = siteMembersData.filter(m => m.email && m.email.toLowerCase() !== 'tajinkart@gmail.com');
   if (filterText) {
     filtered = filtered.filter(m =>
-      m.name.toLowerCase().includes(filterText.toLowerCase()) ||
-      m.email.toLowerCase().includes(filterText.toLowerCase()) ||
+      (m.name && m.name.toLowerCase().includes(filterText.toLowerCase())) ||
+      (m.email && m.email.toLowerCase().includes(filterText.toLowerCase())) ||
       (m.contact && m.contact.includes(filterText))
     );
   }
-  if (tierFilter !== 'all' && tierFilter !== 'CREATOR') {
-    filtered = filtered.filter(m => m.tier === tierFilter);
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:14px; text-align:center;">کاربری یافت نشد.</div>`;
+    renderAdminMemberDetail(null);
+    return;
   }
 
-  let htmlStr = '';
-
-  // ۱. نمایش کاربران و مشتریان واقعی در اولویت اول لیست
-  if (tierFilter !== 'CREATOR') {
-    htmlStr += filtered.map((m, idx) => `
-      <div class="member-list-item ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'active' : ''}" onclick="selectAdminMember(${idx})">
-        <div>
-          <div style="font-size:13.5px; font-weight:800; color:#fff;">${m.name}</div>
-          <div class="font-mono" style="font-size:11px; color:var(--text-muted); margin-top:2px;">${m.email}</div>
+  listEl.innerHTML = filtered.map((m, idx) => `
+    <div class="member-list-item ${idx === selectedMemberIdx ? 'active' : ''}" onclick="selectAdminMember(${idx})" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:#04060a; border:1px solid ${idx === selectedMemberIdx ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.08)'}; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
+      <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+        <div style="width:28px; height:28px; border-radius:50%; background:rgba(0,240,255,0.12); border:1px solid rgba(0,240,255,0.3); color:var(--cyan-electric); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          ${(m.name || 'U').charAt(0).toUpperCase()}
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="tier-tag tier-${m.tier ? m.tier.toLowerCase() : 'member'}">${m.tier || 'عضو'}</span>
-          <span class="font-mono" style="color:var(--gold); font-size:12px; font-weight:800;">${m.totalSpent || '$0'}</span>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // ۲. انتقال کارت خالق اثر (سید سروش تاج) به انتهای لیست به عنوان فرماندهی استودیو
-  if (tierFilter === 'all' || tierFilter === 'CREATOR') {
-    htmlStr += `
-      <div style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(245,158,11,0.3);">
-        <div style="font-size:10.5px; color:var(--gold); font-weight:700; margin-bottom:6px; padding-right:4px;">مدیر و خالق اثر:</div>
-        <div class="member-list-item creator-crown-card ${isCreatorSelected ? 'active' : ''}" onclick="selectAdminCreator()">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg, #f59e0b, #d97706); display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 0 10px rgba(245,158,11,0.5);">👑</div>
-            <div>
-              <div style="font-size:13px; font-weight:900; color:#fbbf24;">${CREATOR_MASTER_RECORD.name}</div>
-              <div class="font-mono" style="font-size:10.5px; color:rgba(255,255,255,0.7); margin-top:1px;">${CREATOR_MASTER_RECORD.email}</div>
-            </div>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="tier-tag tier-creator">خالق اثر 👑</span>
-          </div>
+        <div style="overflow:hidden;">
+          <div style="font-size:12px; font-weight:800; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${m.name || 'کاربر مهمان'}</div>
+          <div class="font-mono" style="font-size:10px; color:var(--text-muted); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${m.email || ''}</div>
         </div>
       </div>
-    `;
-  }
+      <span style="font-size:10px; color:var(--emerald); background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 6px; border-radius:6px; flex-shrink:0;">عضو فعال</span>
+    </div>
+  `).join('');
 
-  listEl.innerHTML = htmlStr;
-
-  if (isCreatorSelected) {
-    renderAdminMemberDetail(CREATOR_MASTER_RECORD);
-  } else {
-    renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0] || CREATOR_MASTER_RECORD);
-  }
+  renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0]);
 }
 
 window.selectAdminCreator = function() {
@@ -3733,9 +3723,63 @@ function renderMemberDashboard() {
   const oBox = document.getElementById('memberOrdersContainer');
   const userOrders = ordersList.filter(o => o.client.toLowerCase() === currentMember.name.toLowerCase() || o.contact === currentMember.email || o.contact === currentMember.contact);
 
-  if (userOrders.length === 0) {
-    oBox.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:16px; text-align:center; background:#06080d; border-radius:12px; border:1px dashed var(--border-subtle);">هنوز سفارشی ثبت نکرده‌اید. برای شروع به بخش ثبت سفارش مراجعه فرمایید.</div>`;
+  // در صورتی که کاربر سفارشی ندارد، نقشه راه شفاف ۵ مرحله‌ای پروژه و کلید پیش‌نمایش نمایش داده می‌شود
+  if (userOrders.length === 0 && !window._showMemberDemoOrder) {
+    oBox.innerHTML = `
+      <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:13.5px; font-weight:900; color:var(--gold);">⚡ نقشه راه ۵ مرحله‌ای تولید کانسپت در استودیو TAJINKART</span>
+          <button type="button" onclick="window._showMemberDemoOrder = true; renderMemberDashboard();" class="btn-secondary" style="font-size:10.5px; padding:4px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+            👁️ مشاهده پیش‌نمایش نحوه رهگیری پروژه فعال
+          </button>
+        </div>
+        
+        <p style="font-size:11.5px; color:#cbd5e1; line-height:1.8; margin:0;">
+          پس از ارسال بریف و تایید سفارش، مراحل پیشرفت پروژه به صورت زنده در این داشبورد با ۵ گام صنعتی پایش و گزارش می‌شود:
+        </p>
+
+        <!-- ۵ گام استاندارد پروژه -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:10px;">
+          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
+            <div style="color:var(--gold); font-weight:800; margin-bottom:2px;">۱. ثبت بریف</div>
+            <span style="color:var(--text-muted);">تحلیل نیازمندی‌ها</span>
+          </div>
+          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
+            <div style="color:var(--emerald); font-weight:800; margin-bottom:2px;">۲. ودیعه ۵۰٪</div>
+            <span style="color:var(--text-muted);">رزرو زمان کاری طراح</span>
+          </div>
+          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
+            <div style="color:var(--cyan-electric); font-weight:800; margin-bottom:2px;">۳. فاز اتودها</div>
+            <span style="color:var(--text-muted);">سیلوئت و لاین‌آرت</span>
+          </div>
+          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
+            <div style="color:var(--violet); font-weight:800; margin-bottom:2px;">۴. رندر مستر</div>
+            <span style="color:var(--text-muted);">نور و متریال نهایی</span>
+          </div>
+          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
+            <div style="color:#f43f5e; font-weight:800; margin-bottom:2px;">۵. تسویه و سورس</div>
+            <span style="color:var(--text-muted);">تحویل سورس 4K PSD</span>
+          </div>
+        </div>
+
+        <div style="margin-top:4px;">
+          <button type="button" onclick="switchView('store')" class="btn-gold" style="width:100%; padding:10px 16px; font-size:12px; font-weight:800;">
+            + ثبت اولین بریف پروژه در استودیو
+          </button>
+        </div>
+      </div>
+    `;
   } else {
+    // اگر کاربر روی پیش‌نمایش کلیک کرده باشد یا سفارش داشته باشد
+    const ordersToRender = userOrders.length > 0 ? userOrders : [{
+      id: 701,
+      pkg: 'مدل‌شیت کاراکتر سایبرپانک و اکسپرشن (پروژه نمونه)',
+      price: '$180 (ودیعه ۵۰٪ تسویه شده)',
+      status: 'فاز ۳: اتود اولیه و لاین‌آرت ارتوگرافیک در جریان است',
+      phase: 'فاز ۳ • لاین‌آرت و شیت سه‌نما',
+      timeline: '۵ تا ۷ روز کاری',
+      brief: 'طراحی فیگور تمام‌قد کاراکتر سایبرپانک روگ با شنل تیره و قطعات بیومکانیکال زره. در حال حاضر اتودهای سیلوئت تایید شده و لاین‌آرت سه‌نما در حال تکمیل است.'
+    }];
     const STAGES = [
       { id: 1, label: 'بریف دریافت شد', hint: 'بررسی در آتلیه' },
       { id: 2, label: 'ودیعه ۵۰٪ تایید شد', hint: 'رزرو ظرفیت' },
@@ -5734,3 +5778,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1200);
 });
+
+// ناوبری ساب‌تب‌های منشور حقوقی استودیو
+window.switchTermsModalSubTab = function(paneKey, btnEl) {
+  document.querySelectorAll('.terms-tab-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+
+  const panes = ['account', 'commission', 'assets', 'academy'];
+  panes.forEach(p => {
+    const el = document.getElementById(`termsPane-${p}`);
+    if (el) el.style.display = (p === paneKey) ? 'block' : 'none';
+  });
+};
