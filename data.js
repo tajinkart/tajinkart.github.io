@@ -38,6 +38,102 @@ let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
 
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
 // بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
+// کانسپت‌های پیش‌فرض و غنی استودیو (Fallback جهت تضمین عدم خالی شدن گالری)
+const DEFAULT_STUDIO_ARTWORKS = [
+  {
+    id: 1731000001,
+    tag: 'character',
+    category: 'character',
+    shortSlug: 'دختر شمشیرزن',
+    title: 'کانسپت کاراکتر دختر شمشیرزن',
+    desc: 'طراحی کاراکتر و شخصیت اصلی با لباس مدرن تاکتیکال و شمشیر سامورایی در جهان روایی استودیو.',
+    pipelineKey: 'sketch1',
+    image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=85',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+    phases: [
+      {
+        name: 'شیت تکمیلی ۱ • سیلوئت و استایل',
+        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=85',
+        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=85',
+        pipelineKey: 'sketch1',
+        subcategory: 'هیرو/کاراکتر اصلی (جزئیات بالا)',
+        desc: 'اکتشاف فرم، تناسبات اندام و لباس رزمی کاراکتر.'
+      },
+      {
+        name: 'شیت تکمیلی ۲ • مدل‌شیت و پوز اکشن',
+        img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=85',
+        image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=85',
+        pipelineKey: 'sketch1',
+        subcategory: 'هیرو/کاراکتر اصلی (جزئیات بالا)',
+        desc: 'زوایای نمای ارتوگرافیک و حالات اکشن کاراکتر.'
+      }
+    ]
+  },
+  {
+    id: 1731000002,
+    tag: 'environment',
+    category: 'environment',
+    shortSlug: 'معماری سایبرپانک',
+    title: 'کانسپت محیطی کلان‌شهر نئونی',
+    desc: 'طراحی کانسپت فضا و معماری دنیای سایبری با نورپردازی حجمی و عمق بصری سینمایی.',
+    pipelineKey: 'sketch2',
+    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=85',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+    phases: [
+      {
+        name: 'شیت ۱ • اسکچ نوری و لایه‌بندی عمق',
+        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=85',
+        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=85',
+        pipelineKey: 'sketch2',
+        subcategory: 'معماری و لنداسکیپ دنیای باز',
+        desc: 'طراحی پرسپکتیو ۳ نقطه‌ای، زاویه دوربین و جو اتمسفریک شهر.'
+      }
+    ]
+  },
+  {
+    id: 1731000003,
+    tag: 'creature',
+    category: 'creature',
+    shortSlug: 'هیولای اعماق',
+    title: 'طراحی موجود باستانی جهان زیرین',
+    desc: 'کانسپت کریچر و آناتومی هیولای بیومکانیکال با جزییات بافت ارگانیک و فلس‌های بازتابنده.',
+    pipelineKey: 'sketch_creature',
+    image: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=85',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+    phases: [
+      {
+        name: 'شیت ۱ • مطالعه عضلانی و اسکلتی',
+        img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=85',
+        image: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=85',
+        pipelineKey: 'sketch_creature',
+        subcategory: 'موجودات، کریچر و هیولا',
+        desc: 'آناتومی حرکتی و جزئیات تهاجمی موجود.'
+      }
+    ]
+  },
+  {
+    id: 1731000004,
+    tag: 'keyframe',
+    category: 'keyframe',
+    shortSlug: 'کی‌فریم نبرد',
+    title: 'کی‌فریم سینمایی نبرد در گرگ‌ومیش',
+    desc: 'روایت داستان بصری در یک فریم دراماتیک با تضاد نوری شدید و ترکیب‌بندی کینماتیک.',
+    pipelineKey: 'sketch3',
+    image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+    phases: [
+      {
+        name: 'شیت ۱ • رندر فینال کی‌فریم',
+        img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
+        image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
+        pipelineKey: 'sketch3',
+        subcategory: 'کی‌فریم سینمایی و کاور',
+        desc: 'نورپردازی طلایی، فوکوس بصری و متریال نهایی صحنه.'
+      }
+    ]
+  }
+];
+
 let currentGalleryFilter = 'all';
 window.currentGalleryFilter = 'all';
 
@@ -50,6 +146,9 @@ try {
   storedArtworks = [];
 }
 let showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
+if (showcaseArtworks.length === 0) {
+  showcaseArtworks = JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
+}
 window.showcaseArtworks = showcaseArtworks;
 
 // ۶ پایپلاین تخصصی آتلیه طبق سند مستر با زیرشاخه‌ها و مراحل شفاف

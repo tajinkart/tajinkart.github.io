@@ -704,7 +704,7 @@ const AVAILABLE_PLATFORMS = [
 ];
 
 let isCreatingNewArt = false;
-let currentSelectedArtIdx = -1;
+currentSelectedArtIdx = -1;
 let stagingNewArt = null;
 let stagingProjectPhases = [];
 
@@ -4964,7 +4964,7 @@ window.unlockBodyScroll = function() {
 
 
 // مدیریت فهرست شناور دسته‌بندی آثار زیر برند
-let currentGalleryFilter = 'all';
+currentGalleryFilter = 'all';
 
 window.toggleCategoryFilterMenu = function(e) {
   if (e) e.stopPropagation();
