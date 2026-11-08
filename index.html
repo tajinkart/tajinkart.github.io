@@ -30,12 +30,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="max-image-preview:large, noai, noimageai" />
-  <title>تاج اینک آرت | سید سروش تاج — استودیو کانسپت آرت و طراحی دنیا</title>
+  <title>TAJINKART</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.8.0">
+  <link rel="stylesheet" href="style.css?v=12.9.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -934,31 +934,72 @@
 
             <!-- ۷. زبانه مدیریت و ویرایشگر منشور قوانین استودیو (Terms & Legal Editor) -->
         <div id="adminTabTerms" class="hidden">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
             <div>
-              <h3 style="font-size:17px; font-weight:900; color:var(--gold);">ویرایشگر زنده منشور قوانین، لایسنس و شرایط استودیو</h3>
-              <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">متن منشور حقوقی استودیو را مستقیماً ویرایش و منتشر کنید؛ بدون نیاز به دستکاری کدهای سایت.</p>
+              <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">ویرایشگر زنده منشور قوانین، لایسنس و شرایط استودیو</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:0;">ویرایش تفکیک‌شده سرفصل‌های حقوقی استودیو؛ بدون نیاز به دستکاری کدهای سایت.</p>
             </div>
             <div style="display:flex; gap:10px;">
-              <button type="button" onclick="resetStudioTermsToDefault()" class="btn-outline" style="padding:8px 14px; font-size:12px;">
-                🔄 بازنشانی به متن پیش‌فرض
-              </button>
-              <button type="button" onclick="openTermsModal()" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+              <button type="button" onclick="openTermsModal(event)" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
                 👁️ پیش‌نمایش در سایت
               </button>
               <button type="button" onclick="saveStudioTerms()" class="btn-gold" style="padding:8px 18px; font-size:12px;">
-                💾 ذخیره و انتشار آنی قوانین
+                💾 ذخیره و انتشار سراسری تمام بخش‌ها
               </button>
             </div>
           </div>
 
+          <!-- ساب‌تب‌های ویرایشگر منشور قوانین استودیو -->
+          <div style="display:flex; gap:8px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
+            <button type="button" onclick="switchAdminTermsEditorTab('account', this)" class="terms-tab-btn active">
+              🛡️ شرایط عمومی و عضویت
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('commission', this)" class="terms-tab-btn">
+              📜 قرارداد سفارش و کمیسیون (ودیعه ۵۰٪)
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('assets', this)" class="terms-tab-btn">
+              💎 لایسنس دارایی‌ها و مارکت‌پلیس
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('academy', this)" class="terms-tab-btn">
+              🎓 ضوابط آکادمی و جامعه هنری
+            </button>
+          </div>
+
           <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:18px;">
-            <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:#e2e8f0;">
-              متن کامل منشور و ضوابط حقوقی استودیو (پشتیبانی از قالب‌بندی متنی، سرفصل‌ها و پاراگراف‌ها):
-            </label>
-            <textarea id="adminTermsContentInput" style="width:100%; height:450px; font-size:13px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
-            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-muted);">
-              <span>💡 نکات: تغییرات بلافاصله پس از فشردن دکمه «ذخیره و انتشار» در تمامی پنجره‌های قوانین سایت و پورتال ثبت‌نام به‌روزرسانی می‌شوند.</span>
+            <!-- بخش ۱: شرایط عمومی -->
+            <div id="adminTermsPane-account" class="admin-terms-editor-pane">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gold);">
+                متن ۱: شرایط عمومی عضویت، حساب کاربری و منع صریح آموزش هوش مصنوعی (Anti-AI):
+              </label>
+              <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <!-- بخش ۲: قرارداد کمیسیون -->
+            <div id="adminTermsPane-commission" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--cyan-electric);">
+                متن ۲: قرارداد رسمی سفارش، قانون ودیعه ۵۰٪، مراحل ادیت و بند رهاسازی سفارش:
+              </label>
+              <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <!-- بخش ۳: لایسنس دارایی‌ها -->
+            <div id="adminTermsPane-assets" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--emerald);">
+                متن ۳: موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA) و شرایط اسقاط انصراف:
+              </label>
+              <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <!-- بخش ۴: آکادمی و کامیونیتی -->
+            <div id="adminTermsPane-academy" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--violet);">
+                متن ۴: ضوابط آکادمی تخصصی طراحی، حقوق معنوی ویدیوها و جامعه هنری:
+              </label>
+              <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <span style="font-size:11.5px; color:var(--text-muted);">💡 هر بخش به صورت جداگانه در پورتال و پنجره قوانین نمایش داده می‌شود.</span>
               <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ با موفقیت ذخیره شد</span>
             </div>
           </div>
@@ -1166,36 +1207,45 @@
                     </div>
                   </div>
 
-                  <!-- کارت ۲-د: پایگاه داده ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر -->
-                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
+                  <!-- کارت مانیتورینگ زنده اتصالات ابری استودیو -->
+                  <div style="background:#06080d; border:1px solid rgba(16,185,129,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:14px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📊 همگام‌سازی ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">MULTI-CLOUD SYNC</span>
+                      <span style="font-size:13.5px; font-weight:900; color:var(--emerald);">🌐 وضعیت زنده اتصالات ابری و زیرساخت استودیو</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">ACTIVE & SECURED</span>
                     </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">پایداری افزونه: هر سفارش جدید همزمان در دیتابیس سوپابیس (جدول orders)، فایل اکسل گوگل درایو و ربات تلگرام استودیو ثبت می‌شود.</p>
 
-                    <div>
-                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                        <span style="font-size:11px; color:#10b981; font-weight:700;">🟢 وضعیت دیتابیس ابری Supabase (جدول orders):</span>
-                        <span style="font-size:10.5px; color:#cbd5e1;">متصل و آماده دریافت خودکار بریف‌ها</span>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:14px;">🟢</span>
+                          <strong style="color:#fff; font-size:12px;">پایگاه داده ابری Supabase</strong>
+                        </div>
+                        <span style="font-size:10.5px; color:#10b981; margin-top:4px; display:block;">جداول orders و artworks متصل و همگام</span>
                       </div>
-                    </div>
 
-                    <div>
-                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">آدرس وب‌هوک گوگل شیتس (Google Apps Script WebApp URL - جهت بک‌آپ اکسل):</label>
-                      <input type="text" id="setGoogleSheetsWebhook" placeholder="https://script.google.com/macros/s/.../exec" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
-                      <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">اختیاری: با قرار دادن وب‌هوک، یک ردیف در فایل Google Sheets شخصی شما در گوگل درایو ثبت می‌شود.</span>
-                    </div>
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:14px;">🟢</span>
+                          <strong style="color:#fff; font-size:12px;">شبکه توزیع محتوا Cloudflare CDN</strong>
+                        </div>
+                        <span style="font-size:10.5px; color:var(--cyan-electric); margin-top:4px; display:block;">فعال روی دامنه tajinkart.space با SSL Full</span>
+                      </div>
 
-                    <div>
-                      <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">توکن اختصاصی آنالیتیکس کلادفلر (Cloudflare Web Analytics Token):</label>
-                      <input type="text" id="setCloudflareToken" placeholder="c76a19f07a524a87b5a19808d4b38d38" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
-                    </div>
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:14px;">🟢</span>
+                          <strong style="color:#fff; font-size:12px;">احراز هویت انحصاری Google OAuth</strong>
+                        </div>
+                        <span style="font-size:10.5px; color:#fbbf24; margin-top:4px; display:block;">قفل فرماندهی برای tajinkart@gmail.com</span>
+                      </div>
 
-                    <div style="margin-top:6px;">
-                      <button type="button" onclick="saveMultiCloudIntegrationsDirect()" class="btn-gold" style="width:100%; padding:10px 16px; font-size:12px; font-weight:800; cursor:pointer;">
-                        ✓ ذخیره تنظیمات گوگل شیتس و کلادفلر
-                      </button>
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:14px;">🟢</span>
+                          <strong style="color:#fff; font-size:12px;">ربات مخابره تلگرام (@tajinkart_bot)</strong>
+                        </div>
+                        <span style="font-size:10.5px; color:var(--cyan-electric); margin-top:4px; display:block;">آماده ارسال آنی بریف‌ها و آثار</span>
+                      </div>
                     </div>
                   </div>
 
@@ -1947,8 +1997,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=12.8.0"></script>
-  <script src="app.js?v=12.8.0"></script>
+  <script src="data.js?v=12.9.0"></script>
+  <script src="app.js?v=12.9.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

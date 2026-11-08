@@ -2090,6 +2090,8 @@ window.scrollStreamToItem = function(index) {
 
 window.toggleImageZoom = function(imgEl, e) {
   if (!imgEl) return;
+  // روی تبلت و موبایل از زوم لمسی پینچ اینستاگرامی استفاده می‌شود
+  if (window.innerWidth <= 768) return;
   const isZoomed = imgEl.classList.toggle('zoomed-image');
   if (isZoomed) {
     if (e) {
@@ -2858,6 +2860,21 @@ window.switchView = function(vKey) {
   document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
   const target = document.getElementById(`view-${vKey}`);
   if (target) target.classList.remove('hidden');
+
+  // آدرس‌دهی تمیز، بین‌المللی و حرفه‌ای در نوار آدرس مرورگر بدون هشتگ زائد
+  try {
+    if (vKey === 'showcase') {
+      history.replaceState(null, '', window.location.pathname);
+    } else if (vKey === 'store') {
+      history.replaceState(null, '', '#commissions');
+    } else if (vKey === 'member-dashboard') {
+      history.replaceState(null, '', '#portal');
+    } else if (vKey === 'admin') {
+      history.replaceState(null, '', '#admin');
+    } else {
+      history.replaceState(null, '', `#${vKey}`);
+    }
+  } catch(e) {}
 
   const topBar = document.getElementById('topCenterBrandBar');
   const dock = document.getElementById('rightVerticalNav');
@@ -5900,3 +5917,84 @@ document.addEventListener('touchend', (e) => {
     pinchCurrentScale = 1;
   }
 }, { passive: true });
+
+// ==============================================================================
+// مدیریت تفکیک‌شده ساب‌تب‌های ویرایشگر منشور قوانین استودیو در ادمین
+// ==============================================================================
+window.switchAdminTermsEditorTab = function(tabKey, btnEl) {
+  const container = document.getElementById('adminTabTerms');
+  if (container) {
+    container.querySelectorAll('.terms-tab-btn').forEach(b => b.classList.remove('active'));
+  }
+  if (btnEl) btnEl.classList.add('active');
+
+  const panes = ['account', 'commission', 'assets', 'academy'];
+  panes.forEach(p => {
+    const el = document.getElementById(`adminTermsPane-${p}`);
+    if (el) el.style.display = (p === tabKey) ? 'block' : 'none';
+  });
+};
+
+window.saveStudioTerms = function() {
+  const acc = document.getElementById('adminTermsAccountInput')?.value.trim();
+  const comm = document.getElementById('adminTermsCommissionInput')?.value.trim();
+  const ass = document.getElementById('adminTermsAssetsInput')?.value.trim();
+  const acad = document.getElementById('adminTermsAcademyInput')?.value.trim();
+
+  siteSettings.termsAccount = acc || '';
+  siteSettings.termsCommission = comm || '';
+  siteSettings.termsAssets = ass || '';
+  siteSettings.termsAcademy = acad || '';
+
+  if (typeof safeSetStorage === 'function') {
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  }
+
+  // به‌روزرسانی آنی محتوای پنجره قوانین در سایت
+  if (acc) {
+    const paneAcc = document.getElementById('termsPane-account');
+    if (paneAcc) paneAcc.innerHTML = `<h4 style="color:var(--gold); font-size:14px; font-weight:800; margin-bottom:10px;">۱. شرایط عمومی عضویت، حساب کاربری و حریم خصوصی</h4>` + acc.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+  }
+  if (comm) {
+    const paneComm = document.getElementById('termsPane-commission');
+    if (paneComm) paneComm.innerHTML = `<h4 style="color:var(--cyan-electric); font-size:14px; font-weight:800; margin-bottom:10px;">۲. قرارداد رسمی سفارش پروژه و تعهدات کمیسیون</h4>` + comm.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+  }
+  if (ass) {
+    const paneAss = document.getElementById('termsPane-assets');
+    if (paneAss) paneAss.innerHTML = `<h4 style="color:var(--emerald); font-size:14px; font-weight:800; margin-bottom:10px;">۳. موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA)</h4>` + ass.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+  }
+  if (acad) {
+    const paneAcad = document.getElementById('termsPane-academy');
+    if (paneAcad) paneAcad.innerHTML = `<h4 style="color:var(--violet); font-size:14px; font-weight:800; margin-bottom:10px;">۴. ضوابط آکادمی تخصصی طراحی و جامعه هنری</h4>` + acad.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+  }
+
+  const notice = document.getElementById('termsSaveNotice');
+  if (notice) {
+    notice.style.display = 'inline-block';
+    setTimeout(() => { notice.style.display = 'none'; }, 3500);
+  }
+  showToast('تمامی بخش‌های منشور قوانین استودیو با موفقیت ذخیره و منتشر شد! ✓', 'success', 4000);
+};
+
+// مقداردهی اولیه اینپوت‌های قوانین در ادمین
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const accInput = document.getElementById('adminTermsAccountInput');
+    const commInput = document.getElementById('adminTermsCommissionInput');
+    const assInput = document.getElementById('adminTermsAssetsInput');
+    const acadInput = document.getElementById('adminTermsAcademyInput');
+
+    if (accInput) {
+      accInput.value = siteSettings.termsAccount || `کاربر با ثبت‌نام و استفاده از سایت، صحت اطلاعات هویتی و ارتباطی خود را تایید می‌نماید. حفظ محرمانگی رمز عبور بر عهده کاربر است.\n\nبند منع صریح هوش مصنوعی (Anti-AI): هرگونه اسکرپ داده، کپی‌برداری اتوماتیک یا استفاده از کانسپت‌ها و آثار استودیو TAJINKART جهت آموزش مدل‌های هوش مصنوعی مولد اکیداً ممنوع بوده و نقض حقوق مالکیت معنوی بین‌المللی تلقی می‌گردد.`;
+    }
+    if (commInput) {
+      commInput.value = siteSettings.termsCommission || `قانون تغییرناپذیر ودیعه ۵۰٪ (The 50% Deposit Rule): فرآیند طراحی و تخصیص زمان آتلیه منحصراً پس از واریز قطعی ۵۰٪ مبلغ کل سفارش به عنوان پیش‌پرداخت غیرقابل‌استرداد آغاز می‌گردد. تسویه ۵۰٪ باقیمانده پیش از تحویل سورس‌فایل نهایی رزولوشن بالا و فایل لایه‌باز PSD الزامی است.\n\nمراحل فیدبک و بازبینی (Revision Policy): در فاز اتودهای اولیه و سیلوئت تا ۲ مرحله ویرایش آزاد منظور شده است. پس از تایید لاین‌آرت و ورود به فاز رندر مستر نهایی، تغییرات اساسی در تناسبات شامل هزینه مازاد خواهد بود.\n\nبند رهاسازی سفارش (Abandonment Clause): در صورت عدم پاسخگویی یا سکوت کارفرما به مدت بیش از ۳۰ روز تقویمی، پروژه رهاشده تلقی شده و با ضبط ودیعه مختومه می‌گردد.`;
+    }
+    if (assInput) {
+      assInput.value = siteSettings.termsAssets || `موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA): خرید محصولات دیجیتال و فایل‌های آماده از استودیو منحصراً حق استفاده غیرانحصاری در محصول نهایی (مانند بازی یا انیمیشن) را اعطا می‌کند؛ هرگونه بازفروش سورس خام، انتشار عمومی یا توزیع مجدد دارایی‌ها ممنوع است.\n\nاسقاط حق انصراف کالای دیجیتال: دانلود موفق فایل سورس دیجیتال به منزله تحویل قطعی کالا بوده و قابلیت استرداد وجه ندارد.`;
+    }
+    if (acadInput) {
+      acadInput.value = siteSettings.termsAcademy || `ضوابط آکادمی تخصصی طراحی و جامعه هنری: محتوای آموزشی، ویدیوهای مسترکلاس و پکیج‌های آموزشی تحت مالکیت مادی و معنوی سید سروش تاج قرار دارند. هرگونه اشتراک‌گذاری عمومی لینک‌ها یا ضبط تصویر ویدیوها پیگرد قانونی دارد.\n\nفعالیت در گروه‌ها و کانال‌های رسمی استودیو مستلزم رعایت احترام متقابل، عدم ارسال اسپم و حفظ حقوق صنفی آرتیست‌هاست.`;
+    }
+  }, 1000);
+});
