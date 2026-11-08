@@ -1606,15 +1606,11 @@ function renderArtStationProject(art) {
 
   let streamHtml = '';
 
-  // ۱. سرتیتر یکپارچه و مجلل اثر (در بالای استریم برای همه دستگاه‌ها)
+  // ۱. سرتیتر یکپارچه و مجلل اثر (فرمت وسط‌چین نامه طراح بدون هشتگ یا بج اضافه)
   streamHtml += `
     <div class="unified-project-header">
       <h1 class="project-header-title">${mainTitle}</h1>
       <p class="project-header-desc">${mainDesc}</p>
-      <div class="project-header-meta-row">
-        <span class="project-header-lore-tag">#${escapeQuotes(artLore)}</span>
-        <span class="font-mono" style="font-size:11px; color:var(--gold); font-weight:800;">/ ${mainPipeName} /</span>
-      </div>
     </div>
   `;
 
@@ -1662,11 +1658,11 @@ function renderArtStationProject(art) {
            data-title="${escapeQuotes(item.name)}">
         <img src="${item.src}" alt="${item.name}" loading="${idx === 0 ? 'eager' : 'lazy'}" class="elastic-pinch-target" />
         <div class="stream-phase-note">
-          <div class="stream-phase-header">
-            <span class="stream-phase-title">${item.phaseNum} • ${item.name}</span>
+          <h3 class="stream-phase-title">${item.phaseNum} • ${item.name}</h3>
+          ${item.desc ? `<p class="stream-phase-desc">${item.desc}</p>` : ''}
+          <div class="stream-phase-meta-footer">
             <span class="stream-phase-pipe font-mono">${pipeInfo}${item.sub ? ` • ${item.sub}` : ''}</span>
           </div>
-          ${item.desc ? `<p class="stream-phase-desc">${item.desc}</p>` : ''}
         </div>
       </div>
     `;
