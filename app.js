@@ -3734,18 +3734,73 @@ function renderMemberDashboard() {
   const userOrders = ordersList.filter(o => o.client.toLowerCase() === currentMember.name.toLowerCase() || o.contact === currentMember.email || o.contact === currentMember.contact);
 
   if (userOrders.length === 0) {
-    oBox.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px;">هنوز سفارشی ثبت نکرده‌اید. برای شروع به بخش آتلیه مراجعه فرمایید.</div>`;
+    oBox.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:16px; text-align:center; background:#06080d; border-radius:12px; border:1px dashed var(--border-subtle);">هنوز سفارشی ثبت نکرده‌اید. برای شروع به بخش ثبت سفارش مراجعه فرمایید.</div>`;
   } else {
-    oBox.innerHTML = userOrders.map(o => `
-      <div style="padding:12px; background:#070a10; border-radius:10px; border:1px solid rgba(0,240,255,0.3); font-size:12px;">
-        <div style="display:flex; justify-content:space-between; font-weight:700;">
-          <span>${o.pkg}</span>
-          <span style="color:var(--cyan-electric); font-size:11px;">${o.status}</span>
+    const STAGES = [
+      { id: 1, label: 'بریف دریافت شد', hint: 'بررسی در آتلیه' },
+      { id: 2, label: 'ودیعه ۵۰٪ تایید شد', hint: 'رزرو ظرفیت' },
+      { id: 3, label: 'اتود و لاین‌آرت', hint: 'فاز اکتشاف فرم' },
+      { id: 4, label: 'رندر مستر نهایی', hint: 'نور و متریال' },
+      { id: 5, label: 'تسویه و تحویل سورس', hint: 'فایل 4K + PSD' }
+    ];
+
+    oBox.innerHTML = userOrders.map(o => {
+      // تعیین شماره گام بر اساس وضعیت متنی پروژه
+      let currentStageNum = 1;
+      const stLower = (o.status || '').toLowerCase();
+      if (stLower.includes('ودیعه') || stLower.includes('پیش‌پرداخت')) currentStageNum = 2;
+      else if (stLower.includes('اتود') || stLower.includes('طراحی') || stLower.includes('تولید')) currentStageNum = 3;
+      else if (stLower.includes('رندر') || stLower.includes('نهایی')) currentStageNum = 4;
+      else if (stLower.includes('تسویه') || stLower.includes('تحویل') || stLower.includes('تکمیل')) currentStageNum = 5;
+
+      return `
+        <div style="padding:16px; background:#04060a; border-radius:14px; border:1px solid rgba(0,240,255,0.3); font-size:12px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <span style="font-size:13.5px; font-weight:800; color:#fff; display:block;">${o.pkg || 'سفارش اختصاصی'}</span>
+              <span class="font-mono" style="font-size:10.5px; color:var(--gold); margin-top:2px; display:block;">کد پیگیری: #${o.id} • هزینه: ${o.price || 'توافقی'}</span>
+            </div>
+            <span style="background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700;">
+              ${o.status || 'بریف دریافت شد'}
+            </span>
+          </div>
+
+          <!-- نوار وضعیت ۵ مرحله‌ای پروژه (Milestone Progress Tracker) -->
+          <div style="background:#080c14; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 10px;">
+            <div style="display:flex; justify-content:space-between; position:relative;">
+              ${STAGES.map(s => {
+                const isPassed = s.id <= currentStageNum;
+                const isCurrent = s.id === currentStageNum;
+                const dotColor = isCurrent ? 'var(--gold)' : (isPassed ? '#10b981' : '#334155');
+                const dotGlow = isCurrent ? '0 0 10px var(--gold)' : (isPassed ? '0 0 8px #10b981' : 'none');
+                return `
+                  <div style="display:flex; flex-direction:column; align-items:center; flex:1; text-align:center; z-index:2;">
+                    <div style="width:20px; height:20px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; color:#000; margin-bottom:5px;">
+                      ${isPassed ? '✓' : s.id}
+                    </div>
+                    <span style="font-size:9.5px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.3;">
+                      ${s.label}
+                    </span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div style="color:#cbd5e1; font-size:11.5px; line-height:1.7; background:rgba(255,255,255,0.02); padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+            <strong style="color:var(--cyan-electric); font-size:11px; display:block; margin-bottom:2px;">خلاصه بریف و نیازمندی پروژه:</strong>
+            ${o.brief || 'توضیحات اختصاصی کانسپت آرت ثبت شده است.'}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:var(--text-muted); padding-top:4px; border-top:1px solid rgba(255,255,255,0.05);">
+            <span>فاز انتخابی: <strong style="color:#fff;">${o.phase || 'استاندارد'}</strong></span>
+            <span>زمان‌بندی تقریبی: <strong style="color:#fff;">${o.timeline || 'طبق توافق قرارداد'}</strong></span>
+          </div>
+
         </div>
-        <div style="color:var(--text-muted); font-size:11px; margin-top:3px;">فاز: ${o.phase || 'در حال اجرا'}</div>
-        <p style="color:var(--text-muted); margin-top:4px;">${o.brief}</p>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   const cBox = document.getElementById('memberCoursesContainer');
@@ -3857,12 +3912,60 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       ordersList.unshift(newOrder);
-      localStorage.setItem(KEYS.ORDERS, JSON.stringify(ordersList));
+      if (typeof safeSetStorage === 'function') {
+        safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+      } else {
+        localStorage.setItem(KEYS.ORDERS, JSON.stringify(ordersList));
+      }
+
+      // ۱. ثبت در دیتابیس ابری Supabase (جدول orders)
+      if (window.supabaseClient) {
+        window.supabaseClient
+          .from('orders')
+          .insert([{
+            id: newOrder.id,
+            client_name: newOrder.client,
+            contact: newOrder.contact,
+            client_email: (window.currentMember && window.currentMember.email) ? window.currentMember.email : (contact.includes('@') ? contact : ''),
+            ref_link: newOrder.refLink,
+            package_name: newOrder.pkg,
+            price_text: newOrder.price,
+            timeline: newOrder.timeline,
+            phase: newOrder.phase,
+            brief_text: newOrder.brief,
+            status: newOrder.status,
+            created_at: new Date().toISOString()
+          }])
+          .then(({ data, error }) => {
+            if (error) {
+              console.warn('[Supabase Orders] Insert error:', error);
+            } else {
+              console.log('[Supabase Orders] Order backed up to Supabase Cloud DB successfully!');
+            }
+          });
+      }
+
+      // ۲. فوروارد به وب‌هوک گوگل شیتس شخصی (Google Sheets Multi-Cloud Backup)
+      if (siteSettings && siteSettings.googleSheetsWebhook && siteSettings.googleSheetsWebhook.startsWith('http')) {
+        try {
+          fetch(siteSettings.googleSheetsWebhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newOrder)
+          }).then(() => {
+            console.log('[Google Sheets] Order forwarded to Google Spreadsheet backup!');
+          }).catch(err => console.warn('[Google Sheets] Webhook error:', err));
+        } catch(e) {}
+      }
+
+      // ۳. ارسال آنی پیام به ربات تلگرام استودیو
       dispatchTelegramNotification(newOrder);
+
       closeModalDirect();
       renderAdminLists();
       renderMemberDashboard();
-      showToast('بریف کمیسیون با موفقیت ثبت شد و به تلگرام استودیو ارجاع گردید.', 'success');
+      showToast('بریف کمیسیون با موفقیت ثبت شد و در پایگاه ابری و تلگرام استودیو بایگانی گردید. ✓', 'success', 5000);
     });
   }
 
@@ -5545,3 +5648,89 @@ window.updateStudioLiveStatus = function() {
 };
 
 // ==============================================================================
+
+// ==============================================================================
+// همگام‌سازی ابری سفارش‌ها از Supabase و ذخیره وب‌هوک گوگل شیتس
+// ==============================================================================
+
+window.syncOrdersFromSupabase = async function() {
+  if (!window.supabaseClient) return;
+  try {
+    const { data: cloudOrders, error } = await window.supabaseClient
+      .from('orders')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) {
+      console.warn('[Supabase Orders Sync Error]', error);
+      return;
+    }
+
+    if (cloudOrders && Array.isArray(cloudOrders) && cloudOrders.length > 0) {
+      const existingIds = new Set(ordersList.map(o => Number(o.id)));
+      let updated = false;
+
+      cloudOrders.forEach(co => {
+        const orderId = Number(co.id);
+        if (!existingIds.has(orderId)) {
+          ordersList.unshift({
+            id: orderId,
+            client: co.client_name,
+            contact: co.contact || co.client_email || '',
+            refLink: co.ref_link || '',
+            pkg: co.package_name || 'سفارش کمیسیون',
+            price: co.price_text || '',
+            timeline: co.timeline || '',
+            phase: co.phase || '',
+            brief: co.brief_text || '',
+            status: co.status || 'بریف دریافت شد'
+          });
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        if (typeof safeSetStorage === 'function') {
+          safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+        }
+        if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+        if (typeof renderAdminLists === 'function') renderAdminLists();
+        console.log('[Supabase Orders] Synchronized', cloudOrders.length, 'orders from Cloud DB.');
+      }
+    }
+  } catch (err) {
+    console.warn('[Supabase Orders Exception]', err);
+  }
+};
+
+window.saveMultiCloudIntegrationsDirect = function() {
+  const gSheetsInput = document.getElementById('setGoogleSheetsWebhook');
+  if (gSheetsInput) {
+    siteSettings.googleSheetsWebhook = gSheetsInput.value.trim();
+  }
+  const cfInput = document.getElementById('setCloudflareToken');
+  if (cfInput) {
+    siteSettings.cloudflareToken = cfInput.value.trim();
+  }
+  if (typeof safeSetStorage === 'function') {
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  }
+  showToast('تنظیمات وب‌هوک گوگل شیتس و آنالیتیکس کلادفلر با موفقیت ثبت شد! ✓', 'success', 4000);
+};
+
+// فراخوانی خودکار همگام‌سازی ابری سفارش‌ها در لود صفحه
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (typeof window.syncOrdersFromSupabase === 'function') {
+      window.syncOrdersFromSupabase();
+    }
+    const gSheetsInput = document.getElementById('setGoogleSheetsWebhook');
+    if (gSheetsInput && siteSettings.googleSheetsWebhook) {
+      gSheetsInput.value = siteSettings.googleSheetsWebhook;
+    }
+    const cfInput = document.getElementById('setCloudflareToken');
+    if (cfInput && siteSettings.cloudflareToken) {
+      cfInput.value = siteSettings.cloudflareToken;
+    }
+  }, 1200);
+});

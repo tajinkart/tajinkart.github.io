@@ -35,9 +35,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.5.3">
+  <link rel="stylesheet" href="style.css?v=12.6.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c76a19f07a524a87b5a19808d4b38d38"}'></script>
 </head>
 <body data-view="showcase">
 
@@ -1179,6 +1181,39 @@
                     </div>
                   </div>
 
+                  <!-- کارت ۲-د: پایگاه داده ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📊 همگام‌سازی ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">MULTI-CLOUD SYNC</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">پایداری افزونه: هر سفارش جدید همزمان در دیتابیس سوپابیس (جدول orders)، فایل اکسل گوگل درایو و ربات تلگرام استودیو ثبت می‌شود.</p>
+
+                    <div>
+                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        <span style="font-size:11px; color:#10b981; font-weight:700;">🟢 وضعیت دیتابیس ابری Supabase (جدول orders):</span>
+                        <span style="font-size:10.5px; color:#cbd5e1;">متصل و آماده دریافت خودکار بریف‌ها</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">آدرس وب‌هوک گوگل شیتس (Google Apps Script WebApp URL - جهت بک‌آپ اکسل):</label>
+                      <input type="text" id="setGoogleSheetsWebhook" placeholder="https://script.google.com/macros/s/.../exec" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                      <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">اختیاری: با قرار دادن وب‌هوک، یک ردیف در فایل Google Sheets شخصی شما در گوگل درایو ثبت می‌شود.</span>
+                    </div>
+
+                    <div>
+                      <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">توکن اختصاصی آنالیتیکس کلادفلر (Cloudflare Web Analytics Token):</label>
+                      <input type="text" id="setCloudflareToken" placeholder="c76a19f07a524a87b5a19808d4b38d38" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+
+                    <div style="margin-top:6px;">
+                      <button type="button" onclick="saveMultiCloudIntegrationsDirect()" class="btn-gold" style="width:100%; padding:10px 16px; font-size:12px; font-weight:800; cursor:pointer;">
+                        ✓ ذخیره تنظیمات گوگل شیتس و کلادفلر
+                      </button>
+                    </div>
+                  </div>
+
                   <!-- کارت ۲-ج: مرکز اتوماسیون ۱۲ شبکه اجتماعی (POSSE Hub) -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1860,8 +1895,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=12.5.3"></script>
-  <script src="app.js?v=12.5.3"></script>
+  <script src="data.js?v=12.6.0"></script>
+  <script src="app.js?v=12.6.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
