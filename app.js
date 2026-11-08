@@ -687,6 +687,49 @@ async function uploadFileToCloudinary(file) {
 }
 
 // سیستم استیجینگ و پیش‌نویس افزودن و ویرایش اثر در ادمین
+const AVAILABLE_PLATFORMS = [
+  { id: 'telegram', name: 'تلگرام', icon: '✈️', placeholder: 'متن و توضیحات اختصاصی برای کانال تلگرام...' },
+  { id: 'artstation', name: 'آرت‌استیشن', icon: '🎨', placeholder: 'توضیحات و مشخصات تکنیکال آرت‌استیشن...' },
+  { id: 'cara', name: 'کارا (Cara)', icon: '🛡️', placeholder: 'متن و کپشن پورتفولیو در پلتفرم ضد هوش‌مصنوعی کارا...' },
+  { id: 'pinterest', name: 'پینترست', icon: '📌', placeholder: 'توضیحات پین، تگ‌های بصری و متادیتای پینترست...' },
+  { id: 'instagram', name: 'اینستاگرام', icon: '📷', placeholder: 'کپشن، داستان شکل‌گیری اثر و هشتگ‌های اصلی اینستاگرام...' },
+  { id: 'reels', name: 'اینستاگرام ریلز', icon: '🎬', placeholder: 'توضیحات و قلاب مخاطب (Hook) برای ویدیوی ریلز...' },
+  { id: 'threads', name: 'تردز (Threads)', icon: '🧵', placeholder: 'متن گفت‌وگومحور و روایت کانسپت در تردز...' },
+  { id: 'reddit', name: 'ردیت (Reddit)', icon: '🤖', placeholder: 'عنوان تاپیک، ساب‌ردیت و توضیحات سابمیشن ردیت...' },
+  { id: 'x', name: 'توییتر (X)', icon: '🐦', placeholder: 'متن خلاصه توییت (زیر ۲۸۰ کاراکتر) و هشتگ‌ها...' },
+  { id: 'bluesky', name: 'بلواسکای', icon: '🦋', placeholder: 'متن پست در شبکه غیرمتمرکز بلواسکای...' },
+  { id: 'shorts', name: 'یوتیوب شورتس', icon: '📹', placeholder: 'عنوان و توضیحات ویدیوی شورتس در چنل یوتیوب...' },
+  { id: 'discord', name: 'دیسکورد', icon: '🎮', placeholder: 'پیام مخابره به روم شوکیس کامیونیتی دیسکورد...' },
+  { id: 'linkedin', name: 'لینکدین', icon: '💼', placeholder: 'متن بیزینس و کاربرد تجاری اثر در لینکدین...' }
+];
+
+window.selectPhaseSocialTab = function(phaseIdx, platId) {
+  if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
+  stagingProjectPhases[phaseIdx].activeSocialTab = platId;
+  renderAdminStagingPhasesOnly();
+};
+
+window.togglePhaseSocialPlatform = function(phaseIdx, platId, isChecked) {
+  if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
+  const p = stagingProjectPhases[phaseIdx];
+  p.socials = p.socials || {};
+  p.socials[platId] = isChecked;
+  if (platId === 'telegram') p.socialTelegram = isChecked;
+  renderAdminStagingPhasesOnly();
+};
+
+window.setPhaseSocialCaption = function(phaseIdx, platId, text) {
+  if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
+  const p = stagingProjectPhases[phaseIdx];
+  p.socialCaptions = p.socialCaptions || {};
+  p.socialCaptions[platId] = text;
+};
+
+window.setPhaseTelegramButton = function(phaseIdx, isChecked) {
+  if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
+  stagingProjectPhases[phaseIdx].tgIncludeButton = isChecked;
+};
+
 let isCreatingNewArt = false;
 let stagingNewArt = null;
 
@@ -879,14 +922,20 @@ function renderStagingPhasesHtml() {
     const hasImage = Boolean(p.img || p.image);
     const imgSrc = p.img || p.image || '';
 
+    p.socials = p.socials || {};
+    p.socialCaptions = p.socialCaptions || {};
+    if (p.socialTelegram !== undefined && p.socials.telegram === undefined) {
+      p.socials.telegram = Boolean(p.socialTelegram);
+    }
+    const currentSelectedTab = p.activeSocialTab || 'telegram';
+    const activePlat = AVAILABLE_PLATFORMS.find(item => item.id === currentSelectedTab) || AVAILABLE_PLATFORMS[0];
+    const isCurrentPlatChecked = Boolean(p.socials[activePlat.id]);
+
     // شمارش پلتفرم‌های فعال اختصاصی برای این شیت
     const activeSocials = [];
-    if (p.socialTelegram) activeSocials.push('تلگرام');
-    if (p.socialArtStation) activeSocials.push('آرت‌استیشن');
-    if (p.socialCara) activeSocials.push('کارا');
-    if (p.socialPinterest) activeSocials.push('پینترست');
-    if (p.socialInstagram) activeSocials.push('اینستاگرام');
-    if (p.socialX) activeSocials.push('X');
+    AVAILABLE_PLATFORMS.forEach(item => {
+      if (p.socials[item.id]) activeSocials.push(item.name);
+    });
 
     return `
       <div style="display:flex; flex-direction:column; gap:12px; background:#04060a; border:1px solid ${isCover ? 'rgba(250,204,21,0.5)' : 'rgba(0,240,255,0.3)'}; border-radius:14px; padding:16px;">
@@ -963,82 +1012,70 @@ function renderStagingPhasesHtml() {
 
         <textarea rows="2" placeholder="توضیحات تخصصی این فاز (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
 
-        <!-- مقاصد انتشار اختصاصی به صورت آکاردئون باز و بسته شونده (پیش‌فرض کاملاً غیرفعال) -->
-        <details style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:10px; padding:8px 12px; margin-top:2px;">
+        <!-- مقاصد انتشار چندکاناله استودیو (دراور شیک و اسکرول‌پذیر با باکس متن کاملاً اختصاصی هر شبکه) -->
+        <details style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:12px; padding:10px 14px; margin-top:2px;">
           <summary style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; list-style:none; user-select:none; outline:none;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:11.5px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار در شبکه‌ها (توزیع خودکار)</span>
+              <span style="font-size:11.5px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار در شبکه‌ها (توزیع اختصاصی این شیت):</span>
               <span class="font-mono" style="font-size:9.5px; color:${activeSocials.length > 0 ? 'var(--gold)' : 'var(--text-muted)'}; background:${activeSocials.length > 0 ? 'rgba(250,204,21,0.12)' : 'rgba(255,255,255,0.05)'}; padding:2px 8px; border-radius:4px;">
                 ${activeSocials.length > 0 ? `${activeSocials.length} شبکه فعال (${activeSocials.join('، ')})` : 'توزیع خودکار: خاموش'}
               </span>
             </div>
             <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; display:flex; align-items:center; gap:5px;">
-              <span>تنظیم گزینه‌ها</span>
+              <span>مدیریت شبکه‌ها</span>
               <span style="font-size:11px;">▾</span>
             </span>
           </summary>
 
-          <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:10px;">
-            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px; font-size:11px;">
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialTelegram = this.checked; renderAdminStagingPhasesOnly()" ${p.socialTelegram ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span style="color:${p.socialTelegram ? 'var(--gold)' : 'inherit'}; font-weight:${p.socialTelegram ? '800' : 'normal'};">✈️ تلگرام</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialArtStation = this.checked; renderAdminStagingPhasesOnly()" ${p.socialArtStation ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🎨 آرت‌استیشن</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialCara = this.checked; renderAdminStagingPhasesOnly()" ${p.socialCara ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🛡️ کارا (Cara)</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialPinterest = this.checked; renderAdminStagingPhasesOnly()" ${p.socialPinterest ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>📌 پینترست</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialInstagram = this.checked; renderAdminStagingPhasesOnly()" ${p.socialInstagram ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>📷 اینستاگرام (پست)</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReels = this.checked; renderAdminStagingPhasesOnly()" ${p.socialReels ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🎬 اینستاگرام ریلز</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialThreads = this.checked; renderAdminStagingPhasesOnly()" ${p.socialThreads ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🧵 تردز (Threads)</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReddit = this.checked; renderAdminStagingPhasesOnly()" ${p.socialReddit ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🤖 ردیت (Reddit)</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialX = this.checked; renderAdminStagingPhasesOnly()" ${p.socialX ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🐦 توییتر (X)</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialBluesky = this.checked; renderAdminStagingPhasesOnly()" ${p.socialBluesky ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🦋 بلواسکای</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialShorts = this.checked; renderAdminStagingPhasesOnly()" ${p.socialShorts ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>📹 یوتیوب شورتس</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialDiscord = this.checked; renderAdminStagingPhasesOnly()" ${p.socialDiscord ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>🎮 دیسکورد</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-                <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialLinkedIn = this.checked; renderAdminStagingPhasesOnly()" ${p.socialLinkedIn ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-                <span>💼 لینکدین</span>
-              </label>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);" class="phase-social-drawer-layout">
+            
+            <!-- ستون ۱: لیست عمودی شیک و قابل اسکرول پلتفرم‌ها (طرح منوی تاج‌اینک‌آرت) -->
+            <div class="phase-social-menu-scroll">
+              ${AVAILABLE_PLATFORMS.map(plat => {
+                const isSelected = (currentSelectedTab === plat.id);
+                const isChecked = Boolean(p.socials && p.socials[plat.id]);
+                return `
+                  <div class="phase-social-menu-item ${isSelected ? 'active' : ''}" onclick="selectPhaseSocialTab(${idx}, '${plat.id}')">
+                    <div style="display:flex; align-items:center; gap:7px;">
+                      <span style="font-size:14px;">${plat.icon}</span>
+                      <span style="font-size:11px; font-weight:${isSelected ? '800' : '600'}; color:${isSelected ? 'var(--gold)' : '#e2e8f0'};">${plat.name}</span>
+                    </div>
+                    <input type="checkbox" onclick="event.stopPropagation()" onchange="togglePhaseSocialPlatform(${idx}, '${plat.id}', this.checked)" ${isChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer; width:15px; height:15px;" title="فعال/غیرفعال کردن ارسال به ${plat.name}" />
+                  </div>
+                `;
+              }).join('')}
             </div>
 
-            <!-- کادر کپشن دلخواه خودِ کاربر برای این اثر/شیت مشخص -->
-            <div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
-              <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">✍️ کپشن و متن دلخواه ارسالی به تلگرام و شبکه‌ها (اختیاری):</label>
-              <textarea rows="2" placeholder="متن یا کپشن دلخواه خود را برای ارسال به تلگرام بنویسید (در صورت خالی بودن، عنوان و توضیحات اثر ارسال می‌شود و هیچ متن تحمیلی اضافه نخواهد شد)..." onchange="stagingProjectPhases[${idx}].customCaption = this.value.trim()" style="font-size:11.5px; padding:7px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a14; width:100%;">${p.customCaption || ''}</textarea>
+            <!-- ستون ۲: باکس تنظیمات و متن کاملاً اختصاصی پلتفرم انتخاب شده -->
+            <div style="background:#04060c; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; align-items:center; gap:7px;">
+                  <span style="font-size:18px;">${activePlat.icon}</span>
+                  <span style="font-size:12.5px; font-weight:800; color:var(--gold);">تنظیمات و متن اختصاصی ${activePlat.name}</span>
+                </div>
+                <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer; color:${isCurrentPlatChecked ? 'var(--gold)' : 'var(--text-muted)'}; background:rgba(255,255,255,0.04); padding:4px 10px; border-radius:6px; border:1px solid ${isCurrentPlatChecked ? 'rgba(250,204,21,0.3)' : 'rgba(255,255,255,0.08)'};">
+                  <input type="checkbox" onchange="togglePhaseSocialPlatform(${idx}, '${activePlat.id}', this.checked)" ${isCurrentPlatChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+                  <span style="font-weight:700;">ارسال این شیت به ${activePlat.name}</span>
+                </label>
+              </div>
+
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن / کپشن اختصاصی برای ${activePlat.name}:</label>
+                <textarea rows="3" placeholder="${activePlat.placeholder}" onchange="setPhaseSocialCaption(${idx}, '${activePlat.id}', this.value.trim())" style="font-size:11.5px; padding:8px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a14; width:100%; box-sizing:border-box;">${(p.socialCaptions && p.socialCaptions[activePlat.id]) || ''}</textarea>
+              </div>
+
+              <!-- تنظیمات انحصاری برای تلگرام -->
+              ${activePlat.id === 'telegram' ? `
+                <div style="background:rgba(0,240,255,0.04); border:1px dashed rgba(0,240,255,0.25); border-radius:8px; padding:10px 12px; margin-top:2px;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11.5px; color:var(--cyan-electric); font-weight:700;">
+                    <input type="checkbox" onchange="setPhaseTelegramButton(${idx}, this.checked)" ${p.tgIncludeButton ? 'checked' : ''} style="accent-color:var(--cyan-electric); cursor:pointer; width:16px; height:16px;" />
+                    <span>افزودن دکمه شیشه‌ای لینک مستقیم به همین اثر در سایت (انحصاری همین اثر)</span>
+                  </label>
+                  <p style="font-size:10px; color:var(--text-muted); margin:4px 0 0 24px;">در صورت غیرفعال بودن، پیام تلگرام بدون هیچ دکمه‌ای در زیر پست ارسال می‌شود.</p>
+                </div>
+              ` : ''}
             </div>
+
           </div>
         </details>
       </div>
@@ -1187,7 +1224,7 @@ window.confirmSaveArtwork = async function() {
 
       // توزیع چندکاناله و مقاصد انتشار (زیرساخت POSSE):
       // بررسی تک‌تک فازها/شیت‌ها؛ هر شیتی که تیک تلگرام داشته باشد مخابره می‌شود
-      const tgPhases = assembledPhases.filter(p => p.socialTelegram === true);
+      const tgPhases = assembledPhases.filter(p => (p.socials?.telegram === true || p.socialTelegram === true));
       for (const ph of tgPhases) {
         await broadcastArtworkPhaseToTelegram(newArtRecord, ph);
       }
@@ -1226,7 +1263,7 @@ window.confirmSaveArtwork = async function() {
       renderAdminSketch2();
       showToast('تغییرات پروژه با موفقیت ذخیره شد!', 'success');
 
-      const tgPhases = assembledPhases.filter(p => p.socialTelegram === true);
+      const tgPhases = assembledPhases.filter(p => (p.socials?.telegram === true || p.socialTelegram === true));
       for (const ph of tgPhases) {
         await broadcastArtworkPhaseToTelegram(art, ph);
       }
@@ -1298,6 +1335,8 @@ window.renderAdminSettingsTab = function() {
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
   const tokenEl = document.getElementById('setTgToken');
   if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
+  const footerEl = document.getElementById('setTgDefaultFooter');
+  if (footerEl) footerEl.value = siteSettings.tgDefaultFooter || '';
   const chatEl = document.getElementById('setTgChat');
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
   const emailEl = document.getElementById('setAdminEmail');
@@ -2353,6 +2392,9 @@ window.saveTelegramSettingsDirect = function() {
     if (v) channels.push(v);
   });
 
+  const footerInput = document.getElementById('setTgDefaultFooter');
+  if (footerInput) siteSettings.tgDefaultFooter = footerInput.value.trim();
+
   siteSettings.tgToken = token;
   siteSettings.tgChannels = channels.length > 0 ? channels : (siteSettings.tgChat ? [siteSettings.tgChat] : []);
   siteSettings.tgChat = siteSettings.tgChannels[0] || '';
@@ -2513,7 +2555,11 @@ window.broadcastArtworkPhaseToTelegram = async function(art, phase) {
   const photoUrl = phase.img || phase.image || art.image || '';
   const title = phase.name || art.title || 'کانسپت جدید استودیو TAJINKART';
   const desc = phase.desc || art.desc || '';
-  const customCap = phase.customCaption ? phase.customCaption.trim() : '';
+  
+  // استخراج متن اختصاصی تلگرام برای این شیت
+  const customCap = (phase.socialCaptions && phase.socialCaptions.telegram) ? 
+                    phase.socialCaptions.telegram.trim() : 
+                    (phase.customCaption ? phase.customCaption.trim() : '');
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -2529,8 +2575,23 @@ window.broadcastArtworkPhaseToTelegram = async function(art, phase) {
     captionHtml = escapeHtml(customCap);
   } else {
     captionHtml = `🎨 <b>${escapeHtml(title)}</b>` + 
-                  (desc ? `\n\n${escapeHtml(desc)}` : '') + 
-                  `\n\n🔗 <a href="https://tajinkart.github.io/?art=${art.id}">مشاهده کامل در آتلیه TAJINKART</a>`;
+                  (desc ? `\n\n${escapeHtml(desc)}` : '');
+  }
+
+  // افزودن فوتر سراسری تلگرام در صورت وجود در تنظیمات
+  if (siteSettings.tgDefaultFooter && siteSettings.tgDefaultFooter.trim()) {
+    captionHtml += `\n\n${escapeHtml(siteSettings.tgDefaultFooter.trim())}`;
+  }
+
+  // دکمه‌های شیشه‌ای زیر پست: به صورت پیش‌فرض کاملاً حذف شدند.
+  // فقط و فقط اگر کاربر تیک اختصاصی دکمه را در تنظیمات همین اثر زده باشد، یک دکمه انحصاری به اثر اضافه می‌شود.
+  let replyMarkupParam = undefined;
+  if (phase.tgIncludeButton === true) {
+    replyMarkupParam = JSON.stringify({
+      inline_keyboard: [[
+        { text: "👁️ مشاهده این اثر در گالری TAJINKART", url: `https://tajinkart.github.io/?art=${art.id}` }
+      ]]
+    });
   }
 
   showToast(`در حال مخابره شیت «${title}» به تلگرام...`, 'info', 2500);
@@ -2575,48 +2636,44 @@ window.broadcastArtworkPhaseToTelegram = async function(art, phase) {
         fd.append('photo', blob, 'artwork.jpg');
         fd.append('caption', captionHtml);
         fd.append('parse_mode', 'HTML');
-        fd.append('reply_markup', JSON.stringify({
-          inline_keyboard: [[
-            { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
-            { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
-          ]]
-        }));
+        if (replyMarkupParam) {
+          fd.append('reply_markup', replyMarkupParam);
+        }
 
         resp = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
           method: 'POST',
           body: fd
         });
       } else if (photoUrl && photoUrl.startsWith('http')) {
+        const payload = {
+          chat_id: chat,
+          photo: photoUrl,
+          caption: captionHtml,
+          parse_mode: 'HTML'
+        };
+        if (replyMarkupParam) {
+          payload.reply_markup = JSON.parse(replyMarkupParam);
+        }
+
         resp = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chat,
-            photo: photoUrl,
-            caption: captionHtml,
-            parse_mode: 'HTML',
-            reply_markup: {
-              inline_keyboard: [[
-                { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
-                { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
-              ]]
-            }
-          })
+          body: JSON.stringify(payload)
         });
       } else {
+        const payload = {
+          chat_id: chat,
+          text: captionHtml,
+          parse_mode: 'HTML'
+        };
+        if (replyMarkupParam) {
+          payload.reply_markup = JSON.parse(replyMarkupParam);
+        }
+
         resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chat,
-            text: captionHtml,
-            parse_mode: 'HTML',
-            reply_markup: {
-              inline_keyboard: [[
-                { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` }
-              ]]
-            }
-          })
+          body: JSON.stringify(payload)
         });
       }
 
@@ -3693,6 +3750,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
   const tokenEl = document.getElementById('setTgToken');
   if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
+  const footerEl = document.getElementById('setTgDefaultFooter');
+  if (footerEl) footerEl.value = siteSettings.tgDefaultFooter || '';
   const chatEl = document.getElementById('setTgChat');
   if (chatEl) chatEl.value = siteSettings.tgChat || '';
   const emailEl = document.getElementById('setAdminEmail');

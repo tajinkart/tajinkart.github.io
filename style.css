@@ -437,8 +437,8 @@
       padding: 20px 14px;
       text-align: center;
       background: rgba(4, 5, 7, 0.78);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       opacity: 0;
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
@@ -2598,9 +2598,9 @@ textarea:-webkit-autofill {
   text-align: center;
   opacity: 0;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(6, 9, 16, 0.35) !important;
-  backdrop-filter: blur(12px) saturate(170%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(170%) !important;
+  background: rgba(6, 9, 16, 0.45) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   pointer-events: none;
   z-index: 5;
 }
@@ -3345,16 +3345,70 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 40px var(--neon-glow, rgba(250, 204, 21, 0.35)) !important;
 }
 .instagram-pinch-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 4, 8, 0.45);
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  z-index: 99990;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 .instagram-pinch-backdrop.active {
   opacity: 1;
+}
+
+/* حذف کامل هرگونه مات شدن و هاور در دستگاه‌های لمسی موبایل هنگام زوم و تاچ */
+@media (hover: none), (max-width: 992px) {
+  .tile-center-title,
+  .mosaic-tile:hover .tile-center-title,
+  .mosaic-tile:active .tile-center-title {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+.mosaic-tile.tile-pinching .tile-center-title {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* دراور شیک و کشویی مقاصد انتشار چندکاناله (Omnichannel Social Drawer) */
+.phase-social-drawer-layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 680px) {
+  .phase-social-drawer-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+.phase-social-menu-scroll {
+  background: #030408;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  gap: 2px;
+}
+.phase-social-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.phase-social-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.phase-social-menu-item.active {
+  background: rgba(250, 204, 21, 0.12) !important;
+  border: 1px solid rgba(250, 204, 21, 0.35) !important;
 }

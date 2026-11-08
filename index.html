@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=11.4">
+  <link rel="stylesheet" href="style.css?v=11.5">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -860,6 +860,11 @@
                     <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">می‌توانید آیدی کانال عمومی (مانند tajinkart@) یا شناسه عددی چت را وارد کنید.</p>
                   </div>
 
+                  <div>
+                    <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">متن پیش‌فرض ثابت در انتهای پیام‌های تلگرام (فوتر / امضای سراسری):</label>
+                    <textarea id="setTgDefaultFooter" rows="2" placeholder="متنی که می‌خواهید همیشه به صورت پیش‌فرض در انتهای پیام‌های تلگرام به عنوان فوتر/امضا قرار بگیرد (اختیاری)..." style="font-size:11.5px; line-height:1.6; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;"></textarea>
+                  </div>
+
                   <div style="margin-top:6px;">
                     <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800;">
                       ✓ ثبت و ذخیره تنظیمات تلگرام
@@ -1570,8 +1575,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=11.4"></script>
-  <script src="app.js?v=11.4" defer></script>
+  <script src="data.js?v=11.5"></script>
+  <script src="app.js?v=11.5" defer></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
