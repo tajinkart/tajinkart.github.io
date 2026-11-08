@@ -5230,53 +5230,69 @@ window.updateStudioLiveStatus = function() {
 // مدیریت داینامیک لوگو و نشان استودیو با درگ اند دراپ در تنظیمات ادمین
 // ==============================================================================
 window.updateStudioLogoDisplay = function() {
-  const logoUrl = siteSettings.studioLogoUrl || '';
-  const headerContainer = document.getElementById('brandCrestContainer');
-  const headerImg = document.getElementById('brandCrestImg');
-  const previewBox = document.getElementById('adminLogoPreviewBox');
-  const previewImg = document.getElementById('adminLogoPreviewImg');
-  const placeholder = document.getElementById('adminLogoPlaceholder');
-  const actionBtns = document.getElementById('adminLogoActionBtns');
-  const favEl = document.getElementById('siteFavicon');
+  const logoUrl = siteSettings.studioLogoUrl || "";
+  const favUrl = siteSettings.faviconUrl || logoUrl || "";
+  
+  const headerContainer = document.getElementById("brandCrestContainer");
+  const headerImg = document.getElementById("brandCrestImg");
+  const previewBox = document.getElementById("adminLogoPreviewBox");
+  const previewImg = document.getElementById("adminLogoPreviewImg");
+  const placeholder = document.getElementById("adminLogoPlaceholder");
+
+  const favPreviewImg = document.getElementById("adminFaviconPreviewImg");
+  const favEmptyIcon = document.getElementById("adminFaviconEmptyIcon");
+  const favInput = document.getElementById("adminFaviconInput");
+  const siteFavicon = document.getElementById("siteFavicon");
 
   if (logoUrl) {
     if (headerContainer && headerImg) {
       headerImg.src = logoUrl;
-      headerContainer.style.display = 'flex';
+      headerContainer.style.display = "flex";
     }
     if (previewBox && previewImg) {
       previewImg.src = logoUrl;
-      previewBox.style.display = 'block';
+      previewBox.style.display = "block";
     }
-    if (placeholder) placeholder.style.display = 'none';
-    if (actionBtns) actionBtns.style.display = 'flex';
-    if (favEl) favEl.href = logoUrl;
+    if (placeholder) placeholder.style.display = "none";
   } else {
-    if (headerContainer) headerContainer.style.display = 'none';
-    if (previewBox) previewBox.style.display = 'none';
-    if (placeholder) placeholder.style.display = 'block';
-    if (actionBtns) actionBtns.style.display = 'none';
-    if (favEl) favEl.href = '';
+    if (headerContainer) headerContainer.style.display = "none";
+    if (previewBox) previewBox.style.display = "none";
+    if (placeholder) placeholder.style.display = "block";
+  }
+
+  if (favUrl) {
+    if (favPreviewImg) {
+      favPreviewImg.src = favUrl;
+      favPreviewImg.style.display = "block";
+    }
+    if (favEmptyIcon) favEmptyIcon.style.display = "none";
+    if (favInput && siteSettings.faviconUrl) favInput.value = siteSettings.faviconUrl;
+    if (siteFavicon) siteFavicon.href = favUrl;
+  } else {
+    if (favPreviewImg) favPreviewImg.style.display = "none";
+    if (favEmptyIcon) favEmptyIcon.style.display = "inline-block";
+    if (favInput) favInput.value = "";
+    if (siteFavicon) siteFavicon.href = "";
   }
 };
 
 window.handleLogoDragOver = function(e) {
   e.preventDefault();
   e.stopPropagation();
-  const dropzone = document.getElementById('adminLogoDropzone');
+  const dropzone = document.getElementById("adminLogoDropzone");
   if (dropzone) {
-    dropzone.style.borderColor = 'var(--cyan-electric)';
-    dropzone.style.background = 'rgba(0, 240, 255, 0.08)';
+    dropzone.style.borderColor = "var(--cyan-electric)";
+    dropzone.style.background = "rgba(0, 240, 255, 0.08)";
   }
 };
 
 window.handleLogoDragLeave = function(e) {
   e.preventDefault();
   e.stopPropagation();
-  const dropzone = document.getElementById('adminLogoDropzone');
+  const dropzone = document.getElementById("adminLogoDropzone");
   if (dropzone) {
-    dropzone.style.borderColor = 'rgba(250, 204, 21, 0.5)';
-    dropzone.style.background = 'rgba(0, 0, 0, 0.55)';
+    dropzone.style.borderColor = "rgba(250, 204, 21, 0.5)";
+    dropzone.style.background = "rgba(0, 0, 0, 0.55)";
   }
 };
 
@@ -5285,47 +5301,65 @@ window.handleLogoDrop = function(e) {
   e.stopPropagation();
   window.handleLogoDragLeave(e);
   if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-    processAndSaveStudioLogo(e.dataTransfer.files[0]);
+    previewAndStageStudioLogo(e.dataTransfer.files[0]);
   }
 };
 
 window.handleAdminLogoUpload = function(inputEl) {
   if (inputEl && inputEl.files && inputEl.files[0]) {
-    processAndSaveStudioLogo(inputEl.files[0]);
+    previewAndStageStudioLogo(inputEl.files[0]);
   }
 };
 
-async function processAndSaveStudioLogo(file) {
-  showToast('در حال بهینه‌سازی و ذخیره نشان استودیو...', 'info', 2500);
-
-  try {
-    let cloudUrl = await uploadFileToCloudinary(file);
-    if (!cloudUrl) {
-      cloudUrl = await compressImageForStorage(file, 800, 800, 0.92);
+function previewAndStageStudioLogo(file) {
+  showToast("در حال پردازش پیش‌نمایش نشان استودیو...", "info", 1500);
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    siteSettings.studioLogoUrl = dataUrl;
+    if (!siteSettings.faviconUrl) {
+      siteSettings.faviconUrl = dataUrl;
     }
-
-    siteSettings.studioLogoUrl = cloudUrl;
-    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-
     window.updateStudioLogoDisplay();
-    showToast('نشان رسمی استودیو با موفقیت بارگذاری شد و در هدر سایت قرار گرفت! 🦅', 'success', 5000);
-  } catch (err) {
-    console.error('Logo upload error:', err);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      siteSettings.studioLogoUrl = e.target.result;
-      safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-      window.updateStudioLogoDisplay();
-      showToast('نشان استودیو ذخیره شد.', 'success');
-    };
-    reader.readAsDataURL(file);
-  }
+    showToast("پیش‌نمایش نشان استودیو آماده شد! برای ثبت دائم، روی «✓ ذخیره و تثبیت نشان و فاویکون» کلیک کنید.", "success", 4500);
+
+    // بهینه‌سازی پس‌زمینه با فشرده‌سازی باکیفیت
+    try {
+      const compressed = await compressImageForStorage(file, 600, 600, 0.92);
+      if (compressed) {
+        siteSettings.studioLogoUrl = compressed;
+      }
+    } catch(ign) {}
+  };
+  reader.readAsDataURL(file);
 }
 
-window.removeStudioLogo = function() {
-  siteSettings.studioLogoUrl = '';
-  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  window.updateStudioLogoDisplay();
-  showToast('نشان استودیو حذف شد.', 'info');
+window.handleAdminFaviconUpload = function(inputEl) {
+  if (inputEl && inputEl.files && inputEl.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      siteSettings.faviconUrl = e.target.result;
+      window.updateStudioLogoDisplay();
+      showToast("پیش‌نمایش فاویکون آماده شد! برای ثبت دائم، روی دکمه ذخیره کلیک کنید.", "info", 3500);
+    };
+    reader.readAsDataURL(inputEl.files[0]);
+  }
 };
 
+window.saveStudioBrandingSettings = function() {
+  const favInput = document.getElementById("adminFaviconInput");
+  if (favInput && favInput.value.trim()) {
+    siteSettings.faviconUrl = favInput.value.trim();
+  }
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast("نشان رسمی استودیو و فاویکون مرورگر با موفقیت ثبت و ذخیره شد! ✓", "success", 5000);
+};
+
+window.removeStudioLogo = function() {
+  siteSettings.studioLogoUrl = "";
+  siteSettings.faviconUrl = "";
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast("نشان و فاویکون استودیو حذف شدند.", "info", 3000);
+};

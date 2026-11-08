@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.2">
+  <link rel="stylesheet" href="style.css?v=12.3">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -134,7 +134,7 @@
         <span class="status-pulse-dot"></span>
         <span id="studioLiveStatusText">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است</span>
       </div>
-      <p class="brand-sub-caption">سید سروش تاج • آرشیو تخصصی کانسپت آرت، طراحی دنیا و تصویرسازی سینمایی</p>
+      <p class="brand-sub-caption">سید سروش تاج • مدیر استودیو و طراح ارشد کانسپت آرت و دنیاسازی (Worldbuilder)</p>
     </div>
 
     <div id="artworkCurtain">
@@ -828,37 +828,60 @@
 
               <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
                 
-                <!-- کارت ۰: مدیریت و دراپ لوگو و نشان رسمی استودیو -->
-                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                <!-- کارت ۰: مدیریت نشان و فاویکون رسمی استودیو -->
+                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--gold);">🦅 نشان و لوگوی رسمی استودیو</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">STUDIO CREST</span>
+                    <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 نشان و آیکون رسمی استودیو (Crest & Favicon)</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">BRANDING</span>
                   </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">لوگوی رسمی استودیو را در این کادر رها (Drag & Drop) کرده یا از سیستم انتخاب کنید.</p>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">لوگوی رسمی استودیو و آیکون تب مرورگر (Favicon) را از سیستم انتخاب کرده یا به این کادر بیندازید.</p>
 
-                  <div id="adminLogoDropzone" 
-                       onclick="document.getElementById('adminLogoFileInput').click()"
-                       ondragover="handleLogoDragOver(event)"
-                       ondragleave="handleLogoDragLeave(event)"
-                       ondrop="handleLogoDrop(event)"
-                       style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:10px; padding:20px; text-align:center; transition:all 0.2s;">
-                    <div id="adminLogoPreviewBox" style="display:none; margin-bottom:8px;">
-                      <img id="adminLogoPreviewImg" src="" style="width:76px; height:76px; object-fit:contain; margin:0 auto; filter:drop-shadow(0 0 15px rgba(250,204,21,0.3));" alt="لوگو" />
+                  <!-- زون دراپ و انتخاب لوگو -->
+                  <div>
+                    <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">نشان اصلی استودیو (هدر صفحه اول):</label>
+                    <div id="adminLogoDropzone" 
+                         onclick="document.getElementById('adminLogoFileInput').click()"
+                         ondragover="handleLogoDragOver(event)"
+                         ondragleave="handleLogoDragLeave(event)"
+                         ondrop="handleLogoDrop(event)"
+                         style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:10px; padding:18px; text-align:center; transition:all 0.2s;">
+                      <div id="adminLogoPreviewBox" style="display:none; margin-bottom:8px;">
+                        <img id="adminLogoPreviewImg" src="" style="width:72px; height:72px; object-fit:contain; margin:0 auto; filter:drop-shadow(0 0 15px rgba(250,204,21,0.35));" alt="نشان" />
+                      </div>
+                      <div id="adminLogoPlaceholder">
+                        <div style="font-size:26px; margin-bottom:4px;">🖼️</div>
+                        <div style="font-size:12px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انتخاب نشان استودیو</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">پشتیبانی از فرمت‌های PNG، JPG و WEBP</div>
+                      </div>
                     </div>
-                    <div id="adminLogoPlaceholder">
-                      <div style="font-size:28px; margin-bottom:4px;">🖼️</div>
-                      <div style="font-size:12px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای بارگذاری نشان استودیو</div>
-                      <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP</div>
+                    <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
+                  </div>
+
+                  <!-- زون فاویکون اختصاصی تب مرورگر -->
+                  <div>
+                    <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">آیکون اختصاصی تب مرورگر (Favicon):</label>
+                    <div style="display:flex; align-items:center; gap:10px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:8px 12px;">
+                      <div id="adminFaviconPreviewBox" style="width:36px; height:36px; border-radius:6px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <img id="adminFaviconPreviewImg" src="" style="width:24px; height:24px; object-fit:contain; display:none;" alt="فاویکون" />
+                        <span id="adminFaviconEmptyIcon" style="font-size:16px;">🌐</span>
+                      </div>
+                      <div style="flex:1;">
+                        <input type="text" id="adminFaviconInput" placeholder="لینک فاویکون یا انتخاب از سیستم..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
+                      </div>
+                      <button type="button" onclick="document.getElementById('adminFaviconFileInput').click()" class="btn-secondary" style="font-size:11px; padding:6px 12px; flex-shrink:0; cursor:pointer;">
+                        انتخاب فایل
+                      </button>
+                      <input type="file" id="adminFaviconFileInput" accept="image/*" style="display:none;" onchange="handleAdminFaviconUpload(this)" />
                     </div>
                   </div>
-                  <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
 
-                  <div id="adminLogoActionBtns" style="display:none; justify-content:space-between; align-items:center;">
-                    <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:5px 12px; cursor:pointer;">
-                      🔄 تغییر نشان
+                  <!-- کلیدهای عملیاتی اختصاصی ذخیره و حذف -->
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:2px;">
+                    <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ذخیره و تثبیت نشان و فاویکون
                     </button>
-                    <button type="button" onclick="removeStudioLogo()" class="btn-secondary" style="color:var(--crimson); font-size:11px; padding:5px 12px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
-                      حذف نشان
+                    <button type="button" onclick="removeStudioLogo()" class="btn-secondary" style="color:var(--crimson); font-size:11.5px; padding:10px 14px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
+                      حذف نشان و فاویکون
                     </button>
                   </div>
                 </div>
