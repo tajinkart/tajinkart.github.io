@@ -789,13 +789,6 @@ function renderAdminArtModalForm(art, isNew) {
           <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
           <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
         </div>
-
-        <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.25); border-radius:10px; padding:10px 12px;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
-            <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--gold);" />
-            فعال‌سازی سفارش به عنوان پکیج کامل پروداکشن (Production Pack) در انتهای اثر
-          </label>
-        </div>
       </div>
 
       <!-- گام ۲: تصاویر و شیت‌های پروژه (مدیریت یکپارچه) -->
@@ -816,8 +809,16 @@ function renderAdminArtModalForm(art, isNew) {
         </div>
       </div>
 
+      <!-- تنظیمات نهایی سفارش پکیج کامل -->
+      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.28); border-radius:12px; padding:12px 14px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
+          <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--gold); cursor:pointer;" />
+          فعال‌سازی سفارش به عنوان پکیج کامل پروداکشن (Production Pack) در انتهای اثر
+        </label>
+      </div>
+
       <!-- دکمه‌های عملیاتی -->
-      <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+      <div style="margin-top:4px; display:flex; flex-direction:column; gap:8px;">
         ${isNew ? `
           <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
             ✓ تایید و افزودن قطعی به گالری
@@ -894,6 +895,76 @@ function renderStagingPhasesHtml() {
         </div>
 
         <textarea rows="2" placeholder="توضیحات تخصصی این فاز (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
+
+        <!-- ماتریکس مقاصد انتشار خودکار این شیت (POSSE Multi-Network Omnichannel) -->
+        <div style="background:#070a14; border:1px solid rgba(250,204,21,0.22); border-radius:12px; padding:12px; margin-top:2px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+            <span style="font-size:11px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار اختصاصی این فایل:</span>
+            <span class="font-mono" style="font-size:9.5px; color:var(--cyan-electric); font-weight:700;">12 NETWORKS READY</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px; font-size:11px;">
+            <!-- ۱. پلتفرم‌های تخصصی پورتفولیو و آرت -->
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialArtStation = this.checked" ${(p.socialArtStation !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🎨 آرت‌استیشن</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialCara = this.checked" ${(p.socialCara !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🛡️ کارا (Cara)</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialPinterest = this.checked" ${(p.socialPinterest !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>📌 پینترست</span>
+            </label>
+
+            <!-- ۲. اینستاگرام، تردز و ویدیوی ریلز -->
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialInstagram = this.checked" ${(p.socialInstagram !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>📷 اینستاگرام (پست)</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReels = this.checked" ${(p.socialReels) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🎬 اینستاگرام ریلز</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialThreads = this.checked" ${(p.socialThreads !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🧵 تردز (Threads)</span>
+            </label>
+
+            <!-- ۳. ردیت، توییتر و بلواسکای -->
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReddit = this.checked" ${(p.socialReddit !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🤖 ردیت (Reddit)</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialX = this.checked" ${(p.socialX !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🐦 توییتر (X)</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialBluesky = this.checked" ${(p.socialBluesky !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🦋 بلواسکای</span>
+            </label>
+
+            <!-- ۴. ویدیو، پیام‌رسان و بیزینس -->
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialShorts = this.checked" ${(p.socialShorts) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>📹 یوتیوب شورتس</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialDiscord = this.checked" ${(p.socialDiscord !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>🎮 دیسکورد</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialTelegram = this.checked" ${(p.socialTelegram !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>✈️ تلگرام</span>
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialLinkedIn = this.checked" ${(p.socialLinkedIn) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span>💼 لینکدین</span>
+            </label>
+          </div>
+        </div>
       </div>
     `;
   }).join('');
@@ -1093,7 +1164,7 @@ window.confirmSaveArtwork = function() {
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
-      showToast('تغییرات اثر با موفقیت ذخیره شد.', 'success');
+      showToast(`تغییرات پروژه ذخیره شد! مقاصد توزیع برای ${assembledPhases.length} شیت آماده اتصال است.`, 'success', 5000);
 
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').update({
@@ -1170,6 +1241,14 @@ window.renderAdminSettingsTab = function() {
   if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'tajinkart';
   const cPresetEl = document.getElementById('setCloudinaryPreset');
   if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'erlvtkx9';
+  if (document.getElementById('setRedditCreds')) document.getElementById('setRedditCreds').value = siteSettings.redditCreds || '';
+  if (document.getElementById('setMetaToken')) document.getElementById('setMetaToken').value = siteSettings.metaToken || '';
+  if (document.getElementById('setTwitterKey')) document.getElementById('setTwitterKey').value = siteSettings.twitterKey || '';
+  if (document.getElementById('setYoutubeKey')) document.getElementById('setYoutubeKey').value = siteSettings.youtubeKey || '';
+  if (document.getElementById('setArtstationCreds')) document.getElementById('setArtstationCreds').value = siteSettings.artstationCreds || '';
+  if (document.getElementById('setPinterestToken')) document.getElementById('setPinterestToken').value = siteSettings.pinterestToken || '';
+  if (document.getElementById('setBlueskyCreds')) document.getElementById('setBlueskyCreds').value = siteSettings.blueskyCreds || '';
+  if (document.getElementById('setDiscordWebhook')) document.getElementById('setDiscordWebhook').value = siteSettings.discordWebhook || '';
 };
 
 // سابقه مرورگر و دکمه بازگشت در موبایل (HTML5 History API)
@@ -1411,10 +1490,13 @@ function renderShowcaseGrid() {
 
     let tileImg = imgSrc;
     let targetPhaseIdx = 0;
+    let displayTitle = art.title;
+    let displaySlug = slug;
+    let activeKey = art.tag || art.category || art.pipelineKey || 'character';
 
-    // تایل داینامیک: اگر دسته‌بندی خاصی فیلتر شده و شیت دوم یا سوم به آن تعلق دارد، تایل همان شیت را نشان می‌دهد
+    // تایل داینامیک: اگر دسته‌بندی خاصی فیلتر شده و شیت دوم یا سوم به آن تعلق دارد، تایل همان شیت، عنوان و رنگ نئون آن را می‌گیرد
     if (currentGalleryFilter && currentGalleryFilter !== 'all' && art.phases && Array.isArray(art.phases)) {
-      const matchIdx = art.phases.findIndex(p => {
+      const matchIdx = art.phases.findIndex((p, pIdx) => {
         const pPipe = p.pipelineKey;
         const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
         const pSub = p.subcategory || '';
@@ -1428,13 +1510,19 @@ function renderShowcaseGrid() {
         return false;
       });
 
-      if (matchIdx !== -1 && (art.phases[matchIdx].img || art.phases[matchIdx].image)) {
-        tileImg = art.phases[matchIdx].img || art.phases[matchIdx].image;
-        targetPhaseIdx = matchIdx + 1;
+      if (matchIdx !== -1) {
+        const matchedPhase = art.phases[matchIdx];
+        if (matchedPhase.img || matchedPhase.image) {
+          tileImg = matchedPhase.img || matchedPhase.image;
+          targetPhaseIdx = matchIdx + 1; // ایندکس متناظر در استریم
+          displayTitle = matchedPhase.name || art.title;
+          displaySlug = matchedPhase.subcategory || PIPELINE_TO_CATEGORY_MAP[matchedPhase.pipelineKey] || slug;
+          activeKey = matchedPhase.pipelineKey || activeKey;
+        }
       }
     }
 
-    // محاسبه پالت نئونی اختصاصی بر اساس دسته‌بندی و پایپلاین غالب اثر
+    // محاسبه پالت نئونی اختصاصی بر اساس شیت نمایش‌داده‌شده
     const neonMap = {
       'character': { border: '#facc15', glow: 'rgba(250, 204, 21, 0.65)', soft: 'rgba(250, 204, 21, 0.25)' },
       'sketch1': { border: '#facc15', glow: 'rgba(250, 204, 21, 0.65)', soft: 'rgba(250, 204, 21, 0.25)' },
@@ -1449,7 +1537,6 @@ function renderShowcaseGrid() {
       'comic': { border: '#38bdf8', glow: 'rgba(56, 189, 248, 0.72)', soft: 'rgba(56, 189, 248, 0.28)' },
       'sketch5': { border: '#38bdf8', glow: 'rgba(56, 189, 248, 0.72)', soft: 'rgba(56, 189, 248, 0.28)' }
     };
-    const activeKey = art.tag || art.category || art.pipelineKey || 'character';
     const neon = neonMap[activeKey] || neonMap['character'];
 
     return `
@@ -1457,9 +1544,9 @@ function renderShowcaseGrid() {
            style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         <div class="tile-center-title">
-          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 12px ${neon.glow};">/ ${slug} /</span>
+          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 12px ${neon.glow};">/ ${displaySlug} /</span>
           <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 12px ${neon.glow};"></span>
-          <span class="tile-sub">${art.title}</span>
+          <span class="tile-sub">${displayTitle}</span>
         </div>
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
@@ -1509,11 +1596,13 @@ window.openArtModalWithPhase = function(id, targetPhaseIdx = 0) {
 
   if (targetPhaseIdx > 0) {
     setTimeout(() => {
+      const modal = document.getElementById('artDetailModal');
       const items = document.querySelectorAll('.project-stream-item');
-      if (items[targetPhaseIdx]) {
-        items[targetPhaseIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (items && items[targetPhaseIdx] && modal) {
+        const itemTop = items[targetPhaseIdx].offsetTop - 20;
+        modal.scrollTo({ top: itemTop, behavior: 'smooth' });
       }
-    }, 250);
+    }, 280);
   }
 };
 
@@ -3533,6 +3622,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // پسورد متنی منسوخ شد
       siteSettings.cloudinaryCloudName = document.getElementById('setCloudinaryCloud')?.value.trim() || 'tajinkart';
       siteSettings.cloudinaryPreset = document.getElementById('setCloudinaryPreset')?.value.trim() || 'erlvtkx9';
+      siteSettings.redditCreds = document.getElementById('setRedditCreds')?.value.trim() || '';
+      siteSettings.metaToken = document.getElementById('setMetaToken')?.value.trim() || '';
+      siteSettings.twitterKey = document.getElementById('setTwitterKey')?.value.trim() || '';
+      siteSettings.youtubeKey = document.getElementById('setYoutubeKey')?.value.trim() || '';
+      siteSettings.artstationCreds = document.getElementById('setArtstationCreds')?.value.trim() || '';
+      siteSettings.pinterestToken = document.getElementById('setPinterestToken')?.value.trim() || '';
+      siteSettings.blueskyCreds = document.getElementById('setBlueskyCreds')?.value.trim() || '';
+      siteSettings.discordWebhook = document.getElementById('setDiscordWebhook')?.value.trim() || '';
       safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
       renderProducts();
       selectPipeline(currentSelectedPipeKey, null, false);

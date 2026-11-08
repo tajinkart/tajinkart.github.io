@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10.3">
+  <link rel="stylesheet" href="style.css?v=10.6">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-view="showcase">
@@ -885,6 +885,59 @@
                   </div>
                 </div>
 
+                <!-- کارت ۵: مرکز اتوماسیون و کلیدهای ارتباطی ۱۲ شبکه (POSSE Multi-Channel Hub) -->
+                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; font-weight:800; color:var(--gold);">📡 مرکز توزیع خودکار سراسری (POSSE 12-Network Hub)</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.12);">OMNICHANNEL READY</span>
+                  </div>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیدهای ارتباطی و توکن‌های پلتفرم‌ها جهت ارسال خودکار فایل‌های اصلی، آلبوم‌ها و ویدیوها.</p>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎨 ArtStation / Cara API Token:</label>
+                      <input type="password" id="setArtstationCreds" class="font-mono" style="font-size:11px;" placeholder="Bearer tok_..." />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📌 Pinterest Access Token & Board:</label>
+                      <input type="password" id="setPinterestToken" class="font-mono" style="font-size:11px;" placeholder="pina_..." />
+                    </div>
+                  </div>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🤖 Reddit Client ID & Secret:</label>
+                      <input type="text" id="setRedditCreds" class="font-mono" style="font-size:11px;" placeholder="client_id:client_secret" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📷 Instagram & Threads Meta Token:</label>
+                      <input type="password" id="setMetaToken" class="font-mono" style="font-size:11px;" placeholder="EAAG..." />
+                    </div>
+                  </div>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🐦 Twitter (X) API Key & Secret:</label>
+                      <input type="password" id="setTwitterKey" class="font-mono" style="font-size:11px;" placeholder="api_key:secret" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🦋 Bluesky Identifier & App Password:</label>
+                      <input type="text" id="setBlueskyCreds" class="font-mono" style="font-size:11px;" placeholder="handle.bsky.social:app-pass" />
+                    </div>
+                  </div>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📹 YouTube API Key (Shorts):</label>
+                      <input type="password" id="setYoutubeKey" class="font-mono" style="font-size:11px;" placeholder="AIzaSy..." />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎮 Discord Webhook URL:</label>
+                      <input type="text" id="setDiscordWebhook" class="font-mono" style="font-size:11px;" placeholder="https://discord.com/api/webhooks/..." />
+                    </div>
+                  </div>
+                </div>
+
               </form>
 
 
@@ -1513,8 +1566,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=10.3"></script>
-  <script src="app.js?v=10.3" defer></script>
+  <script src="data.js?v=10.6"></script>
+  <script src="app.js?v=10.6" defer></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
