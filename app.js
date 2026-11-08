@@ -1546,13 +1546,36 @@ function renderArtStationProject(art) {
   const mainSrc = art.image || art.img || (art.phases && art.phases[0] && (art.phases[0].img || art.phases[0].image)) || '';
   let streamHtml = '';
 
+  const mainTitle = art.title || 'کانسپت مستر استودیو';
+  const mainDesc = art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
+  const mainPipe = art.pipelineKey || 'sketch1';
+  const mainPipeName = pipeData.topSub;
+  const artLore = art.lore || 'جهان اکستوپیا';
+
   if (mainSrc) {
     streamHtml += `
       <div class="artstation-img-card project-stream-item" 
-           data-title="${escapeQuotes(art.title || 'کانسپت مستر')}" 
-           data-phase="/ ۰۱ • تصویر کاور اصلی /" 
-           data-desc="${escapeQuotes(art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.')}">
-        <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" />
+           data-title="${escapeQuotes(mainTitle)}" 
+           data-phase="/ ۰۱ • اثر اصلی و کانسپت نهایی /" 
+           data-desc="${escapeQuotes(mainDesc)}"
+           data-pipe="${mainPipe}"
+           data-sub="">
+        <img src="${mainSrc}" alt="${mainTitle}" loading="eager" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" />
+        
+        <!-- کپشن مستقل زیر فریم اصلی در موبایل -->
+        <div class="mobile-phase-card-caption">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span style="font-size:13px; font-weight:800; color:var(--gold);">${mainTitle}</span>
+            <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${mainPipeName}</span>
+          </div>
+          <p style="margin:4px 0 0; font-size:12px; color:#cbd5e1; line-height:1.75; text-align:justify;">${mainDesc}</p>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+            <strong style="color:#fff;">جهان روایی:</strong> <span style="color:var(--cyan-electric);">${artLore}</span>
+          </div>
+          <button type="button" onclick="goToPipelineFromDrawer('${mainPipe}')" class="btn-gold" style="width:100%; padding:10px 14px; font-size:11.5px; margin-top:6px;">
+            سفارش اثر در این پایپلاین ←
+          </button>
+        </div>
       </div>
     `;
   } else {
@@ -1564,7 +1587,7 @@ function renderArtStationProject(art) {
     `;
   }
 
-  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها همراه با ویژگی‌های ردیابی اسکرول زنده و کپشن موبایل
+  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
@@ -1582,16 +1605,19 @@ function renderArtStationProject(art) {
                data-desc="${escapeQuotes(phaseDesc)}"
                data-pipe="${phasePipe}"
                data-sub="${escapeQuotes(phaseSub)}">
-            <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" class="elastic-pinch-target" />
+            <img src="${pSrc}" alt="${phaseName}" loading="lazy" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" />
             
             <!-- کپشن مستقل زیر هر فریم در موبایل -->
             <div class="mobile-phase-card-caption">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:12px; font-weight:800; color:var(--gold);">${phaseName}</span>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <span style="font-size:13px; font-weight:800; color:var(--gold);">${phaseName}</span>
                 <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${pipeName}${phaseSub ? ` • ${phaseSub}` : ''}</span>
               </div>
-              <p style="margin:0; font-size:11.5px; color:#cbd5e1; line-height:1.7;">${phaseDesc}</p>
-              <button type="button" onclick="goToPipelineFromDrawer('${phasePipe}')" class="btn-gold" style="padding:8px 12px; font-size:11px; margin-top:4px;">
+              <p style="margin:4px 0 0; font-size:12px; color:#cbd5e1; line-height:1.75; text-align:justify;">${phaseDesc}</p>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                <strong style="color:#fff;">جهان روایی:</strong> <span style="color:var(--cyan-electric);">${artLore}</span>
+              </div>
+              <button type="button" onclick="goToPipelineFromDrawer('${phasePipe}')" class="btn-gold" style="width:100%; padding:10px 14px; font-size:11.5px; margin-top:6px;">
                 سفارش این فاز در آتلیه ←
               </button>
             </div>
@@ -1664,6 +1690,8 @@ function initProjectStreamScrollSpy() {
 
 window.toggleImageZoom = function(imgEl, e) {
   if (!imgEl) return;
+  // غیرفعال در موبایل جهت ممانعت از قفل شدن تصویر؛ در موبایل فقط زوم لمسی الاستیک اینستاگرام عمل می‌کند
+  if (window.innerWidth <= 992 || (e && e.pointerType === 'touch')) return;
   const isZoomed = imgEl.classList.toggle('zoomed-image');
   if (isZoomed) {
     if (e) {
@@ -4380,51 +4408,112 @@ window.goToPipelineFromDrawer = function() {
 };
 
 // =========================================================
-// زوم لمسی فنری سبک اینستاگرام در موبایل (Instagram Elastic Spring Pinch)
+// موتور فوق‌پیشرفته زوم فنری سبک اینستاگرام در موبایل (Instagram Elastic Spring Pinch)
 // =========================================================
-let touchInitialDist = 0;
-let touchCurrentScale = 1;
-let activePinchImg = null;
+(function initInstagramPinchZoom() {
+  let activeTarget = null;
+  let initialDist = 0;
+  let initialMidX = 0;
+  let initialMidY = 0;
+  let currentScale = 1;
+  let currentTranslateX = 0;
+  let currentTranslateY = 0;
+  let isPinching = false;
 
-document.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 2) {
-    const target = e.target.closest('.elastic-pinch-target');
-    if (target) {
-      activePinchImg = target;
-      activePinchImg.classList.add('elastic-pinch-active');
-      activePinchImg.classList.remove('elastic-spring-back');
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      touchInitialDist = Math.hypot(dx, dy);
+  function getDistance(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function getMidpoint(t1, t2) {
+    return {
+      x: (t1.clientX + t2.clientX) / 2,
+      y: (t1.clientY + t2.clientY) / 2
+    };
+  }
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches && e.touches.length === 2) {
+      const img = e.target.closest('.elastic-pinch-target') || (e.target.tagName === 'IMG' && e.target.closest('.artstation-img-card') ? e.target : null);
+      if (img) {
+        if (e.cancelable) e.preventDefault();
+        activeTarget = img;
+        isPinching = true;
+        initialDist = getDistance(e.touches[0], e.touches[1]);
+        const mid = getMidpoint(e.touches[0], e.touches[1]);
+        initialMidX = mid.x;
+        initialMidY = mid.y;
+
+        const rect = img.getBoundingClientRect();
+        const originX = ((mid.x - rect.left) / rect.width) * 100;
+        const originY = ((mid.y - rect.top) / rect.height) * 100;
+        activeTarget.style.transformOrigin = `${originX}% ${originY}%`;
+        activeTarget.style.transition = 'none';
+        activeTarget.style.zIndex = '9999';
+        activeTarget.style.position = 'relative';
+        activeTarget.classList.add('elastic-pinch-active');
+      }
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchmove', function(e) {
+    if (isPinching && activeTarget && e.touches && e.touches.length === 2) {
+      if (e.cancelable) e.preventDefault();
+      const currentDist = getDistance(e.touches[0], e.touches[1]);
+      if (initialDist > 0) {
+        let rawScale = currentDist / initialDist;
+        if (rawScale < 1) {
+          rawScale = 1 - (1 - rawScale) * 0.35;
+        } else if (rawScale > 2.5) {
+          rawScale = 2.5 + (rawScale - 2.5) * 0.2;
+        }
+        currentScale = Math.max(0.85, Math.min(rawScale, 2.75));
+
+        const currentMid = getMidpoint(e.touches[0], e.touches[1]);
+        currentTranslateX = (currentMid.x - initialMidX) * 0.8;
+        currentTranslateY = (currentMid.y - initialMidY) * 0.8;
+
+        activeTarget.style.transform = `scale(${currentScale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
+      }
+    }
+  }, { passive: false });
+
+  function endPinch() {
+    if (activeTarget) {
+      const target = activeTarget;
+      target.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease';
+      target.style.transform = 'scale(1) translate(0px, 0px)';
+      target.classList.remove('elastic-pinch-active');
+
+      setTimeout(() => {
+        if (target) {
+          target.style.transition = '';
+          target.style.transform = '';
+          target.style.transformOrigin = '';
+          target.style.zIndex = '';
+          target.style.position = '';
+        }
+      }, 350);
+
+      activeTarget = null;
+      isPinching = false;
+      initialDist = 0;
+      currentScale = 1;
+      currentTranslateX = 0;
+      currentTranslateY = 0;
     }
   }
-}, { passive: true });
 
-document.addEventListener('touchmove', (e) => {
-  if (activePinchImg && e.touches.length === 2 && touchInitialDist > 0) {
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
-    const currentDist = Math.hypot(dx, dy);
-    let scale = currentDist / touchInitialDist;
-    // سقف زوم ۲.۵ برابر جهت جلوگیری از تاری تصویر
-    scale = Math.min(Math.max(scale, 1), 2.5);
-    touchCurrentScale = scale;
-    activePinchImg.style.transform = `scale(${scale})`;
-  }
-}, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (isPinching && (!e.touches || e.touches.length < 2)) {
+      endPinch();
+    }
+  }, { passive: false });
 
-document.addEventListener('touchend', (e) => {
-  if (activePinchImg && e.touches.length < 2) {
-    activePinchImg.classList.add('elastic-spring-back');
-    activePinchImg.style.transform = '';
-    setTimeout(() => {
-      if (activePinchImg) {
-        activePinchImg.classList.remove('elastic-pinch-active');
-        activePinchImg.classList.remove('elastic-spring-back');
-        activePinchImg = null;
-      }
-      touchInitialDist = 0;
-      touchCurrentScale = 1;
-    }, 350);
-  }
-}, { passive: true });
+  document.addEventListener('touchcancel', function(e) {
+    if (isPinching) {
+      endPinch();
+    }
+  }, { passive: false });
+})();
