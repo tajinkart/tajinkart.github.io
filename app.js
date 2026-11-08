@@ -810,18 +810,21 @@ function renderAdminArtModalForm(art, isNew) {
 
       <!-- گام ۲: تصاویر و شیت‌های پروژه (مدیریت یکپارچه) -->
       <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <div>
-            <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصویر کاور و شیت‌های پروژه:</span>
-            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصویر کاور و شیت‌های اثر را بارگذاری کنید. اثر با یک شیت آغاز می‌شود و می‌توانید شیت‌های تکمیلی نیز اضافه کنید.</p>
-          </div>
-          <button type="button" onclick="addStagingPhase()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800; border:none; cursor:pointer;">
-            + افزودن شیت تکمیلی به پروژه
-          </button>
+        <div style="margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+          <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصاویر و شیت‌های پروژه:</span>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصویر کاور و شیت‌های اثر را بارگذاری کنید. در انتهای شیت‌ها می‌توانید با دکمه زیر شیت جدید اضافه کنید.</p>
         </div>
 
         <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:12px;">
           ${renderStagingPhasesHtml()}
+        </div>
+
+        <!-- دکمه افزودن شیت در انتهای باندل شیت‌ها -->
+        <div style="margin-top:14px;">
+          <button type="button" onclick="addStagingPhase()" class="btn-secondary" style="width:100%; padding:11px 16px; font-size:12px; font-weight:800; border:1px dashed var(--cyan-electric); color:var(--cyan-electric); background:rgba(0,240,255,0.04); display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px;">
+            <span style="font-size:16px;">➕</span>
+            <span>افزودن شیت تکمیلی به این اثر</span>
+          </button>
         </div>
       </div>
 
@@ -943,14 +946,26 @@ function renderStagingPhasesHtml() {
 
         <textarea rows="2" placeholder="توضیحات تخصصی این فاز (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
 
-        <!-- ماتریکس مقاصد انتشار خودکار این شیت (POSSE Multi-Network Omnichannel) -->
-        <div style="background:#070a14; border:1px solid rgba(250,204,21,0.22); border-radius:12px; padding:12px; margin-top:2px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
-            <span style="font-size:11px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار اختصاصی این فایل:</span>
-            <span class="font-mono" style="font-size:9.5px; color:var(--cyan-electric); font-weight:700;">12 NETWORKS READY</span>
-          </div>
+        <!-- مقاصد انتشار اختصاصی به صورت آکاردئون باز و بسته شونده با فلش اکستند -->
+        <details style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:10px; padding:8px 12px; margin-top:2px;">
+          <summary style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; list-style:none; user-select:none; outline:none;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:11.5px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار در شبکه‌ها (توزیع خودکار)</span>
+              <span class="font-mono" style="font-size:9.5px; color:${p.socialTelegram !== false ? 'var(--gold)' : 'var(--text-muted)'}; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;">
+                ${p.socialTelegram !== false ? '✈️ تلگرام فعال' : 'بدون ارسال خودکار'}
+              </span>
+            </div>
+            <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; display:flex; align-items:center; gap:5px;">
+              <span>تنظیم گزینه‌ها</span>
+              <span style="font-size:11px;">▾</span>
+            </span>
+          </summary>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px; font-size:11px;">
+          <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px; font-size:11px;">
+            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(250,204,21,0.08); padding:5px 8px; border-radius:6px; border:1px solid rgba(250,204,21,0.3);">
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialTelegram = this.checked" ${(p.socialTelegram !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <span style="color:var(--gold); font-weight:700;">✈️ تلگرام (کانال رسمی)</span>
+            </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialArtStation = this.checked" ${p.socialArtStation ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🎨 آرت‌استیشن</span>
@@ -996,15 +1011,11 @@ function renderStagingPhasesHtml() {
               <span>🎮 دیسکورد</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialTelegram = this.checked" ${p.socialTelegram ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
-              <span>✈️ تلگرام</span>
-            </label>
-            <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
               <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialLinkedIn = this.checked" ${p.socialLinkedIn ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>💼 لینکدین</span>
             </label>
           </div>
-        </div>
+        </details>
       </div>
     `;
   }).join('');
@@ -1145,7 +1156,9 @@ window.confirmSaveArtwork = function() {
       renderAdminSketch2();
       showToast('اثر جدید با موفقیت به گالری اضافه شد!', 'success');
 
-      if (assembledPhases.some(p => p.socialTelegram)) {
+      const shouldSendTelegram = assembledPhases.some(p => p.socialTelegram !== false) || 
+                                 (siteSettings.tgToken && (siteSettings.tgChat || (siteSettings.tgChannels && siteSettings.tgChannels.length > 0)));
+      if (shouldSendTelegram) {
         broadcastArtworkToTelegram(newArtRecord);
       }
 
@@ -2450,10 +2463,24 @@ window.testTelegramConnection = async function() {
 };
 
 window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
-  const token = siteSettings.tgToken;
-  const channels = (siteSettings.tgChannels && siteSettings.tgChannels.length > 0) ? 
-                   siteSettings.tgChannels.filter(Boolean) : [siteSettings.tgChat];
-  if (!token || channels.length === 0) return;
+  const token = siteSettings.tgToken || document.getElementById('setTgToken')?.value.trim();
+  const channelInputs = document.querySelectorAll('.tg-channel-input');
+  let channels = [];
+  channelInputs.forEach(inp => {
+    const v = inp.value.trim();
+    if (v) channels.push(v);
+  });
+  if (channels.length === 0 && siteSettings.tgChannels) {
+    channels = siteSettings.tgChannels.filter(Boolean);
+  }
+  if (channels.length === 0 && siteSettings.tgChat) {
+    channels = [siteSettings.tgChat];
+  }
+
+  if (!token || channels.length === 0) {
+    console.log('[Telegram Broadcast] Token or channels not configured.');
+    return;
+  }
 
   const phase = specificPhase || (art.phases && art.phases[0]) || {};
   const photoUrl = phase.img || phase.image || art.image || '';
@@ -2463,16 +2490,27 @@ window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
   const pipeName = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[pipe]) ? PIPELINE_DATA[pipe].topSub : 'آتلیه کانسپت آرت';
   const sub = phase.subcategory ? ` • ${phase.subcategory}` : '';
 
-  const caption = 
-    `🎨 *${title}*\n\n` +
-    `${desc}\n\n` +
-    `📐 *پایپلاین:* ${pipeName}${sub}\n` +
-    `🌌 *جهان روایی:* #${(art.lore || 'جهان_اکستوپیا').replace(/\s+/g, '_')}\n\n` +
-    `👑 *طراح دنیا و مدیر استودیو:* سید سروش تاج\n` +
-    `🔗 [مشاهده کامل پروژه در آتلیه TAJINKART](https://tajinkart.github.io/?art=${art.id})`;
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  const loreClean = (art.lore || 'جهان_اکستوپیا').replace(/\s+/g, '_');
+  const captionHtml = 
+    `🎨 <b>${escapeHtml(title)}</b>\n\n` +
+    `${escapeHtml(desc)}\n\n` +
+    `📐 <b>پایپلاین:</b> ${escapeHtml(pipeName)}${escapeHtml(sub)}\n` +
+    `🌌 <b>جهان روایی:</b> #${escapeHtml(loreClean)}\n\n` +
+    `👑 <b>طراح دنیا و مدیر استودیو:</b> سید سروش تاج\n` +
+    `🔗 <a href="https://tajinkart.github.io/?art=${art.id}">مشاهده کامل پروژه در آتلیه TAJINKART</a>`;
+
+  showToast('در حال مخابره خودکار اثر به کانال تلگرام...', 'info', 2500);
 
   for (let chat of channels) {
-    // اگر کاربر به جای شناسه عددی، لینک دعوت t.me/+ پیست کرده باشد، خودکار تلاش می‌کنیم از getUpdates شناسه‌اش را حل کنیم
+    // حل خودکار در صورتی که کاربر لینک دعوت t.me/+ وارد کرده باشد
     if (chat.includes('t.me/') || chat.includes('telegram.me/')) {
       try {
         const uResp = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
@@ -2484,49 +2522,53 @@ window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
               chat = String(fCh.id);
               siteSettings.tgChannels[0] = chat;
               siteSettings.tgChat = chat;
-              renderAdminTgChannelsList();
-              saveTelegramSettingsDirect();
+              safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
               break;
             }
           }
         }
       } catch(ignore) {}
     }
+
     try {
+      let resp;
       if (photoUrl && photoUrl.startsWith('data:image')) {
-        // ارسال تصویر Base64 به عنوان فایل باینری فرم‌دیتا به تلگرام
-        const byteString = atob(photoUrl.split(',')[1]);
-        const mimeString = photoUrl.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
+        const base64Parts = photoUrl.split(',');
+        const mimeMatch = base64Parts[0].match(/:(.*?);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const byteCharacters = atob(base64Parts[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
-        const blob = new Blob([ab], { type: mimeString });
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+
         const fd = new FormData();
         fd.append('chat_id', chat);
         fd.append('photo', blob, 'artwork.jpg');
-        fd.append('caption', caption);
-        fd.append('parse_mode', 'Markdown');
+        fd.append('caption', captionHtml);
+        fd.append('parse_mode', 'HTML');
         fd.append('reply_markup', JSON.stringify({
           inline_keyboard: [[
             { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
             { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
           ]]
         }));
-        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+
+        resp = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
           method: 'POST',
           body: fd
         });
       } else if (photoUrl && photoUrl.startsWith('http')) {
-        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        resp = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: chat,
             photo: photoUrl,
-            caption: caption,
-            parse_mode: 'Markdown',
+            caption: captionHtml,
+            parse_mode: 'HTML',
             reply_markup: {
               inline_keyboard: [[
                 { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
@@ -2536,24 +2578,32 @@ window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
           })
         });
       } else {
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: chat,
-            text: caption,
-            parse_mode: 'Markdown',
+            text: captionHtml,
+            parse_mode: 'HTML',
             reply_markup: {
               inline_keyboard: [[
-                { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
-                { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
+                { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` }
               ]]
             }
           })
         });
       }
+
+      const resData = await resp.json();
+      if (resData.ok) {
+        showToast('اثر با موفقیت به کانال تلگرام ارسال شد! ✈️', 'success', 5000);
+      } else {
+        console.warn('[Telegram Error Details]:', resData);
+        showToast(`خطای تلگرام: ${resData.description || 'عدم دسترسی به کانال'}`, 'error', 6500);
+      }
     } catch(err) {
-      console.warn('Telegram broadcast failed for chat:', chat, err);
+      console.warn('Telegram broadcast network error:', err);
+      showToast('خطای شبکه در ارتباط با سرور تلگرام (بررسی فیلترشکن).', 'error', 5000);
     }
   }
 };
