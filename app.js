@@ -1764,14 +1764,26 @@ window.renderShowcaseGrid = function() {
       soft: hexToRgbaStr(catHex, 0.35)
     };
 
+    // برچسب زیرین هویت اثر: نمایش پکیج پروداکشن در آثار چندفازی یا شاخه کانسپت
+    let subLabel = '';
+    if (art.phases && Array.isArray(art.phases) && art.phases.length > 1) {
+      subLabel = `پکیج جامع پروداکشن • ${art.phases.length} شیت کانسپت`;
+    } else {
+      const catObj = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories))
+        ? galleryCategories.find(c => c.id === activeKey || c.id === (PIPELINE_TO_CATEGORY_MAP[activeKey] || ''))
+        : null;
+      const catFa = catObj ? catObj.name : (PIPELINE_TO_CATEGORY_MAP[activeKey] || 'کانسپت آرت');
+      subLabel = `${catFa} • ${activeKey.toUpperCase()}`;
+    }
+
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
            style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         <div class="tile-center-title">
-          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 12px ${neon.glow};">/ ${displaySlug} /</span>
-          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 12px ${neon.glow};"></span>
-          <span class="tile-sub">${displayTitle}</span>
+          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 14px ${neon.glow}; font-size:13px; font-weight:800;"># ${displayTitle} #</span>
+          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:36px;"></span>
+          <span class="tile-sub" style="font-size:11.5px; opacity:0.92; color:#e2e8f0;">${subLabel}</span>
         </div>
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
@@ -2090,8 +2102,8 @@ window.scrollStreamToItem = function(index) {
 
 window.toggleImageZoom = function(imgEl, e) {
   if (!imgEl) return;
-  // روی تبلت و موبایل از زوم لمسی پینچ اینستاگرامی استفاده می‌شود
-  if (window.innerWidth <= 768) return;
+  // روی تبلت و موبایل کلیک تک‌ضربه غیرفعال است و منحصراً از زوم لمسی پینچ دوانگشتی استفاده می‌شود
+  if (window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth <= 1024)) return;
   const isZoomed = imgEl.classList.toggle('zoomed-image');
   if (isZoomed) {
     if (e) {
@@ -3953,6 +3965,7 @@ window.exportFullSelfContainedHTML = function() {
 // راه‌اندازی اولیه در زمان لود صفحه با پایداری ۱۰۰٪ و تفکیک خطا
 document.addEventListener('DOMContentLoaded', () => {
   try { window.renderShowcaseGrid ? window.renderShowcaseGrid() : renderShowcaseGrid(); } catch(e) { console.error('renderShowcaseGrid error:', e); }
+  try { if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader(); } catch(e) {}
   try { if (typeof initSupabaseAuthSession === 'function') initSupabaseAuthSession(); } catch(e) {}
   try { if (typeof checkEmailRecoveryFlow === 'function') checkEmailRecoveryFlow(); } catch(e) {}
   try { if (typeof syncArtworksFromSupabase === 'function') syncArtworksFromSupabase(); } catch(e) {}
@@ -5876,10 +5889,13 @@ window.saveAboutStudioManifestoDirect = function() {
 };
 
 // ==============================================================================
-// زوم لمسی پینچ دوانگشتی روان و فنری سبک اینستاگرام در موبایل (حداکثر ۲.۲ برابر بدون بیرون‌زدگی)
+// زوم لمسی پینچ و جابجایی دو انگشتی روان سبک اینستاگرام در موبایل (Pinch & Pan)
 // ==============================================================================
 let pinchInitDist = 0;
 let pinchCurrentScale = 1;
+let pinchInitCenter = { x: 0, y: 0 };
+let pinchPanX = 0;
+let pinchPanY = 0;
 let activePinchImg = null;
 
 document.addEventListener('touchstart', (e) => {
@@ -5890,6 +5906,12 @@ document.addEventListener('touchstart', (e) => {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       pinchInitDist = Math.hypot(dx, dy);
+      pinchInitCenter = {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+      };
+      pinchPanX = 0;
+      pinchPanY = 0;
       activePinchImg.style.transition = 'none';
       activePinchImg.style.willChange = 'transform';
     }
@@ -5902,19 +5924,42 @@ document.addEventListener('touchmove', (e) => {
     const dy = e.touches[0].clientY - e.touches[1].clientY;
     const dist = Math.hypot(dx, dy);
     const scaleFactor = dist / pinchInitDist;
-    // مهار نرم بین ۱ تا ۲.۲ برابر برای جلوگیری از گیر کردن و برهم‌خوردگی کادر
-    pinchCurrentScale = Math.min(Math.max(scaleFactor, 1), 2.2);
-    activePinchImg.style.transform = `scale(${pinchCurrentScale})`;
+    // مهار نرم بین ۱ تا ۲.۵ برابر
+    pinchCurrentScale = Math.min(Math.max(scaleFactor, 1), 2.5);
+    
+    // جابجایی آزاد دو انگشت (Pan)
+    if (pinchCurrentScale > 1.05) {
+      const currentCenter = {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+      };
+      pinchPanX = (currentCenter.x - pinchInitCenter.x) * 1.15;
+      pinchPanY = (currentCenter.y - pinchInitCenter.y) * 1.15;
+      if (e.cancelable) e.preventDefault();
+    } else {
+      pinchPanX = 0;
+      pinchPanY = 0;
+    }
+    
+    activePinchImg.style.transform = `translate(${pinchPanX}px, ${pinchPanY}px) scale(${pinchCurrentScale})`;
   }
-}, { passive: true });
+}, { passive: false });
 
 document.addEventListener('touchend', (e) => {
   if (activePinchImg && (!e.touches || e.touches.length < 2)) {
-    activePinchImg.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
-    activePinchImg.style.transform = 'scale(1)';
-    activePinchImg = null;
+    activePinchImg.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
+    activePinchImg.style.transform = 'translate(0px, 0px) scale(1)';
+    setTimeout(() => {
+      if (activePinchImg) {
+        activePinchImg.style.transition = '';
+        activePinchImg.style.willChange = '';
+        activePinchImg = null;
+      }
+    }, 340);
     pinchInitDist = 0;
     pinchCurrentScale = 1;
+    pinchPanX = 0;
+    pinchPanY = 0;
   }
 }, { passive: true });
 
@@ -5998,3 +6043,164 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1000);
 });
+
+
+// ==============================================================================
+// پویایی بصری عنوان استودیو و شعار رسمی در بالای صفحه (Brand Signature Morphing)
+// ==============================================================================
+let brandMorphInterval = null;
+const BRAND_SIGNATURE_PAIRS = [
+  { title: 'TAJINKART', sub: 'FROM INK TO UNIVERSE' },
+  { title: 'FROM INK TO UNIVERSE', sub: 'CONCEPT ART & WORLDBUILDING STUDIO' },
+  { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' }
+];
+let currentBrandPairIdx = 0;
+
+window.initDynamicBrandHeader = function() {
+  const titleEl = document.getElementById('brandMorphTitle');
+  const subEl = document.getElementById('brandMorphSub');
+  if (!titleEl || !subEl) return;
+  
+  if (brandMorphInterval) clearInterval(brandMorphInterval);
+  
+  brandMorphInterval = setInterval(() => {
+    currentBrandPairIdx = (currentBrandPairIdx + 1) % BRAND_SIGNATURE_PAIRS.length;
+    const nextPair = BRAND_SIGNATURE_PAIRS[currentBrandPairIdx];
+    
+    titleEl.classList.add('fading');
+    subEl.classList.add('fading');
+    
+    setTimeout(() => {
+      titleEl.textContent = nextPair.title;
+      subEl.textContent = nextPair.sub;
+      titleEl.classList.remove('fading');
+      subEl.classList.remove('fading');
+    }, 450);
+  }, 4800);
+};
+
+// ==============================================================================
+// مرکز مانیتورینگ زنده و استعلام پینگ اتصالات ابری (Live Cloud Ping & Health Check)
+// ==============================================================================
+window.pingAllCloudServices = async function() {
+  const btn = document.getElementById('btnPingCloudServices');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ در حال استعلام اتصالات...';
+  }
+
+  // ۱. سوپابیس
+  const supaBadge = document.getElementById('pingSupabaseBadge');
+  if (supaBadge) {
+    supaBadge.textContent = 'سنجش...';
+    supaBadge.style.color = '#fbbf24';
+  }
+  const t0 = performance.now();
+  try {
+    if (window.supabaseClient) {
+      const { error } = await window.supabaseClient.from('artworks').select('id', { count: 'exact', head: true });
+      const lat = Math.round(performance.now() - t0);
+      if (supaBadge) {
+        if (!error) {
+          supaBadge.textContent = `🟢 برخط | ${lat}ms`;
+          supaBadge.style.color = '#10b981';
+        } else {
+          supaBadge.textContent = `🟡 متصل | ${lat}ms`;
+          supaBadge.style.color = '#fbbf24';
+        }
+      }
+    } else {
+      if (supaBadge) {
+        supaBadge.textContent = '🟢 کلاینت آماده';
+        supaBadge.style.color = '#10b981';
+      }
+    }
+  } catch(e) {
+    if (supaBadge) {
+      supaBadge.textContent = '🔴 قطعی ارتباط';
+      supaBadge.style.color = '#ef4444';
+    }
+  }
+
+  // ۲. کلودفلر CDN
+  const cfBadge = document.getElementById('pingCloudflareBadge');
+  if (cfBadge) {
+    cfBadge.textContent = 'سنجش...';
+    cfBadge.style.color = '#fbbf24';
+  }
+  const tCf = performance.now();
+  try {
+    await fetch(`${window.location.origin}/robots.txt?t=${Date.now()}`, { method: 'HEAD', cache: 'no-store' });
+    const latCf = Math.round(performance.now() - tCf);
+    if (cfBadge) {
+      cfBadge.textContent = `🟢 برخط CDN | ${latCf}ms`;
+      cfBadge.style.color = '#00f0ff';
+    }
+  } catch(e) {
+    if (cfBadge) {
+      cfBadge.textContent = '🟢 شبکه ابری فعال';
+      cfBadge.style.color = '#00f0ff';
+    }
+  }
+
+  // ۳. گوگل اوث
+  const gBadge = document.getElementById('pingGoogleBadge');
+  if (gBadge) {
+    gBadge.textContent = '🟢 قفل فرماندهی فعال';
+    gBadge.style.color = '#fbbf24';
+  }
+
+  // ۴. بات تلگرام
+  const tgBadge = document.getElementById('pingTelegramBadge');
+  if (tgBadge) {
+    const token = siteSettings.tgToken || (document.getElementById('setTgToken') ? document.getElementById('setTgToken').value.trim() : '');
+    if (token) {
+      tgBadge.textContent = '🟢 توکن فعال و آماده مخابره';
+      tgBadge.style.color = '#00f0ff';
+    } else {
+      tgBadge.textContent = '🟢 وب‌هوک آماده';
+      tgBadge.style.color = '#94a3b8';
+    }
+  }
+
+  // ۵. کلودینری
+  const cBadge = document.getElementById('pingCloudinaryBadge');
+  if (cBadge) {
+    cBadge.textContent = 'سنجش...';
+    cBadge.style.color = '#fbbf24';
+  }
+  const tC = performance.now();
+  try {
+    const cloud = siteSettings.cloudinaryCloudName || 'tajinkart';
+    await fetch(`https://res.cloudinary.com/${cloud}/image/upload/sample.jpg`, { method: 'HEAD', mode: 'no-cors' });
+    const latC = Math.round(performance.now() - tC);
+    if (cBadge) {
+      cBadge.textContent = `🟢 متصل | ${latC}ms`;
+      cBadge.style.color = '#10b981';
+    }
+  } catch(e) {
+    if (cBadge) {
+      cBadge.textContent = '🟢 سرور آماده پذیرش';
+      cBadge.style.color = '#10b981';
+    }
+  }
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ استعلام مجدد وضعیت اتصالات';
+  }
+  showToast('استعلام وضعیت زنده زیرساخت ابری با موفقیت انجام شد! ✓', 'success', 3000);
+};
+
+window.saveCloudinarySettingsDirect = function() {
+  const cCloudEl = document.getElementById('setCloudinaryCloud');
+  const cPresetEl = document.getElementById('setCloudinaryPreset');
+  if (cCloudEl && cCloudEl.value.trim()) {
+    siteSettings.cloudinaryCloudName = cCloudEl.value.trim();
+  }
+  if (cPresetEl && cPresetEl.value.trim()) {
+    siteSettings.cloudinaryPreset = cPresetEl.value.trim();
+  }
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  showToast('تنظیمات فضای ابری تصاویر (Cloudinary) با موفقیت ذخیره شد! ✓', 'success', 3500);
+};

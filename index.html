@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.9.0">
+  <link rel="stylesheet" href="style.css?v=13.0.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -156,8 +156,8 @@
       <div id="brandCrestContainer" class="brand-crest-wrapper" style="display:none;">
         <img id="brandCrestImg" src="" alt="TAJINKART Master Crest" class="brand-crest-img" />
       </div>
-      <h1 class="brand-giant-title">TAJINKART</h1>
-      <div class="brand-slogan-bar font-mono">FROM INK TO UNIVERSE</div>
+      <h1 class="brand-giant-title brand-morph-title" id="brandMorphTitle">TAJINKART</h1>
+      <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">FROM INK TO UNIVERSE</div>
       <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" style="margin-top:2px;" title="وضعیت ارتباطی و پذیرش سفارشات در آتلیه">
         <span class="status-pulse-dot"></span>
         <span id="studioLiveStatusText">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است</span>
@@ -1140,23 +1140,7 @@
                     </button>
                   </div>
 
-                  <!-- کارت ۱-ج: شعار رسمی استودیو و عنوان مدیر -->
-                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13px; font-weight:800; color:var(--gold);">✨ شعار رسمی و عنوان مدیر استودیو</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">SLOGAN</span>
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">شعار اصلی صفحه اول (Slogan Bar):</label>
-                      <input type="text" id="setStudioSloganInput" class="font-mono" style="color:var(--gold); font-size:13px; font-weight:800; text-transform:uppercase; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box;" placeholder="FROM INK TO UNIVERSE" value="FROM INK TO UNIVERSE" />
-                    </div>
-                    
-                    <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
-                      ✓ ذخیره شعار و عنوان استودیو
-                    </button>
-                  </div>
-
-                                    <!-- کارت ۱-ج: ویرایشگر متن و مانیفست «درباره استودیو» در صفحه اصلی -->
+                  <!-- کارت ۱-ج: ویرایشگر متن و مانیفست «درباره استودیو» در صفحه اصلی -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; grid-column:1 / -1;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span style="font-size:13.5px; font-weight:800; color:var(--gold);">📜 ویرایشگر مانیفست و متن «درباره استودیو» (صفحه اصلی)</span>
@@ -1174,77 +1158,81 @@
                       ✓ ذخیره و به‌روزرسانی متن درباره استودیو
                     </button>
                   </div>
-<!-- کارت ۱-د: مدیریت نرخ تسعیر ارز -->
-                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13px; font-weight:800; color:var(--gold);">💵 مدیریت نرخ تسعیر ارز</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">CURRENCY</span>
-                    </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیه قیمت‌های آتلیه و فروشگاه بر اساس این نرخ به تومان تبدیل می‌شوند.</p>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نرخ برابری هر دلار (تومان):</label>
-                      <input type="number" id="setUsdRate" class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box;" placeholder="72000" required />
-                    </div>
-                    <button type="button" onclick="saveStudioCurrencySetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer; margin-top:4px;">
-                      ✓ ثبت نرخ تبدیل ارز
-                    </button>
-                  </div>
-
-                  <!-- کارت ۲-ب: فضای ابری تصاویر (Cloudinary) -->
-                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                    </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                      <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="tajinkart" />
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                      <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="erlvtkx9" />
-                    </div>
-                  </div>
-
-                  <!-- کارت مانیتورینگ زنده اتصالات ابری استودیو -->
-                  <div style="background:#06080d; border:1px solid rgba(16,185,129,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:14px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:900; color:var(--emerald);">🌐 وضعیت زنده اتصالات ابری و زیرساخت استودیو</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">ACTIVE & SECURED</span>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
-                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+<!-- مرکز جامع مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو TAJINKART -->
+                  <div style="background:#06080d; border:1.5px solid rgba(16,185,129,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                      <div>
                         <div style="display:flex; align-items:center; gap:8px;">
-                          <span style="font-size:14px;">🟢</span>
-                          <strong style="color:#fff; font-size:12px;">پایگاه داده ابری Supabase</strong>
+                          <span style="font-size:18px;">🌐</span>
+                          <span style="font-size:14.5px; font-weight:900; color:#fff;">مرکز مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو</span>
                         </div>
-                        <span style="font-size:10.5px; color:#10b981; margin-top:4px; display:block;">جداول orders و artworks متصل و همگام</span>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">پایش بلادرنگ اتصالات دیتابیس، شبکه توزیع محتوا (CDN)، هاست ابری تصاویر و بات تلگرام با امکان سنجش پینگ.</span>
+                      </div>
+                      <button type="button" id="btnPingCloudServices" onclick="pingAllCloudServices()" class="btn-cyan" style="font-size:11.5px; padding:8px 16px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                        ⚡ استعلام زنده و پینگ اتصالات
+                      </button>
+                    </div>
+
+                    <!-- کارت‌های کوچک وضعیت زنده اتصالات با نشانگر وضعیت و پینگ -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">🗄️ پایگاه داده ابری Supabase</strong>
+                          <span id="pingSupabaseBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 برخط</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">جداول سفارشات (orders) و گالری (artworks) همگام</span>
                       </div>
 
-                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                          <span style="font-size:14px;">🟢</span>
-                          <strong style="color:#fff; font-size:12px;">شبکه توزیع محتوا Cloudflare CDN</strong>
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">🛡️ کلودفلر (Cloudflare CDN)</strong>
+                          <span id="pingCloudflareBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 برخط CDN</span>
                         </div>
-                        <span style="font-size:10.5px; color:var(--cyan-electric); margin-top:4px; display:block;">فعال روی دامنه tajinkart.space با SSL Full</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">دامنه tajinkart.space با گواهی امنیتی SSL Full</span>
                       </div>
 
-                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                          <span style="font-size:14px;">🟢</span>
-                          <strong style="color:#fff; font-size:12px;">احراز هویت انحصاری Google OAuth</strong>
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">🔐 قفل امنیتی Google OAuth</strong>
+                          <span id="pingGoogleBadge" class="font-mono" style="font-size:10.5px; color:#fbbf24; font-weight:700;">🟢 قفل فرماندهی</span>
                         </div>
-                        <span style="font-size:10.5px; color:#fbbf24; margin-top:4px; display:block;">قفل فرماندهی برای tajinkart@gmail.com</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">دسترسی ادمین انحصاری tajinkart@gmail.com</span>
                       </div>
 
-                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                          <span style="font-size:14px;">🟢</span>
-                          <strong style="color:#fff; font-size:12px;">ربات مخابره تلگرام (@tajinkart_bot)</strong>
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">📡 ربات مخابره تلگرام</strong>
+                          <span id="pingTelegramBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 آماده مخابره</span>
                         </div>
-                        <span style="font-size:10.5px; color:var(--cyan-electric); margin-top:4px; display:block;">آماده ارسال آنی بریف‌ها و آثار</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">ارسال خودکار بریف‌ها و کانسپت‌ها به کانال‌ها</span>
+                      </div>
+
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">☁️ فضای ابری تصاویر Cloudinary</strong>
+                          <span id="pingCloudinaryBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 متصل</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">آپلود مستقیم تصاویر پروژه با لینک ابری CDN</span>
+                      </div>
+                    </div>
+
+                    <!-- پیکربندی ادغام‌شده فضای ابری تصاویر -->
+                    <div style="background:#04060a; border:1px solid rgba(0,240,255,0.2); border-radius:12px; padding:14px 16px; margin-top:4px;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">⚙️ پیکربندی شناسه فضای ابری تصاویر (Cloudinary Host)</span>
+                        <button type="button" onclick="saveCloudinarySettingsDirect()" class="btn-gold" style="font-size:11px; padding:6px 14px; font-weight:800; border-radius:6px; cursor:pointer;">
+                          ✓ ذخیره تنظیمات فضای ابری
+                        </button>
+                      </div>
+                      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+                        <div>
+                          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
+                          <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="tajinkart" />
+                        </div>
+                        <div>
+                          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
+                          <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="erlvtkx9" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1997,8 +1985,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=12.9.0"></script>
-  <script src="app.js?v=12.9.0"></script>
+  <script src="data.js?v=13.0.0"></script>
+  <script src="app.js?v=13.0.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
