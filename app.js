@@ -703,6 +703,73 @@ const AVAILABLE_PLATFORMS = [
   { id: 'linkedin', name: 'لینکدین', icon: '💼', placeholder: 'متن بیزینس و کاربرد تجاری اثر در لینکدین...' }
 ];
 
+let isCreatingNewArt = false;
+let currentSelectedArtIdx = -1;
+let stagingNewArt = null;
+let stagingProjectPhases = [];
+
+window.openCreateArtworkModal = function() {
+  isCreatingNewArt = true;
+  currentSelectedArtIdx = -1;
+  stagingNewArt = {
+    id: Date.now(),
+    tag: 'character',
+    shortSlug: '',
+    title: '',
+    desc: '',
+    pipelineKey: 'sketch1',
+    image: '',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+    phases: [
+      {
+        name: 'کاور و شیت اصلی اثر',
+        img: '',
+        image: '',
+        pipelineKey: 'sketch1',
+        subcategory: 'طراحی و اجرای استاندارد',
+        desc: '',
+        socials: {},
+        socialCaptions: {},
+        tgIncludeButton: false
+      }
+    ]
+  };
+
+  const titleEl = document.getElementById('adminArtEditorModalTitle');
+  if (titleEl) titleEl.textContent = '✨ افزودن اثر جدید به گالری';
+
+  renderAdminArtModalForm(stagingNewArt, true);
+  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+  pushModalState('adminEditor');
+};
+
+window.selectAdminArt = function(idx) {
+  isCreatingNewArt = false;
+  currentSelectedArtIdx = idx;
+  const art = showcaseArtworks[idx];
+  if (!art) return;
+
+  const titleEl = document.getElementById('adminArtEditorModalTitle');
+  if (titleEl) titleEl.textContent = `ویرایش آرت‌ورک: ${art.shortSlug || art.title}`;
+
+  renderAdminArtModalForm(art, false);
+  document.getElementById('adminArtLiveEditorCol').classList.add('active');
+  pushModalState('adminEditor');
+};
+
+window.closeAdminArtEditor = function() {
+  const modal = document.getElementById('adminArtLiveEditorCol');
+  if (modal) modal.classList.remove('active');
+  isCreatingNewArt = false;
+  stagingNewArt = null;
+};
+
+window.closeAdminArtEditorDirect = function(e) {
+  if (e.target.id === 'adminArtLiveEditorCol') {
+    closeAdminArtEditor();
+  }
+};
+
 function renderPhaseSocialDrawerContent(p, idx) {
   p.socials = p.socials || {};
   p.socialCaptions = p.socialCaptions || {};
@@ -810,6 +877,120 @@ window.setPhaseTelegramButton = function(phaseIdx, isChecked) {
   if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
   stagingProjectPhases[phaseIdx].tgIncludeButton = isChecked;
 };
+
+function renderAdminArtModalForm(art, isNew) {
+  const box = document.getElementById('adminArtFormFields');
+  if (!box || !art) return;
+
+  // آماده‌سازی لیست تصاویر و شیت‌های پروژه
+  stagingProjectPhases = [];
+  if (Array.isArray(art.phases) && art.phases.length > 0) {
+    stagingProjectPhases = JSON.parse(JSON.stringify(art.phases));
+  } else if (art.image) {
+    stagingProjectPhases.push({
+      name: art.title || 'تصویر کاور اصلی',
+      img: art.image,
+      image: art.image,
+      pipelineKey: art.pipelineKey || 'sketch1',
+      subcategory: 'طراحی و اجرای استاندارد',
+      desc: '',
+      socials: {},
+      socialCaptions: {},
+      tgIncludeButton: false
+    });
+  } else {
+    stagingProjectPhases.push({
+      name: 'کاور و شیت اصلی اثر',
+      img: '',
+      image: '',
+      pipelineKey: 'sketch1',
+      subcategory: 'طراحی و اجرای استاندارد',
+      desc: '',
+      socials: {},
+      socialCaptions: {},
+      tgIncludeButton: false
+    });
+  }
+
+  box.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      
+      <!-- گام ۱: تیتر و داستان کلی کانسپت -->
+      <div style="background:#04060a; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+        <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+          <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📌 گام ۱: عنوان و داستان کانسپت</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان کامل اثر</label>
+            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
+            <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 داستان و یادداشت طراح:</label>
+          <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
+        </div>
+      </div>
+
+      <!-- گام ۲: تصاویر و شیت‌های پروژه (مدیریت یکپارچه) -->
+      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:18px;">
+        <div style="margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+          <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصاویر و شیت‌های پروژه:</span>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصویر کاور و شیت‌های اثر را بارگذاری کنید. در انتهای شیت‌ها می‌توانید با دکمه زیر شیت جدید اضافه کنید.</p>
+        </div>
+
+        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:14px;">
+          ${renderStagingPhasesHtml()}
+        </div>
+
+        <!-- دکمه افزودن شیت در انتهای باندل شیت‌ها -->
+        <div style="margin-top:14px;">
+          <button type="button" onclick="addStagingPhase()" class="btn-secondary" style="width:100%; padding:12px 16px; font-size:12.5px; font-weight:800; border:1px dashed var(--cyan-electric); color:var(--cyan-electric); background:rgba(0,240,255,0.04); display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px;">
+            <span style="font-size:16px;">➕</span>
+            <span>افزودن شیت تکمیلی به این اثر</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- تنظیمات نهایی سفارش پکیج کامل -->
+      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.28); border-radius:12px; padding:12px 14px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
+          <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--gold); cursor:pointer;" />
+          فعال‌سازی سفارش به عنوان پکیج کامل پروداکشن (Production Pack) در انتهای اثر
+        </label>
+      </div>
+
+      <!-- دکمه‌های عملیاتی -->
+      <div style="margin-top:4px; display:flex; flex-direction:column; gap:8px;">
+        ${isNew ? `
+          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
+            ✓ تایید و افزودن قطعی به گالری
+          </button>
+          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
+            انصراف و لغو
+          </button>
+        ` : `
+          <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
+            ✓ ذخیره تغییرات پروژه (بدون ارسال تکراری به شبکه‌ها)
+          </button>
+          <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
+            حذف این اثر از گالری
+          </button>
+          <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
+            بستن بدون تغییر
+          </button>
+        `}
+      </div>
+
+    </div>
+  `;
+}
 
 function renderStagingPhasesHtml() {
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
@@ -956,8 +1137,9 @@ window.addStagingPhase = function() {
     pipelineKey: defPipe,
     subcategory: defSub,
     desc: '',
-    customCaption: '',
-    socialTelegram: false
+    socials: {},
+    socialCaptions: {},
+    tgIncludeButton: false
   });
   const container = document.getElementById('adminProjectPhasesList');
   if (container) container.innerHTML = renderStagingPhasesHtml();
@@ -1054,12 +1236,12 @@ window.confirmSaveArtwork = async function() {
   try {
     const assembledPhases = JSON.parse(JSON.stringify(validPhases));
 
-    if (isCreatingNewArt && stagingNewArt) {
+    if (isCreatingNewArt) {
       const newArtRecord = {
-        id: stagingNewArt.id || Date.now(),
+        id: (stagingNewArt && stagingNewArt.id) ? stagingNewArt.id : Date.now(),
         tag: cat,
         category: cat,
-        shortSlug: slug || stagingNewArt.shortSlug || title || 'کانسپت جدید',
+        shortSlug: slug || (stagingNewArt && stagingNewArt.shortSlug) || title || 'کانسپت جدید',
         title: title || 'کانسپت جدید استودیو',
         desc: desc,
         isProductionPack: isPack,
@@ -1077,8 +1259,7 @@ window.confirmSaveArtwork = async function() {
       renderAdminSketch2();
       showToast('اثر جدید با موفقیت به گالری اضافه شد!', 'success');
 
-      // توزیع چندکاناله و مقاصد انتشار (زیرساخت POSSE):
-      // بررسی تک‌تک فازها/شیت‌ها؛ هر شیتی که تیک تلگرام داشته باشد مخابره می‌شود
+      // توزیع چندکاناله: فقط برای کارهای جدید و فقط شیت‌هایی که تیک تلگرام دارند
       const tgPhases = assembledPhases.filter(p => (p.socials?.telegram === true || p.socialTelegram === true));
       for (const ph of tgPhases) {
         await broadcastArtworkPhaseToTelegram(newArtRecord, ph);
@@ -1116,10 +1297,9 @@ window.confirmSaveArtwork = async function() {
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
-      showToast('تغییرات پروژه با موفقیت ذخیره شد!', 'success');
+      showToast('تغییرات پروژه با موفقیت در سایت و دیتابیس ذخیره شد (بدون ارسال تکراری به شبکه‌ها).', 'success', 5000);
 
-      // در زمان ویرایش اثر، به درخواست مدیر استودیو هیچ پیامی به شبکه‌ها یا تلگرام ارسال نمی‌شود تا تکراری نباشد.
-
+      // در حالت ویرایش اثر هیچ پیامی به شبکه‌ها مخابره نمی‌شود
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').update({
           tag: art.tag,
@@ -1813,8 +1993,6 @@ window.scrollStreamToItem = function(index) {
 
 window.toggleImageZoom = function(imgEl, e) {
   if (!imgEl) return;
-  // غیرفعال در موبایل جهت ممانعت از قفل شدن تصویر؛ در موبایل فقط زوم لمسی الاستیک اینستاگرام عمل می‌کند
-  if (window.innerWidth <= 992 || (e && e.pointerType === 'touch')) return;
   const isZoomed = imgEl.classList.toggle('zoomed-image');
   if (isZoomed) {
     if (e) {
