@@ -836,24 +836,38 @@
                   </div>
                 </div>
 
-                <!-- کارت ۲: ربات تلگرام -->
-                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                <!-- کارت ۲: ربات تلگرام با قابلیت ثبت مستقیم و چند کانال -->
+                <div style="background:#06080d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">🤖 اتصال ربات تلگرام استودیو (@tajinkart_bot)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE BOT</span>
+                    <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">🤖 اتصال ربات تلگرام استودیو (@tajinkart_bot)</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.12);">ACTIVE BOT</span>
                   </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">ارسال خودکار بریف‌های کارفرمایان و انتشار کانسپت‌ها در کانال رسمی تلگرام استودیو.</p>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">توکن ربات و کانال‌های مقصد را وارد کرده و با دکمه اختصاصی زیر مستقیماً ذخیره کنید.</p>
+                  
                   <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token از BotFather):</label>
-                    <input type="password" id="setTgToken" placeholder="123456:ABC-DEF..." class="font-mono" style="font-size:11px;" />
+                    <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token از BotFather):</label>
+                    <input type="text" id="setTgToken" placeholder="مثال: 7123456789:AAFlq..." class="font-mono" style="font-size:11.5px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
                   </div>
+
                   <div>
-                    <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">شناسه چت یا آیدی کانال تلگرام (Chat ID / @Channel):</label>
-                    <input type="text" id="setTgChat" placeholder="@tajinkart یا -100123456789" class="font-mono" style="font-size:11px;" />
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                      <label style="font-size:11px; color:var(--cyan-electric); font-weight:700;">کانال‌ها یا چت‌های مقصد ارسال:</label>
+                      <button type="button" onclick="addTgChannelField()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
+                        + افزودن کانال / چت دیگر
+                      </button>
+                    </div>
+                    <div id="telegramChannelsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">می‌توانید آیدی کانال عمومی (مانند tajinkart@) یا شناسه عددی چت را وارد کنید.</p>
                   </div>
-                  <button type="button" onclick="testTelegramConnection()" class="btn-secondary" style="font-size:11.5px; padding:9px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:800; margin-top:4px;">
-                    ⚡ تست فوری ارتباط با ربات تلگرام (@tajinkart_bot)
-                  </button>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+                    <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="padding:10px 14px; font-size:12px; font-weight:800;">
+                      ✓ ثبت و ذخیره تنظیمات تلگرام
+                    </button>
+                    <button type="button" onclick="testTelegramConnection()" class="btn-secondary" style="padding:10px 14px; font-size:11.5px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:800;">
+                      ⚡ تست فوری ارتباط با ربات
+                    </button>
+                  </div>
                 </div>
 
                 <!-- کارت ۳: امنیت و رمز عبور -->

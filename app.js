@@ -1236,6 +1236,7 @@ window.adminDeleteArtwork = function(idx) {
 
 window.renderAdminSettingsTab = function() {
   if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
+  if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
   const rateEl = document.getElementById('setUsdRate');
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
   const tokenEl = document.getElementById('setTgToken');
@@ -2219,61 +2220,136 @@ window.navigateComic = function(delta) {
 // ارسال بریف به ربات تلگرام مدیر استودیو
 
 // =========================================================
-// موتور ارتباط زنده و توزیع در تلگرام استودیو (@tajinkart_bot)
+// موتور ارتباط زنده، مدیریت چند کانال و توزیع در تلگرام (@tajinkart_bot)
 // =========================================================
+window.renderAdminTgChannelsList = function() {
+  const container = document.getElementById('telegramChannelsList');
+  if (!container) return;
+
+  if (!siteSettings.tgChannels || !Array.isArray(siteSettings.tgChannels) || siteSettings.tgChannels.length === 0) {
+    siteSettings.tgChannels = siteSettings.tgChat ? [siteSettings.tgChat] : [''];
+  }
+
+  container.innerHTML = siteSettings.tgChannels.map((ch, idx) => `
+    <div style="display:flex; gap:8px; align-items:center;">
+      <input type="text" value="${escapeQuotes(ch)}" placeholder="مثال: @tajinkart یا -100123456789 یا 12345678" class="font-mono tg-channel-input" style="flex:1; font-size:11.5px; padding:7px 10px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" oninput="updateTgChannelVal(${idx}, this.value)" />
+      ${siteSettings.tgChannels.length > 1 ? `
+        <button type="button" onclick="removeTgChannel(${idx})" style="color:var(--crimson); background:none; border:none; font-size:18px; padding:4px 8px; cursor:pointer;" title="حذف این کانال">✕</button>
+      ` : ''}
+    </div>
+  `).join('');
+};
+
+window.updateTgChannelVal = function(idx, val) {
+  if (siteSettings.tgChannels && siteSettings.tgChannels[idx] !== undefined) {
+    siteSettings.tgChannels[idx] = val.trim();
+  }
+};
+
+window.addTgChannelField = function() {
+  if (!siteSettings.tgChannels || !Array.isArray(siteSettings.tgChannels)) {
+    siteSettings.tgChannels = [];
+  }
+  siteSettings.tgChannels.push('');
+  renderAdminTgChannelsList();
+};
+
+window.removeTgChannel = function(idx) {
+  if (!siteSettings.tgChannels) return;
+  siteSettings.tgChannels.splice(idx, 1);
+  if (siteSettings.tgChannels.length === 0) siteSettings.tgChannels = [''];
+  renderAdminTgChannelsList();
+};
+
+window.saveTelegramSettingsDirect = function() {
+  const tokenInput = document.getElementById('setTgToken');
+  const token = tokenInput ? tokenInput.value.trim() : '';
+
+  const channelInputs = document.querySelectorAll('.tg-channel-input');
+  const channels = [];
+  channelInputs.forEach(inp => {
+    const v = inp.value.trim();
+    if (v) channels.push(v);
+  });
+
+  siteSettings.tgToken = token;
+  siteSettings.tgChannels = channels.length > 0 ? channels : (siteSettings.tgChat ? [siteSettings.tgChat] : []);
+  siteSettings.tgChat = siteSettings.tgChannels[0] || '';
+
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  showToast('تنظیمات ربات و کانال‌های تلگرام با موفقیت ثبت و ذخیره شد! ✓', 'success', 4000);
+};
+
 window.testTelegramConnection = async function() {
   const token = document.getElementById('setTgToken')?.value.trim() || siteSettings.tgToken;
-  const chat = document.getElementById('setTgChat')?.value.trim() || siteSettings.tgChat;
+  const channelInputs = document.querySelectorAll('.tg-channel-input');
+  let channels = [];
+  channelInputs.forEach(inp => {
+    const v = inp.value.trim();
+    if (v) channels.push(v);
+  });
+  if (channels.length === 0 && siteSettings.tgChannels) {
+    channels = siteSettings.tgChannels.filter(Boolean);
+  }
+  if (channels.length === 0 && siteSettings.tgChat) {
+    channels = [siteSettings.tgChat];
+  }
 
-  if (!token || !chat) {
-    showToast('لطفاً ابتدا توکن ربات و آیدی چت/کانال تلگرام را وارد کنید.', 'error', 4500);
+  if (!token || channels.length === 0) {
+    showToast('لطفاً ابتدا توکن ربات و حداقل یک آیدی کانال یا چت تلگرام را وارد کنید.', 'error', 4500);
     return;
   }
 
-  showToast('در حال استعلام ارتباط با سرورهای تلگرام...', 'info', 2500);
+  showToast(`در حال ارسال پیام تست به ${channels.length} کانال/چت تلگرام...`, 'info', 3000);
 
-  try {
-    const testMsg = `👑 *تست اتصال موفق وب‌سایت TAJINKART*
+  let successCount = 0;
+  let lastError = '';
 
-` +
-                    `ربات رسمی *@tajinkart_bot* با موفقیت به وب‌سایت استودیو متصل گردید.
-` +
-                    `سیستم آماده توزیع خودکار کانسپت‌ها و دریافت هشدارهای سفارش‌های جدید است!
+  for (const chat of channels) {
+    try {
+      const testMsg = `👑 *تست اتصال موفق وب‌سایت TAJINKART*\n\n` +
+                      `ربات رسمی *@tajinkart_bot* با موفقیت به وب‌سایت استودیو متصل گردید.\n` +
+                      `سیستم آماده توزیع خودکار کانسپت‌ها و دریافت هشدارهای سفارش‌های جدید است!\n\n` +
+                      `🌐 [ورود به سایت رسمی استودیو](https://tajinkart.github.io)`;
 
-` +
-                    `🌐 [ورود به سایت رسمی استودیو](https://tajinkart.github.io)`;
+      const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chat,
+          text: testMsg,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [[
+              { text: "🎨 ورود به آتلیه رسمی", url: "https://tajinkart.github.io" }
+            ]]
+          }
+        })
+      });
 
-    const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chat,
-        text: testMsg,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [[
-            { text: "🎨 ورود به آتلیه رسمی", url: "https://tajinkart.github.io" }
-          ]]
-        }
-      })
-    });
-
-    const res = await resp.json();
-    if (res.ok) {
-      showToast('اتصال با تلگرام ۱۰۰٪ برقرار است! پیام تست به تلگرام ارسال شد. 🎉', 'success', 5000);
-    } else {
-      showToast(`خطای تلگرام: ${res.description || 'اطلاعات نامعتبر است'}`, 'error', 6000);
+      const res = await resp.json();
+      if (res.ok) {
+        successCount++;
+      } else {
+        lastError = res.description || 'نامشخص';
+      }
+    } catch(e) {
+      lastError = e.message || 'خطای شبکه';
     }
-  } catch(e) {
-    console.error('Telegram test error:', e);
-    showToast('خطا در برقراری ارتباط با سرور تلگرام (بررسی فیلترشکن یا آدرس اینترنت)', 'error', 5000);
+  }
+
+  if (successCount > 0) {
+    showToast(`پیام تست با موفقیت به ${successCount} مقصد تلگرام ارسال شد! 🎉`, 'success', 5000);
+  } else {
+    showToast(`خطای تلگرام: ${lastError}`, 'error', 6000);
   }
 };
 
 window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
   const token = siteSettings.tgToken;
-  const chat = siteSettings.tgChat;
-  if (!token || !chat) return;
+  const channels = (siteSettings.tgChannels && siteSettings.tgChannels.length > 0) ? 
+                   siteSettings.tgChannels.filter(Boolean) : [siteSettings.tgChat];
+  if (!token || channels.length === 0) return;
 
   const phase = specificPhase || (art.phases && art.phases[0]) || {};
   const photoUrl = phase.img || phase.image || art.image || '';
@@ -2284,46 +2360,36 @@ window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
   const sub = phase.subcategory ? ` • ${phase.subcategory}` : '';
 
   const caption = 
-    `🎨 *${title}*
-
-` +
-    `${desc}
-
-` +
-    `📐 *پایپلاین:* ${pipeName}${sub}
-` +
-    `🌌 *جهان روایی:* #${(art.lore || 'جهان_اکستوپیا').replace(/\s+/g, '_')}
-
-` +
-    `👑 *طراح دنیا و مدیر استودیو:* سید سروش تاج
-` +
+    `🎨 *${title}*\n\n` +
+    `${desc}\n\n` +
+    `📐 *پایپلاین:* ${pipeName}${sub}\n` +
+    `🌌 *جهان روایی:* #${(art.lore || 'جهان_اکستوپیا').replace(/\s+/g, '_')}\n\n` +
+    `👑 *طراح دنیا و مدیر استودیو:* سید سروش تاج\n` +
     `🔗 [مشاهده کامل پروژه در آتلیه TAJINKART](https://tajinkart.github.io/?art=${art.id})`;
 
-  try {
-    if (photoUrl && photoUrl.startsWith('http')) {
-      const resp = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chat,
-          photo: photoUrl,
-          caption: caption,
-          parse_mode: 'Markdown',
-          reply_markup: {
-            inline_keyboard: [[
-              { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
-              { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
-            ]]
-          }
-        })
-      });
-      const res = await resp.json();
-      if (res.ok) {
-        showToast('پروژه با موفقیت به کانال تلگرام استودیو مخابره شد! ✈️', 'success', 4000);
+  for (const chat of channels) {
+    try {
+      if (photoUrl && photoUrl.startsWith('http')) {
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chat,
+            photo: photoUrl,
+            caption: caption,
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [[
+                { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
+                { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
+              ]]
+            }
+          })
+        });
       }
+    } catch(err) {
+      console.warn('Telegram broadcast failed for chat:', chat, err);
     }
-  } catch(err) {
-    console.warn('Telegram broadcast failed:', err);
   }
 };
 
