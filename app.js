@@ -906,61 +906,61 @@ function renderStagingPhasesHtml() {
           <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px; font-size:11px;">
             <!-- ۱. پلتفرم‌های تخصصی پورتفولیو و آرت -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialArtStation = this.checked" ${(p.socialArtStation !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialArtStation = this.checked" ${p.socialArtStation ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🎨 آرت‌استیشن</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialCara = this.checked" ${(p.socialCara !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialCara = this.checked" ${p.socialCara ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🛡️ کارا (Cara)</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialPinterest = this.checked" ${(p.socialPinterest !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialPinterest = this.checked" ${p.socialPinterest ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>📌 پینترست</span>
             </label>
 
             <!-- ۲. اینستاگرام، تردز و ویدیوی ریلز -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialInstagram = this.checked" ${(p.socialInstagram !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialInstagram = this.checked" ${p.socialInstagram ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>📷 اینستاگرام (پست)</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReels = this.checked" ${(p.socialReels) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReels = this.checked" ${p.socialReels ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🎬 اینستاگرام ریلز</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialThreads = this.checked" ${(p.socialThreads !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialThreads = this.checked" ${p.socialThreads ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🧵 تردز (Threads)</span>
             </label>
 
             <!-- ۳. ردیت، توییتر و بلواسکای -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReddit = this.checked" ${(p.socialReddit !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialReddit = this.checked" ${p.socialReddit ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🤖 ردیت (Reddit)</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialX = this.checked" ${(p.socialX !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialX = this.checked" ${p.socialX ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🐦 توییتر (X)</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialBluesky = this.checked" ${(p.socialBluesky !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialBluesky = this.checked" ${p.socialBluesky ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🦋 بلواسکای</span>
             </label>
 
             <!-- ۴. ویدیو، پیام‌رسان و بیزینس -->
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialShorts = this.checked" ${(p.socialShorts) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialShorts = this.checked" ${p.socialShorts ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>📹 یوتیوب شورتس</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialDiscord = this.checked" ${(p.socialDiscord !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialDiscord = this.checked" ${p.socialDiscord ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>🎮 دیسکورد</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialTelegram = this.checked" ${(p.socialTelegram !== false) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialTelegram = this.checked" ${p.socialTelegram ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>✈️ تلگرام</span>
             </label>
             <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#e2e8f0; background:rgba(255,255,255,0.04); padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
-              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialLinkedIn = this.checked" ${(p.socialLinkedIn) ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
+              <input type="checkbox" onchange="stagingProjectPhases[${idx}].socialLinkedIn = this.checked" ${p.socialLinkedIn ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer;" />
               <span>💼 لینکدین</span>
             </label>
           </div>
