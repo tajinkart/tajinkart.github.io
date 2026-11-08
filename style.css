@@ -2175,6 +2175,22 @@ textarea:-webkit-autofill {
   object-fit: contain;
   display: block;
   margin: 0 auto;
+  cursor: zoom-in;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), max-height 0.3s ease;
+}
+artstation-img-card img.zoomed-image {
+  max-height: none !important;
+  cursor: zoom-out !important;
+  transform: scale(1.65);
+  transform-origin: center center;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95);
+  position: relative;
+  z-index: 50;
+}
+@media (max-width: 768px) {
+  artstation-img-card img.zoomed-image {
+    transform: scale(2.0);
+  }
 }
 .artstation-img-card .img-caption {
   font-size: 12px;
@@ -2821,3 +2837,38 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
       padding: 3px 10px !important;
       letter-spacing: 0.5px;
     }
+
+/* بهینه‌سازی ریسپانسیو و روان‌سازی چیدمان کارت‌های پنل ادمین در موبایل */
+@media (max-width: 768px) {
+  .admin-art-mosaic-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: auto !important;
+    gap: 8px !important;
+  }
+  .admin-mosaic-card {
+    aspect-ratio: 16/11 !important;
+    border-radius: 8px !important;
+    min-height: 95px !important;
+  }
+  .admin-mosaic-add-tile {
+    min-height: 95px !important;
+    padding: 10px !important;
+    font-size: 11px !important;
+    border-radius: 8px !important;
+  }
+  .admin-mosaic-add-tile span:first-child {
+    font-size: 24px !important;
+  }
+  .admin-art-modal-box {
+    width: 95% !important;
+    max-height: 92vh !important;
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+  }
+}
+@media (max-width: 480px) {
+  .admin-art-mosaic-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+}

@@ -744,63 +744,82 @@ window.closeAdminArtEditorDirect = function(e) {
   }
 };
 
+let stagingProjectPhases = [];
+
 function renderAdminArtModalForm(art, isNew) {
   const box = document.getElementById('adminArtFormFields');
   if (!box || !art) return;
+
+  // آماده‌سازی تصاویر چندگانه پروژه
+  if (Array.isArray(art.phases) && art.phases.length > 0) {
+    stagingProjectPhases = JSON.parse(JSON.stringify(art.phases)).filter(p => (p.img || p.image) !== art.image);
+  } else {
+    stagingProjectPhases = [];
+  }
 
   const previewDisplay = art.image ? 'block' : 'none';
   const emptyPreviewDisplay = art.image ? 'none' : 'flex';
 
   box.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; flex-direction:column; gap:14px;">
       
-      <!-- پیش‌نمایش تصویر -->
-      <div style="background:#04060a; border:1px solid var(--border-subtle); border-radius:14px; padding:12px;">
+      <!-- ۱. تصویر کاور اصلی گالری -->
+      <div style="background:#04060a; border:1px solid var(--border-subtle); border-radius:14px; padding:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="font-size:11.5px; font-weight:700; color:var(--gold);">پیش‌نمایش تصویر اثر:</span>
+          <span style="font-size:12px; font-weight:800; color:var(--gold);">🖼️ تصویر کاور اصلی (نمایش در گالری):</span>
           <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">
-            ${art.image ? 'تصویر انتخاب شد' : 'هنوز عکسی انتخاب نشده'}
+            ${art.image ? 'کاور فعال' : 'هنوز عکسی انتخاب نشده'}
           </span>
         </div>
-        <div style="max-height:220px; min-height:120px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative;">
-          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:220px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش" />
-          <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:20px;">
+        <div style="max-height:200px; min-height:110px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:10px;">
+          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:200px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش" />
+          <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:16px;">
             <span>📷</span>
-            <span>برای نمایش پیش‌نمایش، تصویر را آپلود کنید یا لینک آن را قرار دهید.</span>
+            <span>تصویر کاور را از حافظه سیستم انتخاب کنید یا لینک وب بگذارید.</span>
           </div>
         </div>
-      </div>
-
-      <!-- آپلود مستقیم عکس از کامپیوتر یا لینک وب -->
-      <div style="background:#05070d; border:1px solid var(--border-subtle); border-radius:12px; padding:14px;">
-        <label style="font-size:11.5px; font-weight:700; color:var(--cyan-electric); display:block; margin-bottom:6px;">
-          📁 انتخاب تصویر (از حافظه سیستم یا لینک مستقیم):
-        </label>
         <div style="display:flex; gap:8px; margin-bottom:8px;">
-          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 14px;">
-            📁 انتخاب عکس از کامپیوتر (با ارسال ابری به کلودیناری)
+          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px;">
+            📁 انتخاب عکس کاور از کامپیوتر یا گوشی
           </button>
           <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
         </div>
-        <label style="font-size:10.5px; color:var(--text-muted); display:block; margin-bottom:3px;">یا درج لینک وب (URL):</label>
-        <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="https://images.unsplash.com/..." class="font-mono" style="font-size:11.5px;" />
+        <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="یا درج لینک وب کاور: https://..." class="font-mono" style="font-size:11.5px;" />
       </div>
 
-      <!-- فیلدهای مشخصات -->
+      <!-- ۲. بخش تصاویر پروژه (استایل آرت‌استیشن - اسکرول چندتصویره) -->
+      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <span style="font-size:12px; font-weight:800; color:var(--cyan-electric);">📑 سایر تصاویر پروژه (اسکرول به سبک ArtStation):</span>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">اتودها، شیت‌های سه‌نما، کلوزآپ‌ها یا جزییاتی که زیر کاور اصلی باز می‌شوند.</p>
+          </div>
+          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-secondary" style="font-size:11px; padding:6px 12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+            + افزودن تصویر به پروژه
+          </button>
+          <input type="file" id="adminAddPhaseFileInput" accept="image/*" style="display:none;" onchange="handleAdminAddPhaseUpload(this)" />
+        </div>
+
+        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:8px;">
+          ${renderStagingPhasesHtml()}
+        </div>
+      </div>
+
+      <!-- ۳. فیلدهای عنوان و دسته‌بندی -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">عنوان اثر</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان اثر</label>
           <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">اسلاگ هاور (عنوان کوتاه)</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
           <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">دسته‌بندی در گالری</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">دسته‌بندی در گالری</label>
           <select id="editArtCategorySelect" onchange="syncAdminPipeFromCategory(this)">
             ${galleryCategories.map(c => `
               <option value="${c.id}" ${(art.tag === c.id || art.category === c.id) ? 'selected' : ''}>${c.title}</option>
@@ -808,7 +827,7 @@ function renderAdminArtModalForm(art, isNew) {
           </select>
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">پایپلاین دیپ‌لینک به آتلیه</label>
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین آتلیه</label>
           <select id="editArtPipeSelect" onchange="syncAdminCategoryFromPipe(this)">
             <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
             <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
@@ -819,23 +838,19 @@ function renderAdminArtModalForm(art, isNew) {
           </select>
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">لور داستانی</label>
-          <input type="text" id="editArtLoreInput" value="${art.lore || 'جهان اکستوپیا'}" placeholder="جهان جنسیس / اکستوپیا" />
+          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">جهان روایی (Lore)</label>
+          <input type="text" id="editArtLoreInput" value="${art.lore || 'جهان اکستوپیا'}" placeholder="جهان اکستوپیا / جنسیس" />
         </div>
       </div>
 
+      <!-- ۴. متن غنی توضیحات داستانی و لور کاراکتر (جایگزین فیلدهای اضافه فنی) -->
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">مشخصات فنی و فضای رنگی</label>
-        <input type="text" id="editArtColorSpaceInput" value="${art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB'}" />
-      </div>
-
-      <div>
-        <label style="font-size:11px; color:var(--text-muted);">شرح و توضیحات تکمیلی اثر</label>
-        <textarea id="editArtDescInput" rows="2" placeholder="توضیحات و بریف هنری اثر...">${art.desc || ''}</textarea>
+        <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
+        <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
       </div>
 
       <!-- دکمه‌های عملیاتی -->
-      <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+      <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
         ${isNew ? `
           <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
             ✓ تایید و افزودن قطعی به گالری
@@ -845,7 +860,7 @@ function renderAdminArtModalForm(art, isNew) {
           </button>
         ` : `
           <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px;">
-            ✓ ذخیره تغییرات اثر
+            ✓ ذخیره تغییرات پروژه
           </button>
           <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3);">
             حذف این اثر از گالری
@@ -859,6 +874,68 @@ function renderAdminArtModalForm(art, isNew) {
     </div>
   `;
 }
+
+function renderStagingPhasesHtml() {
+  if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
+    return `<div style="font-size:11px; color:var(--text-muted); padding:8px; text-align:center;">هنوز تصویر تکمیلی برای این پروژه اضافه نشده است (اختیاری).</div>`;
+  }
+
+  return stagingProjectPhases.map((p, idx) => `
+    <div style="display:flex; align-items:center; gap:8px; background:#04060a; border:1px solid var(--border-subtle); border-radius:8px; padding:6px 10px;">
+      <img src="${p.img || p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.1);" alt="تصویر" />
+      <input type="text" value="${p.name || ''}" placeholder="عنوان این تصویر (مثال: شیت اتودها)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="flex:1; font-size:11px; padding:5px 8px; margin:0;" />
+      <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:16px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
+    </div>
+  `).join('');
+}
+
+window.removeStagingPhase = function(idx) {
+  stagingProjectPhases.splice(idx, 1);
+  const container = document.getElementById('adminProjectPhasesList');
+  if (container) container.innerHTML = renderStagingPhasesHtml();
+};
+
+window.handleAdminAddPhaseUpload = async function(inputEl) {
+  if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+  const file = inputEl.files[0];
+  showToast('در حال آپلود و افزودن تصویر پروژه...', 'info');
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64Data = e.target.result;
+    let finalUrl = base64Data;
+
+    try {
+      const cCloud = siteSettings.cloudinaryCloudName || 'tajinkart';
+      const cPreset = siteSettings.cloudinaryPreset || 'erlvtkx9';
+      const formData = new FormData();
+      formData.append('file', base64Data);
+      formData.append('upload_preset', cPreset);
+
+      const resp = await fetch(`https://api.cloudinary.com/v1_1/${cCloud}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const resJson = await resp.json();
+      if (resJson.secure_url) {
+        finalUrl = resJson.secure_url;
+      }
+    } catch(err) {
+      console.warn('Phase upload warning:', err);
+    }
+
+    stagingProjectPhases.push({
+      name: `شیت تکمیلی ${stagingProjectPhases.length + 1}`,
+      img: finalUrl,
+      image: finalUrl
+    });
+
+    const container = document.getElementById('adminProjectPhasesList');
+    if (container) container.innerHTML = renderStagingPhasesHtml();
+    showToast('تصویر به پروژه اضافه شد!', 'success');
+  };
+  reader.readAsDataURL(file);
+};
 
 window.handleAdminImageLiveChange = function(url) {
   const cleanUrl = url.trim();
@@ -935,10 +1012,22 @@ window.confirmSaveArtwork = function() {
   }
 
   try {
+    // آماده‌سازی آرایه تصاویر پروژه چندگانه
+    const assembledPhases = [{ name: 'تصویر کاور اصلی', img: img, image: img }];
+    if (Array.isArray(stagingProjectPhases) && stagingProjectPhases.length > 0) {
+      stagingProjectPhases.forEach(p => {
+        const pSrc = p.img || p.image;
+        if (pSrc && pSrc !== img) {
+          assembledPhases.push({
+            name: p.name || 'تصویر تکمیلی پروژه',
+            img: pSrc,
+            image: pSrc
+          });
+        }
+      });
+    }
+
     if (isCreatingNewArt && stagingNewArt) {
-      // ایجاد شیء مستقل قبل از بستن مودال تا دسترسی به اطلاعات قطع نشود
-      const isBase64Img = img.startsWith('data:image/');
-      const phaseSecondaryImg = isBase64Img ? '' : img;
       const newArtRecord = {
         id: stagingNewArt.id || Date.now(),
         tag: cat,
@@ -948,14 +1037,8 @@ window.confirmSaveArtwork = function() {
         desc: desc,
         pipelineKey: pipe,
         image: img,
-        colorSpace: colorSpace,
         lore: lore,
-        phases: [
-          { name: 'اتود اولیه و سیلوئت', img: img },
-          { name: 'لاین‌آرت فنی و کادر', img: phaseSecondaryImg },
-          { name: 'مطالعه نوری و مقداری', img: phaseSecondaryImg },
-          { name: 'رندر متریال نهایی', img: phaseSecondaryImg }
-        ]
+        phases: assembledPhases
       };
 
       showcaseArtworks.unshift(newArtRecord);
@@ -992,8 +1075,8 @@ window.confirmSaveArtwork = function() {
       art.pipelineKey = pipe;
       art.image = img;
       art.lore = lore;
-      art.colorSpace = colorSpace;
       art.desc = desc;
+      art.phases = assembledPhases;
 
       safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
       closeAdminArtEditor();
@@ -1394,15 +1477,12 @@ function renderArtStationProject(art) {
   if (!art) return;
   activeCaseStudyArt = art;
 
-  // ۱. اطلاعات سایدبار
+  // ۱. اطلاعات سایدبار و داستان روایی
   const titleEl = document.getElementById('artDetailTitle');
   if (titleEl) titleEl.textContent = art.title || 'کانسپت بدون عنوان';
 
   const descEl = document.getElementById('artDetailDesc');
   if (descEl) descEl.textContent = art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
-
-  const colorSpaceEl = document.getElementById('caseStudyColorSpace');
-  if (colorSpaceEl) colorSpaceEl.textContent = art.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
 
   const loreEl = document.getElementById('caseStudyLore');
   if (loreEl) loreEl.textContent = art.lore || 'جهان اکستوپیا';
@@ -1411,7 +1491,7 @@ function renderArtStationProject(art) {
   const pipeNameEl = document.getElementById('caseStudyPipeName');
   if (pipeNameEl) pipeNameEl.textContent = pipeData.topSub;
 
-  // ۲. استریم عمودی تصاویر پروژه با اطمینان از نمایش قطعی
+  // ۲. استریم عمودی تصاویر پروژه با قابلیت زوم کلیکی و لمسی به سبک آرت‌استیشن
   const stream = document.getElementById('caseStudyImagesStream');
   if (!stream) return;
 
@@ -1421,7 +1501,7 @@ function renderArtStationProject(art) {
   if (mainSrc) {
     streamHtml += `
       <div class="artstation-img-card">
-        <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" />
+        <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" onclick="toggleImageZoom(this)" title="برای زوم کلیک کنید" />
       </div>
     `;
   } else {
@@ -1433,15 +1513,15 @@ function renderArtStationProject(art) {
     `;
   }
 
-  // تصاویر فازها و اتودها در زیر تصویر اصلی به صورت اسکرولی عمودی
+  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها زیر تصویر اصلی به صورت اسکرولی عمودی
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
         streamHtml += `
           <div class="artstation-img-card">
-            <img src="${pSrc}" alt="${p.name || art.title}" loading="lazy" />
-            <div class="img-caption">${p.name || `فاز ${pIdx + 1} • اتود و بررسی جزئیات`}</div>
+            <img src="${pSrc}" alt="${p.name || art.title}" loading="lazy" onclick="toggleImageZoom(this)" title="برای زوم کلیک کنید" />
+            <div class="img-caption">${p.name || `شیت پروژه • بخش ${pIdx + 1}`}</div>
           </div>
         `;
       }
@@ -1450,6 +1530,11 @@ function renderArtStationProject(art) {
 
   stream.innerHTML = streamHtml;
 }
+
+window.toggleImageZoom = function(imgEl) {
+  if (!imgEl) return;
+  imgEl.classList.toggle('zoomed-image');
+};
 
 // گوش دادن به کلیدهای کیبورد برای ناوبری
 window.addEventListener('keydown', (e) => {
