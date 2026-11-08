@@ -2164,9 +2164,10 @@ textarea:-webkit-autofill {
   width: 100%;
   background: #04060a;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+  position: relative !important;
 }
 .artstation-img-card img {
   width: 100%;
@@ -2176,20 +2177,19 @@ textarea:-webkit-autofill {
   display: block;
   margin: 0 auto;
   cursor: zoom-in;
-  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), max-height 0.3s ease;
+  border-radius: 8px;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease;
 }
-artstation-img-card img.zoomed-image {
-  max-height: none !important;
+.artstation-img-card img.zoomed-image {
   cursor: zoom-out !important;
-  transform: scale(1.65);
-  transform-origin: center center;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95);
+  transform: scale(1.85);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.98), 0 0 40px rgba(250, 204, 21, 0.25) !important;
   position: relative;
-  z-index: 50;
+  z-index: 1000 !important;
 }
 @media (max-width: 768px) {
-  artstation-img-card img.zoomed-image {
-    transform: scale(2.0);
+  .artstation-img-card img.zoomed-image {
+    transform: scale(2.2);
   }
 }
 .artstation-img-card .img-caption {

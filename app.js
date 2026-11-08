@@ -881,10 +881,13 @@ function renderStagingPhasesHtml() {
   }
 
   return stagingProjectPhases.map((p, idx) => `
-    <div style="display:flex; align-items:center; gap:8px; background:#04060a; border:1px solid var(--border-subtle); border-radius:8px; padding:6px 10px;">
-      <img src="${p.img || p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.1);" alt="تصویر" />
-      <input type="text" value="${p.name || ''}" placeholder="عنوان این تصویر (مثال: شیت اتودها)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="flex:1; font-size:11px; padding:5px 8px; margin:0;" />
-      <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:16px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#04060a; border:1px solid var(--border-subtle); border-radius:10px; padding:10px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <img src="${p.img || p.image}" style="width:44px; height:44px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.12);" alt="تصویر" />
+        <input type="text" value="${p.name || ''}" placeholder="عنوان فاز (مثال: مدل‌شیت سه‌نما / اکسپرشن)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="flex:1; font-size:11.5px; padding:6px 10px; margin:0;" />
+        <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
+      </div>
+      <textarea rows="2" placeholder="توضیحات تخصصی این فاز (چرا این فاز مجزاست و چه استانداردهایی دارد)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
     </div>
   `).join('');
 }
@@ -1020,6 +1023,7 @@ window.confirmSaveArtwork = function() {
         if (pSrc && pSrc !== img) {
           assembledPhases.push({
             name: p.name || 'تصویر تکمیلی پروژه',
+            desc: p.desc || p.description || '',
             img: pSrc,
             image: pSrc
           });
@@ -1501,7 +1505,7 @@ function renderArtStationProject(art) {
   if (mainSrc) {
     streamHtml += `
       <div class="artstation-img-card">
-        <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" onclick="toggleImageZoom(this)" title="برای زوم کلیک کنید" />
+        <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" />
       </div>
     `;
   } else {
@@ -1519,15 +1523,19 @@ function renderArtStationProject(art) {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
         const phaseName = p.name || `شیت پروژه • فاز ${pIdx + 1}`;
+        const phaseDesc = p.desc || p.description || '';
         streamHtml += `
           <div class="artstation-img-card">
-            <div class="phase-context-pill" onclick="openPhaseScopeDrawer('${escapeQuotes(phaseName)}', '${art.pipelineKey || 'sketch1'}')" title="مشاهده استانداردهای تولید و مشخصات این فاز">
+            <div class="phase-context-pill" onclick="openPhaseScopeDrawer('${escapeQuotes(phaseName)}', '${art.pipelineKey || 'sketch1'}', '${escapeQuotes(phaseDesc)}')" title="مشاهده استانداردهای تولید و مشخصات این فاز">
               <span class="pill-dot"></span>
               <span>فاز تخصصی: ${phaseName}</span>
               <span style="color:var(--gold); font-size:12px;">ℹ️</span>
             </div>
-            <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this)" title="برای زوم کلیک کنید" />
-            <div class="img-caption">${phaseName}</div>
+            <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" />
+            <div class="img-caption">
+              <strong>${phaseName}</strong>
+              ${phaseDesc ? `<div style="font-size:11px; color:#cbd5e1; margin-top:3px; font-weight:normal;">${phaseDesc}</div>` : ''}
+            </div>
           </div>
         `;
       }
@@ -1537,9 +1545,30 @@ function renderArtStationProject(art) {
   stream.innerHTML = streamHtml;
 }
 
-window.toggleImageZoom = function(imgEl) {
+window.toggleImageZoom = function(imgEl, e) {
   if (!imgEl) return;
-  imgEl.classList.toggle('zoomed-image');
+  const isZoomed = imgEl.classList.toggle('zoomed-image');
+  if (isZoomed) {
+    if (e) {
+      const rect = imgEl.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      imgEl.style.transformOrigin = `${x}% ${y}%`;
+    } else {
+      imgEl.style.transformOrigin = 'center center';
+    }
+
+    imgEl.onmousemove = function(moveEvent) {
+      if (!imgEl.classList.contains('zoomed-image')) return;
+      const rect = imgEl.getBoundingClientRect();
+      const x = ((moveEvent.clientX - rect.left) / rect.width) * 100;
+      const y = ((moveEvent.clientY - rect.top) / rect.height) * 100;
+      imgEl.style.transformOrigin = `${x}% ${y}%`;
+    };
+  } else {
+    imgEl.style.transformOrigin = 'center center';
+    imgEl.onmousemove = null;
+  }
 };
 
 // گوش دادن به کلیدهای کیبورد برای ناوبری
@@ -4181,7 +4210,7 @@ function escapeQuotes(str) {
   return str.replace(/'/g, "\'");
 }
 
-window.openPhaseScopeDrawer = function(phaseTitle, pipeKey) {
+window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '') {
   currentDrawerPipelineKey = pipeKey || 'sketch1';
   const overlay = document.getElementById('phaseScopeDrawerOverlay');
   if (!overlay) return;
@@ -4197,7 +4226,9 @@ window.openPhaseScopeDrawer = function(phaseTitle, pipeKey) {
 
   const purposeEl = document.getElementById('drawerPhasePurpose');
   if (purposeEl) {
-    if (phaseTitle.includes('سه‌نما') || phaseTitle.includes('ارتوگرافیک') || phaseTitle.includes('Turnaround')) {
+    if (customDesc && customDesc.trim().length > 0) {
+      purposeEl.textContent = customDesc.trim();
+    } else if (phaseTitle.includes('سه‌نما') || phaseTitle.includes('ارتوگرافیک') || phaseTitle.includes('Turnaround')) {
       purposeEl.textContent = 'این شیت برای تثبیت زوایای تراز ارتوگرافیک (روبرو، نیم‌رخ و پشت) طراحی شده است و به عنوان نقشه فنی اصلی در اختیار تیم مدلسازی سه‌بعدی و انیمیشن قرار می‌گیرد.';
     } else if (phaseTitle.includes('اکسپرشن') || phaseTitle.includes('چهره') || phaseTitle.includes('حالات')) {
       purposeEl.textContent = 'این فاز به بررسی حالات روحی، احساسات دینامیک و میمیک چهره کاراکتر در شرایط نبرد، خشم، تمرکز و دیالوگ اختصاص دارد تا روح روایی اثر حفظ گردد.';
