@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8.6">
+  <link rel="stylesheet" href="style.css?v=8.7">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-view="showcase">
@@ -915,20 +915,22 @@
         <!-- تصاویر به صورت خودکار و تمام‌عرض تزریق می‌شوند -->
       </div>
 
-      <!-- ستون کناری: شناسنامه کامل پروژه، لور و سفارش سریع در پایپلاین -->
-      <aside class="artstation-sidebar">
+      <!-- ستون کناری چسبان: تغییر هوشمند توضیحات و فازها همگام با اسکرول تصاویر -->
+      <aside class="artstation-sidebar" id="artStationSidebar">
         <div>
-          <span id="artDetailCategory" class="font-mono" style="color:var(--iris); font-size:11px; letter-spacing:0.12em; display:block; margin-bottom:6px;">/ CONCEPT PROJECT /</span>
-          <h2 id="artDetailTitle" style="font-size:22px; font-weight:900; color:#fff; line-height:1.35; margin-bottom:12px;"></h2>
-          <p id="artDetailDesc" style="font-size:12.5px; color:#94a3b8; line-height:1.8; margin-bottom:16px;"></p>
+          <span id="artDetailPhaseIndicator" class="sidebar-phase-badge font-mono">/ CONCEPT PROJECT /</span>
+          <h2 id="artDetailTitle" style="font-size:20px; font-weight:900; color:#fff; line-height:1.35; margin-bottom:10px;"></h2>
+          <div id="artDetailDescBox" class="sidebar-phase-desc-box">
+            <p id="artDetailDesc" style="margin:0; font-size:12px; color:#cbd5e1; line-height:1.8;"></p>
+          </div>
         </div>
 
-        <div style="background:#05070c; border:1px solid var(--border-subtle); border-radius:12px; padding:14px; font-size:12px; display:flex; flex-direction:column; gap:8px;">
+        <div style="background:#05070c; border:1px solid var(--border-subtle); border-radius:12px; padding:12px; font-size:11.5px; display:flex; flex-direction:column; gap:6px;">
           <div><strong style="color:#fff;">پایپلاین طراحی:</strong> <span id="caseStudyPipeName" style="color:var(--gold); font-weight:700;"></span></div>
-          <div><strong style="color:#fff;">جهان و بستر روایی:</strong> <span id="caseStudyLore" style="color:var(--cyan-electric); font-weight:700;">جهان اکستوپیا</span></div>
+          <div><strong style="color:#fff;">جهان روایی:</strong> <span id="caseStudyLore" style="color:var(--cyan-electric); font-weight:700;">جهان اکستوپیا</span></div>
         </div>
 
-        <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; margin-top:8px;">
+        <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:12px; font-size:12px; margin-top:auto;">
           سفارش اثر مشابه در این پایپلاین ←
         </button>
       </aside>
@@ -1496,8 +1498,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=8.6"></script>
-  <script src="app.js?v=8.6" defer></script>
+  <script src="data.js?v=8.7"></script>
+  <script src="app.js?v=8.7" defer></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

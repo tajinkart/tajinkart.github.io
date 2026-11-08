@@ -1504,7 +1504,10 @@ function renderArtStationProject(art) {
 
   if (mainSrc) {
     streamHtml += `
-      <div class="artstation-img-card">
+      <div class="artstation-img-card project-stream-item" 
+           data-title="${escapeQuotes(art.title || 'کانسپت مستر')}" 
+           data-phase="/ ۰۱ • تصویر کاور اصلی /" 
+           data-desc="${escapeQuotes(art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.')}">
         <img src="${mainSrc}" alt="${art.title || 'کانسپت استودیو'}" loading="eager" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" />
       </div>
     `;
@@ -1517,24 +1520,21 @@ function renderArtStationProject(art) {
     `;
   }
 
-  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها همراه با کپسول‌های شناور مشخصات فاز
+  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها همراه با ویژگی‌های ردیابی اسکرول زنده
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
         const phaseName = p.name || `شیت پروژه • فاز ${pIdx + 1}`;
-        const phaseDesc = p.desc || p.description || '';
+        const phaseDesc = p.desc || p.description || p.note || `فاز مکمل پروداکشن: بررسی فرم‌ها، آناتومی و جزئیات طراحی مربوط به این بخش.`;
         streamHtml += `
-          <div class="artstation-img-card">
-            <div class="phase-context-pill" onclick="openPhaseScopeDrawer('${escapeQuotes(phaseName)}', '${art.pipelineKey || 'sketch1'}', '${escapeQuotes(phaseDesc)}')" title="مشاهده استانداردهای تولید و مشخصات این فاز">
-              <span class="pill-dot"></span>
-              <span>فاز تخصصی: ${phaseName}</span>
-              <span style="color:var(--gold); font-size:12px;">ℹ️</span>
-            </div>
+          <div class="artstation-img-card project-stream-item" 
+               data-title="${escapeQuotes(phaseName)}" 
+               data-phase="/ ۰${pIdx + 2} • ${escapeQuotes(phaseName)} /" 
+               data-desc="${escapeQuotes(phaseDesc)}">
             <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" />
             <div class="img-caption">
               <strong>${phaseName}</strong>
-              ${phaseDesc ? `<div style="font-size:11px; color:#cbd5e1; margin-top:3px; font-weight:normal;">${phaseDesc}</div>` : ''}
             </div>
           </div>
         `;
@@ -1543,6 +1543,52 @@ function renderArtStationProject(art) {
   }
 
   stream.innerHTML = streamHtml;
+
+  // راه‌اندازی رصد اسکرول هوشمند (ScrollSpy) جهت تغییر آنی سایدبار
+  setTimeout(initProjectStreamScrollSpy, 150);
+}
+
+// موتور ردیابی زنده اسکرول برای تغییر هماهنگ سایدبار بر اساس عکس در حال مشاهده
+function initProjectStreamScrollSpy() {
+  const modal = document.getElementById('artDetailModal');
+  const items = document.querySelectorAll('.project-stream-item');
+  if (!modal || items.length === 0) return;
+
+  function onScroll() {
+    let currentItem = items[0];
+    const triggerLine = window.innerHeight * 0.45;
+
+    items.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      if (rect.top <= triggerLine) {
+        currentItem = item;
+      }
+    });
+
+    const phase = currentItem.getAttribute('data-phase');
+    const title = currentItem.getAttribute('data-title');
+    const desc = currentItem.getAttribute('data-desc');
+
+    const phaseEl = document.getElementById('artDetailPhaseIndicator');
+    const titleEl = document.getElementById('artDetailTitle');
+    const descEl = document.getElementById('artDetailDesc');
+
+    if (phaseEl && phase && phaseEl.textContent !== phase) {
+      phaseEl.textContent = phase;
+      phaseEl.style.transform = 'scale(1.05)';
+      setTimeout(() => { phaseEl.style.transform = 'scale(1)'; }, 200);
+    }
+    if (titleEl && title && titleEl.textContent !== title) {
+      titleEl.textContent = title;
+    }
+    if (descEl && desc && descEl.textContent !== desc) {
+      descEl.textContent = desc;
+    }
+  }
+
+  modal.removeEventListener('scroll', modal._scrollSpyHandler);
+  modal._scrollSpyHandler = onScroll;
+  modal.addEventListener('scroll', onScroll, { passive: true });
 }
 
 window.toggleImageZoom = function(imgEl, e) {
