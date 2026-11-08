@@ -1129,6 +1129,10 @@ window.confirmSaveArtwork = function() {
       renderShowcaseGrid();
       renderAdminSketch2();
       showToast('اثر جدید با موفقیت تایید و به گالری اضافه شد!', 'success');
+      // مخابره خودکار به تلگرام در صورت فعال بودن تیک
+      if (assembledPhases.some(p => p.socialTelegram)) {
+        broadcastArtworkToTelegram(newArtRecord);
+      }
 
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').insert([{
@@ -1165,6 +1169,9 @@ window.confirmSaveArtwork = function() {
       renderShowcaseGrid();
       renderAdminSketch2();
       showToast(`تغییرات پروژه ذخیره شد! مقاصد توزیع برای ${assembledPhases.length} شیت آماده اتصال است.`, 'success', 5000);
+      if (assembledPhases.some(p => p.socialTelegram)) {
+        broadcastArtworkToTelegram(art);
+      }
 
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').update({
@@ -2210,6 +2217,116 @@ window.navigateComic = function(delta) {
 };
 
 // ارسال بریف به ربات تلگرام مدیر استودیو
+
+// =========================================================
+// موتور ارتباط زنده و توزیع در تلگرام استودیو (@tajinkart_bot)
+// =========================================================
+window.testTelegramConnection = async function() {
+  const token = document.getElementById('setTgToken')?.value.trim() || siteSettings.tgToken;
+  const chat = document.getElementById('setTgChat')?.value.trim() || siteSettings.tgChat;
+
+  if (!token || !chat) {
+    showToast('لطفاً ابتدا توکن ربات و آیدی چت/کانال تلگرام را وارد کنید.', 'error', 4500);
+    return;
+  }
+
+  showToast('در حال استعلام ارتباط با سرورهای تلگرام...', 'info', 2500);
+
+  try {
+    const testMsg = `👑 *تست اتصال موفق وب‌سایت TAJINKART*
+
+` +
+                    `ربات رسمی *@tajinkart_bot* با موفقیت به وب‌سایت استودیو متصل گردید.
+` +
+                    `سیستم آماده توزیع خودکار کانسپت‌ها و دریافت هشدارهای سفارش‌های جدید است!
+
+` +
+                    `🌐 [ورود به سایت رسمی استودیو](https://tajinkart.github.io)`;
+
+    const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chat,
+        text: testMsg,
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [[
+            { text: "🎨 ورود به آتلیه رسمی", url: "https://tajinkart.github.io" }
+          ]]
+        }
+      })
+    });
+
+    const res = await resp.json();
+    if (res.ok) {
+      showToast('اتصال با تلگرام ۱۰۰٪ برقرار است! پیام تست به تلگرام ارسال شد. 🎉', 'success', 5000);
+    } else {
+      showToast(`خطای تلگرام: ${res.description || 'اطلاعات نامعتبر است'}`, 'error', 6000);
+    }
+  } catch(e) {
+    console.error('Telegram test error:', e);
+    showToast('خطا در برقراری ارتباط با سرور تلگرام (بررسی فیلترشکن یا آدرس اینترنت)', 'error', 5000);
+  }
+};
+
+window.broadcastArtworkToTelegram = async function(art, specificPhase = null) {
+  const token = siteSettings.tgToken;
+  const chat = siteSettings.tgChat;
+  if (!token || !chat) return;
+
+  const phase = specificPhase || (art.phases && art.phases[0]) || {};
+  const photoUrl = phase.img || phase.image || art.image || '';
+  const title = phase.name || art.title || 'کانسپت جدید استودیو TAJINKART';
+  const desc = phase.desc || art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
+  const pipe = phase.pipelineKey || art.pipelineKey || 'sketch1';
+  const pipeName = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[pipe]) ? PIPELINE_DATA[pipe].topSub : 'آتلیه کانسپت آرت';
+  const sub = phase.subcategory ? ` • ${phase.subcategory}` : '';
+
+  const caption = 
+    `🎨 *${title}*
+
+` +
+    `${desc}
+
+` +
+    `📐 *پایپلاین:* ${pipeName}${sub}
+` +
+    `🌌 *جهان روایی:* #${(art.lore || 'جهان_اکستوپیا').replace(/\s+/g, '_')}
+
+` +
+    `👑 *طراح دنیا و مدیر استودیو:* سید سروش تاج
+` +
+    `🔗 [مشاهده کامل پروژه در آتلیه TAJINKART](https://tajinkart.github.io/?art=${art.id})`;
+
+  try {
+    if (photoUrl && photoUrl.startsWith('http')) {
+      const resp = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chat,
+          photo: photoUrl,
+          caption: caption,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [[
+              { text: "👁️ مشاهده کامل پروژه در سایت", url: `https://tajinkart.github.io/?art=${art.id}` },
+              { text: "💼 ثبت سفارش در آتلیه", url: `https://tajinkart.github.io/?view=store` }
+            ]]
+          }
+        })
+      });
+      const res = await resp.json();
+      if (res.ok) {
+        showToast('پروژه با موفقیت به کانال تلگرام استودیو مخابره شد! ✈️', 'success', 4000);
+      }
+    }
+  } catch(err) {
+    console.warn('Telegram broadcast failed:', err);
+  }
+};
+
 async function dispatchTelegramNotification(order) {
   if (!siteSettings.tgToken || !siteSettings.tgChat) return;
   const text = encodeURIComponent(
@@ -4772,3 +4889,22 @@ window.goToPipelineFromDrawer = function() {
     }
   }, { passive: false });
 })();
+
+
+// =========================================================
+// بهینه‌سازی اختصاصی مینی‌اپلیکیشن تلگرام (Telegram Mini App Ready)
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.Telegram && window.Telegram.WebApp) {
+    try {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      if (tg.setHeaderColor) tg.setHeaderColor('#040507');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#040507');
+      console.log('Telegram Mini App initialized for TAJINKART studio.');
+    } catch(e) {
+      console.warn('TMA init warning:', e);
+    }
+  }
+});
