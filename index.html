@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=12.0">
+  <link id="siteFavicon" rel="icon" type="image/png" href="">
+  <link rel="stylesheet" href="style.css?v=12.2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -124,11 +125,15 @@
 
 
     <div id="stickyBrandHero">
-      <div class="hero-badge">
-        <span>●</span>
-        <span>استودیو کانسپت آرت و توسعه بصری</span>
+      <div id="brandCrestContainer" class="brand-crest-wrapper" style="display:none;">
+        <img id="brandCrestImg" src="" alt="TAJINKART Master Crest" class="brand-crest-img" />
       </div>
       <h1 class="brand-giant-title">TAJINKART</h1>
+      <div class="brand-slogan-bar font-mono">FROM INK TO UNIVERSE</div>
+      <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" title="وضعیت ارتباطی و پذیرش سفارشات در آتلیه">
+        <span class="status-pulse-dot"></span>
+        <span id="studioLiveStatusText">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است</span>
+      </div>
       <p class="brand-sub-caption">سید سروش تاج • آرشیو تخصصی کانسپت آرت، طراحی دنیا و تصویرسازی سینمایی</p>
     </div>
 
@@ -823,6 +828,41 @@
 
               <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
                 
+                <!-- کارت ۰: مدیریت و دراپ لوگو و نشان رسمی استودیو -->
+                <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; font-weight:800; color:var(--gold);">🦅 نشان و لوگوی رسمی استودیو</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">STUDIO CREST</span>
+                  </div>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">لوگوی رسمی استودیو را در این کادر رها (Drag & Drop) کرده یا از سیستم انتخاب کنید.</p>
+
+                  <div id="adminLogoDropzone" 
+                       onclick="document.getElementById('adminLogoFileInput').click()"
+                       ondragover="handleLogoDragOver(event)"
+                       ondragleave="handleLogoDragLeave(event)"
+                       ondrop="handleLogoDrop(event)"
+                       style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:10px; padding:20px; text-align:center; transition:all 0.2s;">
+                    <div id="adminLogoPreviewBox" style="display:none; margin-bottom:8px;">
+                      <img id="adminLogoPreviewImg" src="" style="width:76px; height:76px; object-fit:contain; margin:0 auto; filter:drop-shadow(0 0 15px rgba(250,204,21,0.3));" alt="لوگو" />
+                    </div>
+                    <div id="adminLogoPlaceholder">
+                      <div style="font-size:28px; margin-bottom:4px;">🖼️</div>
+                      <div style="font-size:12px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای بارگذاری نشان استودیو</div>
+                      <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP</div>
+                    </div>
+                  </div>
+                  <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
+
+                  <div id="adminLogoActionBtns" style="display:none; justify-content:space-between; align-items:center;">
+                    <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:5px 12px; cursor:pointer;">
+                      🔄 تغییر نشان
+                    </button>
+                    <button type="button" onclick="removeStudioLogo()" class="btn-secondary" style="color:var(--crimson); font-size:11px; padding:5px 12px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
+                      حذف نشان
+                    </button>
+                  </div>
+                </div>
+
                 <!-- کارت ۱: نرخ تسعیر ارز -->
                 <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">

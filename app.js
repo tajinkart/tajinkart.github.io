@@ -1372,6 +1372,7 @@ window.renderAdminSettingsTab = function() {
   if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
   const rateEl = document.getElementById('setUsdRate');
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
+  if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay();
   const tokenEl = document.getElementById('setTgToken');
   if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
   const footerEl = document.getElementById('setTgDefaultFooter');
@@ -3784,9 +3785,12 @@ document.addEventListener('DOMContentLoaded', () => {
   try { if (typeof renderAdminProductsTab === 'function') renderAdminProductsTab(); } catch(e) {}
   try { if (typeof renderAdminSketch3 === 'function') renderAdminSketch3(); } catch(e) {}
   try { if (typeof renderAdminLists === 'function') renderAdminLists(); } catch(e) {}
+  try { if (typeof updateStudioLiveStatus === 'function') updateStudioLiveStatus(); } catch(e) {}
+  try { if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay(); } catch(e) {}
 
   const rateEl = document.getElementById('setUsdRate');
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
+  if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay();
   const tokenEl = document.getElementById('setTgToken');
   if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
   const footerEl = document.getElementById('setTgDefaultFooter');
@@ -5199,3 +5203,129 @@ document.addEventListener('DOMContentLoaded', () => {
 window.renderShowcaseGrid = (typeof renderShowcaseGrid === 'function') ? renderShowcaseGrid : window.renderShowcaseGrid;
 window.renderAdminSketch2 = (typeof renderAdminSketch2 === 'function') ? renderAdminSketch2 : window.renderAdminSketch2;
 window.renderAdminLists = (typeof renderAdminLists === 'function') ? renderAdminLists : window.renderAdminLists;
+
+// محاسبه و به‌روزرسانی زنده وضعیت ارتباطی آتلیه (Live Studio Operational Status)
+window.updateStudioLiveStatus = function() {
+  const badge = document.getElementById('studioLiveStatusBadge');
+  const textEl = document.getElementById('studioLiveStatusText');
+  if (!badge || !textEl) return;
+
+  const lastActive = Number(siteSettings.lastAdminLoginTime) || Date.now();
+  const diffHours = (Date.now() - lastActive) / (1000 * 60 * 60);
+
+  // کمتر از ۲۴ ساعت: آتلیه فعال و آنلاین با پالس سبز
+  if (diffHours <= 24) {
+    badge.className = 'hero-badge studio-status-badge status-online';
+    textEl.textContent = '🟢 آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
+  } else {
+    // بیش از ۲۴ ساعت: حالت تعلیق هوشمند با پالس کهربایی و تایید پذیرش سفارش
+    badge.className = 'hero-badge studio-status-badge status-pending';
+    textEl.textContent = '🟡 دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    badge.title = 'پذیرش سفارشات فعال است. به دلیل نوسانات موقت اینترنت منطقه‌ای، بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد اما پروژه‌ها در آتلیه طبق زمان‌بندی پیش می‌روند.';
+  }
+};
+
+// ==============================================================================
+// مدیریت داینامیک لوگو و نشان استودیو با درگ اند دراپ در تنظیمات ادمین
+// ==============================================================================
+window.updateStudioLogoDisplay = function() {
+  const logoUrl = siteSettings.studioLogoUrl || '';
+  const headerContainer = document.getElementById('brandCrestContainer');
+  const headerImg = document.getElementById('brandCrestImg');
+  const previewBox = document.getElementById('adminLogoPreviewBox');
+  const previewImg = document.getElementById('adminLogoPreviewImg');
+  const placeholder = document.getElementById('adminLogoPlaceholder');
+  const actionBtns = document.getElementById('adminLogoActionBtns');
+  const favEl = document.getElementById('siteFavicon');
+
+  if (logoUrl) {
+    if (headerContainer && headerImg) {
+      headerImg.src = logoUrl;
+      headerContainer.style.display = 'flex';
+    }
+    if (previewBox && previewImg) {
+      previewImg.src = logoUrl;
+      previewBox.style.display = 'block';
+    }
+    if (placeholder) placeholder.style.display = 'none';
+    if (actionBtns) actionBtns.style.display = 'flex';
+    if (favEl) favEl.href = logoUrl;
+  } else {
+    if (headerContainer) headerContainer.style.display = 'none';
+    if (previewBox) previewBox.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    if (actionBtns) actionBtns.style.display = 'none';
+    if (favEl) favEl.href = '';
+  }
+};
+
+window.handleLogoDragOver = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dropzone = document.getElementById('adminLogoDropzone');
+  if (dropzone) {
+    dropzone.style.borderColor = 'var(--cyan-electric)';
+    dropzone.style.background = 'rgba(0, 240, 255, 0.08)';
+  }
+};
+
+window.handleLogoDragLeave = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dropzone = document.getElementById('adminLogoDropzone');
+  if (dropzone) {
+    dropzone.style.borderColor = 'rgba(250, 204, 21, 0.5)';
+    dropzone.style.background = 'rgba(0, 0, 0, 0.55)';
+  }
+};
+
+window.handleLogoDrop = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  window.handleLogoDragLeave(e);
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+    processAndSaveStudioLogo(e.dataTransfer.files[0]);
+  }
+};
+
+window.handleAdminLogoUpload = function(inputEl) {
+  if (inputEl && inputEl.files && inputEl.files[0]) {
+    processAndSaveStudioLogo(inputEl.files[0]);
+  }
+};
+
+async function processAndSaveStudioLogo(file) {
+  showToast('در حال بهینه‌سازی و ذخیره نشان استودیو...', 'info', 2500);
+
+  try {
+    let cloudUrl = await uploadFileToCloudinary(file);
+    if (!cloudUrl) {
+      cloudUrl = await compressImageForStorage(file, 800, 800, 0.92);
+    }
+
+    siteSettings.studioLogoUrl = cloudUrl;
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+
+    window.updateStudioLogoDisplay();
+    showToast('نشان رسمی استودیو با موفقیت بارگذاری شد و در هدر سایت قرار گرفت! 🦅', 'success', 5000);
+  } catch (err) {
+    console.error('Logo upload error:', err);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      siteSettings.studioLogoUrl = e.target.result;
+      safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+      window.updateStudioLogoDisplay();
+      showToast('نشان استودیو ذخیره شد.', 'success');
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+window.removeStudioLogo = function() {
+  siteSettings.studioLogoUrl = '';
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast('نشان استودیو حذف شد.', 'info');
+};
+
