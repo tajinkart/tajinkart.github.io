@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.7.0">
+  <link rel="stylesheet" href="style.css?v=12.8.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -158,11 +158,10 @@
       </div>
       <h1 class="brand-giant-title">TAJINKART</h1>
       <div class="brand-slogan-bar font-mono">FROM INK TO UNIVERSE</div>
-      <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" title="وضعیت ارتباطی و پذیرش سفارشات در آتلیه">
+      <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" style="margin-top:2px;" title="وضعیت ارتباطی و پذیرش سفارشات در آتلیه">
         <span class="status-pulse-dot"></span>
         <span id="studioLiveStatusText">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است</span>
       </div>
-      <p class="brand-sub-caption">سید سروش تاج • مدیر استودیو و طراح ارشد کانسپت آرت و دنیاسازی (Worldbuilder)</p>
     </div>
 
     <div id="artworkCurtain">
@@ -979,10 +978,10 @@
               <!-- زیربرگه‌ها (۲ ساب‌تب مجزا) -->
               <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
                 <button type="button" id="adminSettingsSubTabBtn-identity" onclick="switchSettingsSubTab('identity')" class="settings-subtab-btn active" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                  <span>🎨 هویت، برندینگ و محتوای سایت</span>
+                  <span>🏛️ هویت، محتوای استودیو و دیتابیس‌های ابری</span>
                 </button>
                 <button type="button" id="adminSettingsSubTabBtn-social" onclick="switchSettingsSubTab('social')" class="settings-subtab-btn" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                  <span>📡 شبکه‌های اجتماعی و اتصالات</span>
+                  <span>📡 ربات تلگرام و شبکه‌های اجتماعی</span>
                 </button>
               </div>
 
@@ -1110,16 +1109,31 @@
                       <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">شعار اصلی صفحه اول (Slogan Bar):</label>
                       <input type="text" id="setStudioSloganInput" class="font-mono" style="color:var(--gold); font-size:13px; font-weight:800; text-transform:uppercase; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box;" placeholder="FROM INK TO UNIVERSE" value="FROM INK TO UNIVERSE" />
                     </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان رسمی مدیر در هدر و درباره ما:</label>
-                      <input type="text" id="setStudioDirectorTitleInput" style="font-size:12px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="سید سروش تاج • مدیر استودیو و طراح ارشد کانسپت آرت و دنیاسازی (Worldbuilder)" value="سید سروش تاج • مدیر استودیو و طراح ارشد کانسپت آرت و دنیاسازی (Worldbuilder)" />
-                    </div>
+                    
                     <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
                       ✓ ذخیره شعار و عنوان استودیو
                     </button>
                   </div>
 
-                  <!-- کارت ۱-د: مدیریت نرخ تسعیر ارز -->
+                                    <!-- کارت ۱-ج: ویرایشگر متن و مانیفست «درباره استودیو» در صفحه اصلی -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; grid-column:1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">📜 ویرایشگر مانیفست و متن «درباره استودیو» (صفحه اصلی)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">ABOUT MANIFESTO</span>
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">تیتر مانیفست:</label>
+                      <input type="text" id="setAboutManifestoTitle" value="درباره استودیو TAJINKART" style="font-size:12px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن بیانیه و فلسفه دنیاسازی استودیو:</label>
+                      <textarea id="setAboutManifestoText" rows="4" style="font-size:11.5px; line-height:1.8; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;">استودیو تاج‌اینک‌آرت (TAJINKART) متولد اشتیاق بی‌پایان به خلق دنیاهای فانتزی تاریک، سایبرپانک و اساطیری است. با بیش از یک دهه تمرکز بر توسعه کانسپت‌های بصری، هدف آتلیه فراتر از تصویرگری صرف است؛ ما زبان بصری کامل، منطق معماری، متریال‌ها و هویت زیستی جهان‌های بازی و سینما را از نخستین قطره جوهر تا بی‌نهایت کیهان مهندسی می‌کنیم: «From Ink to Universe».</textarea>
+                    </div>
+                    <button type="button" onclick="saveAboutStudioManifestoDirect()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ذخیره و به‌روزرسانی متن درباره استودیو
+                    </button>
+                  </div>
+<!-- کارت ۱-د: مدیریت نرخ تسعیر ارز -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span style="font-size:13px; font-weight:800; color:var(--gold);">💵 مدیریت نرخ تسعیر ارز</span>
@@ -1133,6 +1147,56 @@
                     <button type="button" onclick="saveStudioCurrencySetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer; margin-top:4px;">
                       ✓ ثبت نرخ تبدیل ارز
                     </button>
+                  </div>
+
+                  <!-- کارت ۲-ب: فضای ابری تصاویر (Cloudinary) -->
+                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
+                      <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="tajinkart" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
+                      <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="erlvtkx9" />
+                    </div>
+                  </div>
+
+                  <!-- کارت ۲-د: پایگاه داده ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📊 همگام‌سازی ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">MULTI-CLOUD SYNC</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">پایداری افزونه: هر سفارش جدید همزمان در دیتابیس سوپابیس (جدول orders)، فایل اکسل گوگل درایو و ربات تلگرام استودیو ثبت می‌شود.</p>
+
+                    <div>
+                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        <span style="font-size:11px; color:#10b981; font-weight:700;">🟢 وضعیت دیتابیس ابری Supabase (جدول orders):</span>
+                        <span style="font-size:10.5px; color:#cbd5e1;">متصل و آماده دریافت خودکار بریف‌ها</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">آدرس وب‌هوک گوگل شیتس (Google Apps Script WebApp URL - جهت بک‌آپ اکسل):</label>
+                      <input type="text" id="setGoogleSheetsWebhook" placeholder="https://script.google.com/macros/s/.../exec" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                      <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">اختیاری: با قرار دادن وب‌هوک، یک ردیف در فایل Google Sheets شخصی شما در گوگل درایو ثبت می‌شود.</span>
+                    </div>
+
+                    <div>
+                      <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">توکن اختصاصی آنالیتیکس کلادفلر (Cloudflare Web Analytics Token):</label>
+                      <input type="text" id="setCloudflareToken" placeholder="c76a19f07a524a87b5a19808d4b38d38" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+
+                    <div style="margin-top:6px;">
+                      <button type="button" onclick="saveMultiCloudIntegrationsDirect()" class="btn-gold" style="width:100%; padding:10px 16px; font-size:12px; font-weight:800; cursor:pointer;">
+                        ✓ ذخیره تنظیمات گوگل شیتس و کلادفلر
+                      </button>
+                    </div>
                   </div>
 
                   <!-- کارت ۱-هـ: شناسه رسمی و دارایی‌های انحصاری خالق اثر و مدیر استودیو (انتقال‌یافته از اعضا) -->
@@ -1201,56 +1265,6 @@
                     <div style="margin-top:6px;">
                       <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800;">
                         ✓ ثبت و ذخیره تنظیمات تلگرام
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- کارت ۲-ب: فضای ابری تصاویر (Cloudinary) -->
-                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">☁️ فضای ابری تصاویر (Cloudinary)</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">ACTIVE</span>
-                    </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">آپلود مستقیم تصاویر از کامپیوتر به هاست ابری جهانی با لینک دائمی CDN.</p>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
-                      <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="tajinkart" />
-                    </div>
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
-                      <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="erlvtkx9" />
-                    </div>
-                  </div>
-
-                  <!-- کارت ۲-د: پایگاه داده ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر -->
-                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📊 همگام‌سازی ابری سفارش‌ها، وب‌هوک گوگل شیتس و کلادفلر</span>
-                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">MULTI-CLOUD SYNC</span>
-                    </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">پایداری افزونه: هر سفارش جدید همزمان در دیتابیس سوپابیس (جدول orders)، فایل اکسل گوگل درایو و ربات تلگرام استودیو ثبت می‌شود.</p>
-
-                    <div>
-                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                        <span style="font-size:11px; color:#10b981; font-weight:700;">🟢 وضعیت دیتابیس ابری Supabase (جدول orders):</span>
-                        <span style="font-size:10.5px; color:#cbd5e1;">متصل و آماده دریافت خودکار بریف‌ها</span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">آدرس وب‌هوک گوگل شیتس (Google Apps Script WebApp URL - جهت بک‌آپ اکسل):</label>
-                      <input type="text" id="setGoogleSheetsWebhook" placeholder="https://script.google.com/macros/s/.../exec" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
-                      <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">اختیاری: با قرار دادن وب‌هوک، یک ردیف در فایل Google Sheets شخصی شما در گوگل درایو ثبت می‌شود.</span>
-                    </div>
-
-                    <div>
-                      <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">توکن اختصاصی آنالیتیکس کلادفلر (Cloudflare Web Analytics Token):</label>
-                      <input type="text" id="setCloudflareToken" placeholder="c76a19f07a524a87b5a19808d4b38d38" class="font-mono" style="font-size:11px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
-                    </div>
-
-                    <div style="margin-top:6px;">
-                      <button type="button" onclick="saveMultiCloudIntegrationsDirect()" class="btn-gold" style="width:100%; padding:10px 16px; font-size:12px; font-weight:800; cursor:pointer;">
-                        ✓ ذخیره تنظیمات گوگل شیتس و کلادفلر
                       </button>
                     </div>
                   </div>
@@ -1928,16 +1942,13 @@
   <div id="toastContainer"></div>
 
   <!-- فوتر تک‌خطی دارک با لینک‌های حقوقی و رده‌بندی سنی -->
-  <footer style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:18px 32px; text-align:center;">
-    <div style="max-width:1440px; margin:0 auto; font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-      <div>تمامی حقوق آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده متعلق به استودیو TAJINKART © 2026 است.</div>
-      <div style="display:flex; align-items:center; gap:14px; font-size:11px;">
-        <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:11px; cursor:pointer;">منشور حقوقی و شرایط خدمات استودیو</button>
-      </div>
+  <footer style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:20px 32px; text-align:center;">
+    <div style="max-width:1440px; margin:0 auto; font-size:12px; color:var(--text-muted); display:flex; justify-content:center; align-items:center;">
+      <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=12.7.0"></script>
-  <script src="app.js?v=12.7.0"></script>
+  <script src="data.js?v=12.8.0"></script>
+  <script src="app.js?v=12.8.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

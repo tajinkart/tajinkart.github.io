@@ -1133,8 +1133,18 @@ function renderStagingPhasesHtml() {
           </div>
         `}
 
-        <!-- انتخاب مستقل پایپلاین و زیرشاخه اختصاصی برای این فریم مشخص -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <!-- انتخاب مستقل دسته‌بندی گالری، پایپلاین و زیرشاخه برای این شیت -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div>
+            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 دسته‌بندی گالری آثار:</label>
+            <select onchange="stagingProjectPhases[${idx}].category = this.value; stagingProjectPhases[${idx}].tag = this.value;" style="font-size:11px; padding:5px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
+              ${(typeof galleryCategories !== 'undefined' ? galleryCategories : []).map(cat => `
+                <option value="${cat.id}" ${(p.category === cat.id || (!p.category && cat.id === (PIPELINE_TO_CATEGORY_MAP[pipeKey] || 'character'))) ? 'selected' : ''}>
+                  ${cat.title} (${cat.id})
+                </option>
+              `).join('')}
+            </select>
+          </div>
           <div>
             <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">پایپلاین اختصاصی این عکس:</label>
             <select onchange="handlePhasePipelineChange(${idx}, this.value)" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
@@ -1961,11 +1971,19 @@ function renderArtStationProject(art) {
            data-index="${idx}"
            data-title="${escapeQuotes(item.name)}">
         <img src="${item.src}" alt="${item.name}" loading="${idx === 0 ? 'eager' : 'lazy'}" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" title="کلیک برای بزرگنمایی و زوم اثر" />
-        <div class="stream-phase-note">
-          <h3 class="stream-phase-title">${item.phaseNum} • ${item.name}</h3>
-          ${item.desc ? `<p class="stream-phase-desc">${item.desc}</p>` : ''}
-          <div class="stream-phase-meta-footer">
-            <span class="stream-phase-pipe font-mono">${pipeInfo}${item.sub ? ` • ${item.sub}` : ''}</span>
+        <div class="stream-phase-note" style="padding: 16px 20px; background: rgba(6, 8, 13, 0.75); border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 240px; text-align: right;">
+              <h3 class="stream-phase-title" style="margin: 0 0 8px; font-size: 16px; font-weight: 800; color: #fff; line-height: 1.4;">
+                ${item.phaseNum} • ${item.name}
+              </h3>
+              ${item.desc ? `<p class="stream-phase-desc" style="margin: 0; font-size: 12.5px; color: #94a3b8; line-height: 1.85;">${item.desc}</p>` : ''}
+            </div>
+            <div style="flex-shrink: 0; text-align: left;">
+              <span class="stream-phase-pipe font-mono" style="display: inline-block; padding: 4px 12px; border-radius: 6px; background: rgba(250, 204, 21, 0.12); border: 1px solid rgba(250, 204, 21, 0.35); color: var(--gold); font-size: 11px; font-weight: 800;">
+                ${pipeInfo}${item.sub ? ` • ${item.sub}` : ''}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -1976,7 +1994,7 @@ function renderArtStationProject(art) {
   if (art.isProductionPack !== false) {
     streamHtml += `
       <div class="production-pack-card">
-        <span class="pack-badge font-mono">/ COMPLETE PRODUCTION PACK /</span>
+        
         <h3 class="pack-title">سفارش پکیج کامل این پروژه</h3>
         <p class="pack-desc">تولید کامل این زنجیره کانسپت (شامل تمامی اتودها، مدل‌شیت‌ها و فضاسازی‌های این اثر) به صورت یکپارچه با فرمول تعرفه آتلیه.</p>
         <button type="button" onclick="orderProjectPack('${art.id}')" class="btn-gold pack-order-btn">
@@ -3525,8 +3543,8 @@ function renderAdminSketch3(filterText = '') {
     return;
   }
 
-  listEl.innerHTML = filtered.map((m, idx) => `
-    <div class="member-list-item ${idx === selectedMemberIdx ? 'active' : ''}" onclick="selectAdminMember(${idx})" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:#04060a; border:1px solid ${idx === selectedMemberIdx ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.08)'}; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
+  let membersHtml = filtered.map((m, idx) => `
+    <div class="member-list-item ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'active' : ''}" onclick="selectAdminMember(${idx})" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:#04060a; border:1px solid ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.08)'}; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
       <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
         <div style="width:28px; height:28px; border-radius:50%; background:rgba(0,240,255,0.12); border:1px solid rgba(0,240,255,0.3); color:var(--cyan-electric); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
           ${(m.name || 'U').charAt(0).toUpperCase()}
@@ -3539,6 +3557,25 @@ function renderAdminSketch3(filterText = '') {
       <span style="font-size:10px; color:var(--emerald); background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 6px; border-radius:6px; flex-shrink:0;">عضو فعال</span>
     </div>
   `).join('');
+
+  // پین کردن حساب سید سروش تاج در پایین‌ترین موقعیت لیست
+  membersHtml += `
+    <div style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(250,204,21,0.35);">
+      <div style="font-size:10.5px; color:var(--gold); font-weight:800; margin-bottom:6px; padding-right:2px;">فرماندهی استودیو:</div>
+      <div class="member-list-item ${isCreatorSelected ? 'active' : ''}" onclick="selectAdminCreator()" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, rgba(250,204,21,0.1), #04060a); border:1px solid ${isCreatorSelected ? 'var(--gold)' : 'rgba(250,204,21,0.4)'}; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, #f59e0b, #d97706); font-size:14px; display:flex; align-items:center; justify-content:center;">👑</div>
+          <div>
+            <div style="font-size:12px; font-weight:900; color:#fbbf24;">سید سروش تاج</div>
+            <div class="font-mono" style="font-size:10px; color:rgba(255,255,255,0.7);">tajinkart@gmail.com</div>
+          </div>
+        </div>
+        <span style="font-size:9.5px; font-weight:800; color:#000; background:var(--gold); padding:2px 6px; border-radius:6px;">خالق اثر 👑</span>
+      </div>
+    </div>
+  `;
+
+  listEl.innerHTML = membersHtml;
 
   renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0]);
 }
@@ -5409,12 +5446,12 @@ window.updateStudioLiveStatus = function() {
   // کمتر از ۲۴ ساعت: آتلیه فعال و آنلاین با پالس سبز
   if (diffHours <= 24) {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = '🟢 آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    textEl.textContent = 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
     badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
   } else {
     // بیش از ۲۴ ساعت: حالت تعلیق هوشمند با پالس کهربایی و تایید پذیرش سفارش
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = '🟡 دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    textEl.textContent = 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
     badge.title = 'پذیرش سفارشات فعال است. به دلیل نوسانات موقت اینترنت منطقه‌ای، بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد اما پروژه‌ها در آتلیه طبق زمان‌بندی پیش می‌روند.';
   }
 };
@@ -5681,12 +5718,12 @@ window.updateStudioLiveStatus = function() {
   // کمتر از ۲۴ ساعت: آتلیه فعال و آنلاین با پالس سبز
   if (diffHours <= 24) {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = '🟢 آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    textEl.textContent = 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
     badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
   } else {
     // بیش از ۲۴ ساعت: حالت تعلیق هوشمند با پالس کهربایی و تایید پذیرش سفارش
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = '🟡 دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    textEl.textContent = 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
     badge.title = 'پذیرش سفارشات فعال است. به دلیل نوسانات موقت اینترنت منطقه‌ای، بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد اما پروژه‌ها در آتلیه طبق زمان‌بندی پیش می‌روند.';
   }
 };
@@ -5790,3 +5827,76 @@ window.switchTermsModalSubTab = function(paneKey, btnEl) {
     if (el) el.style.display = (p === paneKey) ? 'block' : 'none';
   });
 };
+
+// ==============================================================================
+// ذخیره زنده مانیفست و بیانیه «درباره استودیو» در صفحه اصلی
+// ==============================================================================
+window.saveAboutStudioManifestoDirect = function() {
+  const titleInput = document.getElementById('setAboutManifestoTitle');
+  const textInput = document.getElementById('setAboutManifestoText');
+  
+  if (titleInput && titleInput.value.trim()) {
+    siteSettings.aboutTitle = titleInput.value.trim();
+  }
+  if (textInput && textInput.value.trim()) {
+    siteSettings.aboutText = textInput.value.trim();
+  }
+  if (typeof safeSetStorage === 'function') {
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  }
+  
+  // اعمال بلادرنگ بر روی المان‌های درباره استودیو در صفحه اصلی
+  const aboutHeading = document.querySelector('#showcaseStudioAboutSection h2');
+  if (aboutHeading && siteSettings.aboutTitle) {
+    aboutHeading.innerHTML = `درباره استودیو <span style="color:var(--gold);">${siteSettings.aboutTitle.replace('درباره استودیو', '').trim() || 'TAJINKART'}</span>`;
+  }
+  const aboutParagraph = document.querySelector('#showcaseStudioAboutSection p[style*="line-height:1.9"]');
+  if (aboutParagraph && siteSettings.aboutText) {
+    aboutParagraph.innerHTML = siteSettings.aboutText;
+  }
+  
+  showToast('متن و مانیفست «درباره استودیو» با موفقیت به‌روزرسانی و ذخیره شد! ✓', 'success', 4000);
+};
+
+// ==============================================================================
+// زوم لمسی پینچ دوانگشتی روان و فنری سبک اینستاگرام در موبایل (حداکثر ۲.۲ برابر بدون بیرون‌زدگی)
+// ==============================================================================
+let pinchInitDist = 0;
+let pinchCurrentScale = 1;
+let activePinchImg = null;
+
+document.addEventListener('touchstart', (e) => {
+  if (e.touches && e.touches.length === 2) {
+    const target = e.target.closest('.elastic-pinch-target');
+    if (target) {
+      activePinchImg = target;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchInitDist = Math.hypot(dx, dy);
+      activePinchImg.style.transition = 'none';
+      activePinchImg.style.willChange = 'transform';
+    }
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (activePinchImg && e.touches && e.touches.length === 2 && pinchInitDist > 0) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.hypot(dx, dy);
+    const scaleFactor = dist / pinchInitDist;
+    // مهار نرم بین ۱ تا ۲.۲ برابر برای جلوگیری از گیر کردن و برهم‌خوردگی کادر
+    pinchCurrentScale = Math.min(Math.max(scaleFactor, 1), 2.2);
+    activePinchImg.style.transform = `scale(${pinchCurrentScale})`;
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (activePinchImg && (!e.touches || e.touches.length < 2)) {
+    activePinchImg.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+    activePinchImg.style.transform = 'scale(1)';
+    activePinchImg = null;
+    pinchInitDist = 0;
+    pinchCurrentScale = 1;
+  }
+}, { passive: true });
