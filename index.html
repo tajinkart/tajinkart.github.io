@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+  <!-- محافظت فوق‌العاده سطح مرورگر در برابر مسدودسازی حافظه یا خطاهای دسترسی -->
+  <script>
+    (function() {
+      try {
+        var k = '__tajin_test__';
+        window.localStorage.setItem(k, k);
+        window.localStorage.removeItem(k);
+      } catch (e) {
+        var mem = {};
+        var fake = {
+          getItem: function(k) { return mem[k] || null; },
+          setItem: function(k, v) { mem[k] = String(v); },
+          removeItem: function(k) { delete mem[k]; },
+          clear: function() { mem = {}; }
+        };
+        try {
+          Object.defineProperty(window, 'localStorage', { value: fake, configurable: true });
+          Object.defineProperty(window, 'sessionStorage', { value: fake, configurable: true });
+        } catch (err) {
+          window.localStorage = fake;
+          window.sessionStorage = fake;
+        }
+      }
+    })();
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="max-image-preview:large, noai, noimageai" />
@@ -9,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.4">
+  <link rel="stylesheet" href="style.css?v=12.5.3">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -1834,8 +1860,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=12.0"></script>
-  <script src="app.js?v=12.0"></script>
+  <script src="data.js?v=12.5.3"></script>
+  <script src="app.js?v=12.5.3"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

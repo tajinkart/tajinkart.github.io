@@ -2819,7 +2819,7 @@ window.switchView = function(vKey) {
     openArtModal.classList.remove('active');
     openArtModal.style.display = 'none';
   }
-  currentView = vKey;
+  currentView = vKey; window.currentView = vKey;
   document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
   const target = document.getElementById(`view-${vKey}`);
   if (target) target.classList.remove('hidden');

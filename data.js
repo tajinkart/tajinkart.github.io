@@ -3,6 +3,31 @@
  * مدیر استودیو و طراح دنیا: سید سروش تاج
  */
 
+// حافظه پشتیبان موقت در صورت مسدود بودن یا پرایوت بودن حافظه مرورگر
+window._tajinMemoryStorage = window._tajinMemoryStorage || {};
+
+function safeGetStorage(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch (e) {
+    return (window._tajinMemoryStorage && window._tajinMemoryStorage[key]) || null;
+  }
+}
+
+function safeSetStorage(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    if (!window._tajinMemoryStorage) window._tajinMemoryStorage = {};
+    window._tajinMemoryStorage[key] = String(value);
+    return false;
+  }
+}
+window.safeGetStorage = safeGetStorage;
+window.safeSetStorage = safeSetStorage;
+
+
 const KEYS = {
   ORDERS: 'tajinkart_orders_fa_v2',
   SETTINGS: 'tajinkart_settings_fa_v2',
@@ -13,28 +38,37 @@ const KEYS = {
   DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2'
 };
 
-let currentView = 'showcase';
-let currentMember = null;
-let comicCurrentPage = 1;
-let activeModalItem = {};
-let currencyMode = 'USD'; // 'USD' or 'TOMAN'
-let activeCaseStudyArt = null;
-let activeCaseStudyPhaseIdx = 0;
+var currentView = 'showcase';
+var currentMember = null;
+var comicCurrentPage = 1;
+var activeModalItem = {};
+var currencyMode = 'USD'; // 'USD' or 'TOMAN'
+var activeCaseStudyArt = null;
+var activeCaseStudyPhaseIdx = 0;
 
-let currentSelectedPipeKey = 'sketch1';
-let currentSelectedStageIdx = 0;
-let currentSelectedArtIdx = 0;
-let currentSelectedProductIdx = 0;
-let selectedMemberIdx = 0;
-let currentMemberTierFilter = 'all';
+var currentSelectedPipeKey = 'sketch1';
+var currentSelectedStageIdx = 0;
+var currentSelectedArtIdx = 0;
+var currentSelectedProductIdx = 0;
+var selectedMemberIdx = 0;
+var currentMemberTierFilter = 'all';
 
-let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
+var siteSettings = {
   usdRate: 72000,
   tgToken: '',
   tgChat: '',
   adminPass: 'tajinkart',
   commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
 };
+try {
+  const _s = safeGetStorage(KEYS.SETTINGS);
+  if (_s) {
+    const _p = JSON.parse(_s);
+    if (_p && typeof _p === 'object') {
+      siteSettings = Object.assign(siteSettings, _p);
+    }
+  }
+} catch(e) {}
 window.siteSettings = siteSettings;
 
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
@@ -135,10 +169,10 @@ const DEFAULT_STUDIO_ARTWORKS = [
   }
 ];
 
-let currentGalleryFilter = 'all';
+var currentGalleryFilter = 'all';
 window.currentGalleryFilter = 'all';
 
-let storedArtworks = [];
+var storedArtworks = [];
 try {
   const rawArt = localStorage.getItem(KEYS.ARTWORKS);
   storedArtworks = rawArt ? JSON.parse(rawArt) : [];
@@ -146,14 +180,23 @@ try {
 } catch(e) {
   storedArtworks = [];
 }
-let showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
+var showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
 if (showcaseArtworks.length === 0) {
   showcaseArtworks = JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
 }
 window.showcaseArtworks = showcaseArtworks;
 
 // ۶ پایپلاین تخصصی آتلیه طبق سند مستر با زیرشاخه‌ها و مراحل شفاف
-let PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.PIPELINES)) || {
+var PIPELINE_DATA = {
+};
+try {
+  const _pData = safeGetStorage(KEYS.PIPELINES);
+  if (_pData) {
+    const _parsedP = JSON.parse(_pData);
+    if (_parsedP && typeof _parsedP === 'object') PIPELINE_DATA = _parsedP;
+  }
+} catch(e) {}
+if (Object.keys(PIPELINE_DATA).length === 0) PIPELINE_DATA = {
   sketch1: {
     id: 'sketch1',
     topSub: 'طراحی کاراکتر و شخصیت',
@@ -229,7 +272,9 @@ let PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.PIPELINES)) || {
 };
 
 // مخزن دارایی‌های دیجیتال مبتنی بر ۷ شاخه استاندارد سند مستر TAJINKART
-let digitalStoreProducts = JSON.parse(localStorage.getItem(KEYS.PRODUCTS)) || [
+var digitalStoreProducts = [];
+let _initialProds = [
+
   {
     id: 1,
     title: 'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ (Rook Knight)',
@@ -295,7 +340,17 @@ let digitalStoreProducts = JSON.parse(localStorage.getItem(KEYS.PRODUCTS)) || [
   }
 ];
 
-let academyCourses = [
+digitalStoreProducts = _initialProds;
+try {
+  const _sp = safeGetStorage(KEYS.PRODUCTS);
+  if (_sp) {
+    const _parsed = JSON.parse(_sp);
+    if (Array.isArray(_parsed) && _parsed.length > 0) digitalStoreProducts = _parsed;
+  }
+} catch(e) {}
+window.digitalStoreProducts = digitalStoreProducts;
+
+var academyCourses = [
   {
     id: 1,
     title: 'مسترکلاس: طراحی کاراکتر فانتزی و متریال زره',
@@ -322,7 +377,7 @@ let academyCourses = [
   }
 ];
 
-let ordersList = [];
+var ordersList = [];
 try {
   const _storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS));
   if (Array.isArray(_storedOrders)) {
@@ -335,14 +390,15 @@ try {
   localStorage.setItem(KEYS.ORDERS, JSON.stringify(ordersList));
 } catch(e) {}
 
-let comicPages = [
+var comicPages = [
   'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80'
 ];
 
-let siteMembersData = JSON.parse(localStorage.getItem(KEYS.MEMBERS)) || [
+var siteMembersData = [];
+let _defaultMembers = [
   {
     id: 101,
     name: 'سید سروش تاج',
