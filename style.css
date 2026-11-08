@@ -366,14 +366,14 @@
     }
     @media (max-width: 768px) { #artworkCurtain { padding: 16px 14px 40px; } }
 
-        /* چیدمان گالری صفحه اول با فرمول هوشمند خودکار ابعاد */
+        /* چیدمان گالری صفحه اول با ابعاد دلنشین و ارگونومیک دسکتاپ */
     #showcaseGrid {
-      column-count: 4;
-      column-gap: 8px;
+      column-count: 5;
+      column-gap: 10px;
       width: 100%;
-      max-width: 1440px;
+      max-width: 1540px;
       margin: 0 auto;
-      padding: 0 8px;
+      padding: 0 10px;
     }
     @media (max-width: 1350px) {
       #showcaseGrid { column-count: 4; column-gap: 8px; }
@@ -2161,23 +2161,28 @@ textarea:-webkit-autofill {
 }
 .artstation-img-card {
   width: 100%;
-  background: #04060a;
-  border-radius: 10px;
+  background: radial-gradient(circle at center, #070a14 0%, #030408 100%);
+  border-radius: 12px;
   overflow: visible !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85);
   position: relative !important;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .artstation-img-card img {
-  width: 100%;
+  max-width: 100%;
+  max-height: 72vh !important;
+  width: auto !important;
   height: auto !important;
-  max-height: none !important;
+  object-fit: contain;
   display: block;
   margin: 0 auto;
-  border-radius: 10px;
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease;
+  border-radius: 8px;
+  cursor: zoom-in;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
   touch-action: pan-y !important;
 }
 /* نشانگر شناور حلقه ذره‌بین اختصاصی در دسکتاپ */
@@ -3342,9 +3347,9 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
 .instagram-pinch-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(3, 4, 8, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(3, 4, 8, 0.45);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   z-index: 99990;
   opacity: 0;
   pointer-events: none;
