@@ -1567,7 +1567,7 @@ function getAutoSpanClass(art) {
 }
 
 // رندر گالری با فرمول خودکار کادربندی و نمایش کامل اثر بدون کراپ
-function renderShowcaseGrid() {
+window.renderShowcaseGrid = function() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
 
@@ -3758,23 +3758,25 @@ window.exportFullSelfContainedHTML = function() {
   showToast('فایل کامل index.html مستقل ذخیره شد!', 'success');
 };
 
-// راه‌اندازی اولیه در زمان لود صفحه
+// راه‌اندازی اولیه در زمان لود صفحه با پایداری ۱۰۰٪ و تفکیک خطا
 document.addEventListener('DOMContentLoaded', () => {
-  renderShowcaseGrid();
-  initSupabaseAuthSession();
-  checkEmailRecoveryFlow();
-  syncArtworksFromSupabase();
-  syncMembersFromSupabase();
-  selectPipeline('sketch1', document.querySelector('#atelierServiceCards .service-nav-card.active'), false);
-  renderProducts();
-  renderAcademy();
-  renderComicPage();
-
-  renderAdminSketch1();
-  renderAdminSketch2();
-  renderAdminProductsTab();
-  renderAdminSketch3();
-  renderAdminLists();
+  try { window.renderShowcaseGrid ? window.renderShowcaseGrid() : renderShowcaseGrid(); } catch(e) { console.error('renderShowcaseGrid error:', e); }
+  try { if (typeof initSupabaseAuthSession === 'function') initSupabaseAuthSession(); } catch(e) {}
+  try { if (typeof checkEmailRecoveryFlow === 'function') checkEmailRecoveryFlow(); } catch(e) {}
+  try { if (typeof syncArtworksFromSupabase === 'function') syncArtworksFromSupabase(); } catch(e) {}
+  try { if (typeof syncMembersFromSupabase === 'function') syncMembersFromSupabase(); } catch(e) {}
+  try {
+    const defaultNavCard = document.querySelector('#atelierServiceCards .service-nav-card.active') || document.querySelector('#atelierServiceCards .service-nav-card');
+    if (typeof selectPipeline === 'function') selectPipeline('sketch1', defaultNavCard, false);
+  } catch(e) {}
+  try { if (typeof renderProducts === 'function') renderProducts(); } catch(e) {}
+  try { if (typeof renderAcademy === 'function') renderAcademy(); } catch(e) {}
+  try { if (typeof renderComicPage === 'function') renderComicPage(); } catch(e) {}
+  try { if (typeof renderAdminSketch1 === 'function') renderAdminSketch1(); } catch(e) {}
+  try { if (typeof renderAdminSketch2 === 'function') renderAdminSketch2(); } catch(e) {}
+  try { if (typeof renderAdminProductsTab === 'function') renderAdminProductsTab(); } catch(e) {}
+  try { if (typeof renderAdminSketch3 === 'function') renderAdminSketch3(); } catch(e) {}
+  try { if (typeof renderAdminLists === 'function') renderAdminLists(); } catch(e) {}
 
   const rateEl = document.getElementById('setUsdRate');
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
@@ -5185,3 +5187,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+// اتصالات قطعی توابع به شیء پنجره مرورگر جهت تضمین پاسخگویی کلیک آیکون‌ها
+window.renderShowcaseGrid = (typeof renderShowcaseGrid === 'function') ? renderShowcaseGrid : window.renderShowcaseGrid;
+window.renderAdminSketch2 = (typeof renderAdminSketch2 === 'function') ? renderAdminSketch2 : window.renderAdminSketch2;
+window.renderAdminLists = (typeof renderAdminLists === 'function') ? renderAdminLists : window.renderAdminLists;

@@ -38,13 +38,19 @@ let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
 
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
 // بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
+let currentGalleryFilter = 'all';
+window.currentGalleryFilter = 'all';
+
 let storedArtworks = [];
 try {
-  storedArtworks = JSON.parse(localStorage.getItem(KEYS.ARTWORKS)) || [];
+  const rawArt = localStorage.getItem(KEYS.ARTWORKS);
+  storedArtworks = rawArt ? JSON.parse(rawArt) : [];
+  if (!Array.isArray(storedArtworks)) storedArtworks = [];
 } catch(e) {
   storedArtworks = [];
 }
-let showcaseArtworks = storedArtworks.filter(a => Number(a.id) > 8);
+let showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
+window.showcaseArtworks = showcaseArtworks;
 
 // ۶ پایپلاین تخصصی آتلیه طبق سند مستر با زیرشاخه‌ها و مراحل شفاف
 let PIPELINE_DATA = JSON.parse(localStorage.getItem(KEYS.PIPELINES)) || {
