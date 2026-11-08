@@ -3487,7 +3487,7 @@ const CREATOR_MASTER_RECORD = {
 };
 
 let isCreatorSelected = false;
-let selectedMemberIdx = 0;
+selectedMemberIdx = 0;
 
 function renderAdminSketch3(filterText = '', tierFilter = currentMemberTierFilter) {
   const listEl = document.getElementById('adminMembersListContainer');
