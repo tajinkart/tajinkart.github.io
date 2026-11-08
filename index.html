@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8.4">
+  <link rel="stylesheet" href="style.css?v=8.5">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-view="showcase">
@@ -1339,6 +1339,60 @@
     </div>
   </div>
 
+    <!-- کشوی اختصاصی تشریح مشخصات و استاندارد فاز پروژه (Phase Scope Drawer) -->
+  <div id="phaseScopeDrawerOverlay" class="phase-scope-drawer-overlay" onclick="closePhaseScopeDrawer(event)">
+    <div class="phase-scope-drawer" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">📐</span>
+          <h3 id="drawerPhaseTitle" style="font-size:16px; font-weight:900; color:var(--gold); margin:0;">مشخصات فاز تخصصی</h3>
+        </div>
+        <button type="button" onclick="closePhaseScopeDrawer()" style="font-size:18px; color:var(--text-muted); cursor:pointer; background:none; border:none; padding:4px 8px;">✕</button>
+      </div>
+
+      <div style="background:#090d16; border:1px solid var(--border-subtle); border-radius:12px; padding:14px;">
+        <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین والد:</span>
+        <div id="drawerPhasePipeline" style="font-size:13px; font-weight:800; color:var(--cyan-electric);">طراحی کاراکتر و شخصیت</div>
+      </div>
+
+      <div>
+        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">🎯 هدف و کاربرد صنعتی این مرحله:</h4>
+        <p id="drawerPhasePurpose" style="font-size:12px; color:#cbd5e1; line-height:1.8; text-align:justify; background:#070a12; border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
+          این فاز جهت تولید زوایای سه‌بعدی ارتوگرافیک برای مدلسازان سه‌بعدی یا انیماتورها پیاده‌سازی شده و از اشتباهات مقیاسی در پروداکشن بازی جلوگیری می‌نماید.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">📦 فرمت و استانداردهای تحویلی:</h4>
+        <div id="drawerPhaseDeliverables" style="display:flex; flex-direction:column; gap:6px; font-size:11.5px; color:var(--text-muted);">
+          <div style="padding:8px 10px; background:#070a12; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
+            <span>سورس لایه‌باز تفکیک‌شده (PSD)</span>
+            <span style="color:var(--emerald); font-weight:700;">✓ ۳۰۰ DPI</span>
+          </div>
+          <div style="padding:8px 10px; background:#070a12; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
+            <span>خطوط تراز و گاید ارتوگرافیک</span>
+            <span style="color:var(--emerald); font-weight:700;">✓ تفکیک نماها</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px; margin-top:auto;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <span style="font-size:14px;">💡</span>
+          <strong style="font-size:12px; color:var(--gold);">شرایط سفارش در آتلیه:</strong>
+        </div>
+        <p style="font-size:11px; color:#cbd5e1; line-height:1.7; margin:0 0 12px;">
+          این مرحله به عنوان یک ماژول تخصصی مجزا یا در قالب پکیج جامع پروداکشن در پایپلاین آتلیه قابل سفارش و قیمت‌گذاری است.
+        </p>
+        <button type="button" id="drawerActionBtn" onclick="goToPipelineFromDrawer()" class="btn-gold" style="width:100%; padding:11px; font-size:12px; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span>محاسبه هزینه و سفارش این فاز</span>
+          <span>←</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- توست نوتیفیکیشن -->
   
   <!-- پنجره اختصاصی قوانین و شرایط خدمات استودیو (Terms & Legal Modal) -->
@@ -1442,8 +1496,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=8.4"></script>
-  <script src="app.js?v=8.4" defer></script>
+  <script src="data.js?v=8.5"></script>
+  <script src="app.js?v=8.5" defer></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

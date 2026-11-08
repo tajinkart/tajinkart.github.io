@@ -1513,15 +1513,21 @@ function renderArtStationProject(art) {
     `;
   }
 
-  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها زیر تصویر اصلی به صورت اسکرولی عمودی
+  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها همراه با کپسول‌های شناور مشخصات فاز
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
+        const phaseName = p.name || `شیت پروژه • فاز ${pIdx + 1}`;
         streamHtml += `
           <div class="artstation-img-card">
-            <img src="${pSrc}" alt="${p.name || art.title}" loading="lazy" onclick="toggleImageZoom(this)" title="برای زوم کلیک کنید" />
-            <div class="img-caption">${p.name || `شیت پروژه • بخش ${pIdx + 1}`}</div>
+            <div class="phase-context-pill" onclick="openPhaseScopeDrawer('${escapeQuotes(phaseName)}', '${art.pipelineKey || 'sketch1'}')" title="مشاهده استانداردهای تولید و مشخصات این فاز">
+              <span class="pill-dot"></span>
+              <span>فاز تخصصی: ${phaseName}</span>
+              <span style="color:var(--gold); font-size:12px;">ℹ️</span>
+            </div>
+            <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this)" title="برای زوم کلیک کنید" />
+            <div class="img-caption">${phaseName}</div>
           </div>
         `;
       }
@@ -4164,3 +4170,63 @@ document.addEventListener('touchend', () => {
     document.querySelectorAll('.mosaic-tile.touch-active').forEach(t => t.classList.remove('touch-active'));
   }, 350);
 }, { passive: true });
+
+// =========================================================
+// کشوی شیک و پرستیژدار تشریح فازهای تخصصی (Phase Scope Drawer)
+// =========================================================
+let currentDrawerPipelineKey = 'sketch1';
+
+function escapeQuotes(str) {
+  if (!str) return '';
+  return str.replace(/'/g, "\'");
+}
+
+window.openPhaseScopeDrawer = function(phaseTitle, pipeKey) {
+  currentDrawerPipelineKey = pipeKey || 'sketch1';
+  const overlay = document.getElementById('phaseScopeDrawerOverlay');
+  if (!overlay) return;
+
+  const titleEl = document.getElementById('drawerPhaseTitle');
+  if (titleEl) titleEl.textContent = phaseTitle || 'فاز تخصصی پروداکشن';
+
+  const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[currentDrawerPipelineKey]) ? 
+                   PIPELINE_DATA[currentDrawerPipelineKey] : { topSub: 'طراحی کاراکتر و کانسپت' };
+  
+  const pipeEl = document.getElementById('drawerPhasePipeline');
+  if (pipeEl) pipeEl.textContent = pipeData.topSub;
+
+  const purposeEl = document.getElementById('drawerPhasePurpose');
+  if (purposeEl) {
+    if (phaseTitle.includes('سه‌نما') || phaseTitle.includes('ارتوگرافیک') || phaseTitle.includes('Turnaround')) {
+      purposeEl.textContent = 'این شیت برای تثبیت زوایای تراز ارتوگرافیک (روبرو، نیم‌رخ و پشت) طراحی شده است و به عنوان نقشه فنی اصلی در اختیار تیم مدلسازی سه‌بعدی و انیمیشن قرار می‌گیرد.';
+    } else if (phaseTitle.includes('اکسپرشن') || phaseTitle.includes('چهره') || phaseTitle.includes('حالات')) {
+      purposeEl.textContent = 'این فاز به بررسی حالات روحی، احساسات دینامیک و میمیک چهره کاراکتر در شرایط نبرد، خشم، تمرکز و دیالوگ اختصاص دارد تا روح روایی اثر حفظ گردد.';
+    } else if (phaseTitle.includes('اتود') || phaseTitle.includes('سیلوئت') || phaseTitle.includes('اسکچ')) {
+      purposeEl.textContent = 'کشف فرم اولیه، تناسبات هندسی و هویت سیلوئت کلی اثر در فاز کانسپت پایه؛ این مرحله پایه تصمیم‌گیری‌های پروداکشن و تعیین مسیر نهایی طراحی است.';
+    } else if (phaseTitle.includes('رندر') || phaseTitle.includes('مستر') || phaseTitle.includes('نور')) {
+      purposeEl.textContent = 'تفکیک متریال‌ها، نورپردازی مقداری، پردازش بافت‌های پوستی/فلزی و خروجی باکیفیت پولیش نهایی با قابلیت چاپ و استفاده مستقیم در پروموشن تجاری.';
+    } else {
+      purposeEl.textContent = 'این ماژول به عنوان بخش مکمل فرآیند توسعه بصری استودیو پیاده‌سازی شده و استانداردهای صنعتی تحویل دارایی را تضمین می‌نماید.';
+    }
+  }
+
+  overlay.classList.add('active');
+};
+
+window.closePhaseScopeDrawer = function(e) {
+  if (e && e.target && e.target.id !== 'phaseScopeDrawerOverlay' && !e.target.closest('button')) return;
+  const overlay = document.getElementById('phaseScopeDrawerOverlay');
+  if (overlay) overlay.classList.remove('active');
+};
+
+window.goToPipelineFromDrawer = function() {
+  const overlay = document.getElementById('phaseScopeDrawerOverlay');
+  if (overlay) overlay.classList.remove('active');
+
+  const artModal = document.getElementById('artDetailModal');
+  if (artModal) closeArtModalDirect();
+
+  switchView('store');
+  selectPipeline(currentDrawerPipelineKey);
+  showToast('به پایپلاین سفارش آتلیه منتقل شدید. فرمول محاسبه هزینه فعال است.', 'info', 4000);
+};
