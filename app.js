@@ -763,90 +763,90 @@ function renderAdminArtModalForm(art, isNew) {
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:14px;">
       
-      <!-- ۱. تصویر کاور اصلی گالری -->
-      <div style="background:#04060a; border:1px solid var(--border-subtle); border-radius:14px; padding:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="font-size:12px; font-weight:800; color:var(--gold);">🖼️ تصویر کاور اصلی (نمایش در گالری):</span>
+      <!-- گام ۱: شناسنامه، کاور اصلی و توضیحات کل پروژه -->
+      <div style="background:#04060a; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+          <span style="font-size:13px; font-weight:900; color:var(--gold);">📌 گام ۱: مشخصات کلی، کاور و داستان اثر</span>
           <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">
             ${art.image ? 'کاور فعال' : 'هنوز عکسی انتخاب نشده'}
           </span>
         </div>
-        <div style="max-height:200px; min-height:110px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:10px;">
-          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:200px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش" />
+
+        <div style="max-height:220px; min-height:120px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative;">
+          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:220px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش کاور" />
           <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:16px;">
             <span>📷</span>
             <span>تصویر کاور را از حافظه سیستم انتخاب کنید یا لینک وب بگذارید.</span>
           </div>
         </div>
-        <div style="display:flex; gap:8px; margin-bottom:8px;">
+
+        <div style="display:flex; gap:8px;">
           <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px;">
             📁 انتخاب عکس کاور از کامپیوتر یا گوشی
           </button>
           <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
         </div>
         <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="یا درج لینک وب کاور: https://..." class="font-mono" style="font-size:11.5px;" />
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان کامل اثر</label>
+            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
+            <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">دسته‌بندی در گالری</label>
+            <select id="editArtCategorySelect" onchange="syncAdminPipeFromCategory(this)">
+              ${galleryCategories.map(c => `
+                <option value="${c.id}" ${(art.tag === c.id || art.category === c.id) ? 'selected' : ''}>${c.title}</option>
+              `).join('')}
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین آتلیه</label>
+            <select id="editArtPipeSelect" onchange="syncAdminCategoryFromPipe(this)">
+              <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
+              <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
+              <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
+              <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
+              <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
+              <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک و استوری‌بورد</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">جهان روایی (Lore)</label>
+            <input type="text" id="editArtLoreInput" value="${art.lore || 'جهان اکستوپیا'}" placeholder="جهان اکستوپیا / جنسیس" />
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
+          <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
+        </div>
       </div>
 
-      <!-- ۲. بخش تصاویر پروژه (استایل آرت‌استیشن - اسکرول چندتصویره) -->
-      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+      <!-- گام ۲: سایر شیت‌ها و واریاسیون‌های پروژه (ArtStation Multi-Image) -->
+      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
           <div>
-            <span style="font-size:12px; font-weight:800; color:var(--cyan-electric);">📑 سایر تصاویر پروژه (اسکرول به سبک ArtStation):</span>
+            <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: سایر شیت‌ها و فازهای پروژه (اسکرول عمودی ArtStation):</span>
             <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">اتودها، شیت‌های سه‌نما، کلوزآپ‌ها یا جزییاتی که زیر کاور اصلی باز می‌شوند.</p>
           </div>
-          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-secondary" style="font-size:11px; padding:6px 12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
             + افزودن تصویر به پروژه
           </button>
           <input type="file" id="adminAddPhaseFileInput" accept="image/*" style="display:none;" onchange="handleAdminAddPhaseUpload(this)" />
         </div>
 
-        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:8px;">
+        <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:10px;">
           ${renderStagingPhasesHtml()}
         </div>
-      </div>
-
-      <!-- ۳. فیلدهای عنوان و دسته‌بندی -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان اثر</label>
-          <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
-          <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
-        </div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">دسته‌بندی در گالری</label>
-          <select id="editArtCategorySelect" onchange="syncAdminPipeFromCategory(this)">
-            ${galleryCategories.map(c => `
-              <option value="${c.id}" ${(art.tag === c.id || art.category === c.id) ? 'selected' : ''}>${c.title}</option>
-            `).join('')}
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین آتلیه</label>
-          <select id="editArtPipeSelect" onchange="syncAdminCategoryFromPipe(this)">
-            <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
-            <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
-            <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
-            <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
-            <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
-            <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک و استوری‌بورد</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">جهان روایی (Lore)</label>
-          <input type="text" id="editArtLoreInput" value="${art.lore || 'جهان اکستوپیا'}" placeholder="جهان اکستوپیا / جنسیس" />
-        </div>
-      </div>
-
-      <!-- ۴. متن غنی توضیحات داستانی و لور کاراکتر (جایگزین فیلدهای اضافه فنی) -->
-      <div>
-        <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">📖 داستان، لور و یادداشت طراح (Lore & Concept Story):</label>
-        <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
       </div>
 
       <!-- دکمه‌های عملیاتی -->
@@ -1552,6 +1552,25 @@ function renderArtStationProject(art) {
   const mainPipeName = pipeData.topSub;
   const artLore = art.lore || 'جهان اکستوپیا';
 
+  // کارت معرفی کلی پروژه در بالای استریم موبایل
+  streamHtml += `
+    <div class="mobile-project-overview-header">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <span class="font-mono" style="font-size:10.5px; color:var(--gold); font-weight:800;">/ کانسپت آرت و طراحی اختصاصی /</span>
+        <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${mainPipeName}</span>
+      </div>
+      <h2 style="font-size:18px; font-weight:900; color:#fff; margin:4px 0 8px;">${mainTitle}</h2>
+      <p style="font-size:12px; color:#cbd5e1; line-height:1.8; margin:0 0 10px; text-align:justify;">${mainDesc}</p>
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+        <span><strong style="color:#fff;">جهان روایی:</strong> <span style="color:var(--cyan-electric); font-weight:700;">${artLore}</span></span>
+        <span style="font-size:10.5px; color:var(--gold);">💡 ضربه روی عکس: مشخصات هر فاز</span>
+      </div>
+      <button type="button" onclick="goToPipelineFromDrawer('${mainPipe}')" class="btn-gold" style="width:100%; padding:11px; font-size:12px; font-weight:800;">
+        سفارش این پروژه در آتلیه ←
+      </button>
+    </div>
+  `;
+
   if (mainSrc) {
     streamHtml += `
       <div class="artstation-img-card project-stream-item" 
@@ -1560,21 +1579,10 @@ function renderArtStationProject(art) {
            data-desc="${escapeQuotes(mainDesc)}"
            data-pipe="${mainPipe}"
            data-sub="">
-        <img src="${mainSrc}" alt="${mainTitle}" loading="eager" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" />
-        
-        <!-- کپشن مستقل زیر فریم اصلی در موبایل -->
-        <div class="mobile-phase-card-caption">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-            <span style="font-size:13px; font-weight:800; color:var(--gold);">${mainTitle}</span>
-            <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${mainPipeName}</span>
-          </div>
-          <p style="margin:4px 0 0; font-size:12px; color:#cbd5e1; line-height:1.75; text-align:justify;">${mainDesc}</p>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
-            <strong style="color:#fff;">جهان روایی:</strong> <span style="color:var(--cyan-electric);">${artLore}</span>
-          </div>
-          <button type="button" onclick="goToPipelineFromDrawer('${mainPipe}')" class="btn-gold" style="width:100%; padding:10px 14px; font-size:11.5px; margin-top:6px;">
-            سفارش اثر در این پایپلاین ←
-          </button>
+        <img src="${mainSrc}" alt="${mainTitle}" loading="eager" class="elastic-pinch-target" onclick="handleImageClick(this, '${escapeQuotes(mainTitle)}', '${mainPipe}', '${escapeQuotes(mainDesc)}', '', event)" />
+        <div class="mobile-minimal-sheet-bar" onclick="openPhaseScopeDrawer('${escapeQuotes(mainTitle)}', '${mainPipe}', '${escapeQuotes(mainDesc)}', '')">
+          <span style="color:var(--gold); font-weight:800;">۰۱ • اثر اصلی و کانسپت نهایی</span>
+          <span style="color:var(--cyan-electric); font-size:11px;">مشاهده مشخصات فاز ↗</span>
         </div>
       </div>
     `;
@@ -1588,10 +1596,12 @@ function renderArtStationProject(art) {
   }
 
   // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها
+  let totalPhaseCount = 1;
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
+        totalPhaseCount++;
         const phaseName = p.name || `شیت پروژه • فاز ${pIdx + 1}`;
         const phaseDesc = p.desc || p.description || p.note || `فاز مکمل پروداکشن: بررسی فرم‌ها، آناتومی و جزئیات طراحی مربوط به این بخش.`;
         const phasePipe = p.pipelineKey || art.pipelineKey || 'sketch1';
@@ -1601,25 +1611,14 @@ function renderArtStationProject(art) {
         streamHtml += `
           <div class="artstation-img-card project-stream-item" 
                data-title="${escapeQuotes(phaseName)}" 
-               data-phase="/ ۰${pIdx + 2} • ${escapeQuotes(phaseName)} /" 
+               data-phase="/ ۰${totalPhaseCount} • ${escapeQuotes(phaseName)} /" 
                data-desc="${escapeQuotes(phaseDesc)}"
                data-pipe="${phasePipe}"
                data-sub="${escapeQuotes(phaseSub)}">
-            <img src="${pSrc}" alt="${phaseName}" loading="lazy" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" />
-            
-            <!-- کپشن مستقل زیر هر فریم در موبایل -->
-            <div class="mobile-phase-card-caption">
-              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                <span style="font-size:13px; font-weight:800; color:var(--gold);">${phaseName}</span>
-                <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${pipeName}${phaseSub ? ` • ${phaseSub}` : ''}</span>
-              </div>
-              <p style="margin:4px 0 0; font-size:12px; color:#cbd5e1; line-height:1.75; text-align:justify;">${phaseDesc}</p>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
-                <strong style="color:#fff;">جهان روایی:</strong> <span style="color:var(--cyan-electric);">${artLore}</span>
-              </div>
-              <button type="button" onclick="goToPipelineFromDrawer('${phasePipe}')" class="btn-gold" style="width:100%; padding:10px 14px; font-size:11.5px; margin-top:6px;">
-                سفارش این فاز در آتلیه ←
-              </button>
+            <img src="${pSrc}" alt="${phaseName}" loading="lazy" class="elastic-pinch-target" onclick="handleImageClick(this, '${escapeQuotes(phaseName)}', '${phasePipe}', '${escapeQuotes(phaseDesc)}', '${escapeQuotes(phaseSub)}', event)" />
+            <div class="mobile-minimal-sheet-bar" onclick="openPhaseScopeDrawer('${escapeQuotes(phaseName)}', '${phasePipe}', '${escapeQuotes(phaseDesc)}', '${escapeQuotes(phaseSub)}')">
+              <span style="color:var(--gold); font-weight:800;">۰${totalPhaseCount} • ${phaseName}</span>
+              <span style="color:var(--cyan-electric); font-size:11px;">مشاهده مشخصات فاز ↗</span>
             </div>
           </div>
         `;
@@ -1629,24 +1628,43 @@ function renderArtStationProject(art) {
 
   stream.innerHTML = streamHtml;
 
+  // مقداردهی رهگیر نوری عمودی در سایدبار دسکتاپ
+  const trackerEl = document.getElementById('sidebarOpticalTracker');
+  if (trackerEl) {
+    let dotsHtml = '';
+    for (let i = 0; i < totalPhaseCount; i++) {
+      dotsHtml += `<span class="tracker-dot ${i === 0 ? 'active' : ''}" data-idx="${i}" onclick="scrollStreamToItem(${i})" title="فاز ${i+1}"></span>`;
+    }
+    trackerEl.innerHTML = dotsHtml;
+  }
+
   // راه‌اندازی رصد اسکرول هوشمند (ScrollSpy) جهت تغییر آنی سایدبار
   setTimeout(initProjectStreamScrollSpy, 150);
 }
 
-// موتور ردیابی زنده اسکرول برای تغییر هماهنگ سایدبار بر اساس عکس در حال مشاهده
+// موتور ردیابی زنده اسکرول برای تغییر هماهنگ سایدبار بر اساس عکس در حال مشاهده با رهگیر نوری و ترنزیشن جهت‌دار
+let lastScrollPosition = 0;
+
 function initProjectStreamScrollSpy() {
   const modal = document.getElementById('artDetailModal');
   const items = document.querySelectorAll('.project-stream-item');
   if (!modal || items.length === 0) return;
 
+  lastScrollPosition = modal.scrollTop;
+
   function onScroll() {
+    const isScrollingDown = modal.scrollTop >= lastScrollPosition;
+    lastScrollPosition = modal.scrollTop;
+
     let currentItem = items[0];
+    let activeIndex = 0;
     const triggerLine = window.innerHeight * 0.45;
 
-    items.forEach(item => {
+    items.forEach((item, idx) => {
       const rect = item.getBoundingClientRect();
       if (rect.top <= triggerLine) {
         currentItem = item;
+        activeIndex = idx;
       }
     });
 
@@ -1658,6 +1676,13 @@ function initProjectStreamScrollSpy() {
     const titleEl = document.getElementById('artDetailTitle');
     const descEl = document.getElementById('artDetailDesc');
 
+    // به‌روزرسانی نقاط رهگیر نوری سایدبار
+    const dots = document.querySelectorAll('.sidebar-optical-tracker .tracker-dot');
+    dots.forEach((dot, dIdx) => {
+      if (dIdx === activeIndex) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
+
     if (titleEl && title && titleEl.textContent !== title) {
       titleEl.textContent = title;
       if (phaseEl && phase) phaseEl.textContent = phase;
@@ -1665,9 +1690,11 @@ function initProjectStreamScrollSpy() {
 
       const sidebarEl = document.getElementById('artStationSidebar');
       if (sidebarEl) {
-        sidebarEl.classList.remove('sidebar-pop-active');
-        void sidebarEl.offsetWidth; // Trigger reflow for smooth pop-in animation
-        sidebarEl.classList.add('sidebar-pop-active');
+        sidebarEl.classList.remove('sidebar-slide-down', 'sidebar-slide-up', 'sidebar-gold-pulse');
+        void sidebarEl.offsetWidth; // ری‌فلو جهت اجرای انیمیشن نرم جهت‌دار
+        sidebarEl.classList.add(isScrollingDown ? 'sidebar-slide-down' : 'sidebar-slide-up');
+        sidebarEl.classList.add('sidebar-gold-pulse');
+        setTimeout(() => sidebarEl.classList.remove('sidebar-gold-pulse'), 400);
       }
 
       const itemPipe = currentItem.getAttribute('data-pipe');
@@ -1687,6 +1714,13 @@ function initProjectStreamScrollSpy() {
   modal._scrollSpyHandler = onScroll;
   modal.addEventListener('scroll', onScroll, { passive: true });
 }
+
+window.scrollStreamToItem = function(index) {
+  const items = document.querySelectorAll('.project-stream-item');
+  if (items[index]) {
+    items[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
 
 window.toggleImageZoom = function(imgEl, e) {
   if (!imgEl) return;
@@ -4355,7 +4389,68 @@ function escapeQuotes(str) {
   return str.replace(/'/g, "\'");
 }
 
-window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '') {
+// =========================================================
+// تفکیک تعامل تصویر: تپ برای شیت مشخصات در موبایل، ذره‌بین متمرکز در دسکتاپ
+// =========================================================
+window.handleImageClick = function(imgEl, phaseTitle, pipeKey, phaseDesc, phaseSub, e) {
+  if (window.innerWidth <= 992) {
+    // در موبایل: باز شدن کشوی مشخصات فنی فاز به سبک Bottom Sheet
+    openPhaseScopeDrawer(phaseTitle, pipeKey, phaseDesc, phaseSub);
+  } else {
+    // در دسکتاپ: باز شدن ذره‌بین متمرکز وسط صفحه با امکان هدایت آزادانه لنز
+    openCenteredMagnifier(imgEl.src, phaseTitle);
+  }
+};
+
+window.openCenteredMagnifier = function(imgSrc, phaseTitle) {
+  const overlay = document.getElementById('centeredFocusMagnifierOverlay');
+  const imgEl = document.getElementById('magnifierActiveImg');
+  const titleEl = document.getElementById('magnifierPhaseTitle');
+  const viewport = document.getElementById('magnifierViewport');
+  if (!overlay || !imgEl || !viewport) return;
+
+  imgEl.src = imgSrc;
+  if (titleEl) titleEl.textContent = phaseTitle || 'بررسی جزئیات کانسپت';
+  overlay.classList.add('active');
+
+  // هدایت فوق‌روان ۶۰ فریم بر ثانیه لنز با حرکت موس
+  viewport.onmousemove = function(e) {
+    const rect = viewport.getBoundingClientRect();
+    const xPct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const yPct = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    imgEl.style.transformOrigin = `${xPct}% ${yPct}%`;
+    imgEl.style.transform = 'scale(2.2)';
+  };
+
+  viewport.onmouseleave = function() {
+    imgEl.style.transform = 'scale(1)';
+    imgEl.style.transformOrigin = 'center center';
+  };
+};
+
+window.closeCenteredMagnifier = function(e) {
+  if (e && e.target && e.target.tagName === 'IMG') return; // کلیک روی عکس خروج نمی‌زند
+  const overlay = document.getElementById('centeredFocusMagnifierOverlay');
+  const imgEl = document.getElementById('magnifierActiveImg');
+  const viewport = document.getElementById('magnifierViewport');
+  if (viewport) {
+    viewport.onmousemove = null;
+    viewport.onmouseleave = null;
+  }
+  if (imgEl) {
+    imgEl.style.transform = '';
+    imgEl.style.transformOrigin = 'center center';
+  }
+  if (overlay) overlay.classList.remove('active');
+};
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeCenteredMagnifier();
+  }
+});
+
+window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '', customSub = '') {
   currentDrawerPipelineKey = pipeKey || 'sketch1';
   const overlay = document.getElementById('phaseScopeDrawerOverlay');
   if (!overlay) return;
@@ -4367,7 +4462,9 @@ window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '') {
                    PIPELINE_DATA[currentDrawerPipelineKey] : { topSub: 'طراحی کاراکتر و کانسپت' };
   
   const pipeEl = document.getElementById('drawerPhasePipeline');
-  if (pipeEl) pipeEl.textContent = pipeData.topSub;
+  if (pipeEl) {
+    pipeEl.textContent = pipeData.topSub + (customSub ? ` • ${customSub}` : '');
+  }
 
   const purposeEl = document.getElementById('drawerPhasePurpose');
   if (purposeEl) {

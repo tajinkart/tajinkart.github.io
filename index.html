@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8.9">
+  <link rel="stylesheet" href="style.css?v=9.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-view="showcase">
@@ -917,6 +917,7 @@
 
       <!-- ستون کناری چسبان: تغییر هوشمند توضیحات و فازها همگام با اسکرول تصاویر -->
       <aside class="artstation-sidebar" id="artStationSidebar">
+        <div class="sidebar-optical-tracker" id="sidebarOpticalTracker" title="رهگیر موقعیت فاز پروژه"></div>
         <div>
           <span id="artDetailPhaseIndicator" class="sidebar-phase-badge font-mono">/ CONCEPT PROJECT /</span>
           <h2 id="artDetailTitle" style="font-size:20px; font-weight:900; color:#fff; line-height:1.35; margin-bottom:10px;"></h2>
@@ -934,6 +935,20 @@
           سفارش اثر مشابه در این پایپلاین ←
         </button>
       </aside>
+    </div>
+  </div>
+
+  <!-- ذره‌بین متمرکز مرکز صفحه برای بازرسی عمیق جزئیات اثر در دسکتاپ (Centered Focus Magnifier) -->
+  <div id="centeredFocusMagnifierOverlay" class="centered-focus-magnifier-overlay" onclick="closeCenteredMagnifier(event)">
+    <div class="magnifier-header-bar" onclick="event.stopPropagation()">
+      <span id="magnifierPhaseTitle" class="magnifier-title font-mono">بررسی جزئیات کانسپت</span>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="magnifier-hint">🔍 حرکت موس برای هدایت لنز • کلیک یا Esc برای بازگشت</span>
+        <button type="button" onclick="closeCenteredMagnifier()" class="magnifier-close-btn" title="بستن (Esc)">✕</button>
+      </div>
+    </div>
+    <div class="magnifier-viewport" id="magnifierViewport" onclick="closeCenteredMagnifier()">
+      <img id="magnifierActiveImg" src="" alt="بزرگ‌نمایی اثر" />
     </div>
   </div>
 
@@ -1498,8 +1513,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=8.9"></script>
-  <script src="app.js?v=8.9" defer></script>
+  <script src="data.js?v=9.0"></script>
+  <script src="app.js?v=9.0" defer></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
