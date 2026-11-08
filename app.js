@@ -880,17 +880,59 @@ function renderStagingPhasesHtml() {
     return `<div style="font-size:11px; color:var(--text-muted); padding:8px; text-align:center;">هنوز تصویر تکمیلی برای این پروژه اضافه نشده است (اختیاری).</div>`;
   }
 
-  return stagingProjectPhases.map((p, idx) => `
-    <div style="display:flex; flex-direction:column; gap:6px; background:#04060a; border:1px solid var(--border-subtle); border-radius:10px; padding:10px;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <img src="${p.img || p.image}" style="width:44px; height:44px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.12);" alt="تصویر" />
-        <input type="text" value="${p.name || ''}" placeholder="عنوان فاز (مثال: مدل‌شیت سه‌نما / اکسپرشن)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="flex:1; font-size:11.5px; padding:6px 10px; margin:0;" />
-        <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
+  const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
+
+  return stagingProjectPhases.map((p, idx) => {
+    const pipeKey = p.pipelineKey || 'sketch1';
+    const subcats = (pipelines[pipeKey] && pipelines[pipeKey].subcategories) ? pipelines[pipeKey].subcategories : ['طراحی و اجرای استاندارد'];
+    const currentSub = p.subcategory || subcats[0] || '';
+
+    return `
+      <div style="display:flex; flex-direction:column; gap:8px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:12px; padding:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="${p.img || p.image}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.15);" alt="تصویر فاز" />
+          <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+            <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این فاز (مثال: مدل‌شیت سه‌نما / طراحی مسکات)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:6px 10px; margin:0;" />
+          </div>
+          <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:20px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
+        </div>
+
+        <!-- انتخاب مستقل پایپلاین و زیرشاخه اختصاصی برای این فریم مشخص -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div>
+            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">پایپلاین اختصاصی این عکس:</label>
+            <select onchange="handlePhasePipelineChange(${idx}, this.value)" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
+              <option value="sketch1" ${pipeKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
+              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
+              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
+              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
+              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
+              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>کمیک و استوری‌بورد</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">زیرشاخه اختصاصی سفارش:</label>
+            <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
+              ${subcats.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <textarea rows="2" placeholder="توضیحات تخصصی این فاز (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
       </div>
-      <textarea rows="2" placeholder="توضیحات تخصصی این فاز (چرا این فاز مجزاست و چه استانداردهایی دارد)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
+
+window.handlePhasePipelineChange = function(idx, newPipe) {
+  if (!stagingProjectPhases || !stagingProjectPhases[idx]) return;
+  stagingProjectPhases[idx].pipelineKey = newPipe;
+  const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
+  const subcats = (pipelines[newPipe] && pipelines[newPipe].subcategories) ? pipelines[newPipe].subcategories : ['طراحی و اجرای استاندارد'];
+  stagingProjectPhases[idx].subcategory = subcats[0] || '';
+  const container = document.getElementById('adminProjectPhasesList');
+  if (container) container.innerHTML = renderStagingPhasesHtml();
+};
 
 window.removeStagingPhase = function(idx) {
   stagingProjectPhases.splice(idx, 1);
@@ -1024,6 +1066,8 @@ window.confirmSaveArtwork = function() {
           assembledPhases.push({
             name: p.name || 'تصویر تکمیلی پروژه',
             desc: p.desc || p.description || '',
+            pipelineKey: p.pipelineKey || pipe,
+            subcategory: p.subcategory || '',
             img: pSrc,
             image: pSrc
           });
@@ -1520,21 +1564,36 @@ function renderArtStationProject(art) {
     `;
   }
 
-  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها همراه با ویژگی‌های ردیابی اسکرول زنده
+  // تصاویر پروژه، اتودها، شیت‌ها و واریاسیون‌ها همراه با ویژگی‌های ردیابی اسکرول زنده و کپشن موبایل
   if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
         const phaseName = p.name || `شیت پروژه • فاز ${pIdx + 1}`;
         const phaseDesc = p.desc || p.description || p.note || `فاز مکمل پروداکشن: بررسی فرم‌ها، آناتومی و جزئیات طراحی مربوط به این بخش.`;
+        const phasePipe = p.pipelineKey || art.pipelineKey || 'sketch1';
+        const phaseSub = p.subcategory || '';
+        const pipeName = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[phasePipe]) ? PIPELINE_DATA[phasePipe].topSub : 'آتلیه طراحی';
+
         streamHtml += `
           <div class="artstation-img-card project-stream-item" 
                data-title="${escapeQuotes(phaseName)}" 
                data-phase="/ ۰${pIdx + 2} • ${escapeQuotes(phaseName)} /" 
-               data-desc="${escapeQuotes(phaseDesc)}">
-            <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" />
-            <div class="img-caption">
-              <strong>${phaseName}</strong>
+               data-desc="${escapeQuotes(phaseDesc)}"
+               data-pipe="${phasePipe}"
+               data-sub="${escapeQuotes(phaseSub)}">
+            <img src="${pSrc}" alt="${phaseName}" loading="lazy" onclick="toggleImageZoom(this, event)" title="برای زوم کلیک کنید" class="elastic-pinch-target" />
+            
+            <!-- کپشن مستقل زیر هر فریم در موبایل -->
+            <div class="mobile-phase-card-caption">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12px; font-weight:800; color:var(--gold);">${phaseName}</span>
+                <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">${pipeName}${phaseSub ? ` • ${phaseSub}` : ''}</span>
+              </div>
+              <p style="margin:0; font-size:11.5px; color:#cbd5e1; line-height:1.7;">${phaseDesc}</p>
+              <button type="button" onclick="goToPipelineFromDrawer('${phasePipe}')" class="btn-gold" style="padding:8px 12px; font-size:11px; margin-top:4px;">
+                سفارش این فاز در آتلیه ←
+              </button>
             </div>
           </div>
         `;
@@ -1573,16 +1632,28 @@ function initProjectStreamScrollSpy() {
     const titleEl = document.getElementById('artDetailTitle');
     const descEl = document.getElementById('artDetailDesc');
 
-    if (phaseEl && phase && phaseEl.textContent !== phase) {
-      phaseEl.textContent = phase;
-      phaseEl.style.transform = 'scale(1.05)';
-      setTimeout(() => { phaseEl.style.transform = 'scale(1)'; }, 200);
-    }
     if (titleEl && title && titleEl.textContent !== title) {
       titleEl.textContent = title;
-    }
-    if (descEl && desc && descEl.textContent !== desc) {
-      descEl.textContent = desc;
+      if (phaseEl && phase) phaseEl.textContent = phase;
+      if (descEl && desc) descEl.textContent = desc;
+
+      const sidebarEl = document.getElementById('artStationSidebar');
+      if (sidebarEl) {
+        sidebarEl.classList.remove('sidebar-pop-active');
+        void sidebarEl.offsetWidth; // Trigger reflow for smooth pop-in animation
+        sidebarEl.classList.add('sidebar-pop-active');
+      }
+
+      const itemPipe = currentItem.getAttribute('data-pipe');
+      if (itemPipe) {
+        currentDrawerPipelineKey = itemPipe;
+        const pipeNameEl = document.getElementById('caseStudyPipeName');
+        const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[itemPipe]) ? PIPELINE_DATA[itemPipe] : null;
+        if (pipeNameEl && pipeData) {
+          const itemSub = currentItem.getAttribute('data-sub');
+          pipeNameEl.textContent = pipeData.topSub + (itemSub ? ` (${itemSub})` : '');
+        }
+      }
     }
   }
 
@@ -4307,3 +4378,53 @@ window.goToPipelineFromDrawer = function() {
   selectPipeline(currentDrawerPipelineKey);
   showToast('به پایپلاین سفارش آتلیه منتقل شدید. فرمول محاسبه هزینه فعال است.', 'info', 4000);
 };
+
+// =========================================================
+// زوم لمسی فنری سبک اینستاگرام در موبایل (Instagram Elastic Spring Pinch)
+// =========================================================
+let touchInitialDist = 0;
+let touchCurrentScale = 1;
+let activePinchImg = null;
+
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    const target = e.target.closest('.elastic-pinch-target');
+    if (target) {
+      activePinchImg = target;
+      activePinchImg.classList.add('elastic-pinch-active');
+      activePinchImg.classList.remove('elastic-spring-back');
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchInitialDist = Math.hypot(dx, dy);
+    }
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (activePinchImg && e.touches.length === 2 && touchInitialDist > 0) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const currentDist = Math.hypot(dx, dy);
+    let scale = currentDist / touchInitialDist;
+    // سقف زوم ۲.۵ برابر جهت جلوگیری از تاری تصویر
+    scale = Math.min(Math.max(scale, 1), 2.5);
+    touchCurrentScale = scale;
+    activePinchImg.style.transform = `scale(${scale})`;
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (activePinchImg && e.touches.length < 2) {
+    activePinchImg.classList.add('elastic-spring-back');
+    activePinchImg.style.transform = '';
+    setTimeout(() => {
+      if (activePinchImg) {
+        activePinchImg.classList.remove('elastic-pinch-active');
+        activePinchImg.classList.remove('elastic-spring-back');
+        activePinchImg = null;
+      }
+      touchInitialDist = 0;
+      touchCurrentScale = 1;
+    }, 350);
+  }
+}, { passive: true });
