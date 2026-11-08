@@ -101,6 +101,7 @@ window.openChatConsultation = function() {
 document.addEventListener('DOMContentLoaded', () => {
   renderFloatingCategoryDropdown();
   renderAdminGalleryCategories();
+  if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
 });
 
 
@@ -2231,10 +2232,10 @@ window.renderAdminTgChannelsList = function() {
   }
 
   container.innerHTML = siteSettings.tgChannels.map((ch, idx) => `
-    <div style="display:flex; gap:8px; align-items:center;">
-      <input type="text" value="${escapeQuotes(ch)}" placeholder="مثال: @tajinkart یا -100123456789 یا 12345678" class="font-mono tg-channel-input" style="flex:1; font-size:11.5px; padding:7px 10px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" oninput="updateTgChannelVal(${idx}, this.value)" />
+    <div style="display:flex; gap:8px; align-items:center;" id="tgChannelRow_${idx}">
+      <input type="text" value="${escapeQuotes(ch)}" placeholder="مثال: @tajinkart یا -100123456789 یا 12345678" class="font-mono tg-channel-input" style="flex:1; font-size:11.5px; padding:8px 10px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#fff; box-sizing:border-box;" oninput="updateTgChannelVal(${idx}, this.value)" />
       ${siteSettings.tgChannels.length > 1 ? `
-        <button type="button" onclick="removeTgChannel(${idx})" style="color:var(--crimson); background:none; border:none; font-size:18px; padding:4px 8px; cursor:pointer;" title="حذف این کانال">✕</button>
+        <button type="button" onclick="removeTgChannel(${idx})" style="color:var(--crimson); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px; font-size:15px; padding:6px 10px; cursor:pointer;" title="حذف این کانال">✕</button>
       ` : ''}
     </div>
   `).join('');
@@ -2247,14 +2248,38 @@ window.updateTgChannelVal = function(idx, val) {
 };
 
 window.addTgChannelField = function() {
-  if (!siteSettings.tgChannels || !Array.isArray(siteSettings.tgChannels)) {
+  // ۱. جمع‌آوری فوری مقادیر تایپ‌شده فعلی تا پاک نشوند
+  const currentInputs = document.querySelectorAll('.tg-channel-input');
+  if (currentInputs && currentInputs.length > 0) {
+    siteSettings.tgChannels = [];
+    currentInputs.forEach(inp => {
+      siteSettings.tgChannels.push(inp.value.trim());
+    });
+  } else if (!siteSettings.tgChannels || !Array.isArray(siteSettings.tgChannels)) {
     siteSettings.tgChannels = [];
   }
+
+  // ۲. افزودن فیلد خالی جدید
   siteSettings.tgChannels.push('');
   renderAdminTgChannelsList();
+
+  // ۳. فوکوس روی فیلد جدید اضافه شده
+  setTimeout(() => {
+    const allInputs = document.querySelectorAll('.tg-channel-input');
+    if (allInputs.length > 0) {
+      allInputs[allInputs.length - 1].focus();
+    }
+  }, 50);
 };
 
 window.removeTgChannel = function(idx) {
+  const currentInputs = document.querySelectorAll('.tg-channel-input');
+  if (currentInputs && currentInputs.length > 0) {
+    siteSettings.tgChannels = [];
+    currentInputs.forEach(inp => {
+      siteSettings.tgChannels.push(inp.value.trim());
+    });
+  }
   if (!siteSettings.tgChannels) return;
   siteSettings.tgChannels.splice(idx, 1);
   if (siteSettings.tgChannels.length === 0) siteSettings.tgChannels = [''];
