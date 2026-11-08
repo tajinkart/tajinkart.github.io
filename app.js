@@ -5235,6 +5235,202 @@ window.updateStudioLogoDisplay = function() {
   
   const headerContainer = document.getElementById("brandCrestContainer");
   const headerImg = document.getElementById("brandCrestImg");
+  const activeCard = document.getElementById("adminLogoActiveCard");
+  const emptyDropzone = document.getElementById("adminLogoEmptyDropzone");
+  const previewImg = document.getElementById("adminLogoPreviewImg");
+
+  const aboutCrestImg = document.getElementById("aboutStudioCrestImg");
+  const aboutCrestPlaceholder = document.getElementById("aboutStudioCrestPlaceholder");
+
+  const favPreviewImg = document.getElementById("adminFaviconPreviewImg");
+  const favEmptyIcon = document.getElementById("adminFaviconEmptyIcon");
+  const favInput = document.getElementById("adminFaviconInput");
+  const siteFavicon = document.getElementById("siteFavicon");
+
+  if (logoUrl) {
+    if (headerContainer && headerImg) {
+      headerImg.src = logoUrl;
+      headerContainer.style.display = "flex";
+    }
+    if (activeCard && emptyDropzone && previewImg) {
+      previewImg.src = logoUrl;
+      activeCard.style.display = "flex";
+      emptyDropzone.style.display = "none";
+    }
+    if (aboutCrestImg && aboutCrestPlaceholder) {
+      aboutCrestImg.src = logoUrl;
+      aboutCrestImg.style.display = "block";
+      aboutCrestPlaceholder.style.display = "none";
+    }
+  } else {
+    if (headerContainer) headerContainer.style.display = "none";
+    if (activeCard && emptyDropzone) {
+      activeCard.style.display = "none";
+      emptyDropzone.style.display = "block";
+    }
+    if (aboutCrestImg && aboutCrestPlaceholder) {
+      aboutCrestImg.style.display = "none";
+      aboutCrestPlaceholder.style.display = "block";
+    }
+  }
+
+  if (favUrl) {
+    if (favPreviewImg) {
+      favPreviewImg.src = favUrl;
+      favPreviewImg.style.display = "block";
+    }
+    if (favEmptyIcon) favEmptyIcon.style.display = "none";
+    if (favInput && siteSettings.faviconUrl) favInput.value = siteSettings.faviconUrl;
+    if (siteFavicon) siteFavicon.href = favUrl;
+  } else {
+    if (favPreviewImg) favPreviewImg.style.display = "none";
+    if (favEmptyIcon) favEmptyIcon.style.display = "inline-block";
+    if (favInput) favInput.value = "";
+    if (siteFavicon) siteFavicon.href = "";
+  }
+};
+
+window.handleLogoDragOver = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dropzone = document.getElementById("adminLogoEmptyDropzone");
+  if (dropzone) {
+    dropzone.style.borderColor = "var(--cyan-electric)";
+    dropzone.style.background = "rgba(0, 240, 255, 0.08)";
+  }
+};
+
+window.handleLogoDragLeave = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dropzone = document.getElementById("adminLogoEmptyDropzone");
+  if (dropzone) {
+    dropzone.style.borderColor = "rgba(250, 204, 21, 0.5)";
+    dropzone.style.background = "rgba(0, 0, 0, 0.55)";
+  }
+};
+
+window.handleLogoDrop = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  window.handleLogoDragLeave(e);
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+    previewAndStageStudioLogo(e.dataTransfer.files[0]);
+  }
+};
+
+window.handleAdminLogoUpload = function(inputEl) {
+  if (inputEl && inputEl.files && inputEl.files[0]) {
+    previewAndStageStudioLogo(inputEl.files[0]);
+  }
+};
+
+function previewAndStageStudioLogo(file) {
+  showToast("در حال بارگذاری نشان استودیو...", "info", 1500);
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    siteSettings.studioLogoUrl = dataUrl;
+    if (!siteSettings.faviconUrl) {
+      siteSettings.faviconUrl = dataUrl;
+    }
+    window.updateStudioLogoDisplay();
+    showToast("پیش‌نمایش نشان ظاهر شد! برای ثبت دائم، دکمه «✓ ثبت و تایید نشان» را بزنید.", "success", 4500);
+
+    try {
+      const compressed = await compressImageForStorage(file, 600, 600, 0.92);
+      if (compressed) {
+        siteSettings.studioLogoUrl = compressed;
+      }
+    } catch(ign) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+window.handleAdminFaviconUpload = function(inputEl) {
+  if (inputEl && inputEl.files && inputEl.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      siteSettings.faviconUrl = e.target.result;
+      window.updateStudioLogoDisplay();
+      showToast("پیش‌نمایش فاویکون آماده شد! برای ثبت دائم روی دکمه ثبت کلیک کنید.", "info", 3500);
+    };
+    reader.readAsDataURL(inputEl.files[0]);
+  }
+};
+
+window.saveStudioBrandingSettings = function() {
+  const favInput = document.getElementById("adminFaviconInput");
+  if (favInput && favInput.value.trim()) {
+    siteSettings.faviconUrl = favInput.value.trim();
+  }
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast("نشان رسمی استودیو و فاویکون مرورگر با موفقیت ثبت و ذخیره شد! ✓", "success", 5000);
+};
+
+window.removeStudioLogo = function() {
+  siteSettings.studioLogoUrl = "";
+  siteSettings.faviconUrl = "";
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  window.updateStudioLogoDisplay();
+  showToast("نشان و فاویکون استودیو با موفقیت حذف شد (ضربدر).", "info", 3000);
+};
+
+// =========================================================
+// بهینه‌سازی اختصاصی مینی‌اپلیکیشن تلگرام (Telegram Mini App Ready)
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.Telegram && window.Telegram.WebApp) {
+    try {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      if (tg.setHeaderColor) tg.setHeaderColor('#040507');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#040507');
+      console.log('Telegram Mini App initialized for TAJINKART studio.');
+    } catch(e) {
+      console.warn('TMA init warning:', e);
+    }
+  }
+});
+
+// اتصالات قطعی توابع به شیء پنجره مرورگر جهت تضمین پاسخگویی کلیک آیکون‌ها
+window.renderShowcaseGrid = (typeof renderShowcaseGrid === 'function') ? renderShowcaseGrid : window.renderShowcaseGrid;
+window.renderAdminSketch2 = (typeof renderAdminSketch2 === 'function') ? renderAdminSketch2 : window.renderAdminSketch2;
+window.renderAdminLists = (typeof renderAdminLists === 'function') ? renderAdminLists : window.renderAdminLists;
+
+// محاسبه و به‌روزرسانی زنده وضعیت ارتباطی آتلیه (Live Studio Operational Status)
+window.updateStudioLiveStatus = function() {
+  const badge = document.getElementById('studioLiveStatusBadge');
+  const textEl = document.getElementById('studioLiveStatusText');
+  if (!badge || !textEl) return;
+
+  const lastActive = Number(siteSettings.lastAdminLoginTime) || Date.now();
+  const diffHours = (Date.now() - lastActive) / (1000 * 60 * 60);
+
+  // کمتر از ۲۴ ساعت: آتلیه فعال و آنلاین با پالس سبز
+  if (diffHours <= 24) {
+    badge.className = 'hero-badge studio-status-badge status-online';
+    textEl.textContent = '🟢 آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
+  } else {
+    // بیش از ۲۴ ساعت: حالت تعلیق هوشمند با پالس کهربایی و تایید پذیرش سفارش
+    badge.className = 'hero-badge studio-status-badge status-pending';
+    textEl.textContent = '🟡 دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    badge.title = 'پذیرش سفارشات فعال است. به دلیل نوسانات موقت اینترنت منطقه‌ای، بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد اما پروژه‌ها در آتلیه طبق زمان‌بندی پیش می‌روند.';
+  }
+};
+
+// ==============================================================================
+// مدیریت داینامیک لوگو و نشان استودیو با درگ اند دراپ در تنظیمات ادمین
+// ==============================================================================
+window.updateStudioLogoDisplay = function() {
+  const logoUrl = siteSettings.studioLogoUrl || "";
+  const favUrl = siteSettings.faviconUrl || logoUrl || "";
+  
+  const headerContainer = document.getElementById("brandCrestContainer");
+  const headerImg = document.getElementById("brandCrestImg");
   const previewBox = document.getElementById("adminLogoPreviewBox");
   const previewImg = document.getElementById("adminLogoPreviewImg");
   const placeholder = document.getElementById("adminLogoPlaceholder");

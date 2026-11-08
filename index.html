@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=12.3">
+  <link rel="stylesheet" href="style.css?v=12.4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -139,6 +139,71 @@
 
     <div id="artworkCurtain">
       <div id="showcaseGrid"></div>
+    </div>
+
+    <!-- بخش درباره استودیو و بیوگرافی مدیر هنری (در انتهای گالری صفحه اول) -->
+    <div id="showcaseStudioAboutSection" style="max-width:1100px; margin:40px auto 70px; padding:0 16px;">
+      <div style="background:radial-gradient(circle at 80% 20%, rgba(250,204,21,0.06) 0%, rgba(6,8,13,0.95) 70%); border:1px solid rgba(250,204,21,0.25); border-radius:18px; padding:36px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; overflow:hidden;">
+        
+        <div class="about-studio-grid" style="display:grid; grid-template-columns:1fr 320px; gap:32px; align-items:center;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:8px; padding:4px 12px; border-radius:999px; background:rgba(250,204,21,0.1); border:1px solid rgba(250,204,21,0.3); margin-bottom:14px;">
+              <span class="font-mono" style="font-size:11px; font-weight:800; color:var(--gold);">STUDIO DIRECTORY & WORLDBUILDING MANIFESTO</span>
+            </div>
+            
+            <h2 style="font-size:24px; font-weight:900; color:#fff; margin-bottom:8px; line-height:1.4;">
+              درباره استودیو <span style="color:var(--gold);">TAJINKART</span>
+            </h2>
+            <p style="font-size:14px; font-weight:700; color:var(--cyan-electric); margin-bottom:14px;">
+              سید سروش تاج • مدیر استودیو، طراح ارشد کانسپت آرت و معمار جهان‌های روایی
+            </p>
+            
+            <p style="font-size:13px; color:#cbd5e1; line-height:1.9; margin-bottom:16px; text-align:justify;">
+              استودیو <strong style="color:#fff;">تاج‌اینک‌آرت (TAJINKART)</strong> متولد اشتیاق بی‌پایان به خلق دنیاهای فانتزی تاریک، سایبرپانک و اساطیری است. با بیش از یک دهه تمرکز بر توسعه کانسپت‌های بصری، هدف آتلیه فراتر از تصویرگری صرف است؛ ما زبان بصری کامل، منطق معماری، متریال‌ها و هویت زیستی جهان‌های بازی و سینما را از نخستین قطره جوهر تا بی‌نهایت کیهان مهندسی می‌کنیم: <span class="font-mono" style="color:var(--gold); font-weight:800;">«From Ink to Universe»</span>.
+            </p>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:20px;">
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 14px;">
+                <span style="font-size:11px; color:var(--gold); font-weight:800; display:block;">⚔️ کاراکتر و کریچر</span>
+                <span style="font-size:11px; color:var(--text-muted);">سیلوئت، مدل‌شیت و آناتومی ارتوگرافیک</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 14px;">
+                <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; display:block;">🌌 فضا و لول‌دیزاین</span>
+                <span style="font-size:11px; color:var(--text-muted);">معماری ماژولار و نورپردازی اتمسفریک</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 14px;">
+                <span style="font-size:11px; color:var(--violet); font-weight:800; display:block;">🎬 کی‌فریم‌های سینماتیک</span>
+                <span style="font-size:11px; color:var(--text-muted);">کاور، اسپلش آرت و استوری‌بورد روایی</span>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <button type="button" onclick="switchView('store')" class="btn-gold" style="padding:11px 22px; font-size:12.5px; font-weight:800; cursor:pointer;">
+                💼 ثبت بریف و رزرو ظرفیت آتلیه ←
+              </button>
+              <button type="button" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="btn-secondary" style="padding:11px 16px; font-size:12px; cursor:pointer;">
+                ↑ بازگشت به بالای گالری
+              </button>
+            </div>
+          </div>
+
+          <!-- ستون دوم: کارت مانیفست و نشان رسمی استودیو -->
+          <div style="background:#030408; border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px;">
+            <div id="aboutStudioCrestBox" style="width:105px; height:105px; border-radius:16px; background:#080b12; border:1.5px solid rgba(250,204,21,0.35); display:flex; align-items:center; justify-content:center; box-shadow:0 0 25px rgba(250,204,21,0.15);">
+              <img id="aboutStudioCrestImg" src="" alt="نشان TAJINKART" style="max-width:85px; max-height:85px; object-fit:contain; display:none;" />
+              <span id="aboutStudioCrestPlaceholder" style="font-size:42px;">👑</span>
+            </div>
+            <div>
+              <span class="font-mono" style="font-size:14px; font-weight:900; color:var(--gold); display:block; letter-spacing:0.1em;">TAJINKART STUDIO</span>
+              <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">تهران • همکاری فریلنس با پروژه‌های سراسر جهان</span>
+            </div>
+            <div style="width:100%; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; font-size:11.5px; color:#94a3b8; line-height:1.7;">
+              پذیرش پروژه‌های پیش‌تولید بازی، کانسپت سینمایی و طراحی دنیا بر پایه قرارداد رسمی و ودیعه ۵۰٪ آتلیه.
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -828,45 +893,63 @@
 
               <form id="adminSettingsForm" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
                 
-                <!-- کارت ۰: مدیریت نشان و فاویکون رسمی استودیو -->
+                <!-- کارت ۰: مدیریت نشان و فاویکون رسمی استودیو (استایل موزاییک با پیش‌نمایش و ضربدر حذف) -->
                 <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 نشان و آیکون رسمی استودیو (Crest & Favicon)</span>
-                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">BRANDING</span>
+                    <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">BRAND CREST</span>
                   </div>
-                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">لوگوی رسمی استودیو و آیکون تب مرورگر (Favicon) را از سیستم انتخاب کرده یا به این کادر بیندازید.</p>
+                  <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">لوگوی رسمی استودیو را در این کادر بیندازید (Drag & Drop) یا از سیستم انتخاب کنید.</p>
 
-                  <!-- زون دراپ و انتخاب لوگو -->
-                  <div>
-                    <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">نشان اصلی استودیو (هدر صفحه اول):</label>
-                    <div id="adminLogoDropzone" 
+                  <!-- بخش کارت موزاییک نشان استودیو همراه با ضربدر حذف و پیش‌نمایش -->
+                  <div id="adminLogoCardContainer">
+                    
+                    <!-- حالت فعال: نمایش تصویر با کادر تیره، دکمه ضربدر قرمز و پیش‌نمایش بزرگ -->
+                    <div id="adminLogoActiveCard" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
+                      <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.15); padding:2px 8px; border-radius:4px;">
+                          🦅 نشان بارگذاری‌شده استودیو
+                        </span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
+                            🔄 تغییر فایل
+                          </button>
+                          <button type="button" onclick="removeStudioLogo()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف نشان (ضربدر)">
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style="position:relative; width:100%; max-height:220px; min-height:140px; background:#020306; border-radius:8px; border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; padding:10px;">
+                        <img id="adminLogoPreviewImg" src="" alt="نشان استودیو" style="max-width:100%; max-height:200px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 0 20px rgba(250,204,21,0.35));" />
+                      </div>
+                    </div>
+
+                    <!-- حالت خالی: زون انتخاب و درگ اند دراپ -->
+                    <div id="adminLogoEmptyDropzone" 
                          onclick="document.getElementById('adminLogoFileInput').click()"
                          ondragover="handleLogoDragOver(event)"
                          ondragleave="handleLogoDragLeave(event)"
                          ondrop="handleLogoDrop(event)"
-                         style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:10px; padding:18px; text-align:center; transition:all 0.2s;">
-                      <div id="adminLogoPreviewBox" style="display:none; margin-bottom:8px;">
-                        <img id="adminLogoPreviewImg" src="" style="width:72px; height:72px; object-fit:contain; margin:0 auto; filter:drop-shadow(0 0 15px rgba(250,204,21,0.35));" alt="نشان" />
-                      </div>
-                      <div id="adminLogoPlaceholder">
-                        <div style="font-size:26px; margin-bottom:4px;">🖼️</div>
-                        <div style="font-size:12px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انتخاب نشان استودیو</div>
-                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">پشتیبانی از فرمت‌های PNG، JPG و WEBP</div>
-                      </div>
+                         style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
+                      <div style="font-size:32px; margin-bottom:6px;">🦅</div>
+                      <div style="font-size:12.5px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انداختن نشان استودیو</div>
+                      <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP (پیش‌نمایش آنی)</div>
                     </div>
-                    <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
-                  </div>
 
-                  <!-- زون فاویکون اختصاصی تب مرورگر -->
+                  </div>
+                  <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
+
+                  <!-- بخش فاویکون اختصاصی تب مرورگر -->
                   <div>
-                    <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">آیکون اختصاصی تب مرورگر (Favicon):</label>
+                    <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">آیکون اختصاصی تب مرورگر (Favicon):</label>
                     <div style="display:flex; align-items:center; gap:10px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:8px 12px;">
                       <div id="adminFaviconPreviewBox" style="width:36px; height:36px; border-radius:6px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                         <img id="adminFaviconPreviewImg" src="" style="width:24px; height:24px; object-fit:contain; display:none;" alt="فاویکون" />
                         <span id="adminFaviconEmptyIcon" style="font-size:16px;">🌐</span>
                       </div>
                       <div style="flex:1;">
-                        <input type="text" id="adminFaviconInput" placeholder="لینک فاویکون یا انتخاب از سیستم..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
+                        <input type="text" id="adminFaviconInput" placeholder="آدرس تصویر یا انتخاب فایل فاویکون..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
                       </div>
                       <button type="button" onclick="document.getElementById('adminFaviconFileInput').click()" class="btn-secondary" style="font-size:11px; padding:6px 12px; flex-shrink:0; cursor:pointer;">
                         انتخاب فایل
@@ -875,15 +958,10 @@
                     </div>
                   </div>
 
-                  <!-- کلیدهای عملیاتی اختصاصی ذخیره و حذف -->
-                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:2px;">
-                    <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
-                      ✓ ذخیره و تثبیت نشان و فاویکون
-                    </button>
-                    <button type="button" onclick="removeStudioLogo()" class="btn-secondary" style="color:var(--crimson); font-size:11.5px; padding:10px 14px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
-                      حذف نشان و فاویکون
-                    </button>
-                  </div>
+                  <!-- دکمه تایید و ثبت قطعی تنظیمات نشان -->
+                  <button type="button" onclick="saveStudioBrandingSettings()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800; cursor:pointer;">
+                    ✓ ثبت و تایید نشان و فاویکون استودیو
+                  </button>
                 </div>
 
                 <!-- کارت ۱: نرخ تسعیر ارز -->

@@ -3519,3 +3519,11 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
+
+/* ریسپانسیو بخش درباره استودیو در پایین گالری */
+@media (max-width: 900px) {
+  .about-studio-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}

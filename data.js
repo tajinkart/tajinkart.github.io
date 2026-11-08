@@ -35,6 +35,7 @@ let siteSettings = JSON.parse(localStorage.getItem(KEYS.SETTINGS)) || {
   adminPass: 'tajinkart',
   commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
 };
+window.siteSettings = siteSettings;
 
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
 // بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
