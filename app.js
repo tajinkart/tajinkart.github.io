@@ -750,24 +750,28 @@ function renderAdminArtModalForm(art, isNew) {
   const box = document.getElementById('adminArtFormFields');
   if (!box || !art) return;
 
-  // آماده‌سازی تصاویر چندگانه پروژه
+  // آماده‌سازی لیست یکپارچه کل تصاویر پروژه
+  stagingProjectPhases = [];
   if (Array.isArray(art.phases) && art.phases.length > 0) {
-    stagingProjectPhases = JSON.parse(JSON.stringify(art.phases)).filter(p => (p.img || p.image) !== art.image);
-  } else {
-    stagingProjectPhases = [];
+    stagingProjectPhases = JSON.parse(JSON.stringify(art.phases));
+  } else if (art.image) {
+    stagingProjectPhases.push({
+      name: art.title || 'تصویر کاور اصلی',
+      img: art.image,
+      image: art.image,
+      pipelineKey: art.pipelineKey || 'sketch1',
+      subcategory: '',
+      desc: ''
+    });
   }
-
-  const previewDisplay = art.image ? 'block' : 'none';
-  const emptyPreviewDisplay = art.image ? 'none' : 'flex';
 
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:14px;">
       
-      <!-- گام ۱: تیتر، شناسنامه روایی و داستان کلی پروژه -->
+      <!-- گام ۱: تیتر و داستان کلی کانسپت -->
       <div style="background:#04060a; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13px; font-weight:900; color:var(--gold);">📌 گام ۱: تیتر، جهان روایی و داستان کلی کانسپت</span>
-          <span class="font-mono" style="font-size:10.5px; color:var(--cyan-electric);">مرحله شناسنامه اثر</span>
+        <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+          <span style="font-size:13px; font-weight:900; color:var(--gold);">📌 گام ۱: عنوان و داستان کانسپت</span>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -778,32 +782,6 @@ function renderAdminArtModalForm(art, isNew) {
           <div>
             <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
             <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-          <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">دسته‌بندی در گالری</label>
-            <select id="editArtCategorySelect" onchange="syncAdminPipeFromCategory(this)">
-              ${galleryCategories.map(c => `
-                <option value="${c.id}" ${(art.tag === c.id || art.category === c.id) ? 'selected' : ''}>${c.title}</option>
-              `).join('')}
-            </select>
-          </div>
-          <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین اصلی آتلیه</label>
-            <select id="editArtPipeSelect" onchange="syncAdminCategoryFromPipe(this)">
-              <option value="sketch1" ${art.pipelineKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
-              <option value="sketch_creature" ${art.pipelineKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
-              <option value="sketch2" ${art.pipelineKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
-              <option value="sketch3" ${art.pipelineKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
-              <option value="sketch4" ${art.pipelineKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
-              <option value="sketch5" ${art.pipelineKey === 'sketch5' ? 'selected' : ''}>کمیک و استوری‌بورد</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">جهان روایی (Lore)</label>
-            <input type="text" id="editArtLoreInput" value="${art.lore || 'جهان اکستوپیا'}" placeholder="جهان اکستوپیا / جنسیس" />
           </div>
         </div>
 
@@ -820,40 +798,14 @@ function renderAdminArtModalForm(art, isNew) {
         </div>
       </div>
 
-      <!-- گام ۲: تصویر کاور اصلی پروژه -->
-      <div style="background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">🖼️ گام ۲: انتخاب و آپلود تصویر کاور اصلی</span>
-          <span id="adminArtPreviewRatioText" class="font-mono" style="font-size:10.5px; color:var(--gold);">
-            ${art.image ? 'کاور فعال' : 'هنوز عکسی انتخاب نشده'}
-          </span>
-        </div>
-
-        <div style="max-height:220px; min-height:120px; border-radius:10px; overflow:hidden; background:#020306; border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; position:relative;">
-          <img id="adminArtPreviewImg" src="${art.image || ''}" style="max-width:100%; max-height:220px; object-fit:contain; display:${previewDisplay};" alt="پیش‌نمایش کاور" />
-          <div id="adminArtEmptyPreviewPlaceholder" style="display:${emptyPreviewDisplay}; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); font-size:12px; padding:16px;">
-            <span>📷</span>
-            <span>تصویر کاور را از حافظه سیستم انتخاب کنید یا لینک وب بگذارید.</span>
-          </div>
-        </div>
-
-        <div style="display:flex; gap:8px;">
-          <button type="button" onclick="document.getElementById('adminLocalArtFilePicker').click()" class="btn-gold" style="flex:1; background:var(--cyan-electric); color:#000; font-size:11.5px; padding:9px 12px; font-weight:800;">
-            📁 انتخاب عکس کاور از کامپیوتر یا گوشی
-          </button>
-          <input type="file" id="adminLocalArtFilePicker" accept="image/*" style="display:none;" onchange="handleAdminLocalFileUpload(this)" />
-        </div>
-        <input type="text" id="editArtImageInput" value="${art.image || ''}" oninput="handleAdminImageLiveChange(this.value)" placeholder="یا درج لینک وب کاور: https://..." class="font-mono" style="font-size:11.5px;" />
-      </div>
-
-      <!-- گام ۳: سایر شیت‌ها و واریاسیون‌های پروژه (ArtStation Multi-Image) -->
-      <div style="background:#05070d; border:1px solid rgba(168,85,247,0.35); border-radius:14px; padding:16px;">
+      <!-- گام ۲: تصاویر و شیت‌های پروژه (مدیریت یکپارچه) -->
+      <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
           <div>
-            <span style="font-size:13px; font-weight:900; color:#c084fc;">📑 گام ۳: سایر شیت‌ها و فازهای پروژه (اسکرول عمودی ArtStation):</span>
-            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">اتودها، شیت‌های سه‌نما، کلوزآپ‌ها یا جزییاتی که زیر کاور اصلی باز می‌شوند.</p>
+            <span style="font-size:13px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصاویر و شیت‌های پروژه (اسکرول عمودی ArtStation):</span>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصاویر پروژه را اینجا اضافه کنید. اولین تصویر به صورت خودکار به عنوان کاور اصلی در گالری نمایش داده می‌شود.</p>
           </div>
-          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:#c084fc; color:#c084fc; font-weight:700;">
+          <button type="button" onclick="document.getElementById('adminAddPhaseFileInput').click()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800;">
             + افزودن تصویر به پروژه
           </button>
           <input type="file" id="adminAddPhaseFileInput" accept="image/*" style="display:none;" onchange="handleAdminAddPhaseUpload(this)" />
@@ -892,7 +844,9 @@ function renderAdminArtModalForm(art, isNew) {
 
 function renderStagingPhasesHtml() {
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
-    return `<div style="font-size:11px; color:var(--text-muted); padding:8px; text-align:center;">هنوز تصویر تکمیلی برای این پروژه اضافه نشده است (اختیاری).</div>`;
+    return `<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#04060a; border-radius:10px; border:1px dashed rgba(255,255,255,0.15);">
+      هنوز تصویری برای این پروژه اضافه نشده است. روی دکمه «+ افزودن تصویر به پروژه» کلیک کنید.
+    </div>`;
   }
 
   const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
@@ -901,12 +855,18 @@ function renderStagingPhasesHtml() {
     const pipeKey = p.pipelineKey || 'sketch1';
     const subcats = (pipelines[pipeKey] && pipelines[pipeKey].subcategories) ? pipelines[pipeKey].subcategories : ['طراحی و اجرای استاندارد'];
     const currentSub = p.subcategory || subcats[0] || '';
+    const isCover = (idx === 0);
 
     return `
-      <div style="display:flex; flex-direction:column; gap:8px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:12px; padding:12px;">
+      <div style="display:flex; flex-direction:column; gap:8px; background:#04060a; border:1px solid ${isCover ? 'rgba(250,204,21,0.45)' : 'rgba(0,240,255,0.25)'}; border-radius:12px; padding:12px;">
         <div style="display:flex; align-items:center; gap:10px;">
-          <img src="${p.img || p.image}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.15);" alt="تصویر فاز" />
+          <img src="${p.img || p.image}" style="width:52px; height:52px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.15);" alt="تصویر فاز" />
           <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="font-mono" style="font-size:10px; padding:2px 8px; border-radius:4px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.15)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'};">
+                ${isCover ? '🖼️ کاور پیش‌فرض پروژه (عکس اول)' : `شیت شماره ${idx + 1}`}
+              </span>
+            </div>
             <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این فاز (مثال: مدل‌شیت سه‌نما / طراحی مسکات)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:6px 10px; margin:0;" />
           </div>
           <button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:20px; padding:4px 8px; cursor:pointer;" title="حذف این تصویر">✕</button>
@@ -1053,42 +1013,28 @@ window.handleAdminLocalFileUpload = async function(inputEl) {
 window.confirmSaveArtwork = function() {
   const title = document.getElementById('editArtTitleInput')?.value.trim() || '';
   const slug = document.getElementById('editArtSlugInput')?.value.trim() || '';
-  const cat = document.getElementById('editArtCategorySelect')?.value || 'character';
-  const pipe = document.getElementById('editArtPipeSelect')?.value || 'sketch1';
-  const lore = document.getElementById('editArtLoreInput')?.value.trim() || 'جهان اکستوپیا';
-  const colorSpace = document.getElementById('editArtColorSpaceInput')?.value.trim() || 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
   const desc = document.getElementById('editArtDescInput')?.value.trim() || '';
+  const isPack = document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true;
 
-  let img = '';
-  if (isCreatingNewArt && stagingNewArt) {
-    img = stagingNewArt.image || document.getElementById('editArtImageInput')?.value.trim() || '';
-  } else if (showcaseArtworks[currentSelectedArtIdx]) {
-    img = showcaseArtworks[currentSelectedArtIdx].image || document.getElementById('editArtImageInput')?.value.trim() || '';
+  if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
+    showToast('لطفاً حداقل یک تصویر برای پروژه اضافه کنید.', 'error');
+    return;
   }
 
+  const primaryPhase = stagingProjectPhases[0];
+  const img = primaryPhase.img || primaryPhase.image || '';
+  const pipe = primaryPhase.pipelineKey || 'sketch1';
+  const cat = PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
+  const lore = 'جهان اکستوپیا';
+  const colorSpace = 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
+
   if (!img) {
-    showToast('لطفاً ابتدا تصویر اثر را از کامپیوتر انتخاب کنید یا لینک آن را وارد نمایید.', 'error');
+    showToast('تصویر معتبری برای کاور پروژه یافت نشد.', 'error');
     return;
   }
 
   try {
-    // آماده‌سازی آرایه تصاویر پروژه چندگانه
-    const assembledPhases = [{ name: 'تصویر کاور اصلی', img: img, image: img }];
-    if (Array.isArray(stagingProjectPhases) && stagingProjectPhases.length > 0) {
-      stagingProjectPhases.forEach(p => {
-        const pSrc = p.img || p.image;
-        if (pSrc && pSrc !== img) {
-          assembledPhases.push({
-            name: p.name || 'تصویر تکمیلی پروژه',
-            desc: p.desc || p.description || '',
-            pipelineKey: p.pipelineKey || pipe,
-            subcategory: p.subcategory || '',
-            img: pSrc,
-            image: pSrc
-          });
-        }
-      });
-    }
+    const assembledPhases = JSON.parse(JSON.stringify(stagingProjectPhases));
 
     if (isCreatingNewArt && stagingNewArt) {
       const newArtRecord = {
@@ -1140,6 +1086,7 @@ window.confirmSaveArtwork = function() {
       art.image = img;
       art.lore = lore;
       art.desc = desc;
+      art.isProductionPack = isPack;
       art.phases = assembledPhases;
 
       safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
@@ -1487,11 +1434,31 @@ function renderShowcaseGrid() {
       }
     }
 
+    // محاسبه پالت نئونی اختصاصی بر اساس دسته‌بندی و پایپلاین غالب اثر
+    const neonMap = {
+      'character': { border: '#facc15', glow: 'rgba(250, 204, 21, 0.65)', soft: 'rgba(250, 204, 21, 0.25)' },
+      'sketch1': { border: '#facc15', glow: 'rgba(250, 204, 21, 0.65)', soft: 'rgba(250, 204, 21, 0.25)' },
+      'creature': { border: '#ef4444', glow: 'rgba(239, 68, 68, 0.72)', soft: 'rgba(239, 68, 68, 0.28)' },
+      'sketch_creature': { border: '#ef4444', glow: 'rgba(239, 68, 68, 0.72)', soft: 'rgba(239, 68, 68, 0.28)' },
+      'environment': { border: '#00f0ff', glow: 'rgba(0, 240, 255, 0.72)', soft: 'rgba(0, 240, 255, 0.28)' },
+      'sketch2': { border: '#00f0ff', glow: 'rgba(0, 240, 255, 0.72)', soft: 'rgba(0, 240, 255, 0.28)' },
+      'keyframe': { border: '#c084fc', glow: 'rgba(192, 132, 252, 0.75)', soft: 'rgba(192, 132, 252, 0.3)' },
+      'sketch3': { border: '#c084fc', glow: 'rgba(192, 132, 252, 0.75)', soft: 'rgba(192, 132, 252, 0.3)' },
+      'props': { border: '#fbbf24', glow: 'rgba(251, 191, 36, 0.72)', soft: 'rgba(251, 191, 36, 0.28)' },
+      'sketch4': { border: '#fbbf24', glow: 'rgba(251, 191, 36, 0.72)', soft: 'rgba(251, 191, 36, 0.28)' },
+      'comic': { border: '#38bdf8', glow: 'rgba(56, 189, 248, 0.72)', soft: 'rgba(56, 189, 248, 0.28)' },
+      'sketch5': { border: '#38bdf8', glow: 'rgba(56, 189, 248, 0.72)', soft: 'rgba(56, 189, 248, 0.28)' }
+    };
+    const activeKey = art.tag || art.category || art.pipelineKey || 'character';
+    const neon = neonMap[activeKey] || neonMap['character'];
+
     return `
-      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
+      <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
+           style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
+           onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         <div class="tile-center-title">
-          <span class="tile-slug">/ ${slug} /</span>
-          <span class="tile-divider"></span>
+          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 12px ${neon.glow};">/ ${slug} /</span>
+          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 12px ${neon.glow};"></span>
           <span class="tile-sub">${art.title}</span>
         </div>
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
@@ -1721,18 +1688,6 @@ function renderArtStationProject(art) {
 
   stream.innerHTML = streamHtml;
 
-  // مقداردهی رهگیر نوری عمودی در سایدبار دسکتاپ
-  const trackerEl = document.getElementById('sidebarOpticalTracker');
-  if (trackerEl) {
-    let dotsHtml = '';
-    for (let i = 0; i < totalPhaseCount; i++) {
-      dotsHtml += `<span class="tracker-dot ${i === 0 ? 'active' : ''}" data-idx="${i}" onclick="scrollStreamToItem(${i})" title="فاز ${i+1}"></span>`;
-    }
-    trackerEl.innerHTML = dotsHtml;
-  }
-
-  // راه‌اندازی رصد اسکرول هوشمند (ScrollSpy) جهت تغییر آنی سایدبار
-  setTimeout(initProjectStreamScrollSpy, 150);
 }
 
 // موتور ردیابی زنده اسکرول برای تغییر هماهنگ سایدبار بر اساس عکس در حال مشاهده با رهگیر نوری و ترنزیشن جهت‌دار
@@ -4638,12 +4593,19 @@ window.goToPipelineFromDrawer = function() {
         initialMidX = mid.x;
         initialMidY = mid.y;
 
+        const parentTile = img.closest('.mosaic-tile');
+        if (parentTile) {
+          parentTile.classList.add('tile-pinching');
+        }
+        const backdrop = document.getElementById('instagramPinchBackdrop');
+        if (backdrop) backdrop.classList.add('active');
+
         const rect = img.getBoundingClientRect();
         const originX = ((mid.x - rect.left) / rect.width) * 100;
         const originY = ((mid.y - rect.top) / rect.height) * 100;
         activeTarget.style.transformOrigin = `${originX}% ${originY}%`;
         activeTarget.style.transition = 'none';
-        activeTarget.style.zIndex = '9999';
+        activeTarget.style.zIndex = '100000';
         activeTarget.style.position = 'relative';
         activeTarget.classList.add('elastic-pinch-active');
       }
@@ -4675,6 +4637,10 @@ window.goToPipelineFromDrawer = function() {
   function endPinch() {
     if (activeTarget) {
       const target = activeTarget;
+      const parentTile = target.closest('.mosaic-tile');
+      const backdrop = document.getElementById('instagramPinchBackdrop');
+      if (backdrop) backdrop.classList.remove('active');
+
       target.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease';
       target.style.transform = 'scale(1) translate(0px, 0px)';
       target.classList.remove('elastic-pinch-active');
@@ -4686,6 +4652,9 @@ window.goToPipelineFromDrawer = function() {
           target.style.transformOrigin = '';
           target.style.zIndex = '';
           target.style.position = '';
+        }
+        if (parentTile) {
+          parentTile.classList.remove('tile-pinching');
         }
       }, 350);
 
