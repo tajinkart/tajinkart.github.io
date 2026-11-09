@@ -1735,7 +1735,7 @@ window.renderShowcaseGrid = function() {
 
     let tileImg = imgSrc;
     let targetPhaseIdx = 0;
-    let displayTitle = art.title;
+    let displayTitle = (currentSiteLanguage === "fa" && art.titleFa && art.titleFa.trim()) ? art.titleFa : art.title;
     let displaySlug = slug;
     let activeKey = art.tag || art.category || art.pipelineKey || 'character';
 
@@ -2256,6 +2256,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
 function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
   activeModalItem = {
     title: title,
+      titleFa: document.getElementById("editArtTitleFa") ? document.getElementById("editArtTitleFa").value.trim() : "",
     desc: desc,
       isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
     price: price,
@@ -6378,8 +6379,10 @@ async function detectUserGeoLocation() {
         console.log('[TAJINKART Geo Engine] Detected visitor country:', country);
         if (country === 'IR') {
           if (typeof setCurrencyMode === 'function') setCurrencyMode('TOMAN');
+          if (!safeGetStorage('tajinkart_lang')) setSiteLanguage('fa');
         } else {
           if (typeof setCurrencyMode === 'function') setCurrencyMode('USD');
+          if (!safeGetStorage('tajinkart_lang')) setSiteLanguage('en');
         }
       }
     }
@@ -6473,4 +6476,115 @@ window.onAdminArtPipeCategoryChange = function(newPipe) {
   if (catInput && newPipe) {
     catInput.value = PIPELINE_TO_CATEGORY_MAP[newPipe] || newPipe;
   }
+};
+
+
+// بستن خودکار زیرمنوی آتلیه هنگام کلیک در هر جای دیگر صفحه
+document.addEventListener('click', (e) => {
+  const storeWrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (storeWrapper && storeWrapper.classList.contains('active')) {
+    if (!storeWrapper.contains(e.target)) {
+      storeWrapper.classList.remove('active');
+    }
+  }
+});
+
+
+// ==============================================================================
+// موتور بومی دو زبانه هوشمند استودیو (Native Bilingual Geo Engine)
+// ==============================================================================
+var currentSiteLanguage = safeGetStorage('tajinkart_lang') || 'en';
+
+const I18N_STRINGS = {
+  en: {
+    brand_slogan: 'FROM INK TO UNIVERSE',
+    all_artworks: 'All Artworks',
+    status_online: 'Studio Online • Accepting Briefs & Concept Commissions',
+    status_vacation: 'Studio Away / Capacity Full • Inquiries Reviewed Shortly',
+    dock_home_title: 'Showcase',
+    dock_home_sub: 'Concept Gallery & IP',
+    dock_members_title: 'Members',
+    dock_members_sub: 'Client Portal',
+    dock_store_title: 'Atelier & Store',
+    dock_store_sub: 'Commissions & Assets',
+    dock_store_comm: '🎨 Concept Commissions',
+    dock_store_prod: '💎 Digital Assets Vault',
+    dock_genesis_title: 'Genesis Lore',
+    dock_genesis_sub: 'Original Universe & Manga',
+    dock_academy_title: 'Academy',
+    dock_academy_sub: 'Workshops & Mentorship',
+    store_title_comm: 'Concept Art & Visual Development Atelier',
+    store_sub_comm: 'Pre-production for games, cinematic concept art, and entertainment design directed by Seyed Soroush Taj.',
+    store_title_prod: 'Official Digital Assets & Production Vault',
+    store_sub_prod: 'Commercial production-ready asset packs, layered PSD master files, brushes, and 3D STL print models.'
+  },
+  fa: {
+    brand_slogan: 'از جوهر تا بی‌نهایت کیهان',
+    all_artworks: 'همه آثار گالری',
+    status_online: 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است',
+    status_vacation: 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است',
+    dock_home_title: 'صفحه اصلی',
+    dock_home_sub: 'آرشیو آثار و گالری',
+    dock_members_title: 'پورتال اعضا',
+    dock_members_sub: 'ورود / عضویت',
+    dock_store_title: 'آتلیه و فروشگاه',
+    dock_store_sub: 'کانسپت و اسست‌ها',
+    dock_store_comm: '🎨 سفارش کانسپت (آتلیه)',
+    dock_store_prod: '💎 دارایی‌های دیجیتال',
+    dock_genesis_title: 'جهان جنسیس',
+    dock_genesis_sub: 'کمیک و داستان',
+    dock_academy_title: 'آکادمی استودیو',
+    dock_academy_sub: 'کارگاه‌ها و آموزش',
+    store_title_comm: 'آتلیه کانسپت و توسعه بصری استودیو',
+    store_sub_comm: 'پذیرش پروژه‌های پیش‌تولید بازی، کانسپت سینمایی و طراحی دنیا زیر نظر مستقیم سید سروش تاج.',
+    store_title_prod: 'مخزن رسمی دارایی‌های دیجیتال و اسست‌های استودیو',
+    store_sub_prod: 'آرشیو دارایی‌های دیجیتال آماده تجاری، سورس‌های لایه‌باز PSD، موتور براش و فایل‌های پرینت سه‌بعدی.'
+  }
+};
+
+window.setSiteLanguage = function(lang) {
+  currentSiteLanguage = (lang === 'fa') ? 'fa' : 'en';
+  safeSetStorage('tajinkart_lang', currentSiteLanguage);
+
+  const langLabel = document.getElementById('siteLangLabel');
+  if (langLabel) langLabel.textContent = currentSiteLanguage.toUpperCase();
+
+  const dict = I18N_STRINGS[currentSiteLanguage];
+
+  // اعمال روی هدر، داک و ویترین
+  const pillLabel = document.getElementById('currentCategoryPillLabel');
+  if (pillLabel && (!currentGalleryFilter || currentGalleryFilter === 'all')) {
+    pillLabel.textContent = dict.all_artworks;
+  }
+
+  const sloganBar = document.getElementById('brandMorphSub');
+  if (sloganBar && sloganBar.textContent.includes('INK')) {
+    sloganBar.textContent = dict.brand_slogan;
+  }
+
+  // به‌روزرسانی عناوین داک
+  const dockHomeTitle = document.querySelector('#rightDockHomeBtn .right-exp-title');
+  if (dockHomeTitle) dockHomeTitle.textContent = dict.dock_home_title;
+  const dockHomeSub = document.querySelector('#rightDockHomeBtn .right-exp-sub');
+  if (dockHomeSub) dockHomeSub.textContent = dict.dock_home_sub;
+
+  const dockStoreTitle = document.querySelector('#dockStoreMainBtn .right-exp-title');
+  if (dockStoreTitle) dockStoreTitle.textContent = dict.dock_store_title;
+  const dockStoreSub = document.querySelector('#dockStoreMainBtn .right-exp-sub');
+  if (dockStoreSub) dockStoreSub.textContent = dict.dock_store_sub;
+
+  const storeCommBtn = document.querySelector('#dockStoreInPlaceAccordion .gold-accent span:last-child');
+  if (storeCommBtn) storeCommBtn.textContent = dict.dock_store_comm;
+  const storeProdBtn = document.querySelector('#dockStoreInPlaceAccordion .cyan-accent span:last-child');
+  if (storeProdBtn) storeProdBtn.textContent = dict.dock_store_prod;
+
+  // بازرندر گالری با عناوین زبانی
+  if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+  if (typeof updateStudioLiveStatus === 'function') updateStudioLiveStatus();
+};
+
+window.toggleSiteLanguage = function() {
+  const nextLang = (currentSiteLanguage === 'en') ? 'fa' : 'en';
+  setSiteLanguage(nextLang);
+  showToast(nextLang === 'fa' ? 'زبان سایت به فارسی تغییر یافت.' : 'Language switched to English.', 'info', 2500);
 };

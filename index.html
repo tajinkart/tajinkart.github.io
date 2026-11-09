@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=15.0.0">
+  <link rel="stylesheet" href="style.css?v=15.1.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -50,7 +50,7 @@
 </head>
 <body data-view="showcase">
 
-  <!-- ۱. نشان شناور برند در بالا-چپ -->
+  <!-- ۱. نشان شناور برند در بالا-چپ همراه با سوئیچر زبان -->
   <div id="topCenterBrandBar">
     <button onclick="switchView('showcase')" class="top-center-pill" title="صفحه اصلی">
       <span class="top-dot"></span>
@@ -68,6 +68,11 @@
         <!-- داینامیک از جاوااسکریپت لود می‌شود -->
       </div>
     </div>
+
+    <!-- سوئیچر زبان مینیمال و لوکس -->
+    <button type="button" onclick="toggleSiteLanguage()" class="top-lang-pill" id="siteLangToggleBtn" title="تغییر زبان / Switch Language">
+      <span id="siteLangLabel" class="font-mono">EN</span>
+    </button>
   </div>
 
   <!-- ۲. داک عمودی ناوبری راست -->
@@ -2169,8 +2174,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=15.0.0"></script>
-  <script src="app.js?v=15.0.0"></script>
+  <script src="data.js?v=15.1.0"></script>
+  <script src="app.js?v=15.1.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

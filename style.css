@@ -3904,3 +3904,52 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   background: #0b0f19 !important;
   outline: none;
 }
+
+/* دکمه سوئیچر زبان در کنار هدر */
+.top-lang-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(10, 14, 22, 0.92);
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+.top-lang-pill:hover {
+  background: rgba(250, 204, 21, 0.18);
+  transform: scale(1.05);
+}
+
+/* بهینه‌سازی آکاردئون عمودی درجا آتلیه در داک */
+.dock-store-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+}
+.dock-store-wrapper.active {
+  border-radius: 14px !important;
+  background: rgba(9, 12, 18, 0.98) !important;
+  border: 1.5px solid var(--gold) !important;
+  padding: 4px !important;
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.3) !important;
+}
+.dock-store-in-place-accordion {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  width: 100%;
+}
+.dock-store-wrapper.active .dock-store-in-place-accordion {
+  display: flex !important;
+}
