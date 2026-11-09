@@ -2946,7 +2946,7 @@ window.switchView = function(vKey) {
     renderShowcaseGrid();
     if (homeBtn) homeBtn.classList.add('hidden');
     if (window.scrollY <= 140 && window.innerWidth > 768) { if (dock) dock.classList.remove("dock-collapsed");
-      if (topBar) topBar.classList.remove('visible');
+      /* topBar is permanently visible */
     } else {
       if (topBar) topBar.classList.add('visible');
     }
@@ -2971,27 +2971,37 @@ let scrollTicking = false;
 
 function handleOptimizedScroll() {
   const dock = document.getElementById('rightVerticalNav');
-  const topBar = document.getElementById('topCenterBrandBar');
+  if (!dock) return;
 
-  // ۱. قانون فولادین موبایل: اسکرول موبایل ۱۰۰٪ بی‌اثر است و هرگز داک را باز نمی‌کند!
+  // قانون موبایل: اسکرول موبایل ۱۰۰٪ بی‌اثر است و هرگز داک بسته را باز نمی‌کند!
   if (window.innerWidth <= 768) {
-    if (dock) {
-      dock.classList.add('dock-collapsed');
-    }
     return;
   }
 
-  // ۲. رفتار دسکتاپ: در بالای صفحه باز است، با اسکرول به پایین (>100px) جمع می‌شود به سه خط
+  // رفتار دسکتاپ: در بالای صفحه باز است، با اسکرول به پایین (>100px) جمع می‌شود به سه خط
   const scrolled = window.scrollY || window.pageYOffset || 0;
   if (scrolled > 100) {
-    if (dock) dock.classList.add('dock-collapsed');
-    if (topBar) topBar.classList.add('visible');
+    dock.classList.add('dock-collapsed');
   } else {
-    if (dock) {
+    dock.classList.remove('dock-collapsed');
+    dock.classList.remove('dock-open');
+  }
+}
+
+function initDockState() {
+  const dock = document.getElementById('rightVerticalNav');
+  if (!dock) return;
+  if (window.innerWidth <= 768) {
+    dock.classList.add('dock-collapsed');
+    dock.classList.remove('dock-open');
+  } else {
+    const scrolled = window.scrollY || window.pageYOffset || 0;
+    if (scrolled > 100) {
+      dock.classList.add('dock-collapsed');
+    } else {
       dock.classList.remove('dock-collapsed');
       dock.classList.remove('dock-open');
     }
-    if (topBar) topBar.classList.remove('visible');
   }
 }
 
@@ -6882,6 +6892,7 @@ window.initAmbientParticles = function() {
   let height = (canvas.height = window.innerHeight);
 
   window.addEventListener('resize', () => {
+  initDockState();
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }, { passive: true });
@@ -7068,6 +7079,7 @@ window.initAmbientParticles = function() {
   let height = (canvas.height = window.innerHeight);
 
   window.addEventListener('resize', () => {
+  initDockState();
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }, { passive: true });
@@ -7284,6 +7296,7 @@ window.initAmbientParticles = function() {
   let height = (canvas.height = window.innerHeight * dpr);
 
   window.addEventListener('resize', () => {
+  initDockState();
     width = canvas.width = window.innerWidth * dpr;
     height = canvas.height = window.innerHeight * dpr;
   }, { passive: true });
@@ -7485,6 +7498,7 @@ window.initAmbientParticles = function() {
   let height = (canvas.height = window.innerHeight * dpr);
 
   window.addEventListener('resize', () => {
+  initDockState();
     width = canvas.width = window.innerWidth * dpr;
     height = canvas.height = window.innerHeight * dpr;
   }, { passive: true });
@@ -7599,6 +7613,7 @@ window.initAmbientParticles = function() {
   let height = (canvas.height = window.innerHeight * dpr);
 
   window.addEventListener('resize', () => {
+  initDockState();
     width = canvas.width = window.innerWidth * dpr;
     height = canvas.height = window.innerHeight * dpr;
   }, { passive: true });
@@ -7680,6 +7695,7 @@ window.initAmbientParticles = function() {
   // تنها در صورت تغییر واقعی عرض نمایشگر (چرخش گوشی)، سایز بوم آپدیت می‌شود
   let lastWidth = window.innerWidth;
   window.addEventListener('resize', () => {
+  initDockState();
     if (Math.abs(window.innerWidth - lastWidth) > 30) {
       lastWidth = window.innerWidth;
       width = canvas.width = window.innerWidth;
