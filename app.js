@@ -6782,9 +6782,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dock = document.getElementById('rightVerticalNav');
   if (dock) {
     // بستن خودکار زیرمنو به محض خارج شدن ماوس از داک در دسکتاپ
-    dock.addEventListener('mouseleave', () => {
-      window.closeAllDockFlyouts();
-    });
+    /* Premature mouseleave listener removed for hover bridge stability */
   }
 
   // بارگذاری مقادیر دوزبانه در صورت ورود به پنل

@@ -5307,3 +5307,100 @@ body {
     padding: 8px !important;
   }
 }
+
+
+
+/* ==============================================================================
+   RELEASE V18.9.0: DESKTOP HOVER BRIDGE & MOBILE COMPACT CIRCULAR ICONS
+   ============================================================================== */
+
+/* ۱. پل نامرئی هاور برای ممانعت قطعی از پریدن و بسته شدن زیرمنوی استور روی دسکتاپ */
+.dock-store-flyout-menu {
+  right: calc(100% + 4px) !important; /* کاهش فاصله به ۴ پیکسل */
+}
+
+.dock-store-flyout-menu::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -12px !important;
+  bottom: -12px !important;
+  right: -25px !important;
+  width: 35px !important;
+  background: transparent !important;
+  pointer-events: auto !important;
+  z-index: 10001 !important;
+}
+
+.dock-store-wrapper:hover .dock-store-flyout-menu,
+.dock-store-wrapper.active .dock-store-flyout-menu {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* ۲. اصلاح اساسی موبایل: دکمه‌ها دقیقاً مانند کامپیوتر فقط آیکون‌های دایره‌ای ۴۲ پیکسلی هستند (حذف کادرهای عریض مزاحم) */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 12px !important;
+    top: 14px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: auto !important;
+  }
+
+  .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: auto !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* در موبایل دکمه‌ها ۱۰۰٪ دایره‌ای کوچک هستند و صفحه را نمی‌پوشانند */
+  .right-exp-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+  }
+
+  /* مخفی‌سازی کامل متن‌های عریض روی موبایل */
+  .right-exp-text {
+    display: none !important;
+    max-width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .right-exp-icon {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* باز شدن روان زیرمنوی استور روی گوشی با لمس دکمه استور */
+  .dock-store-flyout-menu {
+    right: calc(100% + 6px) !important;
+    width: 210px !important;
+    padding: 8px !important;
+    position: absolute !important;
+    top: 0 !important;
+  }
+}
