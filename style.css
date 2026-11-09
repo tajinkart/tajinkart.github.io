@@ -5623,3 +5623,155 @@ body {
     gap: 9px !important;
   }
 }
+
+
+
+/* ==============================================================================
+   RELEASE V19.3.0: DEFINITIVE SCROLL COLLAPSE DOCK & MOBILE THREE-LINE TRIGGER
+   ============================================================================== */
+
+/* استایل رسمی سه خط آبی نئون استودیو */
+#dockMasterTrigger {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(8, 12, 20, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid var(--cyan-electric);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan-electric);
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+  z-index: 10000;
+}
+
+#dockMasterTrigger:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.7);
+}
+
+/* ------------------------------------------------------------------------------
+   ۱. دسکتاپ (صفحات بالای 768px):
+   - بالای صفحه (Hero): آیکون‌ها باز هستند، سه خط مخفی است.
+   - اسکرول به پایین: آیکون‌ها جمع می‌شوند و سه خط آبی ظاهر می‌شود.
+   - کلیک یا هاور روی سه خط: آیکون‌ها باز می‌شوند.
+   ------------------------------------------------------------------------------ */
+@media (min-width: 769px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 22px !important;
+    top: 22px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  /* بالای صفحه: آیکون‌ها باز، سه خط مخفی */
+  #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
+    display: none !important;
+  }
+  #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  /* اسکرول به پایین (dock-collapsed فعال): دکمه‌ها مخفی و سه خط نمایان */
+  #rightVerticalNav.dock-collapsed #dockMasterTrigger {
+    display: flex !important;
+  }
+  #rightVerticalNav.dock-collapsed:not(.dock-open) .dock-buttons-container {
+    display: none !important;
+  }
+
+  /* کلیک روی سه خط حین اسکرول: آیکون‌ها ظاهر می‌شوند */
+  #rightVerticalNav.dock-collapsed.dock-open .dock-buttons-container,
+  #rightVerticalNav.dock-collapsed:hover .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    margin-top: 6px !important;
+  }
+}
+
+/* ------------------------------------------------------------------------------
+   ۲. موبایل (صفحات زیر 768px):
+   - کلاً از ابتدا و همه‌جا روی سه خط بسته است.
+   - با کلیک روی سه خط، ۶ آیکون گرد زیر آن باز می‌شوند.
+   ------------------------------------------------------------------------------ */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 12px !important;
+    top: 14px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: 44px !important;
+  }
+
+  /* روی گوشی کلاً از اول سه خط است */
+  #dockMasterTrigger {
+    display: flex !important;
+  }
+
+  /* حالت بسته: دکمه‌ها مخفی هستند */
+  #rightVerticalNav.dock-collapsed:not(.dock-open) .dock-buttons-container,
+  #rightVerticalNav:not(.dock-open) .dock-buttons-container {
+    display: none !important;
+  }
+
+  /* حالت باز با کلیک روی سه خط: ۶ آیکون گرد زیر آن باز می‌شوند */
+  #rightVerticalNav.dock-open .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    margin-top: 4px !important;
+  }
+
+  /* دکمه‌ها در موبایل منحصراً آیکون‌های گرد ۴۲ پیکسلی هستند */
+  #rightVerticalNav .right-exp-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    border: 1.5px solid var(--border-subtle) !important;
+  }
+
+  #rightVerticalNav .right-exp-text {
+    display: none !important;
+  }
+
+  #rightVerticalNav .right-exp-icon {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .dock-store-flyout-menu {
+    right: calc(100% + 8px) !important;
+    width: 220px !important;
+    padding: 8px !important;
+    position: absolute !important;
+    top: 0 !important;
+  }
+}

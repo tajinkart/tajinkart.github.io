@@ -7753,3 +7753,42 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(window.initAmbientParticles, 20);
 }
+
+
+
+// ==============================================================================
+// RELEASE V19.3.0: DESKTOP SCROLL-COLLAPSE & MOBILE THREE-LINE CONTROLLER
+// ==============================================================================
+
+(function initDynamicDockScroll() {
+  function updateDockState() {
+    const dock = document.getElementById('rightVerticalNav');
+    if (!dock) return;
+
+    if (window.innerWidth > 768) {
+      // دسکتاپ: بالای صفحه باز است، با اسکرول پایین تبدیل به سه خط می‌شود
+      if (window.scrollY > 100) {
+        dock.classList.add('dock-collapsed');
+      } else {
+        dock.classList.remove('dock-collapsed');
+        dock.classList.remove('dock-open');
+      }
+    } else {
+      // موبایل: کلاً و همه‌جا از ابتدا روی سه خط بسته است
+      dock.classList.add('dock-collapsed');
+    }
+  }
+
+  window.addEventListener('scroll', updateDockState, { passive: true });
+  window.addEventListener('resize', updateDockState, { passive: true });
+  document.addEventListener('DOMContentLoaded', updateDockState);
+  setTimeout(updateDockState, 50);
+})();
+
+window.toggleDockExpand = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    dock.classList.toggle('dock-open');
+  }
+};
