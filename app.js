@@ -2973,31 +2973,26 @@ let scrollTicking = false;
 function handleOptimizedScroll() {
   const dock = document.getElementById('rightVerticalNav');
   const topBar = document.getElementById('topCenterBrandBar');
-  const hero = document.getElementById('stickyBrandHero');
 
-  if (currentView === 'showcase') {
-    const scrolled = window.scrollY || window.pageYOffset || 0;
-
-    // بارگذاری سریع و بدون معطلی نشان برند و دسته بندی در اولین حرکت اسکرول
-    if (scrolled > 40) {
-      if (dock) dock.classList.add('dock-collapsed');
-      if (topBar) topBar.classList.add('visible');
-      const catMenu = document.getElementById('floatingGalleryCategoryMenu');
-      if (catMenu) catMenu.classList.add('visible');
-    } else {
-      if (dock) {
-        dock.classList.remove('dock-collapsed');
-        dock.classList.remove('dock-open');
-      }
-      if (topBar) topBar.classList.remove('visible');
-      const catMenu = document.getElementById('floatingGalleryCategoryMenu');
-      if (catMenu) catMenu.classList.remove('visible');
+  // ۱. قانون قفل موبایل: اسکرول در موبایل هرگز نباید داک را باز کند! همیشه بسته روی سه خط می‌ماند
+  if (window.innerWidth <= 768) {
+    if (dock && !dock.classList.contains('dock-open')) {
+      dock.classList.add('dock-collapsed');
     }
+    return;
+  }
 
-    if (hero) {
-      hero.style.transform = '';
-      hero.style.opacity = '';
+  // ۲. رفتار دسکتاپ: در بالای صفحه باز است، با اسکرول به پایین (>100px) جمع می‌شود به سه خط
+  const scrolled = window.scrollY || window.pageYOffset || 0;
+  if (scrolled > 100) {
+    if (dock) dock.classList.add('dock-collapsed');
+    if (topBar) topBar.classList.add('visible');
+  } else {
+    if (dock) {
+      dock.classList.remove('dock-collapsed');
+      dock.classList.remove('dock-open');
     }
+    if (topBar) topBar.classList.remove('visible');
   }
 }
 
@@ -7760,30 +7755,7 @@ if (document.readyState === 'loading') {
 // RELEASE V19.3.0: DESKTOP SCROLL-COLLAPSE & MOBILE THREE-LINE CONTROLLER
 // ==============================================================================
 
-(function initDynamicDockScroll() {
-  function updateDockState() {
-    const dock = document.getElementById('rightVerticalNav');
-    if (!dock) return;
 
-    if (window.innerWidth > 768) {
-      // دسکتاپ: بالای صفحه باز است، با اسکرول پایین تبدیل به سه خط می‌شود
-      if (window.scrollY > 100) {
-        dock.classList.add('dock-collapsed');
-      } else {
-        dock.classList.remove('dock-collapsed');
-        dock.classList.remove('dock-open');
-      }
-    } else {
-      // موبایل: کلاً و همه‌جا از ابتدا روی سه خط بسته است
-      dock.classList.add('dock-collapsed');
-    }
-  }
-
-  window.addEventListener('scroll', updateDockState, { passive: true });
-  window.addEventListener('resize', updateDockState, { passive: true });
-  document.addEventListener('DOMContentLoaded', updateDockState);
-  setTimeout(updateDockState, 50);
-})();
 
 window.toggleDockExpand = function(e) {
   if (e && e.stopPropagation) e.stopPropagation();
@@ -7814,28 +7786,4 @@ window.switchView = function(viewKey) {
 
 
 
-// ==============================================================================
-// RELEASE V19.5.0: DEFINITIVE SCROLL COLLAPSE CONTROLLER
-// ==============================================================================
-(function() {
-  function handleScroll() {
-    const dock = document.getElementById('rightVerticalNav');
-    if (!dock) return;
 
-    if (window.innerWidth > 768) {
-      if (window.scrollY > 100) {
-        dock.classList.add('dock-collapsed');
-      } else {
-        dock.classList.remove('dock-collapsed');
-        dock.classList.remove('dock-open');
-      }
-    } else {
-      dock.classList.add('dock-collapsed');
-    }
-  }
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  window.addEventListener('resize', handleScroll, { passive: true });
-  document.addEventListener('DOMContentLoaded', handleScroll);
-  setTimeout(handleScroll, 30);
-})();

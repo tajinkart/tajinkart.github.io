@@ -5931,3 +5931,104 @@ body.in-admin-view #rightVerticalNav,
     top: 0 !important;
   }
 }
+
+
+
+/* ==============================================================================
+   RELEASE V19.6.0: AIRTIGHT MOBILE 100% CIRCULAR DOCK & SPRING POP-IN ANIMATION
+   ============================================================================== */
+
+/* انیمیشن باز شدن و جمع شدن نرم آیکون‌ها به سبک اسپرینگ */
+.right-exp-btn {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+              opacity 0.22s ease, 
+              width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s ease !important;
+}
+
+#rightVerticalNav.dock-collapsed:not(.dock-open) .right-exp-btn {
+  opacity: 0 !important;
+  transform: scale(0.5) translateY(-14px) !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+#rightVerticalNav.dock-open .right-exp-btn,
+#rightVerticalNav:not(.dock-collapsed) .right-exp-btn {
+  opacity: 1 !important;
+  transform: scale(1) translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+/* در موبایل: فاصله کافی از لبه راست (16px) و نسبت تصویر ۱:۱ واقعی بدون کشیدگی و مفلوج شدن */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 16px !important;
+    top: 16px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  #dockMasterTrigger {
+    display: flex !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  /* دکمه‌ها کاملاً دایره‌ای واقعی با نسبت ۱ به ۱ و بدون برش لبه */
+  #rightVerticalNav .right-exp-btn,
+  .right-exp-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    border: 1.5px solid var(--border-subtle) !important;
+    box-sizing: border-box !important;
+  }
+
+  #rightVerticalNav .right-exp-icon,
+  .right-exp-icon {
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  #rightVerticalNav .right-exp-text,
+  .right-exp-text {
+    display: none !important;
+    max-width: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+  }
+
+  .dock-store-flyout-menu {
+    right: calc(100% + 8px) !important;
+    width: 220px !important;
+    padding: 8px !important;
+    position: absolute !important;
+    top: 0 !important;
+  }
+}
