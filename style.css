@@ -20,6 +20,42 @@
   font-display: swap;
 }
 
+
+/* ==============================================================================
+   قانون وراثت سراسری و خودکار فونت OPTIMUS PRINCEPS برای تمامی المان‌های آینده
+   ============================================================================== */
+:root {
+  --font-brand: 'OptimusPrinceps', serif;
+  --font-headings: 'OptimusPrinceps', serif;
+}
+
+/* هر تایتل، دکمه، کارت، بج، مدال یا سکشن جدیدی که در آینده اضافه شود خودبه‌خود Optimus می‌گیرد */
+h1, h2, h3, h4, h5, h6,
+.title, [class*="title"], [class*="-title"], [class*="_title"],
+.heading, [class*="heading"], [class*="-heading"],
+button, .btn, [class*="btn"], [class*="-btn"],
+.badge, [class*="badge"], [class*="-badge"],
+.card-header, .card-title,
+.nav-link, .nav-item,
+nav a, nav button,
+.modal-title, .modal-header,
+.banner, [class*="banner"],
+.hero-badge,
+.tile-slug {
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.06em;
+}
+
+/* استثنای قطعی و خودکار: پنل ادمین اختصاصی مدیر منحصراً با فونت اصیل Vazirmatn فارسی بماند */
+#view-admin, 
+#view-admin *, 
+.admin-dashboard-layout,
+.admin-art-modal-box,
+.admin-art-modal-box * {
+  font-family: 'Vazirmatn', sans-serif !important;
+  letter-spacing: normal !important;
+}
+
 /* اعمال فونت باوقار و حماسی OptimusPrinceps روی تمام تیترها، هدرها و داک */
 .brand-giant-title,
 .brand-slogan-bar,
