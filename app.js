@@ -4921,9 +4921,9 @@ window.evalPassStrength = function(pass, prefix) {
   if (pass.length < 6 || isSequential || (pass.length <= 8 && isOnlyDigits) || (pass.length <= 7 && isOnlyLetters)) {
     bar.style.width = '25%';
     bar.style.background = 'var(--crimson)';
-    text.textContent = 'سطح امنیت: بسیار ضعیف و آسیب‌پذیر';
+    text.textContent = 'Security Level: Very Weak';
     text.style.color = 'var(--crimson)';
-    if (hint) hint.textContent = isOnlyDigits ? 'رمز نباید فقط عدد باشد' : 'ترکیب حروف و علائم اضافه کنید';
+    if (hint) hint.textContent = isOnlyDigits ? 'Must not be numbers only' : 'Add letters & symbols';
     return;
   }
 
@@ -4931,7 +4931,7 @@ window.evalPassStrength = function(pass, prefix) {
   if (pass.length >= 6 && varietyCount === 2) {
     bar.style.width = '50%';
     bar.style.background = 'var(--amber)';
-    text.textContent = 'سطح امنیت: متوسط';
+    text.textContent = 'Security Level: Medium';
     text.style.color = 'var(--amber)';
     if (hint) hint.textContent = 'افزودن حروف بزرگ و نمادها (@#!%)';
     return;
@@ -4996,7 +4996,7 @@ window.handleLiveEmailCheck = function(emailVal) {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(cleanEmail)) {
     notice.style.color = 'var(--crimson)';
-    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> فرمت ایمیل هنوز ناقص است (مثال: user@gmail.com)';
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> Email format is incomplete (e.g. artist@domain.com)';
     emailInput.style.borderColor = 'var(--crimson)';
     return;
   }
@@ -5006,7 +5006,7 @@ window.handleLiveEmailCheck = function(emailVal) {
   for (const typo of commonTypos) {
     if (cleanEmail.endsWith(typo)) {
       notice.style.color = 'var(--crimson)';
-      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> پسوند دامنه ناقص به نظر می‌رسد! آیا منظورتان ' + typo + 'm بود؟';
+      notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> Domain incomplete. Did you mean ' + typo + 'm?';
       emailInput.style.borderColor = 'var(--crimson)';
       return;
     }
@@ -6588,3 +6588,179 @@ window.toggleSiteLanguage = function() {
   setSiteLanguage(nextLang);
   showToast(nextLang === 'fa' ? 'زبان سایت به فارسی تغییر یافت.' : 'Language switched to English.', 'info', 2500);
 };
+
+
+
+// ==============================================================================
+// RELEASE V17.2.0: DOCK NAVIGATION, DYNAMIC SLOGANS & ENGLISH AUTH VALIDATION
+// ==============================================================================
+
+// ۱. مدیریت بی‌نقص داک و بستن خودکار زیرمنوها
+window.toggleDockExpand = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    const isCurrentlyOpen = dock.classList.contains('dock-open');
+    if (isCurrentlyOpen) {
+      dock.classList.remove('dock-open');
+      dock.classList.add('dock-collapsed');
+    } else {
+      dock.classList.add('dock-open');
+      dock.classList.remove('dock-collapsed');
+    }
+  }
+};
+
+window.closeDockMobile = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    dock.classList.remove('dock-open');
+    dock.classList.add('dock-collapsed');
+  }
+  const storeWrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (storeWrapper) storeWrapper.classList.remove('active');
+};
+
+window.toggleStoreDockInPlace = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const wrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (wrapper) {
+    wrapper.classList.toggle('active');
+  }
+};
+window.toggleStoreDockSubmenu = window.toggleStoreDockInPlace;
+
+window.navigateToStorePane = function(paneKey, e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  switchView('store');
+  if (typeof switchStoreTab === 'function') {
+    switchStoreTab(paneKey);
+  }
+  const wrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (wrapper) wrapper.classList.remove('active');
+  
+  const title = document.getElementById('storeSectionMainTitle');
+  if (title) {
+    title.textContent = (paneKey === 'products') ? 'Official Digital Assets & Studio Vault' : 'Concept Art & Visual Development Atelier';
+  }
+};
+
+// بستن هوشمند منوها با کلیک روی هر نقطه دیگر صفحه
+document.addEventListener('click', (e) => {
+  const storeWrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (storeWrapper && !storeWrapper.contains(e.target)) {
+    storeWrapper.classList.remove('active');
+  }
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock && !dock.contains(e.target) && window.innerWidth <= 768) {
+    dock.classList.remove('dock-open');
+    dock.classList.add('dock-collapsed');
+  }
+});
+
+// ۲. مدیریت و شخصی‌سازی شعارهای برند در پنل ادمین
+window.loadBrandSlogansFromStorage = function() {
+  try {
+    const customPairs = safeGetStorage('tajinkart_brand_pairs');
+    if (customPairs) {
+      const parsed = JSON.parse(customPairs);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        BRAND_SIGNATURE_PAIRS = parsed;
+      }
+    }
+    const customTitle = safeGetStorage('tajinkart_brand_title');
+    if (customTitle) {
+      const titleEl = document.getElementById('brandMorphTitle');
+      if (titleEl) titleEl.textContent = customTitle;
+    }
+    const customGenre = safeGetStorage('tajinkart_brand_genre');
+    if (customGenre) {
+      const genreEl = document.getElementById('brandGenreBar');
+      if (genreEl) genreEl.textContent = customGenre;
+    }
+  } catch(e) {}
+};
+
+window.renderAdminSloganPairs = function() {
+  const container = document.getElementById('adminSloganPairsListContainer');
+  if (!container) return;
+  
+  // بارگذاری مقادیر ورودی‌ها
+  const titleInput = document.getElementById('adminMainBrandTitleInput');
+  if (titleInput) titleInput.value = safeGetStorage('tajinkart_brand_title') || 'TAJINKART';
+  
+  const genreInput = document.getElementById('adminGenreSubtitleInput');
+  if (genreInput) genreInput.value = safeGetStorage('tajinkart_brand_genre') || 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN';
+
+  container.innerHTML = '';
+  BRAND_SIGNATURE_PAIRS.forEach((pair, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; gap:10px; align-items:center; background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 12px;';
+    row.innerHTML = `
+      <span class="font-mono" style="font-size:11px; color:var(--gold); width:20px;">#${idx + 1}</span>
+      <input type="text" class="admin-slogan-title-input font-mono" value="${pair.title || ''}" placeholder="عنوان هدر (مثلاً TAJINKART)" style="flex:1; padding:7px 10px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+      <input type="text" class="admin-slogan-sub-input font-mono" value="${pair.sub || ''}" placeholder="شعار زیرین (مثلاً FROM INK TO UNIVERSE)" style="flex:1.4; padding:7px 10px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+      <button type="button" onclick="removeAdminSloganPairRow(${idx})" style="color:var(--crimson); font-size:16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px; padding:4px 10px; cursor:pointer;" title="حذف این شعار">✕</button>
+    `;
+    container.appendChild(row);
+  });
+};
+
+window.addAdminSloganPairRow = function() {
+  BRAND_SIGNATURE_PAIRS.push({ title: 'TAJINKART', sub: 'CONCEPT ART & WORLDBUILDING' });
+  renderAdminSloganPairs();
+};
+
+window.removeAdminSloganPairRow = function(idx) {
+  if (BRAND_SIGNATURE_PAIRS.length <= 1) {
+    showToast('حداقل یک شعار باید در لیست هدر باقی بماند.', 'warning', 3000);
+    return;
+  }
+  BRAND_SIGNATURE_PAIRS.splice(idx, 1);
+  renderAdminSloganPairs();
+};
+
+window.saveAdminSlogansSettings = function() {
+  const titleInput = document.getElementById('adminMainBrandTitleInput');
+  const genreInput = document.getElementById('adminGenreSubtitleInput');
+  
+  if (titleInput && titleInput.value.trim()) {
+    safeSetStorage('tajinkart_brand_title', titleInput.value.trim());
+    const titleEl = document.getElementById('brandMorphTitle');
+    if (titleEl) titleEl.textContent = titleInput.value.trim();
+  }
+  
+  if (genreInput && genreInput.value.trim()) {
+    safeSetStorage('tajinkart_brand_genre', genreInput.value.trim());
+    const genreEl = document.getElementById('brandGenreBar');
+    if (genreEl) genreEl.textContent = genreInput.value.trim();
+  }
+
+  // ذخیره جفت‌های شعار
+  const titleInputs = document.querySelectorAll('.admin-slogan-title-input');
+  const subInputs = document.querySelectorAll('.admin-slogan-sub-input');
+  const updatedPairs = [];
+
+  for (let i = 0; i < titleInputs.length; i++) {
+    const t = (titleInputs[i].value || '').trim();
+    const s = (subInputs[i].value || '').trim();
+    if (t || s) {
+      updatedPairs.push({ title: t || 'TAJINKART', sub: s || 'FROM INK TO UNIVERSE' });
+    }
+  }
+
+  if (updatedPairs.length > 0) {
+    BRAND_SIGNATURE_PAIRS = updatedPairs;
+    safeSetStorage('tajinkart_brand_pairs', JSON.stringify(updatedPairs));
+  }
+
+  if (typeof initDynamicBrandHeader === 'function') {
+    initDynamicBrandHeader();
+  }
+
+  showToast('تمامی عناوین، زیرعنوان سبک‌ها و شعارهای متحرک هدر با موفقیت ذخیره شدند! ✓', 'success', 4000);
+};
+
+// اجرای اولیه بارگذاری شعارها
+try { window.loadBrandSlogansFromStorage(); } catch(e) {}
