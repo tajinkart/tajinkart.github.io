@@ -6028,7 +6028,7 @@ body.in-admin-view #rightVerticalNav,
 
 
 /* ==============================================================================
-   RELEASE V20.3.0: CLASSY BALANCED HALOGEN, HOVER TEXT EXPANSION & SUBTLE MOBILE GLOW
+   RELEASE V20.4.0: DYNAMIC CATEGORY PILL SIZING & PALETTE, MOBILE CLICK-ACTIVATED GLOW
    ============================================================================== */
 
 /* ۱. نشان برند TAJINKART و منوی All Artworks: پدیدار شدن با اسکرول در گالری */
@@ -6067,6 +6067,9 @@ body.in-admin-view #rightVerticalNav,
   color: #fff !important;
   font-weight: 800 !important;
   cursor: pointer !important;
+  width: auto !important;
+  max-width: max-content !important;
+  white-space: nowrap !important;
 }
 
 #floatingGalleryCategoryMenu,
@@ -6074,32 +6077,39 @@ body.in-admin-view #rightVerticalNav,
   position: relative !important;
   display: block !important;
   margin: 0 !important;
+  width: auto !important;
+  max-width: max-content !important;
 }
 
 body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   display: none !important;
 }
 
+/* پیل دسته‌بندی آثار با اندازه متغیر دینامیک و رنگ‌آمیزی هماهنگ با شاخه/گالری انتخابی */
 .floating-cat-pill {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 7px 16px !important;
+  padding: 7px 18px !important;
   border-radius: 999px !important;
   background: rgba(9, 12, 18, 0.95) !important;
   backdrop-filter: blur(14px) !important;
-  border: 1px solid var(--border-subtle) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7) !important;
+  border: 1.2px solid var(--pill-accent-color, var(--border-subtle)) !important;
+  box-shadow: 0 0 14px var(--pill-glow-color, rgba(250, 204, 21, 0.35)), inset 0 0 6px var(--pill-glow-color, rgba(250, 204, 21, 0.15)) !important;
   color: #cbd5e1 !important;
   font-size: 13px !important;
   font-weight: 700 !important;
   cursor: pointer !important;
+  width: auto !important;
+  max-width: max-content !important;
+  white-space: nowrap !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 /* ۲. معماری دسکتاپ (صفحات بالای 768px):
    - داک کلاً باز می‌ماند (بدون سه خط)
    - هاور موس روی هر دکمه، کپسول متن و عنوان را به سمت چپ باز می‌کند (Hover Text Expansion)
-   - هالوژن‌ها ملایم، شیک، باکلاس و کنترل‌شده (بدون درخشش زننده یا کورکننده) */
+   - هالوژن‌ها متعادل، شیک و دقیقاً منطبق با سلیقه تأییدشده کاربر */
 @media (min-width: 769px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6172,7 +6182,6 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     flex-shrink: 0 !important;
   }
 
-  /* متن توضیحی درون کپسول: در حالت عادی مخفی، با هاور نمایان و خوانا */
   #rightVerticalNav .right-exp-text,
   .right-exp-text {
     display: flex !important;
@@ -6212,7 +6221,7 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     margin-top: 1px !important;
   }
 
-  /* تنظیم هالوژن شیک، متعادل و باکلاس روی دسکتاپ (بدون پررنگی افراطی) */
+  /* هالوژن شیک و جذاب تأییدشده روی دسکتاپ */
   .right-exp-btn.home-theme {
     border: 1.5px solid rgba(255, 87, 34, 0.55) !important;
     box-shadow: 0 0 12px rgba(255, 87, 34, 0.35), inset 0 0 6px rgba(255, 87, 34, 0.18) !important;
@@ -6299,9 +6308,9 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
 }
 
 /* ۳. معماری موبایل (صفحات تا 768px):
-   - از ابتدا بسته است و فقط سه خط دایره‌ای ۴۴px با فاصله ۱۶px از راست نمایش داده می‌شود
-   - با اسکرول باز نمی‌شود و ۱۰۰٪ بسته می‌ماند
-   - دارای هاله هالوژنی ملایم و دلنشین به اندازه پیل تاژین کارت (نه بی‌روح و نه زننده) */
+   - سه خط در حالت استراحت: هاله آبی ملایم و کنترل‌شده
+   - سه خط هنگام کلیک / باز بودن: درخشش نئونی جذاب و روشن
+   - ۶ آیکون دایره‌ای با هاله هالوژنی ملایم و هماهنگ */
 @media (max-width: 768px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6316,6 +6325,7 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     max-width: 44px !important;
   }
 
+  /* سه خط در حالت بسته: هاله آبی ملایم و متین */
   #dockMasterTrigger {
     display: flex !important;
     width: 44px !important;
@@ -6325,13 +6335,20 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     border-radius: 50% !important;
     aspect-ratio: 1 / 1 !important;
     background: rgba(9, 12, 18, 0.95) !important;
-    border: 1.2px solid rgba(0, 240, 255, 0.55) !important;
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.35), inset 0 0 6px rgba(0, 240, 255, 0.18) !important;
+    border: 1.2px solid rgba(0, 240, 255, 0.4) !important;
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.22), inset 0 0 4px rgba(0, 240, 255, 0.12) !important;
     color: var(--cyan-electric) !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* هنگام کلیک یا در حالت باز: هاله سه خط روشن و درخشان می‌شود */
+  #rightVerticalNav.dock-open #dockMasterTrigger,
+  #dockMasterTrigger:active {
+    border-color: #00f0ff !important;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.6), 0 0 26px rgba(0, 240, 255, 0.25), inset 0 0 7px rgba(0, 240, 255, 0.25) !important;
   }
 
   #rightVerticalNav.dock-open #dockMasterTrigger svg {
@@ -6372,6 +6389,7 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     box-sizing: border-box !important;
     background: rgba(9, 12, 18, 0.95) !important;
     backdrop-filter: blur(14px) !important;
+    transition: all 0.25s ease !important;
   }
 
   #rightVerticalNav .right-exp-text,
@@ -6393,10 +6411,13 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     border: none !important;
   }
 
-  /* هاله هالوژنی ملایم و دقیق در موبایل (مشابه تاژین کارت و آلورکس) */
+  /* هاله هالوژنی ملایم و دقیق در موبایل با روشن شدن هنگام لمس */
   .right-exp-btn.home-theme {
-    border: 1.2px solid rgba(255, 87, 34, 0.5) !important;
-    box-shadow: 0 0 10px rgba(255, 87, 34, 0.3), inset 0 0 5px rgba(255, 87, 34, 0.15) !important;
+    border: 1.2px solid rgba(255, 87, 34, 0.45) !important;
+    box-shadow: 0 0 9px rgba(255, 87, 34, 0.28), inset 0 0 5px rgba(255, 87, 34, 0.14) !important;
+  }
+  .right-exp-btn.home-theme:active {
+    box-shadow: 0 0 16px rgba(255, 87, 34, 0.6), inset 0 0 7px rgba(255, 87, 34, 0.25) !important;
   }
   .right-exp-btn.home-theme .right-exp-icon {
     background: rgba(255, 87, 34, 0.12) !important;
@@ -6404,8 +6425,11 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   }
 
   .right-exp-btn.cyan-theme {
-    border: 1.2px solid rgba(0, 240, 255, 0.5) !important;
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
+    border: 1.2px solid rgba(0, 240, 255, 0.45) !important;
+    box-shadow: 0 0 9px rgba(0, 240, 255, 0.28), inset 0 0 5px rgba(0, 240, 255, 0.14) !important;
+  }
+  .right-exp-btn.cyan-theme:active {
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.6), inset 0 0 7px rgba(0, 240, 255, 0.25) !important;
   }
   .right-exp-btn.cyan-theme .right-exp-icon {
     background: rgba(0, 240, 255, 0.12) !important;
@@ -6413,8 +6437,11 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   }
 
   .right-exp-btn.gold-theme {
-    border: 1.2px solid rgba(250, 204, 21, 0.5) !important;
-    box-shadow: 0 0 10px rgba(250, 204, 21, 0.3), inset 0 0 5px rgba(250, 204, 21, 0.15) !important;
+    border: 1.2px solid rgba(250, 204, 21, 0.45) !important;
+    box-shadow: 0 0 9px rgba(250, 204, 21, 0.28), inset 0 0 5px rgba(250, 204, 21, 0.14) !important;
+  }
+  .right-exp-btn.gold-theme:active {
+    box-shadow: 0 0 16px rgba(250, 204, 21, 0.6), inset 0 0 7px rgba(250, 204, 21, 0.25) !important;
   }
   .right-exp-btn.gold-theme .right-exp-icon {
     background: rgba(250, 204, 21, 0.12) !important;
@@ -6422,8 +6449,11 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   }
 
   .right-exp-btn.crimson-theme {
-    border: 1.2px solid rgba(244, 63, 94, 0.5) !important;
-    box-shadow: 0 0 10px rgba(244, 63, 94, 0.3), inset 0 0 5px rgba(244, 63, 94, 0.15) !important;
+    border: 1.2px solid rgba(244, 63, 94, 0.45) !important;
+    box-shadow: 0 0 9px rgba(244, 63, 94, 0.28), inset 0 0 5px rgba(244, 63, 94, 0.14) !important;
+  }
+  .right-exp-btn.crimson-theme:active {
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.6), inset 0 0 7px rgba(244, 63, 94, 0.25) !important;
   }
   .right-exp-btn.crimson-theme .right-exp-icon {
     background: rgba(244, 63, 94, 0.12) !important;
@@ -6431,8 +6461,11 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   }
 
   .right-exp-btn.purple-theme {
-    border: 1.2px solid rgba(168, 85, 247, 0.5) !important;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3), inset 0 0 5px rgba(168, 85, 247, 0.15) !important;
+    border: 1.2px solid rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 0 9px rgba(168, 85, 247, 0.28), inset 0 0 5px rgba(168, 85, 247, 0.14) !important;
+  }
+  .right-exp-btn.purple-theme:active {
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.6), inset 0 0 7px rgba(168, 85, 247, 0.25) !important;
   }
   .right-exp-btn.purple-theme .right-exp-icon {
     background: rgba(168, 85, 247, 0.12) !important;
@@ -6440,8 +6473,11 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   }
 
   .right-exp-btn.emerald-theme {
-    border: 1.2px solid rgba(16, 185, 129, 0.5) !important;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3), inset 0 0 5px rgba(16, 185, 129, 0.15) !important;
+    border: 1.2px solid rgba(16, 185, 129, 0.45) !important;
+    box-shadow: 0 0 9px rgba(16, 185, 129, 0.28), inset 0 0 5px rgba(16, 185, 129, 0.14) !important;
+  }
+  .right-exp-btn.emerald-theme:active {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.6), inset 0 0 7px rgba(16, 185, 129, 0.25) !important;
   }
   .right-exp-btn.emerald-theme .right-exp-icon {
     background: rgba(16, 185, 129, 0.12) !important;

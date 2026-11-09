@@ -5322,24 +5322,40 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
 
   const pillBtn = document.getElementById('currentCategoryPillBtn');
   if (pillBtn) {
-    if (categoryKey === 'all') {
-      pillBtn.style.borderColor = 'var(--gold)';
-      pillBtn.style.boxShadow = '0 0 14px rgba(250, 204, 21, 0.4)';
-      if (labelEl) labelEl.style.color = 'var(--gold)';
-    } else {
-      const cat = galleryCategories.find(c => c.id === categoryKey);
-      const color = (cat && cat.color) ? cat.color : '#38bdf8';
-      pillBtn.style.borderColor = color;
-      pillBtn.style.boxShadow = `0 0 16px ${color}66`;
-      if (labelEl) labelEl.style.color = color;
+    let color = '#facc15';
+    let glow = 'rgba(250, 204, 21, 0.4)';
+    
+    if (categoryKey !== 'all') {
+      const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
+        ? galleryCategories.find(c => c.id === categoryKey) : null;
+      if (cat && cat.color) {
+        color = cat.color;
+      } else {
+        const palette = {
+          'characters': '#ff5722',
+          'environments': '#00f0ff',
+          'creatures': '#f43f5e',
+          'mecha': '#a855f7',
+          'illustrations': '#10b981',
+          'sketches': '#f59e0b'
+        };
+        color = palette[categoryKey] || '#38bdf8';
+      }
+      glow = color.startsWith('#') ? `${color}66` : color;
     }
+
+    pillBtn.style.setProperty('--pill-accent-color', color);
+    pillBtn.style.setProperty('--pill-glow-color', glow);
+    pillBtn.style.borderColor = color;
+    pillBtn.style.boxShadow = `0 0 14px ${glow}, inset 0 0 6px ${glow}`;
+    if (labelEl) labelEl.style.color = color;
   }
 
   document.querySelectorAll('.cat-dropdown-item').forEach(item => {
     item.classList.toggle('active', item.textContent.includes(categoryName));
   });
 
-  const dropdown = document.getElementById('categoryFilterDropdown');
+  const dropdown = document.getElementById('floatingCategoryDropdown') || document.getElementById('categoryFilterDropdown');
   if (dropdown) dropdown.classList.add('hidden');
 
   renderShowcaseGrid();
