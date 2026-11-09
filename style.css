@@ -4548,14 +4548,7 @@ body {
    ============================================================================== */
 
 /* ممانعت قطعی از معلق ماندن زیرمنوی استور در حالت بسته بودن داک */
-#rightVerticalNav.dock-collapsed .dock-store-flyout-menu,
-#rightVerticalNav:not(.dock-open) .dock-store-flyout-menu,
-.dock-store-wrapper:not(.active) .dock-store-flyout-menu {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-}
+/* Blocker rule removed for clean flyout display */
 
 /* اعمال کامل فونت باوقار OptimusPrinceps بر بخش درباره استودیو */
 #showcaseStudioAboutSection,
@@ -5107,5 +5100,210 @@ body {
     top: 0 !important;
     width: 240px !important;
     z-index: 10000 !important;
+  }
+}
+
+
+
+/* ==============================================================================
+   RELEASE V18.8.0: TRANSPARENT HERO, BACKGROUND DUST & BULLETPROOF STORE SPLIT
+   ============================================================================== */
+
+/* هدر و کانتینر گالری ۱۰۰٪ شفاف تا غبار کیهانی دقیقاً پشت لوگوی TAJINKART دیده شود */
+#stickyBrandHero {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+#artworkCurtain {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* کارت‌های آثار اوپک و کدر می‌مانند تا غبار روی تصاویر نیفتد */
+.artwork-card,
+.mosaic-tile {
+  background: #06090e !important;
+  position: relative !important;
+  z-index: 15 !important;
+}
+
+/* ==============================================================================
+   داک ناوبری شناور و ارگونومیک (همسان‌سازی دسکتاپ و موبایل)
+   ============================================================================== */
+#rightVerticalNav {
+  position: fixed !important;
+  right: 18px !important;
+  top: 18px !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 9px !important;
+  direction: ltr !important;
+}
+
+#dockMasterTrigger {
+  display: none !important;
+}
+
+.dock-buttons-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 9px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
+/* دکمه‌های کپسولی داک: آیکون در راست، نوشته‌ها تراز در چپ */
+.right-exp-btn {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  width: 46px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(8, 11, 18, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1.5px solid var(--border-subtle) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75) !important;
+  transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s !important;
+  overflow: hidden !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.right-exp-btn:hover {
+  width: auto !important;
+  min-width: 46px !important;
+  padding: 0 18px 0 6px !important;
+}
+
+.right-exp-icon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.right-exp-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  text-align: left !important;
+  direction: ltr !important;
+  padding-left: 14px !important;
+  padding-right: 8px !important;
+  white-space: nowrap !important;
+  opacity: 0 !important;
+  max-width: 0 !important;
+  overflow: hidden !important;
+  transition: opacity 0.25s ease, max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.right-exp-btn:hover .right-exp-text {
+  opacity: 1 !important;
+  max-width: 220px !important;
+}
+
+.right-exp-title {
+  display: block !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.right-exp-sub {
+  display: block !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.2 !important;
+  margin-top: 2px !important;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+/* زیرمنوی دو قسمتی استور: عملکرد قطعی با کلیک یا هاور در دسکتاپ و موبایل */
+.dock-store-wrapper {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+}
+
+.dock-store-flyout-menu {
+  display: none;
+  position: absolute !important;
+  right: calc(100% + 12px) !important;
+  top: 0 !important;
+  width: 250px !important;
+  background: rgba(8, 11, 18, 0.98) !important;
+  backdrop-filter: blur(22px) !important;
+  border: 1.5px solid var(--gold) !important;
+  border-radius: 16px !important;
+  padding: 10px !important;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.95) !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  z-index: 10000 !important;
+  box-sizing: border-box !important;
+}
+
+/* باز شدن با هاور ماوس یا کلاس فعال با کلیک */
+.dock-store-wrapper:hover .dock-store-flyout-menu,
+.dock-store-wrapper.active .dock-store-flyout-menu {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* بهینه‌سازی داک برای نمایشگرهای موبایل */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    right: 12px !important;
+    top: 14px !important;
+  }
+
+  .right-exp-btn {
+    height: 42px !important;
+    min-width: 42px !important;
+    width: 42px !important;
+  }
+
+  .right-exp-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .dock-store-flyout-menu {
+    right: calc(100% + 8px) !important;
+    width: 230px !important;
+    padding: 8px !important;
   }
 }

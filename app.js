@@ -7556,3 +7556,115 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(window.initAmbientParticles, 30);
 }
+
+
+
+// ==============================================================================
+// RELEASE V18.8.0: ROCK-SOLID STORE SUBMENU TOGGLE & PURE ATMOSPHERIC STARDUST
+// ==============================================================================
+
+window.toggleStoreDockInPlace = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const wrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (wrapper) {
+    wrapper.classList.toggle('active');
+  }
+};
+window.toggleStoreDockSubmenu = window.toggleStoreDockInPlace;
+
+window.navigateToStorePane = function(paneKey, e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  switchView('store');
+  if (typeof switchStoreTab === 'function') {
+    switchStoreTab(paneKey);
+  }
+  const wrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (wrapper) wrapper.classList.remove('active');
+  
+  const title = document.getElementById('storeSectionMainTitle');
+  if (title) {
+    title.textContent = (paneKey === 'products') ? 'Official Digital Assets & Studio Vault' : 'Concept Art & Visual Development Atelier';
+  }
+};
+
+// بستن منو با کلیک در هر نقطه دیگر صفحه یا خروج ماوس
+document.addEventListener('click', (e) => {
+  const storeWrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (storeWrapper && !storeWrapper.contains(e.target)) {
+    storeWrapper.classList.remove('active');
+  }
+});
+
+// بازنویسی موتور غبار با ذرات باوقار و نامرئی در لایه کارت‌ها
+window.initAmbientParticles = function() {
+  const canvas = document.getElementById('ambientParticleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  let width = (canvas.width = window.innerWidth * dpr);
+  let height = (canvas.height = window.innerHeight * dpr);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth * dpr;
+    height = canvas.height = window.innerHeight * dpr;
+  }, { passive: true });
+
+  const colors = [
+    'rgba(250, 204, 21, 0.45)',   // غبار طلایی آرام
+    'rgba(245, 158, 11, 0.35)',   // اخگر کهربایی ملایم
+    'rgba(226, 232, 240, 0.40)'   // غبار نقره‌ای کیهانی
+  ];
+
+  const particleCount = window.innerWidth <= 768 ? 28 : 48;
+  const particles = [];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: (Math.random() * 1.8 + 1.0) * dpr,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 0.3 * dpr,
+      vy: -(Math.random() * 0.45 + 0.18) * dpr,
+      pulse: Math.random() * Math.PI,
+      pulseSpeed: Math.random() * 0.02 + 0.01
+    });
+  }
+
+  function renderParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx + Math.sin(p.pulse) * 0.25 * dpr;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+
+      if (p.y < -15) {
+        p.y = height + 15;
+        p.x = Math.random() * width;
+      }
+      if (p.x < -15) p.x = width + 15;
+      if (p.x > width + 15) p.x = -15;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 6 * dpr;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(renderParticles);
+  }
+
+  renderParticles();
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initAmbientParticles);
+} else {
+  setTimeout(window.initAmbientParticles, 25);
+}
