@@ -4926,3 +4926,186 @@ body {
   direction: ltr !important;
   width: 100% !important;
 }
+
+
+
+/* ==============================================================================
+   RELEASE V18.7.0: BACKGROUND DUST PARTICLES & BULLETPROOF DESKTOP DOCK NAVIGATION
+   ============================================================================== */
+
+/* قرارگیری بوم پارتیکل‌ها در عمق پس‌زمینه (پشت تمام تصاویر و کارت‌های اثر) */
+#ambientParticleCanvas {
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 1 !important; /* پشت تمام کارت‌ها و محتوای صفحه */
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* کارت‌ها، گالری و بخش‌ها روی لایه بالاتر از پارتیکل‌ها قرار می‌گیرند تا تصویر را نپوشانند */
+#stickyBrandHero {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+#artworkCurtain,
+.view-section,
+.container {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.artwork-card,
+.mosaic-tile {
+  background: #05070c !important;
+  position: relative !important;
+  z-index: 12 !important;
+}
+
+/* ==============================================================================
+   ناوبری دسکتاپ (صفحات بزرگتر از 768px): همیشه باز و فعال بدون کلیک اولیه
+   ============================================================================== */
+@media (min-width: 769px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 22px !important;
+    top: 22px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    direction: ltr !important;
+  }
+
+  /* تریگر همبرگری در دسکتاپ مخفی است؛ آیکون‌ها خودشان مستقیماً در دسترسند */
+  #dockMasterTrigger {
+    display: none !important;
+  }
+
+  .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+  }
+
+  .mobile-dock-header,
+  .mobile-dock-backdrop {
+    display: none !important;
+  }
+
+  .right-exp-btn {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    width: 46px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1.5px solid var(--border-subtle) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75) !important;
+    transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .right-exp-btn:hover {
+    width: auto !important;
+    min-width: 46px !important;
+    padding: 0 18px 0 6px !important;
+  }
+
+  .right-exp-icon {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .right-exp-text {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    direction: ltr !important;
+    padding-left: 14px !important;
+    padding-right: 8px !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+    transition: opacity 0.25s ease, max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .right-exp-btn:hover .right-exp-text {
+    opacity: 1 !important;
+    max-width: 220px !important;
+  }
+
+  .right-exp-title {
+    display: block !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    font-family: var(--font-brand) !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.25 !important;
+    text-align: left !important;
+    direction: ltr !important;
+    width: 100% !important;
+  }
+
+  .right-exp-sub {
+    display: block !important;
+    font-size: 11px !important;
+    color: #94a3b8 !important;
+    line-height: 1.2 !important;
+    margin-top: 2px !important;
+    text-align: left !important;
+    direction: ltr !important;
+    width: 100% !important;
+  }
+
+  /* زیرمنوی استور روی کامپیوتر: با هاور یا کلیک فوراً سمت چپ باز می‌شود */
+  .dock-store-wrapper {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+  }
+
+  .dock-store-wrapper:hover .dock-store-flyout-menu,
+  .dock-store-wrapper.active .dock-store-flyout-menu {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: absolute !important;
+    right: calc(100% + 12px) !important;
+    top: 0 !important;
+    width: 240px !important;
+    z-index: 10000 !important;
+  }
+}

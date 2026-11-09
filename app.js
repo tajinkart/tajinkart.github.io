@@ -7475,3 +7475,84 @@ window.saveAdminCategoryEdit = function() {
     showToast(`دسته‌بندی «${newTitleFA}» (${newTitleEN}) با موفقیت ذخیره شد! ✓`, 'success', 3500);
   }
 };
+
+
+
+// ==============================================================================
+// RELEASE V18.7.0: SUBTLE ATMOSPHERIC STARDUST (MUTED GOLD & SILVER)
+// ==============================================================================
+
+window.initAmbientParticles = function() {
+  const canvas = document.getElementById('ambientParticleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  let width = (canvas.width = window.innerWidth * dpr);
+  let height = (canvas.height = window.innerHeight * dpr);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth * dpr;
+    height = canvas.height = window.innerHeight * dpr;
+  }, { passive: true });
+
+  // پالت رنگی باوقار و آرام دارک فانتزی (طلایی ملایم، کهربایی مات و نقره‌ای بدون رنگ‌های زننده)
+  const colors = [
+    'rgba(250, 204, 21, 0.42)',   // غبار طلایی بسیار ملایم
+    'rgba(245, 158, 11, 0.32)',   // اخگر کهربایی مات
+    'rgba(226, 232, 240, 0.38)',  // غبار ستاره‌ای نقره‌ای
+    'rgba(203, 213, 225, 0.28)'   // مه خاکستری کیهانی
+  ];
+
+  const particleCount = window.innerWidth <= 768 ? 26 : 46;
+  const particles = [];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: (Math.random() * 1.8 + 0.9) * dpr,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 0.3 * dpr,
+      vy: -(Math.random() * 0.4 + 0.15) * dpr,
+      pulse: Math.random() * Math.PI,
+      pulseSpeed: Math.random() * 0.02 + 0.01
+    });
+  }
+
+  function renderParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx + Math.sin(p.pulse) * 0.25 * dpr;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+
+      if (p.y < -15) {
+        p.y = height + 15;
+        p.x = Math.random() * width;
+      }
+      if (p.x < -15) p.x = width + 15;
+      if (p.x > width + 15) p.x = -15;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 6 * dpr;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(renderParticles);
+  }
+
+  renderParticles();
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initAmbientParticles);
+} else {
+  setTimeout(window.initAmbientParticles, 30);
+}
