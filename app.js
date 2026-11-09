@@ -1432,6 +1432,13 @@ window.adminDeleteArtwork = function(idx) {
 };
 
 window.renderAdminSettingsTab = function() {
+  // مقداردهی رادیوی وضعیت حضور استودیو
+  const curMode = siteSettings.studioAvailabilityMode || 'auto';
+  const radioEl = document.getElementById(`studioMode${curMode.charAt(0).toUpperCase() + curMode.slice(1)}`);
+  if (radioEl) radioEl.checked = true;
+  const customMsgEl = document.getElementById('setStudioCustomStatusMessage');
+  if (customMsgEl) customMsgEl.value = siteSettings.studioCustomStatusMessage || '';
+  if (typeof previewStudioStatusSelection === 'function') previewStudioStatusSelection();
   if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
   if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
   const rateEl = document.getElementById('setUsdRate');
@@ -5470,19 +5477,75 @@ window.updateStudioLiveStatus = function() {
   const textEl = document.getElementById('studioLiveStatusText');
   if (!badge || !textEl) return;
 
+  const mode = siteSettings.studioAvailabilityMode || 'auto';
+  const customMsg = (siteSettings.studioCustomStatusMessage || '').trim();
+
+  if (mode === 'vacation') {
+    badge.className = 'hero-badge studio-status-badge status-vacation';
+    textEl.textContent = customMsg || 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است';
+    badge.title = 'آتلیه در حالت مرخصی و سفر موقت است.';
+    return;
+  }
+
+  if (mode === 'online') {
+    badge.className = 'hero-badge studio-status-badge status-online';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
+    return;
+  }
+
+  if (mode === 'away') {
+    badge.className = 'hero-badge studio-status-badge status-pending';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت';
+    badge.title = 'پذیرش سفارشات فعال است و بریف‌ها با اندکی تاخیر بررسی خواهند شد.';
+    return;
+  }
+
+  // حالت خودکار هوشمند (Auto): کمتر از ۲۴ ساعت آنلاین، بیش از آن پاسخگویی با تاخیر
   const lastActive = Number(siteSettings.lastAdminLoginTime) || Date.now();
   const diffHours = (Date.now() - lastActive) / (1000 * 60 * 60);
 
-  // کمتر از ۲۴ ساعت: آتلیه فعال و آنلاین با پالس سبز
   if (diffHours <= 24) {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
     badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
   } else {
-    // بیش از ۲۴ ساعت: حالت تعلیق هوشمند با پالس کهربایی و تایید پذیرش سفارش
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
-    badge.title = 'پذیرش سفارشات فعال است. به دلیل نوسانات موقت اینترنت منطقه‌ای، بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد اما پروژه‌ها در آتلیه طبق زمان‌بندی پیش می‌روند.';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    badge.title = 'پذیرش سفارشات فعال است. بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد.';
+  }
+};
+
+window.saveStudioAvailabilitySettingsDirect = function() {
+  const selectedMode = document.querySelector('input[name="studioAvailabilityChoice"]:checked')?.value || 'auto';
+  const customMsg = document.getElementById('setStudioCustomStatusMessage')?.value.trim() || '';
+  
+  siteSettings.studioAvailabilityMode = selectedMode;
+  siteSettings.studioCustomStatusMessage = customMsg;
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  
+  updateStudioLiveStatus();
+  previewStudioStatusSelection();
+  showToast('وضعیت حضور و پذیرش سفارشات استودیو با موفقیت به‌روزرسانی شد! ✓', 'success', 3500);
+};
+
+window.previewStudioStatusSelection = function() {
+  const selectedMode = document.querySelector('input[name="studioAvailabilityChoice"]:checked')?.value || 'auto';
+  const previewBadge = document.getElementById('currentStudioModeBadgePreview');
+  if (!previewBadge) return;
+  
+  if (selectedMode === 'vacation') {
+    previewBadge.className = 'hero-badge studio-status-badge status-vacation font-mono';
+    previewBadge.textContent = '🔴 حالت سفر و مرخصی (سفارش بسته)';
+  } else if (selectedMode === 'online') {
+    previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
+    previewBadge.textContent = '🟢 همیشه آنلاین و باز';
+  } else if (selectedMode === 'away') {
+    previewBadge.className = 'hero-badge studio-status-badge status-pending font-mono';
+    previewBadge.textContent = '🟡 بررسی با تاخیر (Away)';
+  } else {
+    previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
+    previewBadge.textContent = '🔄 خودکار ۲۴ ساعته';
   }
 };
 
@@ -5742,19 +5805,75 @@ window.updateStudioLiveStatus = function() {
   const textEl = document.getElementById('studioLiveStatusText');
   if (!badge || !textEl) return;
 
+  const mode = siteSettings.studioAvailabilityMode || 'auto';
+  const customMsg = (siteSettings.studioCustomStatusMessage || '').trim();
+
+  if (mode === 'vacation') {
+    badge.className = 'hero-badge studio-status-badge status-vacation';
+    textEl.textContent = customMsg || 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است';
+    badge.title = 'آتلیه در حالت مرخصی و سفر موقت است.';
+    return;
+  }
+
+  if (mode === 'online') {
+    badge.className = 'hero-badge studio-status-badge status-online';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
+    return;
+  }
+
+  if (mode === 'away') {
+    badge.className = 'hero-badge studio-status-badge status-pending';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت';
+    badge.title = 'پذیرش سفارشات فعال است و بریف‌ها با اندکی تاخیر بررسی خواهند شد.';
+    return;
+  }
+
+  // حالت خودکار هوشمند (Auto): کمتر از ۲۴ ساعت آنلاین، بیش از آن پاسخگویی با تاخیر
   const lastActive = Number(siteSettings.lastAdminLoginTime) || Date.now();
   const diffHours = (Date.now() - lastActive) / (1000 * 60 * 60);
 
-  // کمتر از ۲۴ ساعت: آتلیه فعال و آنلاین با پالس سبز
   if (diffHours <= 24) {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
     badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
   } else {
-    // بیش از ۲۴ ساعت: حالت تعلیق هوشمند با پالس کهربایی و تایید پذیرش سفارش
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
-    badge.title = 'پذیرش سفارشات فعال است. به دلیل نوسانات موقت اینترنت منطقه‌ای، بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد اما پروژه‌ها در آتلیه طبق زمان‌بندی پیش می‌روند.';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    badge.title = 'پذیرش سفارشات فعال است. بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد.';
+  }
+};
+
+window.saveStudioAvailabilitySettingsDirect = function() {
+  const selectedMode = document.querySelector('input[name="studioAvailabilityChoice"]:checked')?.value || 'auto';
+  const customMsg = document.getElementById('setStudioCustomStatusMessage')?.value.trim() || '';
+  
+  siteSettings.studioAvailabilityMode = selectedMode;
+  siteSettings.studioCustomStatusMessage = customMsg;
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  
+  updateStudioLiveStatus();
+  previewStudioStatusSelection();
+  showToast('وضعیت حضور و پذیرش سفارشات استودیو با موفقیت به‌روزرسانی شد! ✓', 'success', 3500);
+};
+
+window.previewStudioStatusSelection = function() {
+  const selectedMode = document.querySelector('input[name="studioAvailabilityChoice"]:checked')?.value || 'auto';
+  const previewBadge = document.getElementById('currentStudioModeBadgePreview');
+  if (!previewBadge) return;
+  
+  if (selectedMode === 'vacation') {
+    previewBadge.className = 'hero-badge studio-status-badge status-vacation font-mono';
+    previewBadge.textContent = '🔴 حالت سفر و مرخصی (سفارش بسته)';
+  } else if (selectedMode === 'online') {
+    previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
+    previewBadge.textContent = '🟢 همیشه آنلاین و باز';
+  } else if (selectedMode === 'away') {
+    previewBadge.className = 'hero-badge studio-status-badge status-pending font-mono';
+    previewBadge.textContent = '🟡 بررسی با تاخیر (Away)';
+  } else {
+    previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
+    previewBadge.textContent = '🔄 خودکار ۲۴ ساعته';
   }
 };
 

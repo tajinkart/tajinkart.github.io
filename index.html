@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+  <!-- ریدایرکت خودکار و انحصاری به دامنه رسمی تاج اینک آرت (Exclusive tajinkart.space) -->
+  <link rel=canonical href="https://tajinkart.space/" />
+  <script>
+    if (window.location.hostname === 'tajinkart.github.io') {
+      window.location.replace('https://tajinkart.space' + window.location.pathname + window.location.search + window.location.hash);
+    }
+  </script>
   <!-- محافظت فوق‌العاده سطح مرورگر در برابر مسدودسازی حافظه یا خطاهای دسترسی -->
   <script>
     (function() {
@@ -35,9 +42,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=13.0.0">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css?v=13.1.0">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c76a19f07a524a87b5a19808d4b38d38"}'></script>
 </head>
@@ -1158,7 +1165,71 @@
                       ✓ ذخیره و به‌روزرسانی متن درباره استودیو
                     </button>
                   </div>
-<!-- مرکز جامع مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو TAJINKART -->
+                  <!-- کارت تنظیم دستی وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه (حالت سفر/مرخصی) -->
+                  <div style="background:#06080d; border:1.5px solid rgba(250,204,21,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                      <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:18px;">🎛️</span>
+                          <span style="font-size:14.5px; font-weight:900; color:var(--gold);">کنترل وضعیت حضور، پاسخ‌گویی و پذیرش سفارشات آتلیه</span>
+                        </div>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">تعیین مستقیم نشانگر آنلاین، زمان پاسخ‌دهی یا بستن موقت سفارشات در زمان سفر و مرخصی استودیو.</span>
+                      </div>
+                      <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 پیش‌نمایش زنده</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                      <!-- گزینه ۱: خودکار هوشمند -->
+                      <label style="background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin-top:3px;" checked />
+                        <div>
+                          <strong style="color:#fff; font-size:12px; display:block;">🔄 خودکار (هوشمند ۲۴ ساعته)</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">تعیین وضعیت بر اساس آخرین ورود شما (کمتر از ۲۴ ساعت آنلاین، بیش از آن پاسخ‌دهی ۲۴ ساعته).</span>
+                        </div>
+                      </label>
+
+                      <!-- گزینه ۲: آنلاین و فعال دائم -->
+                      <label style="background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
+                        <div>
+                          <strong style="color:#10b981; font-size:12px; display:block;">🟢 همیشه آنلاین و باز</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است.</span>
+                        </div>
+                      </label>
+
+                      <!-- گزینه ۳: در حال بررسی با تاخیر -->
+                      <label style="background:#04060a; border:1px solid rgba(251,191,36,0.3); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
+                        <div>
+                          <strong style="color:#fbbf24; font-size:12px; display:block;">🟡 بررسی با تاخیر (Away)</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت.</span>
+                        </div>
+                      </label>
+
+                      <!-- گزینه ۴: حالت مرخصی و سفر استودیو -->
+                      <label style="background:#04060a; border:1px solid rgba(239,68,68,0.35); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
+                        <div>
+                          <strong style="color:#ef4444; font-size:12px; display:block;">🔴 مرخصی و سفر استودیو (بسته)</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارشات موقتاً متوقف است.</span>
+                        </div>
+                      </label>
+                    </div>
+
+                    <!-- کادر متن پیام سفارشی وضعیت -->
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن پیام سفارشی نشانگر وضعیت (اختیاری):</label>
+                      <input type="text" id="setStudioCustomStatusMessage" placeholder="مثلاً: استودیو تا دوشنبه آینده در سفر تحقیقاتی دنیاسازی است و پس از بازگشت پاسخگوی سفارشات خواهد بود." style="font-size:11.5px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:10px 12px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                      <button type="button" onclick="saveStudioAvailabilitySettingsDirect()" class="btn-gold" style="font-size:12px; padding:10px 22px; font-weight:800; border-radius:8px; cursor:pointer;">
+                        ✓ ذخیره و فعال‌سازی فوری وضعیت استودیو
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- مرکز جامع مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو TAJINKART -->
                   <div style="background:#06080d; border:1.5px solid rgba(16,185,129,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
                       <div>
@@ -1985,8 +2056,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=13.0.0"></script>
-  <script src="app.js?v=13.0.0"></script>
+  <script src="data.js?v=13.1.0"></script>
+  <script src="app.js?v=13.1.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
