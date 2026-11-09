@@ -5775,3 +5775,16 @@ body {
     top: 0 !important;
   }
 }
+
+
+
+/* ==============================================================================
+   مخفی‌سازی ۱۰۰٪ قطعی داک عمومی در پنل مدیریت استودیو (#view-admin)
+   ============================================================================== */
+body.in-admin-view #rightVerticalNav,
+#view-admin:not(.hidden) ~ #rightVerticalNav {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

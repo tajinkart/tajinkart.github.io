@@ -7792,3 +7792,22 @@ window.toggleDockExpand = function(e) {
     dock.classList.toggle('dock-open');
   }
 };
+
+
+
+// مخفی‌سازی داک در پنل ادمین
+const origSwitchViewAdminGuard = window.switchView;
+window.switchView = function(viewKey) {
+  if (viewKey === 'admin') {
+    document.body.classList.add('in-admin-view');
+    const dock = document.getElementById('rightVerticalNav');
+    if (dock) dock.style.display = 'none';
+  } else {
+    document.body.classList.remove('in-admin-view');
+    const dock = document.getElementById('rightVerticalNav');
+    if (dock) dock.style.display = '';
+  }
+  if (typeof origSwitchViewAdminGuard === 'function') {
+    origSwitchViewAdminGuard(viewKey);
+  }
+};
