@@ -7058,3 +7058,189 @@ window.saveAdminCategoryEdit = function() {
     showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
   }
 };
+
+
+
+// ==============================================================================
+// RELEASE V18.5.0: VISIBLE DUST PARTICLES ENGINE & INLINE ADMIN CATEGORY EDIT
+// ==============================================================================
+
+// ۱. راه‌اندازی فوری پارتیکل‌های کیهانی در پس‌زمینه سایت
+window.initAmbientParticles = function() {
+  const canvas = document.getElementById('ambientParticleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }, { passive: true });
+
+  const colors = [
+    'rgba(250, 204, 21, 0.85)',   // طلایی درخشان
+    'rgba(0, 240, 255, 0.8)',     // نئون سیان
+    'rgba(255, 87, 34, 0.75)',    // اخگر مرجانی
+    'rgba(168, 85, 247, 0.75)',   // بنفش کیهانی
+    'rgba(255, 255, 255, 0.8)'    // غبار سفید ستاره‌ای
+  ];
+
+  const particleCount = window.innerWidth <= 768 ? 35 : 70;
+  const particles = [];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 2.2 + 1.1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: -(Math.random() * 0.55 + 0.2),
+      pulse: Math.random() * Math.PI,
+      pulseSpeed: Math.random() * 0.025 + 0.015
+    });
+  }
+
+  function renderParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx + Math.sin(p.pulse) * 0.3;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+
+      if (p.y < -10) {
+        p.y = height + 10;
+        p.x = Math.random() * width;
+      }
+      if (p.x < -10) p.x = width + 10;
+      if (p.x > width + 10) p.x = -10;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(renderParticles);
+  }
+
+  renderParticles();
+};
+
+// اجرای اولیه فوری
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initAmbientParticles);
+} else {
+  setTimeout(window.initAmbientParticles, 50);
+}
+
+// ۲. رندر دقیق منوی All Artworks (چپ‌چین، نقطه در چپ، ارتفاع سطر یکسان)
+window.renderFloatingCategoryDropdown = function() {
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (!dropdown) return;
+
+  let itemsHtml = `
+    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
+      <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
+      <span class="cat-item-text">All Artworks</span>
+    </div>
+  `;
+
+  galleryCategories.forEach(cat => {
+    const isActive = currentGalleryFilter === cat.id;
+    const color = cat.color || '#38bdf8';
+    itemsHtml += `
+      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${cat.title}')">
+        <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
+        <span class="cat-item-text">${cat.title}</span>
+      </div>
+    `;
+  });
+
+  dropdown.innerHTML = itemsHtml;
+};
+
+// ۳. ویرایشگر خطی و شیک دسته‌بندی‌ها دقیقاً بالای لیست دسته‌ها در پنل ادمین
+window.renderAdminGalleryCategories = function() {
+  const container = document.getElementById('adminGalleryCategoriesList');
+  if (!container) return;
+  const badge = document.getElementById('adminCategoryCountBadge');
+  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
+
+  container.innerHTML = galleryCategories.map((cat) => {
+    const color = cat.color || '#38bdf8';
+    return `
+      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}66; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="کلیک برای باز شدن کادر ویرایش این دسته">
+        <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
+        <span style="font-size:12.5px; font-weight:700; color:#fff;">${cat.title}</span>
+        <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">(${cat.id})</span>
+        <span style="font-size:11px; opacity:0.6;">✏️</span>
+      </div>
+    `;
+  }).join('');
+};
+
+window.openAdminCategoryEdit = function(catId) {
+  const cat = galleryCategories.find(c => c.id === catId);
+  if (!cat) return;
+
+  const row = document.getElementById('adminInlineEditCategoryRow');
+  const origIdInput = document.getElementById('adminEditCatOriginalId');
+  const titleInput = document.getElementById('adminEditCatTitle');
+  const idInput = document.getElementById('adminEditCatId');
+  const colorInput = document.getElementById('adminEditCatColor');
+  const colorPicker = document.getElementById('adminEditCatColorPicker');
+
+  if (origIdInput) origIdInput.value = cat.id;
+  if (titleInput) titleInput.value = cat.title;
+  if (idInput) idInput.value = cat.id;
+  if (colorInput) colorInput.value = cat.color || '#38bdf8';
+  if (colorPicker) colorPicker.value = cat.color || '#38bdf8';
+
+  if (row) {
+    row.style.display = 'block';
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+};
+
+window.closeAdminCategoryEditForm = function() {
+  const row = document.getElementById('adminInlineEditCategoryRow');
+  if (row) row.style.display = 'none';
+};
+
+window.saveAdminCategoryEdit = function() {
+  const origIdInput = document.getElementById('adminEditCatOriginalId');
+  const titleInput = document.getElementById('adminEditCatTitle');
+  const idInput = document.getElementById('adminEditCatId');
+  const colorInput = document.getElementById('adminEditCatColor');
+
+  const origId = origIdInput ? origIdInput.value : '';
+  const newTitle = titleInput ? titleInput.value.trim() : '';
+  const newId = idInput ? idInput.value.trim().toLowerCase() : '';
+  const newColor = colorInput ? colorInput.value.trim() : '#38bdf8';
+
+  if (!newTitle || !newId) {
+    showToast('عنوان و شناسه دسته نمی‌تواند خالی باشد.', 'warning', 3000);
+    return;
+  }
+
+  const catIdx = galleryCategories.findIndex(c => c.id === origId);
+  if (catIdx !== -1) {
+    galleryCategories[catIdx].title = newTitle;
+    galleryCategories[catIdx].id = newId;
+    galleryCategories[catIdx].color = newColor;
+
+    safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
+    window.renderAdminGalleryCategories();
+    window.renderFloatingCategoryDropdown();
+    window.closeAdminCategoryEditForm();
+    showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
+  }
+};
