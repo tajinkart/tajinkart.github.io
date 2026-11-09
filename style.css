@@ -224,7 +224,7 @@ nav a, nav button,
       box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
     }
 
-    #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: flex; }
+    #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: none !important; }
     
     #rightVerticalNav.dock-collapsed .right-exp-btn {
       opacity: 0;
@@ -1997,9 +1997,7 @@ nav a, nav button,
     right: 14px !important;
     z-index: 9999 !important;
   }
-  #rightVerticalNav.dock-collapsed #dockMasterTrigger {
-    display: flex !important;
-  }
+  #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: none !important; }
   body {
     padding-bottom: 25px !important;
   }
@@ -2076,9 +2074,7 @@ nav a, nav button,
   }
 
   /* حالت جمع‌شده با اسکرول به پایین */
-  #rightVerticalNav.dock-collapsed #dockMasterTrigger {
-    display: flex !important;
-  }
+  #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: none !important; }
   
   #rightVerticalNav.dock-collapsed .right-exp-btn {
     opacity: 0 !important;
@@ -3786,9 +3782,7 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
     right: 14px !important;
     z-index: 9999 !important;
   }
-  #rightVerticalNav #dockMasterTrigger {
-    display: flex !important;
-  }
+  #rightVerticalNav #dockMasterTrigger { display: none !important; }
   #rightVerticalNav:not(.dock-open) .right-exp-btn {
     display: none !important;
     opacity: 0 !important;
@@ -4416,9 +4410,7 @@ body {
     top: 14px !important;
   }
 
-  #dockMasterTrigger {
-    display: flex !important;
-  }
+  #dockMasterTrigger { display: none !important; }
 
   .mobile-dock-backdrop {
     display: none;
@@ -5598,5 +5590,36 @@ body {
     justify-content: center !important;
     background: transparent !important;
     border: none !important;
+  }
+}
+
+
+
+/* ==============================================================================
+   RELEASE V19.2.0: COMPLETE REMOVAL OF HAMBURGER TRIGGER (PURE ICONS LIKE DESKTOP)
+   ============================================================================== */
+#dockMasterTrigger,
+#rightVerticalNav #dockMasterTrigger {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* فاصله متقارن و ارگونومیک داک از بالای صفحه در موبایل */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 12px !important;
+    top: 18px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 9px !important;
   }
 }

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=19.1.0">
+  <link rel="stylesheet" href="style.css?v=19.2.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -60,77 +60,7 @@
     <!-- ۲. داک عمودی ناوبری راست -->
     <!-- ۲. داک عمودی ناوبری راست -->
   <nav id="rightVerticalNav">
-    <!-- مستر تریگر برای موبایل و دسکتاپ -->
-    <div id="dockMasterTrigger" title="Menu Navigation" onclick="toggleDockExpand(event)">
-      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-    </div>
-
-    <!-- موبایل دراور بک‌دراپ -->
     
-
-    <!-- کانتینر دکمه‌های ناوبری -->
-    <div id="dockButtonsContainer" class="dock-buttons-container">
-      <!-- ۰. هدر بستن در موبایل -->
-      
-
-      <!-- ۱. Home / Showcase -->
-      <button id="rightDockHomeBtn" onclick="switchView('showcase'); closeDockMobile();" class="right-exp-btn home-theme" title="Home Showcase">
-        <span class="right-exp-icon">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-          </svg>
-        </span>
-        <span class="right-exp-text">
-          <span class="right-exp-title" style="color:var(--coral-flame);">Showcase</span>
-          <span class="right-exp-sub">Concept Portfolio</span>
-        </span>
-      </button>
-
-      <!-- ۲. Members Portal -->
-      <button onclick="handleMembersIconClick(); closeDockMobile();" class="right-exp-btn cyan-theme" title="Members Portal">
-        <span class="right-exp-icon">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-          </svg>
-        </span>
-        <span class="right-exp-text">
-          <span class="right-exp-title" id="rightMemberLabel" style="color:var(--cyan-electric);">Portal</span>
-          <span class="right-exp-sub">Sign In / Join</span>
-        </span>
-      </button>
-
-      <!-- ۳. Atelier & Store (با منوی دو قسمتی بازشونده) -->
-      <div class="dock-store-wrapper" id="dockStoreDropdownWrapper">
-        <button type="button" onclick="toggleStoreDockInPlace(event)" class="right-exp-btn gold-theme" id="dockStoreMainBtn" title="Atelier & Store">
-          <span class="right-exp-icon">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-            </svg>
-          </span>
-          <span class="right-exp-text">
-            <span class="right-exp-title" style="color:var(--gold);">Atelier & Store ▾</span>
-            <span class="right-exp-sub">Commissions & Assets</span>
-          </span>
-        </button>
-
-        <!-- زیرمنوی دو قسمتی استور: کمیسیون‌ها و دارایی‌ها -->
-        <div class="dock-store-flyout-menu" id="dockStoreFlyoutMenu">
-          <button type="button" onclick="navigateToStorePane('commissions', event); closeDockMobile();" class="dock-flyout-sub-btn gold-accent" title="Concept Commissions">
-            <span class="sub-btn-icon">🎨</span>
-            <div class="sub-btn-text">
-              <strong style="color:var(--gold);">Concept Commissions</strong>
-              <span>Pre-Production & Characters</span>
-            </div>
-          </button>
-          <button type="button" onclick="navigateToStorePane('products', event); closeDockMobile();" class="dock-flyout-sub-btn cyan-accent" title="Digital Assets Vault">
-            <span class="sub-btn-icon">💎</span>
-            <div class="sub-btn-text">
-              <strong style="color:var(--cyan-electric);">Digital Assets Vault</strong>
-              <span>Brush Sets, PSDs & Lore</span>
-            </div>
-          </button>
-        </div>
-      </div>
 
       <!-- ۴. Genesis Lore -->
       <button onclick="switchView('genesis'); closeDockMobile();" class="right-exp-btn crimson-theme" title="Genesis Lore">
@@ -2303,8 +2233,8 @@
       </button>
     </div>
   </footer>
-  <script src="data.js?v=19.1.0"></script>
-  <script src="app.js?v=19.1.0"></script>
+  <script src="data.js?v=19.2.0"></script>
+  <script src="app.js?v=19.2.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
