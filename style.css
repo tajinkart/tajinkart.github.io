@@ -3797,61 +3797,110 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
 /* ==============================================================================
    v14.1.0: ساب‌آیکون‌های دوگانه آتلیه و فروشگاه در منوی داک
    ============================================================================== */
+/* ==============================================================================
+   v15.0.0: آکاردئون عمودی درجا برای زیرمنوی آتلیه و فروشگاه در داک (کاملاً کلیکی بدون پرش)
+   ============================================================================== */
 .dock-store-wrapper {
-  position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
 }
-.dock-store-submenu {
+.dock-store-wrapper.active {
+  background: rgba(8, 11, 18, 0.98) !important;
+  border: 1.5px solid var(--gold) !important;
+  padding: 4px !important;
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.25) !important;
+}
+.dock-store-in-place-accordion {
   display: none;
   flex-direction: column;
-  gap: 6px;
-  position: absolute;
-  left: -210px;
-  top: 0;
-  background: rgba(6, 8, 14, 0.96);
-  border: 1px solid rgba(250, 204, 21, 0.35);
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.85);
-  backdrop-filter: blur(14px);
-  z-index: 100;
-  min-width: 190px;
+  gap: 4px;
+  margin-top: 6px;
+  width: 100%;
 }
-.dock-store-wrapper:hover .dock-store-submenu,
-.dock-store-wrapper.active .dock-store-submenu {
+.dock-store-wrapper.active .dock-store-in-place-accordion {
   display: flex !important;
 }
-.dock-sub-item {
+.dock-in-place-btn {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
   padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #fff;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  width: 100%;
+  box-sizing: border-box;
 }
-.dock-sub-item:hover {
-  background: rgba(250,204,21,0.15);
+.dock-in-place-btn.gold-accent:hover {
+  background: rgba(250, 204, 21, 0.15);
   border-color: var(--gold);
   color: var(--gold);
 }
-.dock-sub-item.cyan-sub:hover {
-  background: rgba(0,240,255,0.15);
+.dock-in-place-btn.cyan-accent:hover {
+  background: rgba(0, 240, 255, 0.15);
   border-color: var(--cyan-electric);
   color: var(--cyan-electric);
 }
 
-@media (max-width: 768px) {
-  .dock-store-submenu {
-    left: auto;
-    right: 50px;
-    top: 0;
-  }
+/* ==============================================================================
+   UI/UX PRO MAX: آرام‌سازی بصری و ارگونومی مونوکروم تیره پنل ادمین
+   ============================================================================== */
+#view-admin {
+  background: #05070c !important;
+}
+.admin-vertical-sidebar {
+  background: #080b12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+}
+.admin-nav-item {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid transparent !important;
+}
+.admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+.admin-nav-item.active {
+  background: rgba(250, 204, 21, 0.1) !important;
+  border-color: var(--gold) !important;
+  color: #fff !important;
+}
+.admin-nav-item.active .admin-nav-title {
+  color: var(--gold) !important;
+}
+.admin-nav-item.active .admin-nav-icon {
+  background: rgba(250, 204, 21, 0.18) !important;
+}
+
+/* کارت‌ها و فرم‌های پنل ادمین: حذف بردرهای تند نئونی به نفع خطوط ملایم دودی */
+.admin-main-panes-holder div[style*="background:#06080d"],
+.admin-main-panes-holder div[style*="background:var(--bg-panel)"],
+.admin-sketch1-layout > div,
+.admin-products-layout > div {
+  background: #080b12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* جدول ماتریس قیمت‌گذاری ادمین */
+#matPriceTable input {
+  transition: border-color 0.2s, background 0.2s;
+}
+#matPriceTable input:focus {
+  border-color: var(--gold) !important;
+  background: #0b0f19 !important;
+  outline: none;
 }

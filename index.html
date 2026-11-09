@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=14.1.0">
+  <link rel="stylesheet" href="style.css?v=15.0.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -60,7 +60,7 @@
     <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان برند TAJINKART -->
     <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
       <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
-        <span id="currentCategoryPillLabel">همه آثار</span>
+        <span id="currentCategoryPillLabel">All Artworks</span>
         <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
       </button>
 
@@ -102,29 +102,29 @@
       </span>
     </button>
 
-    <!-- ۲. آتلیه و فروشگاه با ساب‌آیکون‌های اختصاصی -->
+        <!-- ۲. آتلیه و فروشگاه با ساب‌آیکون‌های عمودی درجا -->
     <div class="dock-store-wrapper" id="dockStoreDropdownWrapper">
-      <button onclick="toggleStoreDockSubmenu(event)" class="right-exp-btn gold-theme" title="فروشگاه و آتلیه">
+      <button type="button" onclick="toggleStoreDockInPlace(event)" class="right-exp-btn gold-theme" id="dockStoreMainBtn" title="Atelier & Store">
         <span class="right-exp-icon">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
           </svg>
         </span>
         <span class="right-exp-text">
-          <span class="right-exp-title" style="color:var(--gold);">آتلیه و فروشگاه</span>
-          <span class="right-exp-sub">کانسپت و اسست‌ها</span>
+          <span class="right-exp-title" style="color:var(--gold);">Atelier & Store</span>
+          <span class="right-exp-sub">Commissions & Assets</span>
         </span>
       </button>
 
-      <!-- ساب‌آیکون‌های دوگانه اختصاصی آتلیه -->
-      <div class="dock-store-submenu" id="dockStoreSubmenu">
-        <button type="button" onclick="navigateToStorePane('commissions', event)" class="dock-sub-item gold-sub" title="سفارش کانسپت آتلیه">
-          <span style="font-size:14px;">🎨</span>
-          <span>سفارش کانسپت (آتلیه)</span>
+      <!-- ساب‌آیکون‌های عمودی درجا زیر خود آیکون -->
+      <div class="dock-store-in-place-accordion" id="dockStoreInPlaceAccordion">
+        <button type="button" onclick="navigateToStorePane('commissions', event)" class="dock-in-place-btn gold-accent" title="Concept Commissions">
+          <span style="font-size:13px;">🎨</span>
+          <span>Commissions (Atelier)</span>
         </button>
-        <button type="button" onclick="navigateToStorePane('products', event)" class="dock-sub-item cyan-sub" title="دارایی‌های دیجیتال و اسست‌ها">
-          <span style="font-size:14px;">💎</span>
-          <span>دارایی‌های دیجیتال</span>
+        <button type="button" onclick="navigateToStorePane('products', event)" class="dock-in-place-btn cyan-accent" title="Digital Assets Vault">
+          <span style="font-size:13px;">💎</span>
+          <span>Digital Assets</span>
         </button>
       </div>
     </div>
@@ -262,8 +262,8 @@
       <!-- هدر خلوت، باوقار و مینی‌مال آتلیه -->
       <div class="section-head" style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
         <div>
-          <h2 class="view-hero-title" id="storeSectionMainTitle" style="font-size:22px; font-weight:900; color:#fff; margin:0 0 4px;">آتلیه کانسپت و توسعه بصری</h2>
-          <span style="font-size:12px; color:var(--text-muted);">پذیرش پروژه‌های پیش‌تولید بازی، کانسپت سینمایی و طراحی دنیا زیر نظر مستقیم سید سروش تاج.</span>
+          <h2 class="view-hero-title" id="storeSectionMainTitle" style="font-size:22px; font-weight:900; color:#fff; margin:0 0 4px;">Concept Art & Visual Development Atelier</h2>
+          <span style="font-size:12px; color:var(--text-muted);">Pre-production for games, cinematic concept art, and entertainment design directed by Seyed Soroush Taj.</span>
         </div>
       </div>
 
@@ -376,19 +376,19 @@
             </div>
 
             <div id="mosaicStageContainer" class="mosaic-pipeline-grid"></div>
+            <!-- توضیحات استاندارد آتلیه دقیقاً هم‌عرض باکس سمت چپ -->
+            <div style="margin-top:20px; padding:16px 20px; border-radius:14px; background:#04060b; border:1px solid rgba(250,204,21,0.25); display:flex; align-items:flex-start; gap:12px;">
+              <span style="font-size:18px;">⚡</span>
+              <div>
+                <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:12.5px;">TAJINKART International Production Pipeline Standard:</strong>
+                <p style="margin:0; font-size:11px; color:var(--text-muted); line-height:1.75;">All commissions include transparent initial concept thumbnails, orthographic 3-view model sheets, lighting studies, and print-ready master renders with layered PSD files at commercial 300DPI quality with guaranteed timelines and phased client feedback.</p>
+              </div>
+            </div>
           </div>
 
         </div>
 
-        <!-- توضیحات استاندارد آتلیه در انتهای صفحه زیر میزکار -->
-        <div style="margin-top:24px; padding:16px 20px; border-radius:14px; background:#04060b; border:1px solid rgba(250,204,21,0.22); display:flex; align-items:flex-start; gap:12px;">
-          <span style="font-size:18px;">⚡</span>
-          <div>
-            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:12.5px;">پایپلاین استاندارد بین‌المللی توسعه بصری استودیو TAJINKART:</strong>
-            <p style="margin:0; font-size:11px; color:var(--text-muted); line-height:1.75;">کلیه سفارشات شامل مراحل شفاف اتود مفهومی، مدل‌شیت سه‌نمای ارتوگرافیک، نورپردازی مقداری و رندر مستر نهایی با فایل لایه‌باز PSD در استاندارد چاپ تجاری ۳۰۰DPI با تضمین زمان‌بندی دقیق و فیدبک‌های دوره‌ای است.</p>
-          </div>
-        </div>
-      </div>
+        
 
       <!-- تب ۲: فروشگاه دارایی‌های دیجیتال (با طراحی کاملاً همگام با سفارشات کانسپت) -->
       <div id="storePaneProducts" class="hidden">
@@ -695,13 +695,13 @@
               <h3 style="font-size:14.5px; font-weight:800; color:#fff; margin-top:2px;">منوی مدیریت استودیو</h3>
             </div>
             
-            <nav class="admin-sidebar-menu">
+                        <nav class="admin-sidebar-menu">
               <!-- ۱. گالری و آثار استودیو -->
               <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
                 <span class="admin-nav-icon">🖼️</span>
                 <div class="admin-nav-text">
                   <span class="admin-nav-title">۱. گالری و آثار استودیو</span>
-                  <span class="admin-nav-sub">پورتفولیو و نمونه‌های زنده</span>
+                  <span class="admin-nav-sub">پورتفولیو، چیدمان و نمونه‌های زنده</span>
                 </div>
               </button>
 
@@ -732,12 +732,30 @@
                 </div>
               </button>
 
-              <!-- ۵. مرکز تنظیمات و زیرساخت استودیو -->
+              <!-- ۵. اعضا و گزارش‌های مالی -->
+              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
+                <span class="admin-nav-icon">👥</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۵. اعضا و کاربران</span>
+                  <span class="admin-nav-sub">سطوح کاربری و تراکنش‌ها</span>
+                </div>
+              </button>
+
+              <!-- ۶. منشور و قوانین استودیو -->
+              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
+                <span class="admin-nav-icon">⚖️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۶. منشور و قوانین استودیو</span>
+                  <span class="admin-nav-sub">۴ تب مستقل لایسنس و شرایط</span>
+                </div>
+              </button>
+
+              <!-- ۷. مرکز تنظیمات و زیرساخت استودیو -->
               <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
                 <span class="admin-nav-icon">⚙️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۵. تنظیمات و زیرساخت</span>
-                  <span class="admin-nav-sub">وضعیت حضور، برند، ابر و قوانین</span>
+                  <span class="admin-nav-title">۷. تنظیمات و زیرساخت</span>
+                  <span class="admin-nav-sub">حضور استودیو، برند، تلگرام و مانیتورینگ</span>
                 </div>
               </button>
             </nav>
@@ -2151,8 +2169,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=14.1.0"></script>
-  <script src="app.js?v=14.1.0"></script>
+  <script src="data.js?v=15.0.0"></script>
+  <script src="app.js?v=15.0.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

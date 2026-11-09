@@ -63,7 +63,7 @@ window.renderAdminGalleryCategories = function() {
     return `
       <div class="admin-cat-pill" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid ${color}44; border-radius:20px; padding:6px 12px; box-shadow:0 0 10px ${color}15;">
         <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
-        <span style="font-size:12px; font-weight:700; color:#fff;">${cat.title}</span>
+        <span onclick="adminEditCategoryTitle('${cat.id}')" style="font-size:12px; font-weight:700; color:#fff; cursor:pointer; text-decoration:underline dashed rgba(255,255,255,0.3);" title="کلیک برای ویرایش نام این دسته">${cat.title} ✏️</span>
         <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">${cat.id}</span>
         
         <div style="position:relative; display:inline-flex; align-items:center;" title="تغییر رنگ نئون این دسته">
@@ -6404,15 +6404,14 @@ window.navigateToStorePane = function(paneKey, e) {
   }
 };
 
-window.toggleStoreDockSubmenu = function(e) {
-  if (window.innerWidth <= 768) {
-    if (e) e.stopPropagation();
-    const wrapper = document.getElementById('dockStoreDropdownWrapper');
-    if (wrapper) wrapper.classList.toggle('active');
-  } else {
-    navigateToStorePane('commissions', e);
+window.toggleStoreDockInPlace = function(e) {
+  if (e) e.stopPropagation();
+  const wrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (wrapper) {
+    wrapper.classList.toggle('active');
   }
 };
+window.toggleStoreDockSubmenu = window.toggleStoreDockInPlace;
 
 // ==============================================================================
 // ذخیره و بارگذاری مستقیم ماتریس قیمت‌گذاری و ضرایب آتلیه (Studio Pricing Matrix)
@@ -6454,4 +6453,24 @@ window.loadStudioPricingMatrixToForm = function() {
     if (document.getElementById(`matWeapon_${p}`)) document.getElementById(`matWeapon_${p}`).value = item.weapon;
     if (document.getElementById(`matDiscount_${p}`)) document.getElementById(`matDiscount_${p}`).value = item.disc;
   });
+};
+
+window.adminEditCategoryTitle = function(catId) {
+  const cat = galleryCategories.find(c => c.id === catId);
+  if (!cat) return;
+  const newTitle = prompt('ویرایش نام دسته‌بندی:', cat.title);
+  if (newTitle && newTitle.trim()) {
+    cat.title = newTitle.trim();
+    safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+    renderAdminGalleryCategories();
+    renderFloatingCategoryDropdown();
+    showToast(`نام دسته به «${cat.title}» تغییر یافت. ✓`, 'success', 2500);
+  }
+};
+
+window.onAdminArtPipeCategoryChange = function(newPipe) {
+  const catInput = document.getElementById('editArtCategory');
+  if (catInput && newPipe) {
+    catInput.value = PIPELINE_TO_CATEGORY_MAP[newPipe] || newPipe;
+  }
 };
