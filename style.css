@@ -6027,267 +6027,11 @@ body.in-admin-view #rightVerticalNav,
 }
 
 
-
 /* ==============================================================================
-   RELEASE V20.0.0: THE ULTIMATE HALOGEN GLOW, ROTATING TRIGGER & PERFECT CIRCULAR DOCK
+   RELEASE V20.3.0: CLASSY BALANCED HALOGEN, HOVER TEXT EXPANSION & SUBTLE MOBILE GLOW
    ============================================================================== */
 
-/* ۱. انیمیشن چرخش و هالوژن سه‌خط آبی استودیو */
-#dockMasterTrigger {
-  width: 44px !important;
-  height: 44px !important;
-  min-width: 44px !important;
-  border-radius: 50% !important;
-  aspect-ratio: 1 / 1 !important;
-  background: rgba(8, 12, 20, 0.96) !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1.5px solid var(--cyan-electric) !important;
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.45), inset 0 0 8px rgba(0, 240, 255, 0.2) !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: var(--cyan-electric) !important;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
-  flex-shrink: 0 !important;
-  z-index: 10000 !important;
-  box-sizing: border-box !important;
-}
-
-#dockMasterTrigger svg {
-  width: 22px !important;
-  height: 22px !important;
-  stroke: var(--cyan-electric) !important;
-  stroke-width: 2 !important;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-#dockMasterTrigger:hover {
-  transform: scale(1.08) !important;
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.75), inset 0 0 12px rgba(0, 240, 255, 0.35) !important;
-}
-
-/* وقتی داک باز است، سه خط با چرخش نرم ۹۰ درجه تبدیل به ضربدر شیک می‌شود */
-#rightVerticalNav.dock-open #dockMasterTrigger {
-  transform: rotate(90deg) scale(1.06) !important;
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.7) !important;
-}
-
-/* ۲. سیستم هالوژن‌های نئونی اختصاصی برای هر آیکون (همان هالوژن باشکوه مدنظر) */
-.right-exp-btn {
-  display: flex !important;
-  flex-direction: row-reverse !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  height: 44px !important;
-  width: 44px !important;
-  min-width: 44px !important;
-  border-radius: 50% !important;
-  aspect-ratio: 1 / 1 !important;
-  background: rgba(8, 11, 18, 0.94) !important;
-  backdrop-filter: blur(16px) !important;
-  border: 1.5px solid var(--border-subtle) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
-              opacity 0.22s ease, 
-              width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              box-shadow 0.25s ease, 
-              border-color 0.25s ease !important;
-  overflow: hidden !important;
-  cursor: pointer !important;
-  box-sizing: border-box !important;
-  position: relative !important;
-}
-
-/* هالوژن نئونی دکمه‌ها در هاور و حالت فعال */
-.right-exp-btn.home-theme:hover,
-.right-exp-btn.home-theme.active {
-  border-color: var(--coral-flame) !important;
-  box-shadow: 0 0 22px rgba(255, 87, 34, 0.65), 0 0 40px rgba(255, 87, 34, 0.25) !important;
-}
-.right-exp-btn.home-theme .right-exp-icon {
-  background: rgba(255, 87, 34, 0.14) !important;
-  color: var(--coral-flame) !important;
-}
-
-.right-exp-btn.cyan-theme:hover,
-.right-exp-btn.cyan-theme.active {
-  border-color: var(--cyan-electric) !important;
-  box-shadow: 0 0 22px rgba(0, 240, 255, 0.65), 0 0 40px rgba(0, 240, 255, 0.25) !important;
-}
-.right-exp-btn.cyan-theme .right-exp-icon {
-  background: rgba(0, 240, 255, 0.14) !important;
-  color: var(--cyan-electric) !important;
-}
-
-.right-exp-btn.gold-theme:hover,
-.right-exp-btn.gold-theme.active {
-  border-color: var(--gold) !important;
-  box-shadow: 0 0 22px rgba(250, 204, 21, 0.65), 0 0 40px rgba(250, 204, 21, 0.25) !important;
-}
-.right-exp-btn.gold-theme .right-exp-icon {
-  background: rgba(250, 204, 21, 0.14) !important;
-  color: var(--gold) !important;
-}
-
-.right-exp-btn.crimson-theme:hover,
-.right-exp-btn.crimson-theme.active {
-  border-color: var(--crimson) !important;
-  box-shadow: 0 0 22px rgba(244, 63, 94, 0.65), 0 0 40px rgba(244, 63, 94, 0.25) !important;
-}
-.right-exp-btn.crimson-theme .right-exp-icon {
-  background: rgba(244, 63, 94, 0.14) !important;
-  color: var(--crimson) !important;
-}
-
-.right-exp-btn.purple-theme:hover,
-.right-exp-btn.purple-theme.active {
-  border-color: var(--violet) !important;
-  box-shadow: 0 0 22px rgba(168, 85, 247, 0.65), 0 0 40px rgba(168, 85, 247, 0.25) !important;
-}
-.right-exp-btn.purple-theme .right-exp-icon {
-  background: rgba(168, 85, 247, 0.14) !important;
-  color: var(--violet) !important;
-}
-
-.right-exp-btn.emerald-theme:hover,
-.right-exp-btn.emerald-theme.active {
-  border-color: var(--emerald) !important;
-  box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 0 40px rgba(16, 185, 129, 0.25) !important;
-}
-.right-exp-btn.emerald-theme .right-exp-icon {
-  background: rgba(16, 185, 129, 0.14) !important;
-  color: var(--emerald) !important;
-}
-
-/* آیکون مرکزی */
-.right-exp-icon {
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 50% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  border: none !important;
-}
-
-/* ۳. انیمیشن جهشی پاپ‌این و جمع شدن (Spring Pop-In) */
-#rightVerticalNav.dock-collapsed:not(.dock-open) .right-exp-btn {
-  opacity: 0 !important;
-  transform: scale(0.5) translateY(-14px) !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-}
-
-#rightVerticalNav.dock-open .right-exp-btn {
-  opacity: 1 !important;
-  transform: scale(1) translateY(0) !important;
-  pointer-events: auto !important;
-  height: 44px !important;
-  width: 44px !important;
-  margin-top: 6px !important;
-}
-
-/* ۴. دسکتاپ: باز در هیرو، هاور بازشونده، جمع‌شونده با اسکرول */
-@media (min-width: 769px) {
-  #rightVerticalNav {
-    position: fixed !important;
-    right: 22px !important;
-    top: 22px !important;
-    z-index: 9999 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 10px !important;
-  }
-
-  #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
-    display: none !important;
-  }
-
-  #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 10px !important;
-  }
-
-  /* هاور دسکتاپ: کپسول گسترش می‌یابد به چپ */
-  .right-exp-btn:hover {
-    width: auto !important;
-    border-radius: 999px !important;
-    aspect-ratio: auto !important;
-    padding: 0 18px 0 6px !important;
-  }
-
-  .right-exp-text {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    text-align: left !important;
-    direction: ltr !important;
-    padding-left: 14px !important;
-    padding-right: 8px !important;
-    white-space: nowrap !important;
-    opacity: 0 !important;
-    max-width: 0 !important;
-    overflow: hidden !important;
-    transition: opacity 0.25s ease, max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  .right-exp-btn:hover .right-exp-text {
-    opacity: 1 !important;
-    max-width: 220px !important;
-  }
-}
-
-/* ۵. موبایل: ایزوله کامل، ۱۰۰٪ دایره‌ای، فاصله ۱۸ پیکسل از لبه راست بدون بریدگی */
-@media (max-width: 768px) {
-  #rightVerticalNav {
-    position: fixed !important;
-    right: 18px !important;
-    top: 18px !important;
-    z-index: 9999 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 8px !important;
-    width: 44px !important;
-    max-width: 44px !important;
-  }
-
-  #dockMasterTrigger {
-    display: flex !important;
-  }
-
-  /* دکمه‌ها در موبایل منحصراً دایره‌های ۴۴ پیکسلی هستند */
-  #rightVerticalNav .right-exp-btn {
-    width: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    height: 44px !important;
-    border-radius: 50% !important;
-    aspect-ratio: 1 / 1 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  #rightVerticalNav .right-exp-text {
-    display: none !important;
-  }
-}
-
-
-/* ==============================================================================
-   RELEASE V20.2.0: PERMANENT DESKTOP OPEN DOCK, MOBILE SCROLL REVEAL & SOFTENED MOBILE HALO
-   ============================================================================== */
-
-/* ۱. نشان برند TAJINKART و منوی All Artworks: پدیدار شدن با اسکرول به پایین در گالری */
+/* ۱. نشان برند TAJINKART و منوی All Artworks: پدیدار شدن با اسکرول در گالری */
 #topCenterBrandBar {
   position: fixed !important;
   top: 16px !important;
@@ -6319,7 +6063,7 @@ body.in-admin-view #rightVerticalNav,
   background: rgba(9, 12, 18, 0.95) !important;
   backdrop-filter: blur(14px) !important;
   border: 1.5px solid var(--gold) !important;
-  box-shadow: 0 0 16px rgba(250, 204, 21, 0.45), inset 0 0 8px rgba(250, 204, 21, 0.2) !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.4), inset 0 0 6px rgba(250, 204, 21, 0.18) !important;
   color: #fff !important;
   font-weight: 800 !important;
   cursor: pointer !important;
@@ -6352,9 +6096,10 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   cursor: pointer !important;
 }
 
-/* ۲. دسکتاپ (صفحات بالای 768px):
-   - کلاً داک همیشه باز می‌ماند (بدون جمع شدن به سه خط در اسکرول)
-   - هاله نئونی هالوژن پررنگ، غنی و خیره‌کننده */
+/* ۲. معماری دسکتاپ (صفحات بالای 768px):
+   - داک کلاً باز می‌ماند (بدون سه خط)
+   - هاور موس روی هر دکمه، کپسول متن و عنوان را به سمت چپ باز می‌کند (Hover Text Expansion)
+   - هالوژن‌ها ملایم، شیک، باکلاس و کنترل‌شده (بدون درخشش زننده یا کورکننده) */
 @media (min-width: 769px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6367,7 +6112,6 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     gap: 10px !important;
   }
 
-  /* روی کامپیوتر سه خط کاملاً مخفی است چون همه آیکون‌ها کلاً باز هستند */
   #dockMasterTrigger {
     display: none !important;
   }
@@ -6383,130 +6127,181 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     pointer-events: auto !important;
   }
 
+  /* ساختار کپسولی دکمه: آیکون در راست، نوشته بازشونده به سمت چپ */
   #rightVerticalNav .right-exp-btn,
   .right-exp-btn {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    width: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(9, 12, 18, 0.95) !important;
+    backdrop-filter: blur(14px) !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.25s ease, 
+                border-color 0.25s ease !important;
+  }
+
+  /* با هاور روی دکمه، کپسول به چپ باز می‌شود */
+  #rightVerticalNav .right-exp-btn:hover,
+  .right-exp-btn:hover {
+    width: auto !important;
+    min-width: 44px !important;
+    max-width: 260px !important;
+    padding-left: 6px !important;
+  }
+
+  #rightVerticalNav .right-exp-icon,
+  .right-exp-icon {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
-    border-radius: 50% !important;
-    aspect-ratio: 1 / 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: rgba(9, 12, 18, 0.95) !important;
-    backdrop-filter: blur(14px) !important;
-    box-sizing: border-box !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transform: none !important;
-    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  #rightVerticalNav .right-exp-icon {
-    width: 44px !important;
-    height: 44px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border: none !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
   }
 
-  #rightVerticalNav .right-exp-text {
-    display: none !important;
+  /* متن توضیحی درون کپسول: در حالت عادی مخفی، با هاور نمایان و خوانا */
+  #rightVerticalNav .right-exp-text,
+  .right-exp-text {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    direction: ltr !important;
+    padding-left: 12px !important;
+    padding-right: 4px !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+    transition: opacity 0.2s ease, max-width 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    pointer-events: none !important;
   }
 
-  /* سیستم هالوژن پررنگ و شکوهمند اختصاصی دسکتاپ */
+  #rightVerticalNav .right-exp-btn:hover .right-exp-text,
+  .right-exp-btn:hover .right-exp-text {
+    opacity: 1 !important;
+    max-width: 200px !important;
+    pointer-events: auto !important;
+  }
+
+  .right-exp-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .right-exp-sub {
+    font-size: 10.5px !important;
+    color: #94a3b8 !important;
+    line-height: 1.2 !important;
+    margin-top: 1px !important;
+  }
+
+  /* تنظیم هالوژن شیک، متعادل و باکلاس روی دسکتاپ (بدون پررنگی افراطی) */
   .right-exp-btn.home-theme {
-    border: 1.5px solid rgba(255, 87, 34, 0.75) !important;
-    box-shadow: 0 0 18px rgba(255, 87, 34, 0.55), inset 0 0 10px rgba(255, 87, 34, 0.25) !important;
+    border: 1.5px solid rgba(255, 87, 34, 0.55) !important;
+    box-shadow: 0 0 12px rgba(255, 87, 34, 0.35), inset 0 0 6px rgba(255, 87, 34, 0.18) !important;
   }
   .right-exp-btn.home-theme:hover,
   .right-exp-btn.home-theme.active {
     border-color: #ff5722 !important;
-    box-shadow: 0 0 28px rgba(255, 87, 34, 0.95), 0 0 55px rgba(255, 87, 34, 0.55), inset 0 0 14px rgba(255, 87, 34, 0.45) !important;
+    box-shadow: 0 0 18px rgba(255, 87, 34, 0.65), 0 0 30px rgba(255, 87, 34, 0.3), inset 0 0 8px rgba(255, 87, 34, 0.25) !important;
   }
   .right-exp-btn.home-theme .right-exp-icon {
-    background: rgba(255, 87, 34, 0.2) !important;
+    background: rgba(255, 87, 34, 0.14) !important;
     color: #ff5722 !important;
   }
 
   .right-exp-btn.cyan-theme {
-    border: 1.5px solid rgba(0, 240, 255, 0.75) !important;
-    box-shadow: 0 0 18px rgba(0, 240, 255, 0.55), inset 0 0 10px rgba(0, 240, 255, 0.25) !important;
+    border: 1.5px solid rgba(0, 240, 255, 0.55) !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.35), inset 0 0 6px rgba(0, 240, 255, 0.18) !important;
   }
   .right-exp-btn.cyan-theme:hover,
   .right-exp-btn.cyan-theme.active {
     border-color: #00f0ff !important;
-    box-shadow: 0 0 28px rgba(0, 240, 255, 0.95), 0 0 55px rgba(0, 240, 255, 0.55), inset 0 0 14px rgba(0, 240, 255, 0.45) !important;
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.65), 0 0 30px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(0, 240, 255, 0.25) !important;
   }
   .right-exp-btn.cyan-theme .right-exp-icon {
-    background: rgba(0, 240, 255, 0.2) !important;
+    background: rgba(0, 240, 255, 0.14) !important;
     color: #00f0ff !important;
   }
 
   .right-exp-btn.gold-theme {
-    border: 1.5px solid rgba(250, 204, 21, 0.75) !important;
-    box-shadow: 0 0 18px rgba(250, 204, 21, 0.55), inset 0 0 10px rgba(250, 204, 21, 0.25) !important;
+    border: 1.5px solid rgba(250, 204, 21, 0.55) !important;
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.35), inset 0 0 6px rgba(250, 204, 21, 0.18) !important;
   }
   .right-exp-btn.gold-theme:hover,
   .right-exp-btn.gold-theme.active {
     border-color: #facc15 !important;
-    box-shadow: 0 0 28px rgba(250, 204, 21, 0.95), 0 0 55px rgba(250, 204, 21, 0.55), inset 0 0 14px rgba(250, 204, 21, 0.45) !important;
+    box-shadow: 0 0 18px rgba(250, 204, 21, 0.65), 0 0 30px rgba(250, 204, 21, 0.3), inset 0 0 8px rgba(250, 204, 21, 0.25) !important;
   }
   .right-exp-btn.gold-theme .right-exp-icon {
-    background: rgba(250, 204, 21, 0.2) !important;
+    background: rgba(250, 204, 21, 0.14) !important;
     color: #facc15 !important;
   }
 
   .right-exp-btn.crimson-theme {
-    border: 1.5px solid rgba(244, 63, 94, 0.75) !important;
-    box-shadow: 0 0 18px rgba(244, 63, 94, 0.55), inset 0 0 10px rgba(244, 63, 94, 0.25) !important;
+    border: 1.5px solid rgba(244, 63, 94, 0.55) !important;
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.35), inset 0 0 6px rgba(244, 63, 94, 0.18) !important;
   }
   .right-exp-btn.crimson-theme:hover,
   .right-exp-btn.crimson-theme.active {
     border-color: #f43f5e !important;
-    box-shadow: 0 0 28px rgba(244, 63, 94, 0.95), 0 0 55px rgba(244, 63, 94, 0.55), inset 0 0 14px rgba(244, 63, 94, 0.45) !important;
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.65), 0 0 30px rgba(244, 63, 94, 0.3), inset 0 0 8px rgba(244, 63, 94, 0.25) !important;
   }
   .right-exp-btn.crimson-theme .right-exp-icon {
-    background: rgba(244, 63, 94, 0.2) !important;
+    background: rgba(244, 63, 94, 0.14) !important;
     color: #f43f5e !important;
   }
 
   .right-exp-btn.purple-theme {
-    border: 1.5px solid rgba(168, 85, 247, 0.75) !important;
-    box-shadow: 0 0 18px rgba(168, 85, 247, 0.55), inset 0 0 10px rgba(168, 85, 247, 0.25) !important;
+    border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35), inset 0 0 6px rgba(168, 85, 247, 0.18) !important;
   }
   .right-exp-btn.purple-theme:hover,
   .right-exp-btn.purple-theme.active {
     border-color: #a855f7 !important;
-    box-shadow: 0 0 28px rgba(168, 85, 247, 0.95), 0 0 55px rgba(168, 85, 247, 0.55), inset 0 0 14px rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.65), 0 0 30px rgba(168, 85, 247, 0.3), inset 0 0 8px rgba(168, 85, 247, 0.25) !important;
   }
   .right-exp-btn.purple-theme .right-exp-icon {
-    background: rgba(168, 85, 247, 0.2) !important;
+    background: rgba(168, 85, 247, 0.14) !important;
     color: #a855f7 !important;
   }
 
   .right-exp-btn.emerald-theme {
-    border: 1.5px solid rgba(16, 185, 129, 0.75) !important;
-    box-shadow: 0 0 18px rgba(16, 185, 129, 0.55), inset 0 0 10px rgba(16, 185, 129, 0.25) !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.55) !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.35), inset 0 0 6px rgba(16, 185, 129, 0.18) !important;
   }
   .right-exp-btn.emerald-theme:hover,
   .right-exp-btn.emerald-theme.active {
     border-color: #10b981 !important;
-    box-shadow: 0 0 28px rgba(16, 185, 129, 0.95), 0 0 55px rgba(16, 185, 129, 0.55), inset 0 0 14px rgba(16, 185, 129, 0.45) !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.65), 0 0 30px rgba(16, 185, 129, 0.3), inset 0 0 8px rgba(16, 185, 129, 0.25) !important;
   }
   .right-exp-btn.emerald-theme .right-exp-icon {
-    background: rgba(16, 185, 129, 0.2) !important;
+    background: rgba(16, 185, 129, 0.14) !important;
     color: #10b981 !important;
   }
 }
 
-/* ۳. موبایل (صفحات تا 768px):
-   - از ابتدا بسته است و فقط سه خط دایره‌ای با فاصله ۱۶px از راست نمایش داده می‌شود
-   - با اسکرول باز نمی‌شود و بسته می‌ماند
-   - رنگ‌آمیزی و هاله هالوژن روی گوشی بسیار ملایم، ظریف، شیک و بدون زنندگی است */
+/* ۳. معماری موبایل (صفحات تا 768px):
+   - از ابتدا بسته است و فقط سه خط دایره‌ای ۴۴px با فاصله ۱۶px از راست نمایش داده می‌شود
+   - با اسکرول باز نمی‌شود و ۱۰۰٪ بسته می‌ماند
+   - دارای هاله هالوژنی ملایم و دلنشین به اندازه پیل تاژین کارت (نه بی‌روح و نه زننده) */
 @media (max-width: 768px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6530,8 +6325,8 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     border-radius: 50% !important;
     aspect-ratio: 1 / 1 !important;
     background: rgba(9, 12, 18, 0.95) !important;
-    border: 1px solid rgba(0, 240, 255, 0.45) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 8px rgba(0, 240, 255, 0.25) !important;
+    border: 1.2px solid rgba(0, 240, 255, 0.55) !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.35), inset 0 0 6px rgba(0, 240, 255, 0.18) !important;
     color: var(--cyan-electric) !important;
     align-items: center !important;
     justify-content: center !important;
@@ -6544,12 +6339,10 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* در حالت بسته روی موبایل: دکمه‌ها ۱۰۰٪ مخفی هستند */
   #rightVerticalNav:not(.dock-open) .dock-buttons-container {
     display: none !important;
   }
 
-  /* فقط با کلیک روی سه خط باز می‌شوند */
   #rightVerticalNav.dock-open .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
@@ -6600,58 +6393,58 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     border: none !important;
   }
 
-  /* سیستم رنگ و هاله ملایم، مات و شیک برای موبایل (بدون زنندگی و شلوغی) */
+  /* هاله هالوژنی ملایم و دقیق در موبایل (مشابه تاژین کارت و آلورکس) */
   .right-exp-btn.home-theme {
-    border: 1px solid rgba(255, 87, 34, 0.4) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 6px rgba(255, 87, 34, 0.2) !important;
+    border: 1.2px solid rgba(255, 87, 34, 0.5) !important;
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.3), inset 0 0 5px rgba(255, 87, 34, 0.15) !important;
   }
   .right-exp-btn.home-theme .right-exp-icon {
-    background: rgba(255, 87, 34, 0.1) !important;
+    background: rgba(255, 87, 34, 0.12) !important;
     color: #ff5722 !important;
   }
 
   .right-exp-btn.cyan-theme {
-    border: 1px solid rgba(0, 240, 255, 0.4) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 6px rgba(0, 240, 255, 0.2) !important;
+    border: 1.2px solid rgba(0, 240, 255, 0.5) !important;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
   }
   .right-exp-btn.cyan-theme .right-exp-icon {
-    background: rgba(0, 240, 255, 0.1) !important;
+    background: rgba(0, 240, 255, 0.12) !important;
     color: #00f0ff !important;
   }
 
   .right-exp-btn.gold-theme {
-    border: 1px solid rgba(250, 204, 21, 0.4) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 6px rgba(250, 204, 21, 0.2) !important;
+    border: 1.2px solid rgba(250, 204, 21, 0.5) !important;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.3), inset 0 0 5px rgba(250, 204, 21, 0.15) !important;
   }
   .right-exp-btn.gold-theme .right-exp-icon {
-    background: rgba(250, 204, 21, 0.1) !important;
+    background: rgba(250, 204, 21, 0.12) !important;
     color: #facc15 !important;
   }
 
   .right-exp-btn.crimson-theme {
-    border: 1px solid rgba(244, 63, 94, 0.4) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 6px rgba(244, 63, 94, 0.2) !important;
+    border: 1.2px solid rgba(244, 63, 94, 0.5) !important;
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.3), inset 0 0 5px rgba(244, 63, 94, 0.15) !important;
   }
   .right-exp-btn.crimson-theme .right-exp-icon {
-    background: rgba(244, 63, 94, 0.1) !important;
+    background: rgba(244, 63, 94, 0.12) !important;
     color: #f43f5e !important;
   }
 
   .right-exp-btn.purple-theme {
-    border: 1px solid rgba(168, 85, 247, 0.4) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 6px rgba(168, 85, 247, 0.2) !important;
+    border: 1.2px solid rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3), inset 0 0 5px rgba(168, 85, 247, 0.15) !important;
   }
   .right-exp-btn.purple-theme .right-exp-icon {
-    background: rgba(168, 85, 247, 0.1) !important;
+    background: rgba(168, 85, 247, 0.12) !important;
     color: #a855f7 !important;
   }
 
   .right-exp-btn.emerald-theme {
-    border: 1px solid rgba(16, 185, 129, 0.4) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 6px rgba(16, 185, 129, 0.2) !important;
+    border: 1.2px solid rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3), inset 0 0 5px rgba(16, 185, 129, 0.15) !important;
   }
   .right-exp-btn.emerald-theme .right-exp-icon {
-    background: rgba(16, 185, 129, 0.1) !important;
+    background: rgba(16, 185, 129, 0.12) !important;
     color: #10b981 !important;
   }
 }
