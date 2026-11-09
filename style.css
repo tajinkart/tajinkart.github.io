@@ -224,7 +224,7 @@ nav a, nav button,
       box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
     }
 
-    #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: none !important; }
+    
     
     #rightVerticalNav.dock-collapsed .right-exp-btn {
       opacity: 0;
@@ -1997,7 +1997,7 @@ nav a, nav button,
     right: 14px !important;
     z-index: 9999 !important;
   }
-  #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: none !important; }
+  
   body {
     padding-bottom: 25px !important;
   }
@@ -2074,7 +2074,7 @@ nav a, nav button,
   }
 
   /* حالت جمع‌شده با اسکرول به پایین */
-  #rightVerticalNav.dock-collapsed #dockMasterTrigger { display: none !important; }
+  
   
   #rightVerticalNav.dock-collapsed .right-exp-btn {
     opacity: 0 !important;
@@ -3782,7 +3782,7 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
     right: 14px !important;
     z-index: 9999 !important;
   }
-  #rightVerticalNav #dockMasterTrigger { display: none !important; }
+  
   #rightVerticalNav:not(.dock-open) .right-exp-btn {
     display: none !important;
     opacity: 0 !important;
@@ -4410,7 +4410,7 @@ body {
     top: 14px !important;
   }
 
-  #dockMasterTrigger { display: none !important; }
+  
 
   .mobile-dock-backdrop {
     display: none;
@@ -4973,9 +4973,7 @@ body {
   }
 
   /* تریگر همبرگری در دسکتاپ مخفی است؛ آیکون‌ها خودشان مستقیماً در دسترسند */
-  #dockMasterTrigger {
-    display: none !important;
-  }
+  
 
   .dock-buttons-container {
     display: flex !important;
@@ -5149,9 +5147,7 @@ body {
   direction: ltr !important;
 }
 
-#dockMasterTrigger {
-  display: none !important;
-}
+
 
 .dock-buttons-container {
   display: flex !important;
@@ -5450,9 +5446,7 @@ body {
     max-width: 44px !important;
   }
 
-  #dockMasterTrigger {
-    display: none !important;
-  }
+  
 
   .dock-buttons-container {
     display: flex !important;
@@ -5598,17 +5592,7 @@ body {
 /* ==============================================================================
    RELEASE V19.2.0: COMPLETE REMOVAL OF HAMBURGER TRIGGER (PURE ICONS LIKE DESKTOP)
    ============================================================================== */
-#dockMasterTrigger,
-#rightVerticalNav #dockMasterTrigger {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
+
 
 /* فاصله متقارن و ارگونومیک داک از بالای صفحه در موبایل */
 @media (max-width: 768px) {
@@ -5673,9 +5657,7 @@ body {
   }
 
   /* بالای صفحه: آیکون‌ها باز، سه خط مخفی */
-  #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
-    display: none !important;
-  }
+  #rightVerticalNav:not(.dock-collapsed) 
   #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
@@ -5787,4 +5769,165 @@ body.in-admin-view #rightVerticalNav,
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+
+
+/* ==============================================================================
+   RELEASE V19.5.0: THE BULLETPROOF MASTER THREE-LINE TRIGGER & DOCK SYSTEM
+   ============================================================================== */
+
+/* استایل رسمی سه خط آبی نئون استودیو */
+#dockMasterTrigger {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 50% !important;
+  background: rgba(8, 12, 20, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1.5px solid var(--cyan-electric) !important;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.45) !important;
+  cursor: pointer !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--cyan-electric) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  flex-shrink: 0 !important;
+  z-index: 10000 !important;
+  box-sizing: border-box !important;
+}
+
+#dockMasterTrigger svg {
+  width: 22px !important;
+  height: 22px !important;
+  stroke: var(--cyan-electric) !important;
+  stroke-width: 2 !important;
+}
+
+#dockMasterTrigger:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.75) !important;
+}
+
+/* ۱. رفتار روی دسکتاپ (صفحات بزرگتر از 768px):
+   - بالای صفحه: ۶ آیکون باز، سه خط مخفی
+   - اسکرول به پایین (dock-collapsed): ۶ آیکون جمع شده و سه خط آبی ظاهر می‌شود
+   - کلیک روی سه خط: ۶ آیکون باز می‌شوند */
+@media (min-width: 769px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 22px !important;
+    top: 22px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  /* بالای صفحه: آیکون‌ها باز، سه خط مخفی */
+  #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
+    display: none !important;
+  }
+  #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* اسکرول به پایین: سه خط آبی ظاهر می‌شود و دکمه‌ها جمع می‌شوند */
+  #rightVerticalNav.dock-collapsed #dockMasterTrigger {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  #rightVerticalNav.dock-collapsed:not(.dock-open) .dock-buttons-container {
+    display: none !important;
+  }
+  #rightVerticalNav.dock-collapsed.dock-open .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    margin-top: 8px !important;
+  }
+}
+
+/* ۲. رفتار روی موبایل (صفحات 768px و کوچکتر):
+   - از ابتدا و همه‌جا منحصراً روی سه خط آبی بسته است
+   - با لمس سه خط، ۶ آیکون گرد زیر آن باز می‌شوند */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 14px !important;
+    top: 14px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: 44px !important;
+  }
+
+  /* در موبایل سه خط همیشه هست */
+  #dockMasterTrigger {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* دکمه‌ها در حالت عادی مخفی هستند */
+  #rightVerticalNav:not(.dock-open) .dock-buttons-container {
+    display: none !important;
+  }
+
+  /* با لمس سه خط، ۶ آیکون گرد باز می‌شوند */
+  #rightVerticalNav.dock-open .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    margin-top: 6px !important;
+  }
+
+  /* دکمه‌ها در موبایل منحصراً آیکون‌های گرد ۴۲ پیکسلی هستند */
+  #rightVerticalNav .right-exp-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    border: 1.5px solid var(--border-subtle) !important;
+  }
+
+  #rightVerticalNav .right-exp-text {
+    display: none !important;
+  }
+
+  #rightVerticalNav .right-exp-icon {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .dock-store-flyout-menu {
+    right: calc(100% + 8px) !important;
+    width: 220px !important;
+    padding: 8px !important;
+    position: absolute !important;
+    top: 0 !important;
+  }
 }

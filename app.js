@@ -7811,3 +7811,31 @@ window.switchView = function(viewKey) {
     origSwitchViewAdminGuard(viewKey);
   }
 };
+
+
+
+// ==============================================================================
+// RELEASE V19.5.0: DEFINITIVE SCROLL COLLAPSE CONTROLLER
+// ==============================================================================
+(function() {
+  function handleScroll() {
+    const dock = document.getElementById('rightVerticalNav');
+    if (!dock) return;
+
+    if (window.innerWidth > 768) {
+      if (window.scrollY > 100) {
+        dock.classList.add('dock-collapsed');
+      } else {
+        dock.classList.remove('dock-collapsed');
+        dock.classList.remove('dock-open');
+      }
+    } else {
+      dock.classList.add('dock-collapsed');
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('resize', handleScroll, { passive: true });
+  document.addEventListener('DOMContentLoaded', handleScroll);
+  setTimeout(handleScroll, 30);
+})();
