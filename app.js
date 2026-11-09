@@ -2934,10 +2934,15 @@ window.switchView = function(vKey) {
   const dock = document.getElementById('rightVerticalNav');
   const homeBtn = document.getElementById('rightDockHomeBtn');
 
-  // آپدیت وضعیت دکمه‌های ناوبری موبایل
+  // آپدیت وضعیت دکمه‌های ناوبری موبایل و دسکتاپ
   if (dock) {
-    dock.classList.add('dock-collapsed');
-    dock.classList.remove('dock-open');
+    if (window.innerWidth <= 768) {
+      dock.classList.add('dock-collapsed');
+      dock.classList.remove('dock-open');
+    } else {
+      dock.classList.remove('dock-collapsed');
+      dock.classList.remove('dock-open');
+    }
   }
 
   const catMenu = document.getElementById('floatingGalleryCategoryMenu');
@@ -2970,39 +2975,61 @@ window.switchStoreTab = function(tabKey, btn) {
 let scrollTicking = false;
 
 function handleOptimizedScroll() {
+  const scrolled = window.scrollY || window.pageYOffset || 0;
+  const topBar = document.getElementById('topCenterBrandBar');
+  const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
+
+  // ۱. کنترل پدیدار شدن نشان تاژین کارت و دسته‌بندی آثار با اسکرول به پایین (روی موبایل و دسکتاپ در صفحه اول)
+  if (topBar) {
+    if (cView === 'showcase') {
+      if (scrolled > 80) {
+        topBar.classList.add('visible');
+      } else {
+        topBar.classList.remove('visible');
+      }
+    } else {
+      topBar.classList.add('visible');
+    }
+  }
+
+  // ۲. مدیریت داک در موبایل: همیشه بسته می‌ماند و اسکرول تأثیری رویش ندارد
   const dock = document.getElementById('rightVerticalNav');
   if (!dock) return;
-
-  // قانون موبایل: اسکرول موبایل ۱۰۰٪ بی‌اثر است و هرگز داک بسته را باز نمی‌کند!
   if (window.innerWidth <= 768) {
     return;
   }
 
-  // رفتار دسکتاپ: در بالای صفحه باز است، با اسکرول به پایین (>100px) جمع می‌شود به سه خط
-  const scrolled = window.scrollY || window.pageYOffset || 0;
-  if (scrolled > 100) {
-    dock.classList.add('dock-collapsed');
-  } else {
-    dock.classList.remove('dock-collapsed');
-    dock.classList.remove('dock-open');
-  }
+  // ۳. روی دسکتاپ: کلاً داک همیشه باز می‌ماند
+  dock.classList.remove('dock-collapsed');
 }
 
 function initDockState() {
   const dock = document.getElementById('rightVerticalNav');
+  const topBar = document.getElementById('topCenterBrandBar');
+  const scrolled = window.scrollY || window.pageYOffset || 0;
+  const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
+
+  // وضعیت اولیه نشان برند در بالا-چپ
+  if (topBar) {
+    if (cView === 'showcase' && scrolled <= 80) {
+      topBar.classList.remove('visible');
+    } else {
+      topBar.classList.add('visible');
+    }
+  }
+
   if (!dock) return;
+
+  // موبایل: همیشه از اول بسته است و فقط ۳ خط نمایش داده می‌شود
   if (window.innerWidth <= 768) {
     dock.classList.add('dock-collapsed');
     dock.classList.remove('dock-open');
-  } else {
-    const scrolled = window.scrollY || window.pageYOffset || 0;
-    if (scrolled > 100) {
-      dock.classList.add('dock-collapsed');
-    } else {
-      dock.classList.remove('dock-collapsed');
-      dock.classList.remove('dock-open');
-    }
+    return;
   }
+
+  // دسکتاپ: کلاً باز می‌ماند
+  dock.classList.remove('dock-collapsed');
+  dock.classList.remove('dock-open');
 }
 
 window.addEventListener('scroll', () => {
