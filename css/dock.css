@@ -1,0 +1,346 @@
+/* ==============================================================================
+   TAJINKART RIGHT VERTICAL DOCK NAVIGATION & MOBILE DRAWER
+   ============================================================================== */
+
+#rightVerticalNav {
+  position: fixed !important;
+  right: 22px !important;
+  left: auto !important;
+  top: 22px !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 10px !important;
+  direction: ltr !important;
+}
+
+#dockMasterTrigger {
+  display: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(9, 12, 18, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid var(--cyan-electric);
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.35);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan-electric);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+#dockMasterTrigger:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+}
+
+.dock-buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.mobile-dock-header,
+.mobile-dock-backdrop {
+  display: none;
+}
+
+/* Single-border capsule buttons (No concentric black outer ring) */
+.right-exp-btn {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  width: 46px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(8, 11, 18, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1.5px solid var(--border-subtle) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75) !important;
+  transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s !important;
+  overflow: hidden !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.right-exp-btn:hover {
+  width: auto !important;
+  min-width: 46px !important;
+  padding: 0 18px 0 5px !important;
+}
+
+.right-exp-icon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.right-exp-text {
+  display: flex !important;
+  flex-direction: column !important;
+  padding-left: 14px !important;
+  padding-right: 8px !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+  opacity: 0 !important;
+  max-width: 0 !important;
+  overflow: hidden !important;
+  transition: opacity 0.25s ease, max-width 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.right-exp-btn:hover .right-exp-text {
+  opacity: 1 !important;
+  max-width: 220px !important;
+}
+
+.right-exp-title {
+  display: block !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.06em !important;
+  line-height: 1.25 !important;
+}
+
+.right-exp-sub {
+  display: block !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.2 !important;
+  margin-top: 2px !important;
+}
+
+/* Dock Themes */
+.right-exp-btn.home-theme { border-color: rgba(255, 87, 34, 0.4) !important; }
+.right-exp-btn.home-theme:hover { border-color: var(--coral-flame) !important; box-shadow: 0 0 25px rgba(255, 87, 34, 0.4) !important; }
+.right-exp-btn.home-theme .right-exp-icon { color: var(--coral-flame) !important; }
+
+.right-exp-btn.cyan-theme { border-color: rgba(0, 240, 255, 0.4) !important; }
+.right-exp-btn.cyan-theme:hover { border-color: var(--cyan-electric) !important; box-shadow: 0 0 25px rgba(0, 240, 255, 0.4) !important; }
+.right-exp-btn.cyan-theme .right-exp-icon { color: var(--cyan-electric) !important; }
+
+.right-exp-btn.gold-theme { border-color: rgba(250, 204, 21, 0.4) !important; }
+.right-exp-btn.gold-theme:hover { border-color: var(--gold) !important; box-shadow: 0 0 25px rgba(250, 204, 21, 0.4) !important; }
+.right-exp-btn.gold-theme .right-exp-icon { color: var(--gold) !important; }
+
+.right-exp-btn.crimson-theme { border-color: rgba(244, 63, 94, 0.4) !important; }
+.right-exp-btn.crimson-theme:hover { border-color: var(--crimson) !important; box-shadow: 0 0 25px rgba(244, 63, 94, 0.4) !important; }
+.right-exp-btn.crimson-theme .right-exp-icon { color: var(--crimson) !important; }
+
+.right-exp-btn.purple-theme { border-color: rgba(168, 85, 247, 0.4) !important; }
+.right-exp-btn.purple-theme:hover { border-color: var(--violet) !important; box-shadow: 0 0 25px rgba(168, 85, 247, 0.4) !important; }
+.right-exp-btn.purple-theme .right-exp-icon { color: var(--violet) !important; }
+
+.right-exp-btn.emerald-theme { border-color: rgba(16, 185, 129, 0.4) !important; }
+.right-exp-btn.emerald-theme:hover { border-color: var(--emerald) !important; box-shadow: 0 0 25px rgba(16, 185, 129, 0.4) !important; }
+.right-exp-btn.emerald-theme .right-exp-icon { color: var(--emerald) !important; }
+
+/* 2-Part Store Flyout Sub-menu */
+.dock-store-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.dock-store-flyout-menu {
+  display: none;
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 0;
+  width: 230px;
+  background: rgba(8, 11, 18, 0.98);
+  backdrop-filter: blur(20px);
+  border: 1.5px solid var(--gold);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9);
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10000;
+  animation: flyoutSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes flyoutSlideIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.dock-store-wrapper.active .dock-store-flyout-menu {
+  display: flex !important;
+}
+
+.dock-flyout-sub-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: all 0.2s ease !important;
+  color: #fff !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.dock-flyout-sub-btn:hover {
+  background: rgba(250, 204, 21, 0.12) !important;
+  border-color: var(--gold) !important;
+  transform: translateX(-3px) !important;
+}
+
+.dock-flyout-sub-btn.cyan-accent:hover {
+  background: rgba(0, 240, 255, 0.12) !important;
+  border-color: var(--cyan-electric) !important;
+}
+
+.sub-btn-icon {
+  font-size: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+.sub-btn-text {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.sub-btn-text strong {
+  font-size: 13px !important;
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.04em !important;
+}
+
+.sub-btn-text span {
+  font-size: 10.5px !important;
+  color: var(--text-muted) !important;
+  margin-top: 1px !important;
+}
+
+/* Mobile Responsive Drawer */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    right: 14px !important;
+    top: 14px !important;
+  }
+
+  #dockMasterTrigger {
+    display: flex !important;
+  }
+
+  .mobile-dock-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 10001;
+  }
+
+  #rightVerticalNav.dock-open .mobile-dock-backdrop {
+    display: block !important;
+  }
+
+  #rightVerticalNav.dock-collapsed .dock-buttons-container {
+    display: none !important;
+  }
+
+  #rightVerticalNav.dock-open .dock-buttons-container {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 290px !important;
+    max-width: 85vw !important;
+    background: rgba(8, 11, 18, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
+    border-left: 1px solid var(--border-subtle) !important;
+    padding: 22px 18px !important;
+    box-shadow: -15px 0 50px rgba(0, 0, 0, 0.9) !important;
+    z-index: 10002 !important;
+    overflow-y: auto !important;
+    animation: drawerSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  @keyframes drawerSlideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  .mobile-dock-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding-bottom: 16px !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    margin-bottom: 14px !important;
+  }
+
+  .mobile-dock-brand {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: var(--gold) !important;
+    font-family: var(--font-brand) !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .mobile-dock-close-btn {
+    font-size: 20px !important;
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 6px !important;
+  }
+
+  #rightVerticalNav.dock-open .right-exp-btn {
+    width: 100% !important;
+    height: 52px !important;
+    border-radius: 14px !important;
+    padding: 0 14px !important;
+    flex-direction: row-reverse !important;
+    justify-content: flex-start !important;
+  }
+
+  #rightVerticalNav.dock-open .right-exp-text {
+    opacity: 1 !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 12px !important;
+  }
+
+  #rightVerticalNav.dock-open .right-exp-title {
+    font-size: 15px !important;
+  }
+
+  #rightVerticalNav.dock-open .right-exp-sub {
+    font-size: 11.5px !important;
+  }
+
+  .dock-store-wrapper {
+    width: 100% !important;
+  }
+
+  .dock-store-flyout-menu {
+    position: static !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 8px !important;
+  }
+}

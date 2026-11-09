@@ -1,3 +1,15 @@
+/* ==============================================================================
+   TAJINKART MASTER STYLESHEET (MODULAR AGGREGATOR)
+   ============================================================================== */
+
+@import url('css/tokens.css');
+@import url('css/layout.css');
+@import url('css/dock.css');
+@import url('css/views.css');
+@import url('css/modals.css');
+@import url('css/admin.css');
+
+
 
 /* ==============================================================================
    OPTIMUS PRINCEPS MASTER TYPOGRAPHY (TAJINKART BRAND SIGNATURE)
