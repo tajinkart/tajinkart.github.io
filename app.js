@@ -2299,22 +2299,26 @@ window.recalcWizardPrice = function() {
     baseUSD = activeModalItem.usdVal;
   }
 
+  const scopeEl = document.getElementById('wizCharacterScope');
   const framingEl = document.getElementById('wizFraming');
   const compEl = document.getElementById('wizComplexity');
   const phaseEl = document.getElementById('orderPhaseSelect');
+  const weaponEl = document.getElementById('wizHeroWeapon');
   const expEl = document.getElementById('wizExpressions');
-  const vfxEl = document.getElementById('wizVFX');
+  const paletteEl = document.getElementById('wizColorPalette');
   const commEl = document.getElementById('wizCommercial');
 
   let extra = 0;
+  if (scopeEl) extra += parseInt(scopeEl.options[scopeEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (expEl && expEl.checked) extra += 35;
-  if (vfxEl && vfxEl.checked) extra += 25;
+  if (weaponEl && weaponEl.checked) extra += 35;
+  if (expEl && expEl.checked) extra += 30;
+  if (paletteEl && paletteEl.checked) extra += 20;
   if (commEl && commEl.checked) extra += 45;
 
-  const totalUSD = Math.max(50, baseUSD + extra);
+  const totalUSD = Math.max(60, baseUSD + extra);
   activeModalItem.calculatedPriceUSD = totalUSD;
 
   // آپدیت آنی و زنده قیمت روی صفحه

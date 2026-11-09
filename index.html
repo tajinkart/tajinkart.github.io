@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=13.3.0">
+  <link rel="stylesheet" href="style.css?v=14.0.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -341,6 +341,18 @@
                   <span>تجهیزات، پراپ و UI</span>
                 </div>
                 <div class="service-nav-desc">سلاح‌ها و تجهیزات جادویی، المان‌های HUD دارک‌فانتزی، آیکون‌های مهارت و نقش‌های قبیله‌ای.</div>
+              </div>
+            </div>
+
+                        <!-- ۷. مسکات و هویت برند -->
+            <div onclick="selectPipeline('sketch_mascot', this)" class="service-nav-card" data-pipeline="sketch_mascot">
+              <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80" alt="مسکات و برندینگ" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">07.</span>
+                  <span>مسکات، نشان تجاری و کرست</span>
+                </div>
+                <div class="service-nav-desc">طراحی نماد انحصاری برندها، مسکات بازی و نشان رسمی با راهنمای هویت بصری.</div>
               </div>
             </div>
 
@@ -1547,21 +1559,30 @@
               <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
             <div class="wizard-step-body">
+              <div>
+                <label style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">تیپ و سناریوی پروژه (Scope & Archetype):</label>
+                <select id="wizCharacterScope" onchange="recalcWizardPrice()" style="width:100%; font-size:12px; margin-bottom:10px;">
+                  <option value="single" data-usd="0" selected>👤 تک‌کاراکتر مستقل (Hero / Single Character Concept)</option>
+                  <option value="timeline" data-usd="60">⏳ خط زمانی سن و سال کاراکتر (کودکی ➔ جوانی ➔ کهنسالی) (+۶۰$)</option>
+                  <option value="party" data-usd="85">👥 پکیج تیمی / فکشن / خانوادگی (کاراکتر اصلی + همراهان) (+۸۵$)</option>
+                  <option value="redesign" data-usd="15">🔄 بازطراحی و ارتقای کاراکتر قدیمی (Redesign & Evolution) (+۱۵$)</option>
+                </select>
+              </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">کادربندی (Framing)</label>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">کادربندی و نما</label>
                   <select id="wizFraming" onchange="recalcWizardPrice()">
                     <option value="bust" data-usd="0">پرتره / نیم‌تنه (پایه)</option>
-                    <option value="full" data-usd="50" selected>تمام‌قد پویا (+۵۰$)</option>
-                    <option value="turnaround" data-usd="90">شیت سه‌نما ارتوگرافیک (+۹۰$)</option>
+                    <option value="full" data-usd="40" selected>تمام‌قد پویا (+۴۰$)</option>
+                    <option value="turnaround" data-usd="75">مدل‌شیت ۳۶۰ درجه ارتوگرافیک (+۷۵$)</option>
                   </select>
                 </div>
                 <div>
                   <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ضریب پیچیدگی دیزاین</label>
                   <select id="wizComplexity" onchange="recalcWizardPrice()">
-                    <option value="simple" data-usd="0">ساده (المان‌های مینیمال)</option>
-                    <option value="medium" data-usd="35" selected>پیچیده (زره نیمه‌سنگین / بافت)</option>
-                    <option value="hard" data-usd="70">سخت (زره تشریفاتی / مکانیکال)</option>
+                    <option value="simple" data-usd="0">ساده (سیلوئت و المان‌های مینیمال)</option>
+                    <option value="medium" data-usd="30" selected>استاندارد پروداکشن (زره و بافت)</option>
+                    <option value="hard" data-usd="60">پیچیده سینمایی (زره سنگین / ارگانیک)</option>
                   </select>
                 </div>
               </div>
@@ -1584,23 +1605,30 @@
                   <option value="فاز ۴: رندر کامل سینمایی + فایل لایه‌باز PSD" data-usd="50" selected>فاز ۴: رندر مستر سینمایی + لایه‌باز PSD</option>
                 </select>
               </div>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                  <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
-                  <span>شیت حالات چهره (+۳۵$)</span>
-                </label>
-                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                  <input type="checkbox" id="wizVFX" onchange="recalcWizardPrice()" style="width:auto;" />
-                  <span>افکت جادویی و VFX (+۲۵$)</span>
-                </label>
-                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                  <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
-                  <span>حقوق لایسنس تجاری (+۴۵$)</span>
-                </label>
-                <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                  <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked style="width:auto;" />
-                  <span>فایل مستر لایه‌باز PSD (شامل)</span>
-                </label>
+              <div style="margin-top:6px; margin-bottom:8px;">
+                <span style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 افزونه‌های پیوسته به همین پرونده (Character Add-ons):</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>طراحی سلاح اختصاصی (+۳۵$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>شیت حالات چهره (+۳۰$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizColorPalette" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>واریاسیون رنگ لباس (+۲۰$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>لایسنس تجاری AAA (+۴۵$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
+                    <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
+                    <span style="color:#10b981; font-weight:700;">✓ فایل مستر لایه‌باز PSD چاپ ۳۰۰DPI تجاری (رایگان و تضمین‌شده)</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -2056,8 +2084,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=13.3.0"></script>
-  <script src="app.js?v=13.3.0"></script>
+  <script src="data.js?v=14.0.0"></script>
+  <script src="app.js?v=14.0.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

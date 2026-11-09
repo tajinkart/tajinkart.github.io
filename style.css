@@ -3748,3 +3748,48 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
+
+/* ==============================================================================
+   v14.0.0: کارت‌های عریض و پانورامیک آتلیه و بازطراحی ارگونومیک ویزارد
+   ============================================================================== */
+.service-nav-card {
+  height: 108px !important;
+  border-radius: 16px !important;
+  border: 1.5px solid var(--border-subtle) !important;
+}
+.service-nav-card img {
+  opacity: 0.52 !important;
+}
+.service-nav-card:hover img {
+  opacity: 0.25 !important;
+  transform: scale(1.06) !important;
+}
+.service-nav-title {
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  color: #fff !important;
+}
+.service-nav-desc {
+  font-size: 11px !important;
+  color: #cbd5e1 !important;
+  line-height: 1.5 !important;
+}
+.pipeline-tile {
+  min-height: 250px !important;
+  border-radius: 16px !important;
+  border: 1.5px solid var(--border-subtle) !important;
+}
+.pipeline-tile:hover {
+  border-color: var(--gold) !important;
+  box-shadow: 0 14px 40px rgba(250, 204, 21, 0.25) !important;
+}
+.pipeline-tile-title {
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  line-height: 1.4 !important;
+}
+.pipeline-tile-desc {
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+  color: #94a3b8 !important;
+}
