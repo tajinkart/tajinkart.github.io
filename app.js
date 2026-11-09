@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFloatingCategoryDropdown();
   renderAdminGalleryCategories();
   if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
+  if (typeof loadStudioPricingMatrixToForm === 'function') loadStudioPricingMatrixToForm();
 });
 
 
@@ -1342,6 +1343,7 @@ window.confirmSaveArtwork = async function() {
         title: title || 'کانسپت جدید استودیو',
         desc: desc,
         isProductionPack: isPack,
+    isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
         pipelineKey: pipe,
         image: img,
         colorSpace: colorSpace,
@@ -1388,6 +1390,7 @@ window.confirmSaveArtwork = async function() {
       art.image = img;
       art.desc = desc;
       art.isProductionPack = isPack;
+    art.isAtelierSample = document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false;
       art.phases = assembledPhases;
 
       safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
@@ -1467,6 +1470,7 @@ window.renderAdminSettingsTab = function() {
   if (typeof previewStudioStatusSelection === 'function') previewStudioStatusSelection();
   if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
   if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
+  if (typeof loadStudioPricingMatrixToForm === 'function') loadStudioPricingMatrixToForm();
   const rateEl = document.getElementById('setUsdRate');
   if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
   if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay();
@@ -2223,7 +2227,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
         <div class="pipeline-tile ${tile.span}" onclick="openModal('${tile.title}', '${tile.desc}', '${displayPrice}', '${tile.img}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
           <img src="${tile.img}" class="pipeline-tile-img" alt="${tile.title}" />
           <div class="pipeline-tile-overlay">
-            <span class="pipeline-step-badge">${tile.badge}</span>
+            
             <h4 class="pipeline-tile-title">${tile.title}</h4>
             <p class="pipeline-tile-desc">${tile.desc}</p>
             <div class="pipeline-tile-footer">
@@ -6383,3 +6387,71 @@ async function detectUserGeoLocation() {
     console.log('[TAJINKART Geo Engine] Trace fallback active.');
   }
 }
+
+
+// ==============================================================================
+// ناوبری زیرمنوی دوگانه آتلیه و فروشگاه در داک (سفارش کانسپت / دارایی‌های دیجیتال)
+// ==============================================================================
+window.navigateToStorePane = function(paneKey, e) {
+  if (e) e.stopPropagation();
+  switchView('store');
+  switchStoreTab(paneKey);
+  const wrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (wrapper) wrapper.classList.remove('active');
+  const title = document.getElementById('storeSectionMainTitle');
+  if (title) {
+    title.textContent = (paneKey === 'products') ? 'مخزن رسمی دارایی‌های دیجیتال و اسست‌های استودیو' : 'آتلیه کانسپت و توسعه بصری استودیو';
+  }
+};
+
+window.toggleStoreDockSubmenu = function(e) {
+  if (window.innerWidth <= 768) {
+    if (e) e.stopPropagation();
+    const wrapper = document.getElementById('dockStoreDropdownWrapper');
+    if (wrapper) wrapper.classList.toggle('active');
+  } else {
+    navigateToStorePane('commissions', e);
+  }
+};
+
+// ==============================================================================
+// ذخیره و بارگذاری مستقیم ماتریس قیمت‌گذاری و ضرایب آتلیه (Studio Pricing Matrix)
+// ==============================================================================
+window.saveStudioPricingMatrixDirect = function() {
+  const pipes = ['sketch1', 'sketch_creature', 'sketch2', 'sketch3', 'sketch4', 'sketch_mascot'];
+  siteSettings.pricingMatrix = siteSettings.pricingMatrix || {};
+
+  pipes.forEach(p => {
+    const base = Number(document.getElementById(`matBase_${p}`)?.value) || 90;
+    const full = Number(document.getElementById(`matFull_${p}`)?.value) || 0;
+    const turn = Number(document.getElementById(`matTurn_${p}`)?.value) || 0;
+    const weapon = Number(document.getElementById(`matWeapon_${p}`)?.value) || 0;
+    const disc = Number(document.getElementById(`matDiscount_${p}`)?.value) || 0;
+
+    siteSettings.pricingMatrix[p] = { base, full, turn, weapon, disc };
+
+    if (PIPELINE_DATA[p]) {
+      if (PIPELINE_DATA[p].tiles && PIPELINE_DATA[p].tiles[0]) {
+        PIPELINE_DATA[p].tiles[0].usdVal = base;
+      }
+    }
+  });
+
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  if (typeof selectPipeline === 'function') selectPipeline(currentSelectedPipeKey, null, false);
+  showToast('ماتریس قیمت‌ها و ضرایب آتلیه با موفقیت ذخیره و اعمال شد! ✓', 'success', 3500);
+};
+
+window.loadStudioPricingMatrixToForm = function() {
+  if (!siteSettings.pricingMatrix) return;
+  const matrix = siteSettings.pricingMatrix;
+  Object.keys(matrix).forEach(p => {
+    const item = matrix[p];
+    if (document.getElementById(`matBase_${p}`)) document.getElementById(`matBase_${p}`).value = item.base;
+    if (document.getElementById(`matFull_${p}`)) document.getElementById(`matFull_${p}`).value = item.full;
+    if (document.getElementById(`matTurn_${p}`)) document.getElementById(`matTurn_${p}`).value = item.turn;
+    if (document.getElementById(`matWeapon_${p}`)) document.getElementById(`matWeapon_${p}`).value = item.weapon;
+    if (document.getElementById(`matDiscount_${p}`)) document.getElementById(`matDiscount_${p}`).value = item.disc;
+  });
+};

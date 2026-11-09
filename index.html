@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=14.0.0">
+  <link rel="stylesheet" href="style.css?v=14.1.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -102,18 +102,32 @@
       </span>
     </button>
 
-    <!-- ۲. استور و کمیسیون -->
-    <button onclick="switchView('store')" class="right-exp-btn gold-theme" title="فروشگاه و سفارش">
-      <span class="right-exp-icon">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-        </svg>
-      </span>
-      <span class="right-exp-text">
-        <span class="right-exp-title" style="color:var(--gold);">فروشگاه و آتلیه</span>
-        <span class="right-exp-sub">ثبت سفارش کانسپت</span>
-      </span>
-    </button>
+    <!-- ۲. آتلیه و فروشگاه با ساب‌آیکون‌های اختصاصی -->
+    <div class="dock-store-wrapper" id="dockStoreDropdownWrapper">
+      <button onclick="toggleStoreDockSubmenu(event)" class="right-exp-btn gold-theme" title="فروشگاه و آتلیه">
+        <span class="right-exp-icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+          </svg>
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" style="color:var(--gold);">آتلیه و فروشگاه</span>
+          <span class="right-exp-sub">کانسپت و اسست‌ها</span>
+        </span>
+      </button>
+
+      <!-- ساب‌آیکون‌های دوگانه اختصاصی آتلیه -->
+      <div class="dock-store-submenu" id="dockStoreSubmenu">
+        <button type="button" onclick="navigateToStorePane('commissions', event)" class="dock-sub-item gold-sub" title="سفارش کانسپت آتلیه">
+          <span style="font-size:14px;">🎨</span>
+          <span>سفارش کانسپت (آتلیه)</span>
+        </button>
+        <button type="button" onclick="navigateToStorePane('products', event)" class="dock-sub-item cyan-sub" title="دارایی‌های دیجیتال و اسست‌ها">
+          <span style="font-size:14px;">💎</span>
+          <span>دارایی‌های دیجیتال</span>
+        </button>
+      </div>
+    </div>
 
     <!-- ۳. جهان جنسیس (قرمز) -->
     <button onclick="switchView('genesis')" class="right-exp-btn crimson-theme" title="جهان جنسیس">
@@ -245,40 +259,18 @@
   <section id="view-store" class="view-section hidden">
     <div class="container">
       
-      <!-- هدر اصلی فروشگاه با جابجایی چراغ ظرفیت به کنار تیتر اصلی طبق دستور کاربر -->
-      <div class="section-head">
-        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-          <h2 class="view-hero-title">فروشگاه دارایی‌های دیجیتال و آتلیه کانسپت</h2>
-          <!-- چراغ کامیشن‌ها دقیقاً در کنار تیتر اصلی قرار گرفت -->
-          <div id="commissionCapacityIndicator" class="comm-capacity-badge" title="ظرفیت پذیرش ماهانه آتلیه استودیو">
-            <span class="capacity-pulse-dot"></span>
-            <span>۲ از ۳ ظرفیت آتلیه رزرو شده</span>
-          </div>
-        </div>
-
-        <div class="store-action-bar">
-          <div class="store-dual-nav">
-            <button onclick="switchStoreTab('commissions', this)" class="store-dual-btn active">سفارش کانسپت اختصاصی (۶ دسته)</button>
-            <button onclick="switchStoreTab('products', this)" class="store-dual-btn">دارایی‌های دیجیتال و فروشگاه</button>
-          </div>
-          <!-- انتخاب واحد پولی زنده (دلار و تومان) -->
-          <div class="currency-toggle-box" title="انتخاب واحد پولی پیش‌فرض">
-            <button id="currBtnUSD" onclick="setCurrencyMode('USD')" class="curr-btn active">$ دلار</button>
-            <button id="currBtnTOMAN" onclick="setCurrencyMode('TOMAN')" class="curr-btn">تومان</button>
-          </div>
+      <!-- هدر خلوت، باوقار و مینی‌مال آتلیه -->
+      <div class="section-head" style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h2 class="view-hero-title" id="storeSectionMainTitle" style="font-size:22px; font-weight:900; color:#fff; margin:0 0 4px;">آتلیه کانسپت و توسعه بصری</h2>
+          <span style="font-size:12px; color:var(--text-muted);">پذیرش پروژه‌های پیش‌تولید بازی، کانسپت سینمایی و طراحی دنیا زیر نظر مستقیم سید سروش تاج.</span>
         </div>
       </div>
 
       <!-- تب ۱: میزکار کمیسیون -->
       <div id="storePaneCommissions">
         
-        <!-- توضیحات مجزا و دقیق اختصاصی برای سفارشات کانسپت آرت -->
-        <div class="panel-intro-banner gold-border">
-          <div>
-            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:14px;">⚡ پایپلاین سفارش اختصاصی کانسپت آرت و توسعه بصری:</strong>
-            پایپلاین استاندارد بین‌المللی طراحی دنیا زیر نظر مستقیم سید سروش تاج. هر سفارش شامل مراحل شفاف اتود مفهومی، مدل‌شیت سه‌نمای ارتوگرافیک، نورپردازی مقداری و رندر مستر نهایی با فایل لایه‌باز PSD در رزولوشن 4K/8K با تضمین زمان‌بندی دقیق و فیدبک‌های دوره‌ای است.
-          </div>
-        </div>
+
 
         <div class="comm-studio-layout">
           
@@ -386,6 +378,15 @@
             <div id="mosaicStageContainer" class="mosaic-pipeline-grid"></div>
           </div>
 
+        </div>
+
+        <!-- توضیحات استاندارد آتلیه در انتهای صفحه زیر میزکار -->
+        <div style="margin-top:24px; padding:16px 20px; border-radius:14px; background:#04060b; border:1px solid rgba(250,204,21,0.22); display:flex; align-items:flex-start; gap:12px;">
+          <span style="font-size:18px;">⚡</span>
+          <div>
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:12.5px;">پایپلاین استاندارد بین‌المللی توسعه بصری استودیو TAJINKART:</strong>
+            <p style="margin:0; font-size:11px; color:var(--text-muted); line-height:1.75;">کلیه سفارشات شامل مراحل شفاف اتود مفهومی، مدل‌شیت سه‌نمای ارتوگرافیک، نورپردازی مقداری و رندر مستر نهایی با فایل لایه‌باز PSD در استاندارد چاپ تجاری ۳۰۰DPI با تضمین زمان‌بندی دقیق و فیدبک‌های دوره‌ای است.</p>
+          </div>
         </div>
       </div>
 
@@ -695,66 +696,48 @@
             </div>
             
             <nav class="admin-sidebar-menu">
-              <!-- ۱. موزاییک آثار گالری (گزینه اول) -->
+              <!-- ۱. گالری و آثار استودیو -->
               <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
                 <span class="admin-nav-icon">🖼️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۱. موزاییک آثار گالری</span>
-                  <span class="admin-nav-sub">مدیریت و چیدمان پورتفولیو</span>
+                  <span class="admin-nav-title">۱. گالری و آثار استودیو</span>
+                  <span class="admin-nav-sub">پورتفولیو و نمونه‌های زنده</span>
                 </div>
               </button>
 
-              <!-- ۲. پایپلاین و مراحل قیمت‌گذاری -->
+              <!-- ۲. آتلیه، پایپلاین و تعرفه‌ها -->
               <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
                 <span class="admin-nav-icon">⚡</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۲. پایپلاین و قیمت‌گذاری</span>
-                  <span class="admin-nav-sub">تعرفه و فازهای کمیسیون</span>
+                  <span class="admin-nav-title">۲. آتلیه و قیمت‌گذاری</span>
+                  <span class="admin-nav-sub">پایپلاین‌ها و ماتریس تعرفه‌ها</span>
                 </div>
               </button>
 
-              <!-- ۳. مدیریت دارایی‌های دیجیتال -->
-              <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
-                <span class="admin-nav-icon">💎</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">۳. دارایی‌های دیجیتال</span>
-                  <span class="admin-nav-sub">فروشگاه اسست‌ها و لور</span>
-                </div>
-              </button>
-
-              <!-- ۴. اعضا و گزارش‌های مالی -->
-              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
-                <span class="admin-nav-icon">👥</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">۴. اعضا و گزارش‌های مالی</span>
-                  <span class="admin-nav-sub">سطوح کاربری و درآمدها</span>
-                </div>
-              </button>
-
-              <!-- ۵. سفارش‌های دریافتی -->
+              <!-- ۳. سفارش‌های دریافتی -->
               <button type="button" onclick="switchAdminTab('orders', this)" class="admin-nav-item" data-tab="orders">
                 <span class="admin-nav-icon">📋</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۵. سفارش‌های دریافتی</span>
-                  <span class="admin-nav-sub">بریف‌ها و وضعیت پروژه</span>
+                  <span class="admin-nav-title">۳. سفارش‌های دریافتی</span>
+                  <span class="admin-nav-sub">بریف‌ها، فاکتورها و وضعیت</span>
                 </div>
               </button>
 
-              <!-- ۷. منشور و قوانین استودیو -->
-              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
-                <span class="admin-nav-icon">⚖️</span>
+              <!-- ۴. فروشگاه دارایی‌های دیجیتال -->
+              <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
+                <span class="admin-nav-icon">💎</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۷. منشور و قوانین استودیو</span>
-                  <span class="admin-nav-sub">ویرایش زنده ToS، لایسنس و شرایط</span>
+                  <span class="admin-nav-title">۴. فروشگاه دارایی‌ها</span>
+                  <span class="admin-nav-sub">اسست‌ها، براش‌ها و کمیک</span>
                 </div>
               </button>
 
-              <!-- ۶. تنظیمات سراسری و تلگرام -->
+              <!-- ۵. مرکز تنظیمات و زیرساخت استودیو -->
               <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
                 <span class="admin-nav-icon">⚙️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۶. تنظیمات سراسری و تلگرام</span>
-                  <span class="admin-nav-sub">نرخ دلار، توکن بات و رمز</span>
+                  <span class="admin-nav-title">۵. تنظیمات و زیرساخت</span>
+                  <span class="admin-nav-sub">وضعیت حضور، برند، ابر و قوانین</span>
                 </div>
               </button>
             </nav>
@@ -847,6 +830,90 @@
               </div>
             </div>
           </div>
+            <!-- جدول ماتریس تعرفه‌ها و ضرایب استودیو (Studio Pricing Matrix) -->
+            <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.6);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                <div>
+                  <h4 style="font-size:14.5px; font-weight:900; color:var(--gold); margin:0 0 4px;">📊 جدول ماتریس قیمت‌گذاری و ضرایب آتلیه (Studio Pricing Matrix)</h4>
+                  <span style="font-size:11.5px; color:var(--text-muted);">مدیریت یکپارچه قیمت پایه، ضرایب کادربندی، افزونه‌ها و درصد تخفیف پکیج‌ها بدون نیاز به اکسل خارجی.</span>
+                </div>
+                <button type="button" onclick="saveStudioPricingMatrixDirect()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; font-weight:800; border-radius:8px; cursor:pointer;">
+                  ✓ ذخیره ماتریس قیمت‌ها
+                </button>
+              </div>
+
+              <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:right;">
+                  <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.12); color:var(--text-muted); font-size:11px;">
+                      <th style="padding:10px 8px;">شاخه و پایپلاین</th>
+                      <th style="padding:10px 8px;">قیمت پایه ($)</th>
+                      <th style="padding:10px 8px;">ضریب تمام‌قد ($)</th>
+                      <th style="padding:10px 8px;">مدل‌شیت ارتوگرافیک ($)</th>
+                      <th style="padding:10px 8px;">افزونه سلاح ($)</th>
+                      <th style="padding:10px 8px;">تخفیف پکیج (%)</th>
+                      <th style="padding:10px 8px;">زمان تحویل</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👤 طراحی کاراکتر و قهرمانان</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch1" value="95" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch1" value="40" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch1" value="75" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch1" value="35" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch1" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🐉 موجودات، تایتان‌ها و هیولاها</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch_creature" value="100" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch_creature" value="45" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch_creature" value="80" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch_creature" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch_creature" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۵ تا ۷ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🏰 طراحی فضا، معماری و دنیا</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch2" value="105" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch2" value="35" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch2" value="65" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch2" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch2" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🎬 کاور و کی‌فریم سینمایی</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch3" value="130" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch3" value="50" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch3" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch3" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch3" value="20" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۵ تا ۸ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">⚔️ تجهیزات و پراپ</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch4" value="70" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch4" value="25" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch4" value="45" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch4" value="20" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch4" value="10" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۳ تا ۵ روز</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👑 مسکات و نشان برند</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch_mascot" value="100" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch_mascot" value="40" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch_mascot" value="60" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch_mascot" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch_mascot" value="10" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
         </div>
 
             <div id="adminTabProducts" class="hidden">
@@ -2084,8 +2151,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=14.0.0"></script>
-  <script src="app.js?v=14.0.0"></script>
+  <script src="data.js?v=14.1.0"></script>
+  <script src="app.js?v=14.1.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
