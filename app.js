@@ -6764,3 +6764,111 @@ window.saveAdminSlogansSettings = function() {
 
 // اجرای اولیه بارگذاری شعارها
 try { window.loadBrandSlogansFromStorage(); } catch(e) {}
+
+
+
+// ==============================================================================
+// RELEASE V18.2.0: ROCK-SOLID DOCK FLYOUT AUTO-CLOSE & BILINGUAL ADMIN EDITORS
+// ==============================================================================
+
+// تابع بستن اضطراری تمام پاپ‌آپ‌ها و زیرمنوهای داک
+window.closeAllDockFlyouts = function() {
+  const storeWrapper = document.getElementById('dockStoreDropdownWrapper');
+  if (storeWrapper) storeWrapper.classList.remove('active');
+};
+
+// افزودن لیسنرهای بستن خودکار به داک و عناصر صفحه
+document.addEventListener('DOMContentLoaded', () => {
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    // بستن خودکار زیرمنو به محض خارج شدن ماوس از داک در دسکتاپ
+    dock.addEventListener('mouseleave', () => {
+      window.closeAllDockFlyouts();
+    });
+  }
+
+  // بارگذاری مقادیر دوزبانه در صورت ورود به پنل
+  window.loadStudioStatusBilingual();
+  window.loadAdminTermsBilingual();
+});
+
+// سوئیچ تب با بستن فوری زیرمنو
+const origSwitchView = window.switchView;
+window.switchView = function(viewKey) {
+  window.closeAllDockFlyouts();
+  if (typeof origSwitchView === 'function') {
+    origSwitchView(viewKey);
+  } else {
+    const allViews = ['showcase', 'store', 'genesis', 'academy', 'society', 'admin', 'member-dashboard'];
+    allViews.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.classList.add('hidden');
+    });
+    const target = document.getElementById(`view-${viewKey}`);
+    if (target) {
+      target.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+};
+
+// کنترل وضعیت دوزبانه استودیو
+window.loadStudioStatusBilingual = function() {
+  try {
+    const statusFA = safeGetStorage('tajinkart_status_fa') || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت';
+    const statusEN = safeGetStorage('tajinkart_status_en') || 'Studio Online • Accepting Briefs & Concept Commissions';
+    
+    const inputFA = document.getElementById('adminStudioStatusFA');
+    const inputEN = document.getElementById('adminStudioStatusEN');
+    if (inputFA) inputFA.value = statusFA;
+    if (inputEN) inputEN.value = statusEN;
+
+    // اعمال در هدر سایت (به زبان انگلیسی عمومی)
+    const badgeText = document.getElementById('studioLiveStatusText');
+    if (badgeText) badgeText.textContent = statusEN;
+  } catch(e) {}
+};
+
+window.saveStudioStatusBilingual = function() {
+  const inputFA = document.getElementById('adminStudioStatusFA');
+  const inputEN = document.getElementById('adminStudioStatusEN');
+  
+  const valFA = inputFA ? inputFA.value.trim() : '';
+  const valEN = inputEN ? inputEN.value.trim() : '';
+
+  if (valFA) safeSetStorage('tajinkart_status_fa', valFA);
+  if (valEN) {
+    safeSetStorage('tajinkart_status_en', valEN);
+    const badgeText = document.getElementById('studioLiveStatusText');
+    if (badgeText) badgeText.textContent = valEN;
+  }
+
+  showToast('وضعیت زنده استودیو (فارسی و انگلیسی) با موفقیت ثبت و منتشر شد! ✓', 'success', 4000);
+};
+
+// بارگذاری و ذخیره قوانین دوزبانه
+window.loadAdminTermsBilingual = function() {
+  try {
+    const sections = ['account', 'commission', 'assets', 'academy'];
+    sections.forEach(sec => {
+      const faVal = safeGetStorage(`tajinkart_terms_fa_${sec}`);
+      const enVal = safeGetStorage(`tajinkart_terms_en_${sec}`);
+      const elFA = document.getElementById(`adminTermsContentInputFA-${sec}`);
+      const elEN = document.getElementById(`adminTermsContentInputEN-${sec}`);
+      if (elFA && faVal) elFA.value = faVal;
+      if (elEN && enVal) elEN.value = enVal;
+    });
+  } catch(e) {}
+};
+
+window.saveStudioTermsBilingual = function() {
+  const sections = ['account', 'commission', 'assets', 'academy'];
+  sections.forEach(sec => {
+    const elFA = document.getElementById(`adminTermsContentInputFA-${sec}`);
+    const elEN = document.getElementById(`adminTermsContentInputEN-${sec}`);
+    if (elFA && elFA.value.trim()) safeSetStorage(`tajinkart_terms_fa_${sec}`, elFA.value.trim());
+    if (elEN && elEN.value.trim()) safeSetStorage(`tajinkart_terms_en_${sec}`, elEN.value.trim());
+  });
+  showToast('هر دو نسخه فارسی و انگلیسی منشور و قوانین استودیو ذخیره شدند! ✓', 'success', 4000);
+};
+window.saveStudioTerms = window.saveStudioTermsBilingual;

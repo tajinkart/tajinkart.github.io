@@ -4540,3 +4540,45 @@ body {
     letter-spacing: 0.18em !important;
   }
 }
+
+
+
+/* ==============================================================================
+   RELEASE V18.2.0: FLYOUT SAFEGUARD, ABOUT STUDIO TYPOGRAPHY & FOOTER STYLING
+   ============================================================================== */
+
+/* ممانعت قطعی از معلق ماندن زیرمنوی استور در حالت بسته بودن داک */
+#rightVerticalNav.dock-collapsed .dock-store-flyout-menu,
+#rightVerticalNav:not(.dock-open) .dock-store-flyout-menu,
+.dock-store-wrapper:not(.active) .dock-store-flyout-menu {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* اعمال کامل فونت باوقار OptimusPrinceps بر بخش درباره استودیو */
+#showcaseStudioAboutSection,
+#showcaseStudioAboutSection *,
+.about-studio-grid,
+.about-studio-grid *,
+.font-brand-scope,
+.font-brand-scope * {
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.04em !important;
+}
+
+#showcaseStudioAboutSection p {
+  font-size: 13.5px !important;
+  line-height: 1.85 !important;
+}
+
+.footer-lang-pill {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.footer-lang-pill:hover {
+  border-color: var(--gold) !important;
+  color: #fff !important;
+  box-shadow: 0 0 16px var(--gold-glow) !important;
+}

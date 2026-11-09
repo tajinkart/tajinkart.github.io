@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=18.1.0">
+  <link rel="stylesheet" href="style.css?v=18.2.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -69,10 +69,7 @@
       </div>
     </div>
 
-    <!-- سوئیچر زبان مینیمال و لوکس -->
-    <button type="button" onclick="toggleSiteLanguage()" class="top-lang-pill" id="siteLangToggleBtn" title="تغییر زبان / Switch Language">
-      <span id="siteLangLabel" class="font-mono">EN</span>
-    </button>
+    
   </div>
 
     <!-- ۲. داک عمودی ناوبری راست -->
@@ -204,10 +201,7 @@
       </div>
       <h1 class="brand-giant-title brand-morph-title" id="brandMorphTitle">TAJINKART</h1>
       
-      <!-- زیرعنوان متقارن سبک‌ها و ژانرهای استودیو -->
-      <div class="brand-genre-bar font-mono" id="brandGenreBar">
-        DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN
-      </div>
+      
 
       <!-- شعار چرخشی برند -->
       <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">FROM INK TO UNIVERSE</div>
@@ -223,7 +217,7 @@
     </div>
 
         <!-- بخش درباره استودیو و بیوگرافی مدیر هنری (در انتهای گالری صفحه اول) -->
-    <div id="showcaseStudioAboutSection" style="max-width:1100px; margin:40px auto 70px; padding:0 16px;">
+    <div id="showcaseStudioAboutSection" class="font-brand-scope" style="max-width:1100px; margin:40px auto 70px; padding:0 16px;">
       <div style="background:#06080d; background-image:radial-gradient(circle at 80% 20%, rgba(250,204,21,0.08) 0%, #06080d 75%); border:1px solid rgba(250,204,21,0.25); border-radius:18px; padding:36px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; overflow:hidden;">
         
         <div class="about-studio-grid" style="display:grid; grid-template-columns:1fr 320px; gap:32px; align-items:center;">
@@ -1287,7 +1281,33 @@
                     </button>
                   </div>
 
-                                    <!-- کارت ۱-د: مدیریت شعارهای متحرک و عناوین برند هدر استودیو (کاملاً داینامیک) -->
+                                                      <!-- کارت ۱-ج: مدیریت وضعیت استودیو و ظرفیت پذیرش سفارش (دو نسخه فارسی و انگلیسی) -->
+                  <div style="background:#06080d; border:1px solid rgba(16,185,129,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px; grid-column:1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <div>
+                        <span style="font-size:14px; font-weight:800; color:var(--emerald);">🟢 کنترل وضعیت ارتباطی و پذیرش آتلیه (Studio Availability Status)</span>
+                        <span style="display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px;">تنظیم متن نشانگر وضعیت زنده در هدر سایت برای مراجعین بین‌المللی و داخلی.</span>
+                      </div>
+                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:3px 8px; border-radius:4px; background:rgba(16,185,129,0.1);">LIVE BADGE</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+                      <div>
+                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">🇮🇷 متن وضعیت به زبان فارسی (نسخه داخلی):</label>
+                        <input type="text" id="adminStudioStatusFA" class="font-mono" placeholder="آتلیه فعال و آنلاین • پذیرش بریف و کانسپت" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff; direction:rtl;" />
+                      </div>
+                      <div>
+                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">🌐 Studio Status Text (English - Public Site):</label>
+                        <input type="text" id="adminStudioStatusEN" class="font-mono" placeholder="Studio Online • Accepting Briefs & Concept Commissions" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff; direction:ltr;" />
+                      </div>
+                    </div>
+
+                    <button type="button" onclick="saveStudioStatusBilingual()" class="btn-gold" style="width:100%; padding:11px; font-size:12.5px; font-weight:800; cursor:pointer;">
+                      ✓ ثبت و به‌روزرسانی وضعیت زنده آتلیه
+                    </button>
+                  </div>
+
+                  <!-- کارت ۱-د: مدیریت شعارهای متحرک و عناوین برند هدر استودیو (کاملاً داینامیک) -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px; grid-column:1 / -1;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                       <div>
@@ -2245,13 +2265,20 @@
   <div id="toastContainer"></div>
 
   <!-- فوتر تک‌خطی دارک با لینک‌های حقوقی و رده‌بندی سنی -->
-  <footer style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:20px 32px; text-align:center;">
-    <div style="max-width:1440px; margin:0 auto; font-size:12px; color:var(--text-muted); display:flex; justify-content:center; align-items:center;">
-      <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
+    <!-- پاورقی رسمی و مدرن استودیو TAJINKART همراه با سوئیچر زبان -->
+  <footer id="globalFooter" style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:22px 32px; text-align:center;">
+    <div style="max-width:1440px; margin:0 auto; font-size:12.5px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div style="font-family:var(--font-brand); letter-spacing:0.04em; color:#cbd5e1;">
+        © 2026 TAJINKART Studio • Directed by Seyed Soroush Taj. All Rights Reserved.
+      </div>
+      <button type="button" onclick="toggleSiteLanguage()" class="footer-lang-pill" id="siteLangToggleBtn" title="تغییر زبان / Switch Language" style="display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:999px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:12px; cursor:pointer; transition:all 0.25s;">
+        <span style="font-size:13px;">🌐</span>
+        <span id="siteLangToggleLabel" style="font-weight:700;">EN | فارسی</span>
+      </button>
     </div>
   </footer>
-  <script src="data.js?v=18.1.0"></script>
-  <script src="app.js?v=18.1.0"></script>
+  <script src="data.js?v=18.2.0"></script>
+  <script src="app.js?v=18.2.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
