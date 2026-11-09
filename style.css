@@ -5404,3 +5404,118 @@ body {
     top: 0 !important;
   }
 }
+
+
+
+/* ==============================================================================
+   RELEASE V19.0.0: AIRTIGHT MOBILE CIRCULAR ICONS & MOBILE-SAFE STARDUST CANVAS
+   ============================================================================== */
+
+/* بوم پارتیکل‌های غبار کیهانی: استقرار در لایه z-index: 2 در کل صفحه */
+#ambientParticleCanvas {
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* هدر و گالری شفاف تا غبار در سراسر صفحه و پشت لوگوی TAJINKART بدرخشد */
+#stickyBrandHero,
+#artworkCurtain {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* ==============================================================================
+   قانون قطعی و نهایی موبایل (صفحات زیر 768px):
+   تمام دکمه‌های داک منحصراً آیکون‌های دایره‌ای ۴۲ پیکسلی شیک (دقیقاً مثل دسکتاپ)
+   ============================================================================== */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 12px !important;
+    top: 14px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  #dockMasterTrigger {
+    display: none !important;
+  }
+
+  .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: 44px !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* در موبایل دکمه‌ها ۱۰۰٪ دایره‌ای کوچک هستند و متن‌های عریض کاملاً مخفی می‌شوند */
+  #rightVerticalNav .right-exp-btn,
+  .right-exp-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    border: 1.5px solid var(--border-subtle) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* مخفی‌سازی قطعی متن‌های عریض روی موبایل */
+  #rightVerticalNav .right-exp-text,
+  .right-exp-text {
+    display: none !important;
+    max-width: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    visibility: hidden !important;
+  }
+
+  #rightVerticalNav .right-exp-icon,
+  .right-exp-icon {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  /* باز شدن تمیز زیرمنوی دو قسمتی استور روی گوشی با لمس دکمه */
+  .dock-store-flyout-menu {
+    right: calc(100% + 8px) !important;
+    width: 220px !important;
+    padding: 8px !important;
+    position: absolute !important;
+    top: 0 !important;
+    box-sizing: border-box !important;
+  }
+}

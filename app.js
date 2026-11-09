@@ -7666,3 +7666,90 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(window.initAmbientParticles, 25);
 }
+
+
+
+// ==============================================================================
+// RELEASE V19.0.0: STABLE MOBILE & DESKTOP COSMIC STARDUST CANVAS ENGINE
+// ==============================================================================
+
+window.initAmbientParticles = function() {
+  const canvas = document.getElementById('ambientParticleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // تنظیم ابعاد پایه و ایمن در برابر ریست شدن اسکرول موبایل
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  // تنها در صورت تغییر واقعی عرض نمایشگر (چرخش گوشی)، سایز بوم آپدیت می‌شود
+  let lastWidth = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (Math.abs(window.innerWidth - lastWidth) > 30) {
+      lastWidth = window.innerWidth;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+  }, { passive: true });
+
+  // پالت رنگی باوقار، گرم و کلاسیک دارک فانتزی (طلایی ملایم، کهربایی، نقره‌ای شفاف)
+  const colors = [
+    'rgba(250, 204, 21, 0.65)',   // غبار طلایی درخشان
+    'rgba(245, 158, 11, 0.55)',   // اخگر کهربایی مات
+    'rgba(226, 232, 240, 0.60)',  // غبار ستاره‌ای نقره‌ای
+    'rgba(0, 240, 255, 0.50)'     // ذره کیهانی نئون ملایم
+  ];
+
+  const isMobile = window.innerWidth <= 768;
+  const particleCount = isMobile ? 32 : 55;
+  const particles = [];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 1.8 + 1.1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: -(Math.random() * 0.45 + 0.15),
+      pulse: Math.random() * Math.PI,
+      pulseSpeed: Math.random() * 0.02 + 0.01
+    });
+  }
+
+  function renderParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx + Math.sin(p.pulse) * 0.25;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+
+      if (p.y < -15) {
+        p.y = height + 15;
+        p.x = Math.random() * width;
+      }
+      if (p.x < -15) p.x = width + 15;
+      if (p.x > width + 15) p.x = -15;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(renderParticles);
+  }
+
+  renderParticles();
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initAmbientParticles);
+} else {
+  setTimeout(window.initAmbientParticles, 20);
+}
