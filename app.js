@@ -5316,39 +5316,51 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
   const pillBtn = document.getElementById('currentCategoryPillBtn');
   if (pillBtn) {
     let color = '#facc15';
-    let glow = 'rgba(250, 204, 21, 0.4)';
-    
+    let glow = 'rgba(250, 204, 21, 0.45)';
+
+    // پالت دقیق رنگ‌های هر شاخه و آتلیه
+    const categoryColorMap = {
+      'all': '#facc15',
+      'character': '#ff5722',
+      'characters': '#ff5722',
+      'environment': '#00f0ff',
+      'environments': '#00f0ff',
+      'creature': '#10b981',
+      'creatures': '#10b981',
+      'keyframe': '#f43f5e',
+      'keyframes': '#f43f5e',
+      'props': '#a855f7',
+      'comic': '#fb923c',
+      'comics': '#fb923c',
+      'mascot': '#ec4899'
+    };
+
     if (categoryKey !== 'all') {
-      const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
-        ? galleryCategories.find(c => c.id === categoryKey) : null;
-      if (cat && cat.color) {
-        color = cat.color;
+      if (categoryColorMap[categoryKey]) {
+        color = categoryColorMap[categoryKey];
       } else {
-        const palette = {
-          'characters': '#ff5722',
-          'environments': '#00f0ff',
-          'creatures': '#f43f5e',
-          'mecha': '#a855f7',
-          'illustrations': '#10b981',
-          'sketches': '#f59e0b'
-        };
-        color = palette[categoryKey] || '#38bdf8';
+        const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
+          ? galleryCategories.find(c => c.id === categoryKey) : null;
+        if (cat && cat.color) color = cat.color;
       }
       glow = color.startsWith('#') ? `${color}66` : color;
     }
 
-    pillBtn.style.setProperty('--pill-accent-color', color);
-    pillBtn.style.setProperty('--pill-glow-color', glow);
-    pillBtn.style.borderColor = color;
-    pillBtn.style.boxShadow = `0 0 14px ${glow}, inset 0 0 6px ${glow}`;
-    if (labelEl) labelEl.style.color = color;
+    // اعمال مقتدرانه رنگ با important روی کادر و هاله هالوژن پیل
+    pillBtn.style.setProperty('--pill-accent-color', color, 'important');
+    pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
+    pillBtn.style.setProperty('border-color', color, 'important');
+    pillBtn.style.setProperty('box-shadow', `0 0 16px ${glow}, inset 0 0 6px ${glow}`, 'important');
+    if (labelEl) {
+      labelEl.style.setProperty('color', color, 'important');
+    }
   }
 
   document.querySelectorAll('.cat-dropdown-item').forEach(item => {
     item.classList.toggle('active', item.textContent.includes(categoryName));
   });
 
-  const dropdown = document.getElementById('floatingCategoryDropdown') || document.getElementById('categoryFilterDropdown');
+  const dropdown = document.getElementById('categoryFilterDropdown') || document.getElementById('floatingCategoryDropdown');
   if (dropdown) dropdown.classList.add('hidden');
 
   renderShowcaseGrid();

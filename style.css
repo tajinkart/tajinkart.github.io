@@ -6028,32 +6028,96 @@ body.in-admin-view #rightVerticalNav,
 
 
 /* ==============================================================================
-   RELEASE V20.7.0: GENESIS & ACADEMY COMING SOON BADGES & MOBILE DOCK TEXT LABELS
+   RELEASE V20.8.0: AUTHORITATIVE COLOR ADAPTATION, CRISP DOCK BORDERS & MOBILE DOCK LABELS
    ============================================================================== */
 
-/* ۱. اعمال فونت سراسری استودیو (OptimusPrinceps) در تمامی بخش‌های پورتال اعضا */
-#memberModal,
-#memberModal h3,
-#memberModal label,
-#memberModal input,
-#memberModal button,
-#memberModal span,
-#memberModal a,
-#memberModal p,
-.btn-google-auth,
-#memberModal .auth-tab-link,
-#memberModal .btn-gold {
-  font-family: var(--font-brand), 'OptimusPrinceps', serif !important;
-  letter-spacing: 0.03em !important;
+/* ۱. نشان برند TAJINKART و پیل دسته‌بندی با اندازه متغیر دینامیک و هماهنگی رنگ با شاخه انتخابی */
+#topCenterBrandBar {
+  position: fixed !important;
+  top: 16px !important;
+  left: 16px !important;
+  z-index: 9990 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  opacity: 0 !important;
+  transform: translateY(-24px) !important;
+  pointer-events: none !important;
+  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-#memberModal input::placeholder {
-  font-family: var(--font-brand), 'OptimusPrinceps', serif !important;
-  opacity: 0.65 !important;
+#topCenterBrandBar.visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
 }
 
-/* ۲. خط محیطی شارپ و توپر ۱.۵px دور تمام آیکون‌های داک با هاله هالوژن متناسب */
-.right-exp-btn.home-theme {
+.top-center-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 18px !important;
+  border-radius: 999px !important;
+  background: rgba(9, 12, 18, 0.95) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1.5px solid var(--gold) !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.4), inset 0 0 6px rgba(250, 204, 21, 0.18) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  width: auto !important;
+  min-width: fit-content !important;
+  max-width: max-content !important;
+  white-space: nowrap !important;
+}
+
+#floatingGalleryCategoryMenu,
+.floating-cat-menu-wrapper {
+  position: relative !important;
+  display: block !important;
+  margin: 0 !important;
+  width: auto !important;
+  min-width: fit-content !important;
+  max-width: max-content !important;
+}
+
+body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
+  display: none !important;
+}
+
+/* پیل فیلتر دسته‌بندی آثار: اندازه کاملاً راحت و جادار، رنگ دینامیک با شاخه */
+#currentCategoryPillBtn,
+.floating-cat-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 20px !important;
+  border-radius: 999px !important;
+  background: rgba(9, 12, 18, 0.95) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1.5px solid var(--pill-accent-color, var(--gold)) !important;
+  box-shadow: 0 0 14px var(--pill-glow-color, rgba(250, 204, 21, 0.35)), inset 0 0 6px var(--pill-glow-color, rgba(250, 204, 21, 0.15)) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  width: auto !important;
+  min-width: fit-content !important;
+  max-width: max-content !important;
+  white-space: nowrap !important;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#currentCategoryPillLabel {
+  color: var(--pill-accent-color, #fff) !important;
+  font-weight: 800 !important;
+}
+
+/* ۲. خط محیطی شارپ، مشخص و توپر ۱.۵px دور تمام آیکون‌های داک دقیقاً مشابه نشان تاژین کارت */
+.right-exp-btn.home-theme,
+#rightDockHomeBtn {
   border: 1.5px solid var(--coral-flame) !important;
   box-shadow: 0 0 12px rgba(255, 87, 34, 0.35), inset 0 0 6px rgba(255, 87, 34, 0.18) !important;
 }
@@ -6077,14 +6141,17 @@ body.in-admin-view #rightVerticalNav,
   color: var(--cyan-electric) !important;
 }
 
-.right-exp-btn.gold-theme {
+.right-exp-btn.gold-theme,
+#dockStoreMainBtn {
   border: 1.5px solid var(--gold) !important;
   box-shadow: 0 0 12px rgba(250, 204, 21, 0.35), inset 0 0 6px rgba(250, 204, 21, 0.18) !important;
 }
-.right-exp-btn.gold-theme:hover {
+.right-exp-btn.gold-theme:hover,
+#dockStoreMainBtn:hover {
   box-shadow: 0 0 18px rgba(250, 204, 21, 0.65), 0 0 30px rgba(250, 204, 21, 0.3), inset 0 0 8px rgba(250, 204, 21, 0.25) !important;
 }
-.right-exp-btn.gold-theme .right-exp-icon {
+.right-exp-btn.gold-theme .right-exp-icon,
+#dockStoreMainBtn .right-exp-icon {
   background: rgba(250, 204, 21, 0.14) !important;
   color: var(--gold) !important;
 }
@@ -6239,8 +6306,8 @@ body.in-admin-view #rightVerticalNav,
 }
 
 /* ۴. معماری موبایل (صفحات تا 768px):
-   - داک در حالت بسته: فقط سه خط ۴۴px
-   - داک در حالت باز (dock-open): دکمه‌ها به‌صورت کپسولی با نوشته واضح و خوانا باز می‌شوند تا کاربر بداند چه گزینه‌ای را انتخاب می‌کند */
+   - داک در حالت بسته: فقط سه خط ۴۴px با خط محیطی فیروزه‌ای ۱.۵px
+   - داک در حالت باز (dock-open): دکمه‌ها بدون کات شدن و به‌طور کامل با آیکون و متن و عنوان باز می‌شوند */
 @media (max-width: 768px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6252,7 +6319,7 @@ body.in-admin-view #rightVerticalNav,
     align-items: flex-end !important;
     gap: 10px !important;
     width: auto !important;
-    max-width: 280px !important;
+    max-width: 290px !important;
   }
 
   #dockMasterTrigger {
@@ -6287,23 +6354,27 @@ body.in-admin-view #rightVerticalNav,
     display: none !important;
   }
 
-  /* در حالت باز روی موبایل: نمایش کانتینر گزینه‌ها */
-  #rightVerticalNav.dock-open .dock-buttons-container {
+  /* در حالت باز روی موبایل: رفع محدودیت عرض ۴۴ پیکسلی کانتینر */
+  #rightVerticalNav.dock-open .dock-buttons-container,
+  .dock-open .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-end !important;
     gap: 9px !important;
     width: auto !important;
+    max-width: 280px !important;
     padding: 0 !important;
     margin-top: 8px !important;
+    overflow: visible !important;
   }
 
-  /* در حالت باز روی موبایل: دکمه‌ها به شکل کپسول باز می‌شوند تا عنوان هر بخش خوانا و قابل لمس باشد */
+  /* هر دکمه در حالت باز موبایل: کپسول خودکار با نمایش کامل عنوان و آیکون */
   #rightVerticalNav.dock-open .right-exp-btn,
-  .dock-open .right-exp-btn {
+  .dock-open .right-exp-btn,
+  #rightVerticalNav.dock-open #dockButtonsContainer .right-exp-btn {
     width: auto !important;
     min-width: 44px !important;
-    max-width: 250px !important;
+    max-width: 260px !important;
     height: 44px !important;
     border-radius: 999px !important;
     display: flex !important;
@@ -6312,21 +6383,28 @@ body.in-admin-view #rightVerticalNav,
     justify-content: flex-start !important;
     padding: 0 0 0 14px !important;
     margin: 0 !important;
-    background: rgba(9, 12, 18, 0.95) !important;
-    backdrop-filter: blur(14px) !important;
-    overflow: hidden !important;
+    background: rgba(9, 12, 18, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    overflow: visible !important;
     box-sizing: border-box !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
   }
 
-  #rightVerticalNav.dock-open .right-exp-btn:active,
-  .dock-open .right-exp-btn:active {
-    transform: scale(0.94) !important;
+  /* دکمه استور در موبایل */
+  #rightVerticalNav.dock-open .dock-store-wrapper,
+  .dock-open .dock-store-wrapper {
+    width: auto !important;
+    max-width: 260px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    overflow: visible !important;
   }
 
-  /* نمایش متن در حالت باز روی موبایل */
+  /* متون اختصاصی هر بخش روی موبایل */
   #rightVerticalNav.dock-open .right-exp-text,
-  .dock-open .right-exp-text {
+  .dock-open .right-exp-text,
+  #rightVerticalNav.dock-open #dockButtonsContainer .right-exp-text {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -6337,8 +6415,17 @@ body.in-admin-view #rightVerticalNav,
     padding-right: 4px !important;
     white-space: nowrap !important;
     opacity: 1 !important;
-    max-width: 180px !important;
+    visibility: visible !important;
+    width: auto !important;
+    max-width: 190px !important;
     pointer-events: auto !important;
+  }
+
+  #rightVerticalNav.dock-open .right-exp-text *,
+  .dock-open .right-exp-text * {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   #rightVerticalNav:not(.dock-open) .right-exp-text {
@@ -6359,31 +6446,5 @@ body.in-admin-view #rightVerticalNav,
     border: none !important;
     border-radius: 50% !important;
     flex-shrink: 0 !important;
-  }
-
-  /* خط محیطی ۱.۵px شارپ به همراه هاله متین و دلنشین در موبایل */
-  .right-exp-btn.home-theme {
-    border: 1.5px solid var(--coral-flame) !important;
-    box-shadow: 0 0 10px rgba(255, 87, 34, 0.3), inset 0 0 5px rgba(255, 87, 34, 0.15) !important;
-  }
-  .right-exp-btn.cyan-theme {
-    border: 1.5px solid var(--cyan-electric) !important;
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
-  }
-  .right-exp-btn.gold-theme {
-    border: 1.5px solid var(--gold) !important;
-    box-shadow: 0 0 10px rgba(250, 204, 21, 0.3), inset 0 0 5px rgba(250, 204, 21, 0.15) !important;
-  }
-  .right-exp-btn.crimson-theme {
-    border: 1.5px solid var(--crimson) !important;
-    box-shadow: 0 0 10px rgba(244, 63, 94, 0.3), inset 0 0 5px rgba(244, 63, 94, 0.15) !important;
-  }
-  .right-exp-btn.purple-theme {
-    border: 1.5px solid var(--violet) !important;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3), inset 0 0 5px rgba(168, 85, 247, 0.15) !important;
-  }
-  .right-exp-btn.emerald-theme {
-    border: 1.5px solid var(--emerald) !important;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3), inset 0 0 5px rgba(16, 185, 129, 0.15) !important;
   }
 }
