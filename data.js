@@ -1,0 +1,528 @@
+/**
+ * TAJINKART Master Spec v2.1 Data Store
+ * مدیر استودیو و طراح دنیا: سید سروش تاج
+ */
+
+// حافظه پشتیبان موقت در صورت مسدود بودن یا پرایوت بودن حافظه مرورگر
+window._tajinMemoryStorage = window._tajinMemoryStorage || {};
+
+function safeGetStorage(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch (e) {
+    return (window._tajinMemoryStorage && window._tajinMemoryStorage[key]) || null;
+  }
+}
+
+function safeSetStorage(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    if (!window._tajinMemoryStorage) window._tajinMemoryStorage = {};
+    window._tajinMemoryStorage[key] = String(value);
+    return false;
+  }
+}
+window.safeGetStorage = safeGetStorage;
+window.safeSetStorage = safeSetStorage;
+
+
+const KEYS = {
+  ORDERS: 'tajinkart_orders_fa_v2',
+  SETTINGS: 'tajinkart_settings_fa_v2',
+  ARTWORKS: 'tajinkart_artworks_fa_v2',
+  PIPELINES: 'tajinkart_pipelines_fa_v2',
+  PRODUCTS: 'tajinkart_products_fa_v2',
+  MEMBERS: 'tajinkart_members_fa_v2',
+  DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2'
+};
+
+var currentView = 'showcase';
+var currentMember = null;
+var comicCurrentPage = 1;
+var activeModalItem = {};
+var currencyMode = 'USD'; // 'USD' or 'TOMAN'
+var activeCaseStudyArt = null;
+var activeCaseStudyPhaseIdx = 0;
+
+var currentSelectedPipeKey = 'sketch1';
+var currentSelectedStageIdx = 0;
+var currentSelectedArtIdx = 0;
+var currentSelectedProductIdx = 0;
+var selectedMemberIdx = 0;
+var currentMemberTierFilter = 'all';
+
+var siteSettings = {
+  usdRate: 72000,
+  tgToken: '',
+  tgChat: '',
+  adminPass: 'tajinkart',
+  commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
+};
+try {
+  const _s = safeGetStorage(KEYS.SETTINGS);
+  if (_s) {
+    const _p = JSON.parse(_s);
+    if (_p && typeof _p === 'object') {
+      siteSettings = Object.assign(siteSettings, _p);
+    }
+  }
+} catch(e) {}
+window.siteSettings = siteSettings;
+
+// گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
+// بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
+// کانسپت‌های پیش‌فرض و غنی استودیو (Fallback جهت تضمین عدم خالی شدن گالری)
+const DEFAULT_STUDIO_ARTWORKS = [];
+
+var storedArtworks = [];
+try {
+  const rawArt = localStorage.getItem(KEYS.ARTWORKS);
+  storedArtworks = rawArt ? JSON.parse(rawArt) : [];
+  if (!Array.isArray(storedArtworks)) storedArtworks = [];
+} catch(e) {
+  storedArtworks = [];
+}
+var showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
+if (showcaseArtworks.length === 0) {
+  showcaseArtworks = JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
+}
+window.showcaseArtworks = showcaseArtworks;
+
+// ۶ پایپلاین تخصصی آتلیه طبق سند مستر با زیرشاخه‌ها و مراحل شفاف
+var PIPELINE_DATA = {
+  sketch1: {
+    id: 'sketch1',
+    topSub: 'Character Design & Heroes',
+    badgeSlug: '01 • CHARACTER PIPELINE',
+    subcategories: ['Hero / Main Concept (Full IP)', 'Orthographic 3D Model Sheet', 'Age Timeline Progression', 'Party & Faction Bundle', 'Character Redesign & Evolution'],
+    note: 'Commercial 300DPI print-ready standard with layered PSD master files, 5-thumbnail exploration, 360° turnaround model sheets, and hero weapon add-ons.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Full IP',
+        title: 'Full Character Concept Creation (From Scratch)',
+        desc: '10 initial thumbnail silhouettes ➔ 5 curated finalists ➔ form selection and costume detailing ➔ final 300DPI master render with layered PSD.',
+        price: '95 - 150',
+        usdVal: 95,
+        timeline: '4 to 6 business days',
+        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • 3D Turnaround',
+        title: 'Orthographic 3-View Model Sheet (3D & Animation Ready)',
+        desc: 'Precise 3-view turnaround (Front, Profile, Back) with material callout diagrams, costume anatomy, and joint mechanics for 3D sculptors.',
+        price: '120 - 180',
+        usdVal: 120,
+        timeline: '5 to 7 business days',
+        img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=900&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 3 • Redesign',
+        title: 'Character Evolution & Next-Gen Redesign',
+        desc: 'Modernizing, upgrading fidelity, and reimagining legacy characters into darker, grittier next-gen game and cinematic standards.',
+        price: '85 - 130',
+        usdVal: 85,
+        timeline: '3 to 5 business days',
+        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1100&q=80'
+      }
+    ]
+  },
+  sketch_creature: {
+    id: 'sketch_creature',
+    topSub: 'Creatures, Titans & Monsters',
+    badgeSlug: '02 • CREATURE PIPELINE',
+    subcategories: ['Colossal Bosses & Titans', 'Ecosystem Predators & Wildlife', 'Mounts & Companions'],
+    note: 'Speculative biology, skeletal articulation, locomotion diagrams for wings/claws, tactile chitin/scales, and complimentary human scale reference.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Speculative Biology',
+        title: 'Creature Concept & Biology Design (From Scratch)',
+        desc: 'Initial physiological thumbnails, skeletal articulation, human scale comparison, tactile skin/chitin texturing, and natural habitat rendering.',
+        price: '100 - 160',
+        usdVal: 100,
+        timeline: '4 to 6 business days',
+        img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • Locomotion Rig',
+        title: 'Locomotion & Joint Anatomy Breakdown Sheet',
+        desc: 'Technical diagrams detailing wing-folding mechanics, claw articulation, tail movement, and gait structure for 3D rigging and animators.',
+        price: '125 - 170',
+        usdVal: 125,
+        timeline: '5 to 7 business days',
+        img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 3 • Sub-Species',
+        title: 'Mutated Sub-Species & Regional Variants',
+        desc: 'Developing 3 distinct regional adaptations of a base creature (e.g., Toxic, Frost, and Alpha Leader variants) with custom palettes and textures.',
+        price: '90 - 140',
+        usdVal: 90,
+        timeline: '4 to 6 business days',
+        img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1100&q=80'
+      }
+    ]
+  },
+  sketch2: {
+    id: 'sketch2',
+    topSub: 'Environment, Worlds & Architecture',
+    badgeSlug: '03 • ENVIRONMENT PIPELINE',
+    subcategories: ['Cinematic Establishing Shot', 'Modular Level-Design Kit', 'Dungeons & Interior Architecture'],
+    note: 'Dark-fantasy architecture, panoramic 16:9/21:9 framing, initial value thumbnails, depth haze layers, and volumetric lighting.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Establishing Shot',
+        title: 'Cinematic World Establishing Shot (16:9 / 21:9)',
+        desc: '3 compositional value thumbnails ➔ panoramic framing selection ➔ final grand vista matte render with distinct depth and atmospheric haze.',
+        price: '105 - 170',
+        usdVal: 105,
+        timeline: '4 to 6 business days',
+        img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • Modular Kit',
+        title: 'Modular Architecture & Asset Kit (Level-Design Ready)',
+        desc: 'Geometric architectural callouts, ancient pillars, obelisks, and modular structures designed for direct implementation in Unreal Engine/Unity.',
+        price: '120 - 180',
+        usdVal: 120,
+        timeline: '5 to 7 business days',
+        img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 3 • Atmospheric Painting',
+        title: 'Atmospheric Cinematic Environment Painting',
+        desc: 'Full environmental painting with light scattering, volumetric fog, day/night mood variations, and 300DPI layered master PSD.',
+        price: '135 - 210',
+        usdVal: 135,
+        timeline: '6 to 8 business days',
+        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1100&q=80'
+      }
+    ]
+  },
+  sketch3: {
+    id: 'sketch3',
+    topSub: 'Cinematic Keyframes & Covers',
+    badgeSlug: '04 • KEYFRAME PIPELINE',
+    subcategories: ['Flagship Game Splash Art', 'Narrative Battle Keyframe', 'Commercial Book & Album Cover'],
+    note: 'Central commercial artwork at 300DPI master print polish, bleed/spine bleed margins, and motion comic animation layer separation.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Hero Splash',
+        title: 'Flagship Character & Game Splash Art (300DPI Master)',
+        desc: 'High-polish promotional artwork with dramatic focal lighting designed for Steam store capsules, marketing posters, and retail covers.',
+        price: '150 - 240',
+        usdVal: 150,
+        timeline: '6 to 9 business days',
+        img: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • Story Keyframe',
+        title: 'Narrative Story Moment & Battle Keyframe',
+        desc: 'Illustrating pivotal story climaxes, heroic duels, and emotional narrative turning points with high kinetic motion and cinematic lenses.',
+        price: '130 - 200',
+        usdVal: 130,
+        timeline: '5 to 8 business days',
+        img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 3 • Commercial Cover',
+        title: 'Commercial Book, Graphic Novel & Album Cover',
+        desc: 'Custom cover design accounting for spine thickness, trim bleed zones, and harmonious negative space for title typography.',
+        price: '120 - 180',
+        usdVal: 120,
+        timeline: '5 to 7 business days',
+        img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80'
+      }
+    ]
+  },
+  sketch4: {
+    id: 'sketch4',
+    topSub: 'Props, Weapons & Artifacts',
+    badgeSlug: '05 • PROPS & WEAPONS',
+    subcategories: ['Hero Weapons & Ancient Relics', 'Consumables & Loot Sets', 'Dark-Fantasy HUD Icons'],
+    note: 'Weapons and mechanical props with alloy callouts, exploratory sketches, and transparent PNG cutouts ready for direct game engine import.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Hero Weapon',
+        title: 'Hero Weapon & Ancient Relic Concept Design',
+        desc: 'Exploratory silhouette thumbnails ➔ 3D dimensional orthographic sheet with alloy material callouts ➔ final render with VFX glow effects.',
+        price: '75 - 120',
+        usdVal: 75,
+        timeline: '3 to 5 business days',
+        img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • Loot Sets',
+        title: 'Inventory Loot, Potions & Consumables Set',
+        desc: 'Multi-item icon bundles of enchanted artifacts, alchemy vials, and survival gear delivered with alpha-channel transparent PNGs.',
+        price: '65 - 110',
+        usdVal: 65,
+        timeline: '3 to 5 business days',
+        img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 3 • UI Kit',
+        title: 'Dark-Fantasy HUD Frames & Skill Icon Kit',
+        desc: 'Custom UI frames, guild insignias, and glowing magical skill icons crafted for dark-fantasy and gothic RPG game interfaces.',
+        price: '60 - 100',
+        usdVal: 60,
+        timeline: '3 to 4 business days',
+        img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80'
+      }
+    ]
+  },
+  sketch5: {
+    id: 'sketch5',
+    topSub: 'Comics, Manga & Sequential Art',
+    badgeSlug: '06 • SEQUENTIAL ART',
+    subcategories: ['Cinematic Storyboard', 'Inked Manga Line-Art', 'Full Color Webtoon Pages'],
+    note: 'Scene pacing, dynamic camera angles, speech bubble placement, authentic pen inking with screentones, and layered comic-motion files.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Storyboard',
+        title: 'Cinematic Decoupage & Production Storyboard',
+        desc: 'Visual scene pacing, dynamic camera framing, lens angles, and strategic speech bubble and SFX sound-effect composition.',
+        price: '80 - 130',
+        usdVal: 80,
+        timeline: '3 to 5 business days',
+        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • Inked Manga',
+        title: 'Authentic Inked Manga & Comic Line-Art Pages',
+        desc: 'Traditional pressure-sensitive inking, cross-hatching, action speedlines, deep blacks, and halftone screentone texturing.',
+        price: '95 - 150',
+        usdVal: 95,
+        timeline: '4 to 6 business days',
+        img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 3 • Color Webtoon',
+        title: 'Full-Color Webtoon Pages (Motion-Comic Ready)',
+        desc: 'Dramatic cinematic coloring with rim lighting and separated character/background layers optimized for vertical-scroll and motion comics.',
+        price: '130 - 200',
+        usdVal: 130,
+        timeline: '5 to 8 business days',
+        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1100&q=80'
+      }
+    ]
+  },
+  sketch_mascot: {
+    id: 'sketch_mascot',
+    topSub: 'Brand Mascot & Studio Crest',
+    badgeSlug: '07 • BRAND IDENTITY',
+    subcategories: ['Commercial 2D/3D Mascot', 'Studio Crest & Logo-Mascot', 'Visual Brand Guide'],
+    note: 'Custom mascot creation, gaming emblems, and studio crests with luxury cyber-gold aesthetics and visual identity guideline books.',
+    tiles: [
+      {
+        span: 'col-span-4',
+        badge: 'Package 1 • Brand Mascot',
+        title: 'Commercial Brand Mascot & Game Character Design',
+        desc: 'Custom mascot creation across multiple action poses, 3-view turnaround sheet, and vector/high-res production files ready for commercial use.',
+        price: '100 - 160',
+        usdVal: 100,
+        timeline: '4 to 6 business days',
+        img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80'
+      },
+      {
+        span: 'col-span-4',
+        badge: 'Package 2 • Studio Crest',
+        title: 'Studio Crest, Emblem & Mascot Identity Guide',
+        desc: 'Authoritative dark/gold crest design with comprehensive visual brand guidelines, color palettes, and material specifications.',
+        price: '120 - 180',
+        usdVal: 120,
+        timeline: '5 to 7 business days',
+        img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80'
+      }
+    ]
+  }
+};
+
+// مخزن دارایی‌های دیجیتال مبتنی بر ۷ شاخه استاندارد سند مستر TAJINKART
+var digitalStoreProducts = [];
+let _initialProds = [
+
+  {
+    id: 1,
+    title: 'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ (Rook Knight)',
+    price: 39,
+    type: 'بسته‌های اسست بازی و اسپریت ۲D',
+    loreKey: 'جهان اکستوپیا • آنلاک لور اسکواد کلاغ‌ها',
+    img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80',
+    desc: 'اسپرایت‌شیت‌های کاراکتر همراه با انیمیشن‌های چندجهته (حرکت، حمله خنجری، شیرجه هوایی و مرگ)، بهینه‌شده برای Unity و Godot همراه با لایه‌های پس‌زمینه پارالاکس.'
+  },
+  {
+    id: 2,
+    title: 'موتور براش، بافت و آلفای زنگ‌زدگی و پوست هیولا (۶۴ عددی)',
+    price: 19,
+    type: 'موتور براش، تکسچر و استمپ‌های کانسپت آرت',
+    loreKey: 'جهان اکستوپیا • تکنیک‌های مات‌پینتینگ استودیو',
+    img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=700&q=80',
+    desc: 'ست براش فتوشاپ (.ABR) و پروکریت برای رندر متریال‌های زنگ‌زدگی، چرم کهنه، فلس و پوست لجن‌گرفته هیولاها به همراه بافت‌های آلفا یکپارچه (Seamless Alphas).'
+  },
+  {
+    id: 3,
+    title: 'کیت پراپ و المان‌های HUD دارک‌فانتزی (۱۲۰ آیکون + فریم)',
+    price: 34,
+    type: 'کیت‌های پراپ، آیکون و اینترفیس بازی',
+    loreKey: 'جهان جنسیس • نشان‌های رونیک باستانی',
+    img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80',
+    desc: 'پکیج آیکون‌های مهارت جادویی، معجون‌ها، تجهیزات افسانه‌ای، فریم اینونتوری و نوارهای مانا و سلامت در فرمت PNG ترنسپرنت (رزولوشن 256x256 و 512x512).'
+  },
+  {
+    id: 4,
+    title: 'کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD',
+    price: 24,
+    type: 'کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر',
+    loreKey: 'جهان جنسیس • دسترسی به قلب تپنده لور کایلو',
+    img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80',
+    desc: 'چپترهای کمیک با رزولوشن فوق‌العاده بالا به همراه فایل‌های تفکیک‌شده لایه‌باز PSD برای تحلیل لایه‌ها، آرت‌بوک لور و اتودهای اولیه به صورت PDF آماده چاپ.'
+  },
+  {
+    id: 5,
+    title: 'لوپ‌های ویدیویی منوی بازی و اسپلش سینمایی 4K بی‌پایان',
+    price: 29,
+    type: 'فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش',
+    loreKey: 'جهان اکستوپیا • اتمسفر مگاسازه رووکری',
+    img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=700&q=80',
+    desc: 'ویدیوهای لوپ پیوسته بدون درز (Seamless 4K MP4 / WebM) مناسب برای منوی اصلی بازی‌ها، پس‌زمینه استیم، اوورلی استریم توییچ و تیزرهای تبلیغاتی.'
+  },
+  {
+    id: 6,
+    title: 'فایل پرینت ۳ بعدی مینیاتوری کایمرای اعماق (.STL و .OBJ)',
+    price: 28,
+    type: 'فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی',
+    loreKey: 'جهان جنسیس • مینیاتوری رومیزی و بیس‌مش ZBrush',
+    img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=700&q=80',
+    desc: 'فایل‌های بهینه‌سازی‌شده .STL و .OBJ سر و پیکره کایمرا مناسب برای پرینترهای رزینی به همراه بیس‌مش خام (Base Mesh) با توپولوژی استاندارد جهت مجسمه‌سازی ZBrush.'
+  },
+  {
+    id: 7,
+    title: 'بسته اوورلی ذرات، مه سمی و باران گوگردی (Atmospheric FX Pack)',
+    price: 22,
+    type: 'اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری',
+    loreKey: 'جهان اکستوپیا • چرخه‌های اقلیمی چهارگانه',
+    img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80',
+    desc: 'فایل‌های PNG ترنسپرنت و ویدیوهای لوپ بلک‌اسکرین از ذرات معلق اتر، مه سنگین گوگردی، باران اسیدی و پاشش خون آماده استفاده با مد Screen یا Linear Dodge.'
+  }
+];
+
+digitalStoreProducts = _initialProds;
+try {
+  const _sp = safeGetStorage(KEYS.PRODUCTS);
+  if (_sp) {
+    const _parsed = JSON.parse(_sp);
+    if (Array.isArray(_parsed) && _parsed.length > 0) digitalStoreProducts = _parsed;
+  }
+} catch(e) {}
+window.digitalStoreProducts = digitalStoreProducts;
+
+var academyCourses = [
+  {
+    id: 1,
+    title: 'مسترکلاس: طراحی کاراکتر فانتزی و متریال زره',
+    price: 59,
+    duration: '۱۴ ساعت ویدیو HD + فایل‌های PSD',
+    img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+    desc: 'از اتودزنی سیلوئت تا مدل‌شیت سه‌نما و تکنیک‌های پیشرفته رندر فلز و چرم طبق پایپلاین استودیو.'
+  },
+  {
+    id: 2,
+    title: 'جهان‌سازی و کانسپت آرت محیط‌های سینمایی',
+    price: 65,
+    duration: '۱۲ ساعت ویدیو HD + براش اختصاصی',
+    img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
+    desc: 'پرسپکتیو کاربردی، نورپردازی حجمی، تعادل تیرگی و روشن و مدیریت نقاط کانونی در شات‌های عریض.'
+  },
+  {
+    id: 3,
+    title: 'نقشه راه فریلنسری کانسپت آرتیست‌ها در بازار جهانی',
+    price: 49,
+    duration: '۸ ساعت ویدیو + قالب قراردادها',
+    img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+    desc: 'تنظیم پورتفولیو استاندارد، ارتباط با کارفرمای خارجی، تعریف مایل‌استون‌ها و عقد قرارداد بین‌المللی.'
+  }
+];
+
+var ordersList = [];
+try {
+  const _storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS));
+  if (Array.isArray(_storedOrders)) {
+    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'استودیو نوا' && !String(o.client).includes('نوا'));
+  }
+} catch(e) {
+  ordersList = [];
+}
+try {
+  localStorage.setItem(KEYS.ORDERS, JSON.stringify(ordersList));
+} catch(e) {}
+
+var comicPages = [
+  'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80'
+];
+
+var siteMembersData = [];
+let _defaultMembers = [
+  {
+    id: 101,
+    name: 'سید سروش تاج',
+    email: 'soroush@tajinkart.com',
+    contact: '09120000000',
+    tier: 'VIP',
+    balance: ',450',
+    withdrawn: ',200',
+    assetsBought: [
+      'کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD',
+      'موتور براش، بافت و آلفای زنگ‌زدگی (۶۴ عددی)',
+      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ'
+    ],
+    totalSpent: '20'
+  },
+  {
+    id: 102,
+    name: 'استودیو پایا گیمز',
+    email: 'director@payagames.ir',
+    contact: '09350000000',
+    tier: 'PRO',
+    balance: '50',
+    withdrawn: '50',
+    assetsBought: [
+      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ',
+      'لوپ‌های ویدیویی منوی بازی و اسپلش سینمایی 4K'
+    ],
+    totalSpent: '90'
+  },
+  {
+    id: 103,
+    name: 'آریا کیان',
+    email: 'aria@gmail.com',
+    contact: '09190000000',
+    tier: 'STANDARD',
+    balance: '/usr/bin/bash',
+    withdrawn: '/usr/bin/bash',
+    assetsBought: ['موتور براش، بافت و آلفای زنگ‌زدگی و پوست هیولا'],
+    totalSpent: '9'
+  }
+];

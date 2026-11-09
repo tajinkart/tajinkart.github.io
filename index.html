@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <!-- ریدایرکت خودکار و انحصاری به دامنه رسمی تاج اینک آرت (Exclusive tajinkart.space) -->
+  <link rel=canonical href="https://tajinkart.space/" />
+  <script>
+    if (window.location.hostname === 'tajinkart.github.io') {
+      window.location.replace('https://tajinkart.space' + window.location.pathname + window.location.search + window.location.hash);
+    }
+  </script>
+  <!-- محافظت فوق‌العاده سطح مرورگر در برابر مسدودسازی حافظه یا خطاهای دسترسی -->
+  <script>
+    (function() {
+      try {
+        var k = '__tajin_test__';
+        window.localStorage.setItem(k, k);
+        window.localStorage.removeItem(k);
+      } catch (e) {
+        var mem = {};
+        var fake = {
+          getItem: function(k) { return mem[k] || null; },
+          setItem: function(k, v) { mem[k] = String(v); },
+          removeItem: function(k) { delete mem[k]; },
+          clear: function() { mem = {}; }
+        };
+        try {
+          Object.defineProperty(window, 'localStorage', { value: fake, configurable: true });
+          Object.defineProperty(window, 'sessionStorage', { value: fake, configurable: true });
+        } catch (err) {
+          window.localStorage = fake;
+          window.sessionStorage = fake;
+        }
+      }
+    })();
+  </script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="max-image-preview:large, noai, noimageai" />
+  <title>TAJINKART</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  <link id="siteFavicon" rel="icon" type="image/png" href="">
+  <link rel="stylesheet" href="style.css?v=18.1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c76a19f07a524a87b5a19808d4b38d38"}'></script>
+</head>
+<body data-view="showcase">
+
+  <!-- ۱. نشان شناور برند در بالا-چپ همراه با سوئیچر زبان -->
+  <div id="topCenterBrandBar">
+    <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
+      <span class="top-dot"></span>
+      <span>TAJINKART</span>
+    </button>
+
+    <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان برند TAJINKART -->
+    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks">
+        <span id="currentCategoryPillLabel">All Artworks</span>
+        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+      </button>
+
+      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      </div>
+    </div>
+
+    <!-- سوئیچر زبان مینیمال و لوکس -->
+    <button type="button" onclick="toggleSiteLanguage()" class="top-lang-pill" id="siteLangToggleBtn" title="تغییر زبان / Switch Language">
+      <span id="siteLangLabel" class="font-mono">EN</span>
+    </button>
+  </div>
+
+    <!-- ۲. داک عمودی ناوبری راست -->
+    <!-- ۲. داک عمودی ناوبری راست -->
+  <nav id="rightVerticalNav" class="dock-collapsed">
+    <!-- مستر تریگر برای موبایل و دسکتاپ -->
+    <div id="dockMasterTrigger" title="Menu Navigation" onclick="toggleDockExpand(event)">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+    </div>
+
+    <!-- موبایل دراور بک‌دراپ -->
+    <div id="mobileDockBackdrop" class="mobile-dock-backdrop" onclick="closeDockMobile(event)"></div>
+
+    <!-- کانتینر دکمه‌های ناوبری -->
+    <div id="dockButtonsContainer" class="dock-buttons-container">
+      <!-- ۰. هدر بستن در موبایل -->
+      <div class="mobile-dock-header">
+        <span class="mobile-dock-brand">TAJINKART MENU</span>
+        <button type="button" onclick="closeDockMobile(event)" class="mobile-dock-close-btn" title="Close Menu">✕</button>
+      </div>
+
+      <!-- ۱. Home / Showcase -->
+      <button id="rightDockHomeBtn" onclick="switchView('showcase'); closeDockMobile();" class="right-exp-btn home-theme" title="Home Showcase">
+        <span class="right-exp-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" style="color:var(--coral-flame);">Showcase</span>
+          <span class="right-exp-sub">Concept Portfolio</span>
+        </span>
+      </button>
+
+      <!-- ۲. Members Portal -->
+      <button onclick="handleMembersIconClick(); closeDockMobile();" class="right-exp-btn cyan-theme" title="Members Portal">
+        <span class="right-exp-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" id="rightMemberLabel" style="color:var(--cyan-electric);">Portal</span>
+          <span class="right-exp-sub">Sign In / Join</span>
+        </span>
+      </button>
+
+      <!-- ۳. Atelier & Store (با منوی دو قسمتی بازشونده) -->
+      <div class="dock-store-wrapper" id="dockStoreDropdownWrapper">
+        <button type="button" onclick="toggleStoreDockInPlace(event)" class="right-exp-btn gold-theme" id="dockStoreMainBtn" title="Atelier & Store">
+          <span class="right-exp-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+            </svg>
+          </span>
+          <span class="right-exp-text">
+            <span class="right-exp-title" style="color:var(--gold);">Atelier & Store ▾</span>
+            <span class="right-exp-sub">Commissions & Assets</span>
+          </span>
+        </button>
+
+        <!-- زیرمنوی دو قسمتی استور: کمیسیون‌ها و دارایی‌ها -->
+        <div class="dock-store-flyout-menu" id="dockStoreFlyoutMenu">
+          <button type="button" onclick="navigateToStorePane('commissions', event); closeDockMobile();" class="dock-flyout-sub-btn gold-accent" title="Concept Commissions">
+            <span class="sub-btn-icon">🎨</span>
+            <div class="sub-btn-text">
+              <strong style="color:var(--gold);">Concept Commissions</strong>
+              <span>Pre-Production & Characters</span>
+            </div>
+          </button>
+          <button type="button" onclick="navigateToStorePane('products', event); closeDockMobile();" class="dock-flyout-sub-btn cyan-accent" title="Digital Assets Vault">
+            <span class="sub-btn-icon">💎</span>
+            <div class="sub-btn-text">
+              <strong style="color:var(--cyan-electric);">Digital Assets Vault</strong>
+              <span>Brush Sets, PSDs & Lore</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ۴. Genesis Lore -->
+      <button onclick="switchView('genesis'); closeDockMobile();" class="right-exp-btn crimson-theme" title="Genesis Lore">
+        <span class="right-exp-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" style="color:var(--crimson);">Genesis Lore</span>
+          <span class="right-exp-sub">Original Universe</span>
+        </span>
+      </button>
+
+      <!-- ۵. Academy -->
+      <button onclick="switchView('academy'); closeDockMobile();" class="right-exp-btn purple-theme" title="Academy">
+        <span class="right-exp-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+          </svg>
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" style="color:var(--violet);">Academy</span>
+          <span class="right-exp-sub">Pipelines & Mentorship</span>
+        </span>
+      </button>
+
+      <!-- ۶. Society & Community (بازگردانی کامل) -->
+      <button onclick="switchView('society'); closeDockMobile();" class="right-exp-btn emerald-theme" title="Society & Community">
+        <span class="right-exp-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+          </svg>
+        </span>
+        <span class="right-exp-text">
+          <span class="right-exp-title" style="color:var(--emerald);">Society</span>
+          <span class="right-exp-sub">Community & Channels</span>
+        </span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- بخش ۰: صفحه اول با ترنزیشن نرم سبک ZEN -->
+  <section id="view-showcase" class="view-section">
+
+
+        <div id="stickyBrandHero">
+      <div id="brandCrestContainer" class="brand-crest-wrapper" style="display:none;">
+        <img id="brandCrestImg" src="" alt="TAJINKART Master Crest" class="brand-crest-img" />
+      </div>
+      <h1 class="brand-giant-title brand-morph-title" id="brandMorphTitle">TAJINKART</h1>
+      
+      <!-- زیرعنوان متقارن سبک‌ها و ژانرهای استودیو -->
+      <div class="brand-genre-bar font-mono" id="brandGenreBar">
+        DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN
+      </div>
+
+      <!-- شعار چرخشی برند -->
+      <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">FROM INK TO UNIVERSE</div>
+
+      <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" style="margin-top:4px;" title="Studio Availability & Brief Acceptance">
+        <span class="status-pulse-dot"></span>
+        <span id="studioLiveStatusText">Studio Online • Accepting Briefs & Concept Commissions</span>
+      </div>
+    </div>
+
+<div id="artworkCurtain">
+      <div id="showcaseGrid"></div>
+    </div>
+
+        <!-- بخش درباره استودیو و بیوگرافی مدیر هنری (در انتهای گالری صفحه اول) -->
+    <div id="showcaseStudioAboutSection" style="max-width:1100px; margin:40px auto 70px; padding:0 16px;">
+      <div style="background:#06080d; background-image:radial-gradient(circle at 80% 20%, rgba(250,204,21,0.08) 0%, #06080d 75%); border:1px solid rgba(250,204,21,0.25); border-radius:18px; padding:36px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; overflow:hidden;">
+        
+        <div class="about-studio-grid" style="display:grid; grid-template-columns:1fr 320px; gap:32px; align-items:center;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:8px; padding:4px 12px; border-radius:999px; background:rgba(250,204,21,0.1); border:1px solid rgba(250,204,21,0.3); margin-bottom:14px;">
+              <span class="font-mono" style="font-size:11px; font-weight:800; color:var(--gold);">STUDIO DIRECTORY & WORLDBUILDING MANIFESTO</span>
+            </div>
+            
+            <h2 style="font-size:24px; font-weight:900; color:#fff; margin-bottom:8px; line-height:1.4;">
+              About <span style="color:var(--gold);">TAJINKART</span> Studio
+            </h2>
+            <p style="font-size:14px; font-weight:700; color:var(--cyan-electric); margin-bottom:14px;">
+              Seyed Soroush Taj • Studio Director, Lead Concept Artist & Worldbuilder
+            </p>
+            
+            <p style="font-size:13px; color:#cbd5e1; line-height:1.9; margin-bottom:16px; text-align:justify;">
+              <strong style="color:#fff;">TAJINKART Studio</strong> was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, structural architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: <span class="font-mono" style="color:var(--gold); font-weight:800;">«From Ink to Universe»</span>.
+            </p>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:20px;">
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 14px;">
+                <span style="font-size:11px; color:var(--gold); font-weight:800; display:block;">⚔️ Character & Creatures</span>
+                <span style="font-size:11px; color:var(--text-muted);">Silhouettes, 360° turnarounds & anatomy</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 14px;">
+                <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; display:block;">🌌 Worlds & Level Design</span>
+                <span style="font-size:11px; color:var(--text-muted);">Modular kits & volumetric lighting</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px 14px;">
+                <span style="font-size:11px; color:var(--violet); font-weight:800; display:block;">🎬 Cinematic Keyframes</span>
+                <span style="font-size:11px; color:var(--text-muted);">Covers, splash art & sequential narrative</span>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <button type="button" onclick="switchView('store')" class="btn-gold" style="padding:11px 22px; font-size:12.5px; font-weight:800; cursor:pointer;">
+                💼 Commission Project & Reserve Atelier Capacity ←
+              </button>
+              <button type="button" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="btn-secondary" style="padding:11px 16px; font-size:12px; cursor:pointer;">
+                ↑ Back to Top of Gallery
+              </button>
+            </div>
+          </div>
+
+          <!-- ستون دوم: کارت مانیفست و نشان رسمی استودیو -->
+          <div style="background:#030408; border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px;">
+            <div id="aboutStudioCrestBox" style="width:105px; height:105px; border-radius:16px; background:#080b12; border:1.5px solid rgba(250,204,21,0.35); display:flex; align-items:center; justify-content:center; box-shadow:0 0 25px rgba(250,204,21,0.15);">
+              <img id="aboutStudioCrestImg" src="" alt="TAJINKART Crest" style="max-width:85px; max-height:85px; object-fit:contain; display:none;" />
+              <span id="aboutStudioCrestPlaceholder" style="font-size:42px;">👑</span>
+            </div>
+            <div>
+              <span class="font-mono" style="font-size:14px; font-weight:900; color:var(--gold); display:block; letter-spacing:0.1em;">TAJINKART STUDIO</span>
+              <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Tehran • Remote Pre-Production with Studios Worldwide</span>
+            </div>
+            <div style="width:100%; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; font-size:11.5px; color:#94a3b8; line-height:1.7;">
+              Pre-production for games, cinematic concept art, and entertainment design on official studio contract milestones.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- بخش ۱: استور و میزکار آتلیه -->
+  <section id="view-store" class="view-section hidden">
+    <div class="container">
+      
+            <!-- هدر خلوت، باوقار و مینی‌مال آتلیه -->
+      <div class="section-head" style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <h2 class="view-hero-title" id="storeSectionMainTitle" style="font-size:24px; font-weight:900; color:#fff; margin:0 0 4px;">Concept Art & Visual Development Atelier</h2>
+          <span style="font-size:12px; color:var(--text-muted);">Pre-production for games, cinematic concept art, and entertainment design directed by Seyed Soroush Taj.</span>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="storeSubTabBtnCommissions" type="button" onclick="switchStoreTab('commissions', this)" class="store-dual-btn active" style="padding:9px 18px; font-size:12px; font-weight:700;">
+            🎨 Concept Commissions (7 Pipelines)
+          </button>
+          <button id="storeSubTabBtnProducts" type="button" onclick="switchStoreTab('products', this)" class="store-dual-btn" style="padding:9px 18px; font-size:12px; font-weight:700;">
+            💎 Digital Assets & Vault
+          </button>
+        </div>
+      </div>
+
+      <!-- تب ۱: میزکار کمیسیون -->
+      <div id="storePaneCommissions">
+        
+
+
+        <div class="comm-studio-layout">
+          
+          <!-- کارت‌های دسته‌بندی سمت راست (در RTL) -->
+          <div class="studio-side-tabs" id="atelierServiceCards">
+            <!-- ۱. کاراکتر -->
+            <div onclick="selectPipeline('sketch1', this)" class="service-nav-card active" data-pipeline="sketch1">
+              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="طراحی کاراکتر" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">01.</span>
+                  <span>Character & Heroes</span>
+                </div>
+                <div class="service-nav-desc">Thumbnail silhouettes, concept exploration, 360° model sheets, and master cinematic renders.</div>
+              </div>
+            </div>
+
+            <!-- ۲. هیولا و موجودات -->
+            <div onclick="selectPipeline('sketch_creature', this)" class="service-nav-card" data-pipeline="sketch_creature">
+              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="طراحی هیولا" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">02.</span>
+                  <span>Creatures & Bosses</span>
+                </div>
+                <div class="service-nav-desc">Speculative biology, predatory locomotion, jaw diagrams, tactile scales, and human scale comparison.</div>
+              </div>
+            </div>
+
+            <!-- ۳. محیط و لنداسکیپ -->
+            <div onclick="selectPipeline('sketch2', this)" class="service-nav-card" data-pipeline="sketch2">
+              <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80" alt="طراحی محیط" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">03.</span>
+                  <span>Environment & Worlds</span>
+                </div>
+                <div class="service-nav-desc">Dark-fantasy architecture, modular level-design kits, depth haze, and wide atmospheric establishing shots.</div>
+              </div>
+            </div>
+
+            <!-- ۴. کاور و کی‌فریم -->
+            <div onclick="selectPipeline('sketch3', this)" class="service-nav-card" data-pipeline="sketch3">
+              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="کاور و پوستر" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">04.</span>
+                  <span>Keyframes & Covers</span>
+                </div>
+                <div class="service-nav-desc">Flagship game splash art, dramatic narrative battle moments, and commercial book/album covers.</div>
+              </div>
+            </div>
+
+            <!-- ۵. پراپ و رابط کاربری -->
+            <div onclick="selectPipeline('sketch4', this)" class="service-nav-card" data-pipeline="sketch4">
+              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="پراپ و تجهیزات" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">05.</span>
+                  <span>Props, Weapons & Relics</span>
+                </div>
+                <div class="service-nav-desc">Hero weapons, enchanted artifacts, inventory loot sets, and dark-fantasy HUD frames.</div>
+              </div>
+            </div>
+
+                        <!-- ۷. مسکات و هویت برند -->
+            <div onclick="selectPipeline('sketch_mascot', this)" class="service-nav-card" data-pipeline="sketch_mascot">
+              <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80" alt="مسکات و برندینگ" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">07.</span>
+                  <span>Brand Mascot & Crest</span>
+                </div>
+                <div class="service-nav-desc">Custom brand mascot creation, gaming emblems, and studio crests with visual identity guidelines.</div>
+              </div>
+            </div>
+
+            <!-- ۶. کمیک و استوری‌بورد -->
+            <div onclick="selectPipeline('sketch5', this)" class="service-nav-card" data-pipeline="sketch5">
+              <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80" alt="کمیک و مانگا" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--gold);">06.</span>
+                  <span>Comics & Sequential</span>
+                </div>
+                <div class="service-nav-desc">Cinematic storyboarding, authentic inked manga line-art with screentones, and full-color webtoon pages.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- میزکار مراحل -->
+          <div class="sketch-workbench" id="sketchWorkbenchArea">
+            <div class="sketch-workbench-header">
+              <div>
+                <div class="sketch-banner-title">
+                  <span style="color:var(--gold);">Production Pipeline</span>
+                  <span style="color:var(--border-subtle);">/</span>
+                  <span id="sketchTopSubTitle" style="color:#fff;">Character Design & Heroes</span>
+                </div>
+                <p id="sketchAnnotationNote" style="font-size:12.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;"></p>
+              </div>
+              <span class="font-mono" style="font-size:11px; color:var(--gold); padding:5px 12px; border-radius:8px; background:rgba(250,204,21,0.12); border:1px solid rgba(250,204,21,0.35);" id="sketchBadgeSlug">STAGE PIPELINE</span>
+            </div>
+
+            <div id="mosaicStageContainer" class="mosaic-pipeline-grid"></div>
+            <!-- توضیحات استاندارد آتلیه دقیقاً هم‌عرض باکس سمت چپ -->
+            <div style="margin-top:20px; padding:16px 20px; border-radius:14px; background:#04060b; border:1px solid rgba(250,204,21,0.25); display:flex; align-items:flex-start; gap:12px;">
+              <span style="font-size:18px;">⚡</span>
+              <div>
+                <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:12.5px;">TAJINKART International Production Pipeline Standard:</strong>
+                <p style="margin:0; font-size:11px; color:var(--text-muted); line-height:1.75;">All commissions include transparent initial concept thumbnails, orthographic 3-view model sheets, lighting studies, and print-ready master renders with layered PSD files at commercial 300DPI quality with guaranteed timelines and phased client feedback.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        
+
+      <!-- تب ۲: فروشگاه دارایی‌های دیجیتال (با طراحی کاملاً همگام با سفارشات کانسپت) -->
+      <div id="storePaneProducts" class="hidden">
+        
+        <!-- توضیحات مجزا و دقیق اختصاصی برای دارایی‌های دیجیتال -->
+        <div class="panel-intro-banner cyan-border">
+          <div>
+            <strong style="color:var(--cyan-electric); display:block; margin-bottom:4px; font-size:14px;">💎 مخزن رسمی دارایی‌های دیجیتال، اسست‌های بازی و ابزارهای تولید:</strong>
+            آرشیو دارایی‌های دیجیتال آماده تجاری، شامل بسته‌های اسپرایت انیمیشنی دوبعدی برای موتورهای Unity و Godot، جلدهای کمیک با لایه‌های تفکیک‌شده PSD، براش‌های تخصصی نقاشی دیجیتال و فوتیج‌های لوپ سینمایی با لایسنس تجاری دائمی.
+          </div>
+        </div>
+
+        <div class="comm-studio-layout">
+                    <!-- سایدبار دسته‌های دارایی با ۷ شاخه استاندارد Master Spec v2.1 -->
+          <div class="studio-side-tabs" id="assetCategoryTabs">
+
+            <div onclick="filterStoreAssets('all', this)" class="service-nav-card cyan-card active" data-asset-cat="all">
+              <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="همه دارایی‌ها" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">00.</span>
+                  <span>همه دارایی‌های استودیو</span>
+                </div>
+                <div class="service-nav-desc">آرشیو کامل پکیج‌ها، سورس‌های لایه‌باز و فایل‌های آماده تولید تجاری.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('بسته‌های اسست بازی و اسپریت ۲D', this)" class="service-nav-card cyan-card" data-asset-cat="بسته‌های اسست بازی و اسپریت ۲D">
+              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="اسست بازی" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">01.</span>
+                  <span>اسست بازی و اسپریت ۲D</span>
+                </div>
+                <div class="service-nav-desc">اسپرایت‌شیت‌های کاراکتر، انیمیشن‌های چندجهته بهینه‌شده برای Unity و Godot.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('موتور براش، تکسچر و استمپ‌های کانسپت آرت', this)" class="service-nav-card cyan-card" data-asset-cat="موتور براش، تکسچر و استمپ‌های کانسپت آرت">
+              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="موتور براش" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">02.</span>
+                  <span>موتور براش، بافت و آلفا</span>
+                </div>
+                <div class="service-nav-desc">ست‌های براش فتوشاپ و پروکریت برای متریال زنگ‌زدگی، فلس، پوست و مه اتمسفریک.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('کیت‌های پراپ، آیکون و اینترفیس بازی', this)" class="service-nav-card cyan-card" data-asset-cat="کیت‌های پراپ، آیکون و اینترفیس بازی">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="پراپ و UI" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">03.</span>
+                  <span>کیت‌های پراپ، آیکون و UI</span>
+                </div>
+                <div class="service-nav-desc">آیکون‌های مهارت جادویی، معجون‌ها، فریم‌های دارک‌فانتزی HUD و اینونتوری.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر', this)" class="service-nav-card cyan-card" data-asset-cat="کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر">
+              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="کمیک و ناول" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">04.</span>
+                  <span>کمیک، آرت‌بوک و مستر PSD</span>
+                </div>
+                <div class="service-nav-desc">چپترهای کمیک با لایه‌های تفکیک‌شده PSD، آرت‌بوک لور و یادداشت‌های کارگردانی.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش', this)" class="service-nav-card cyan-card" data-asset-cat="فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="لوپ سینمایی" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">05.</span>
+                  <span>لوپ‌های سینمایی 4K</span>
+                </div>
+                <div class="service-nav-desc">ویدیوهای لوپ بدون درز مناسب منوی اصلی بازی، والپیپر استیم و تیزرهای تبلیغاتی.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی', this)" class="service-nav-card cyan-card" data-asset-cat="فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی">
+              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="پرینت ۳D" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">06.</span>
+                  <span>پرینت ۳D و مینیاتوری STL</span>
+                </div>
+                <div class="service-nav-desc">فایل‌های STL و OBJ سر هیولاها برای پرینترهای رزینی همراه با بیس‌مش خام ZBrush.</div>
+              </div>
+            </div>
+
+            <div onclick="filterStoreAssets('اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری', this)" class="service-nav-card cyan-card" data-asset-cat="اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="افکت FX" />
+              <div class="service-nav-overlay">
+                <div class="service-nav-title">
+                  <span class="font-mono" style="color:var(--cyan-electric);">07.</span>
+                  <span>اوورلی ذرات و افکت FX</span>
+                </div>
+                <div class="service-nav-desc">ذرات معلق اتر، مه سنگین، باران گوگردی و پاشش خون در فرمت PNG ترنسپرنت و بلک‌اسکرین.</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- میزکار نمایش اسست‌ها -->
+          <div class="sketch-workbench" id="assetWorkbenchArea">
+            <div class="sketch-workbench-header">
+              <div>
+                <div class="sketch-banner-title">
+                  <span style="color:var(--cyan-electric);">مخزن دارایی‌های دیجیتال</span>
+                  <span style="color:var(--border-subtle);">/</span>
+                  <span id="currentAssetCategoryTitle" style="color:#fff;">همه آیتم‌ها</span>
+                </div>
+                <p id="assetCategoryDynamicNote" style="font-size:12.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;">
+                  کلیه دارایی‌های این مخزن همراه با فایل‌های مستر باکیفیت و مجوز رسمی استفاده تجاری بدون محدودیت در بازی‌ها و پروژه‌ها ارائه می‌گردند.
+                </p>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="text" id="assetSearchBox" placeholder="🔍 جستجو در اسست‌ها..." oninput="searchStoreAssets(this.value)" style="width:190px; padding:6px 12px; font-size:11.5px; border-radius:8px;" />
+                <span class="font-mono" style="font-size:11px; color:var(--cyan-electric); padding:6px 12px; border-radius:8px; background:rgba(0,240,255,0.1); border:1px solid rgba(0,240,255,0.3);" id="assetCountBadge">5 ASSETS AVAILABLE</span>
+              </div>
+            </div>
+
+            <div id="productsMerchGrid" class="cards-grid-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- بخش ۲: جهان جنسیس و کمیک -->
+  <section id="view-genesis" class="view-section hidden">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="view-hero-title">Genesis Universe & Graphic Lore</h2>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">Original dark fantasy universe, narrative chapters, and world progression roadmap.</p>
+        </div>
+      </div>
+
+      <div class="genesis-hero">
+        <p style="font-size:13.5px; color:#cbd5e1; line-height:1.8; max-width:860px;">
+          An independent dark-fantasy worldbuilding and storytelling franchise. Explore the prologue chapters, concept art, and unlock upcoming character rosters and digital collector editions.
+        </p>
+
+        <div style="margin-top:20px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px;">
+            <span>هدف اولیه پروژه: <strong style="color:var(--gold); direction:ltr; display:inline-block;">$10,000 USD</strong></span>
+            <span style="color:var(--crimson); font-weight:700;">تأمین شده: ۴,۲۰۰ دلار (۴۲٪)</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+        </div>
+
+        <div class="milestone-stepper">
+          <div class="milestone-box unlocked">
+            <div style="color:var(--gold); font-weight:700;">مرحله ۱ • ۱۰,۰۰۰ دلار (شماره اول باز شد)</div>
+            <div style="color:#cbd5e1; margin-top:3px;">انتشار دیجیتال ۲۴ صفحه پیش‌درآمد همراه با اتودهای خام PSD.</div>
+          </div>
+          <div class="milestone-box">
+            <div style="color:var(--text-muted); font-weight:700;">مرحله ۲ • ۱۵,۰۰۰ دلار (کاراکترهای جدید)</div>
+            <div style="color:var(--text-muted); margin-top:3px;">آنلاک دو شخصیت جدید همراه با شیت‌های حالات چهره و موسیقی متن اختصاصی.</div>
+          </div>
+          <div class="milestone-box">
+            <div style="color:var(--text-muted); font-weight:700;">مرحله ۳ • ۲۰,۰۰۰ دلار (پروتوتایپ بازی)</div>
+            <div style="color:var(--text-muted); margin-top:3px;">دموی بازی پیکسلی دوبعدی و فایل STL سه بعدی برای پرینت رزینی.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comic-reader-box">
+        <div style="display:flex; align-items:center; justify-content:space-between; max-width:720px; margin:0 auto; flex-wrap:wrap; gap:10px;">
+          <span class="font-mono" style="font-size:12px; color:var(--gold);" id="comicPageIndicator">PAGE 1 / 4</span>
+          <h3 style="font-size:15px; font-weight:800; color:#fff;">پیش‌درآمد داستان: مبدأ بازمانده</h3>
+          <div style="display:flex; gap:6px;">
+            <button onclick="navigateComic(-1)" class="btn-secondary" style="padding:6px 14px; font-size:11px;">← صفحه قبلی</button>
+            <button onclick="navigateComic(1)" class="btn-secondary" style="padding:6px 14px; font-size:11px;">صفحه بعدی ←</button>
+          </div>
+        </div>
+        <div class="comic-page-stage">
+          <img id="comicPageImg" src="" alt="صفحه کمیک" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- بخش ۳: آکادمی طراحی -->
+  <section id="view-academy" class="view-section hidden">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="view-hero-title">آکادمی کانسپت آرت و توسعه بصری</h2>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">مسترکلاس‌های تخصصی طراحی شده برای ورود به بازار کار بین‌المللی و تسلط بر تصویرسازی دیجیتال.</p>
+        </div>
+      </div>
+      <div id="academyCoursesGrid" class="cards-grid-3"></div>
+    </div>
+  </section>
+
+    <!-- بخش ۴: جامعه هنری و شبکه‌ها -->
+  <section id="view-society" class="view-section hidden">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="view-hero-title">Official Channels & Artist Society</h2>
+          <p style="font-size:14px; color:var(--text-muted); margin-top:6px;">Direct communication with the Studio Director, raw PSD asset drops, community lore releases, and creator networking.</p>
+        </div>
+      </div>
+      <div class="cards-grid-3">
+        <div class="society-card">
+          <div>
+            <div class="font-mono" style="font-size:11.5px; color:#38bdf8;">TELEGRAM CHANNEL</div>
+            <h3 style="font-size:18px; font-weight:800; margin:8px 0; color:#fff;">Official Studio Telegram (@tajinkart)</h3>
+            <p style="font-size:13px; color:var(--text-muted); line-height:1.75;">Layered PSD working files, custom brush sets, early production sketches, and audio design logs.</p>
+          </div>
+          <a href="https://t.me/tajinkart" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="text-align:center; color:#38bdf8; text-decoration:none; font-weight:700;">Join Telegram Channel →</a>
+        </div>
+        <div class="society-card">
+          <div>
+            <div class="font-mono" style="font-size:11.5px; color:#f43f5e;">INSTAGRAM FEED</div>
+            <h3 style="font-size:18px; font-weight:800; margin:8px 0; color:#fff;">Official Studio Instagram (@tajinkart)</h3>
+            <p style="font-size:13px; color:var(--text-muted); line-height:1.75;">Painting process time-lapses, new character debuts, and daily behind-the-scenes studio stories.</p>
+          </div>
+          <a href="https://instagram.com/tajinkart" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="text-align:center; color:#f43f5e; text-decoration:none; font-weight:700;">View on Instagram →</a>
+        </div>
+        <div class="society-card">
+          <div>
+            <div class="font-mono" style="font-size:11.5px; color:var(--iris);">ART DISPATCH / X / BLUESKY</div>
+            <h3 style="font-size:18px; font-weight:800; margin:8px 0; color:#fff;">Global Art Network (@tajinkart)</h3>
+            <p style="font-size:13px; color:var(--text-muted); line-height:1.75;">Networking with international art directors, game developers, and worldbuilding collaborators.</p>
+          </div>
+          <a href="https://x.com/tajinkart" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="text-align:center; color:var(--iris); text-decoration:none; font-weight:700;">Follow Global Feed →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- بخش ۵: داشبورد اعضا -->
+  <section id="view-member-dashboard" class="view-section hidden">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="view-hero-title">داشبورد کاربری: <span id="dashMemberName" style="color:var(--cyan-electric);">کاربر</span></h2>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">ایمیل حساب: <span id="dashMemberEmail" class="font-mono"></span> | شماره تماس: <span id="dashMemberContact" class="font-mono"></span></p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-gold hidden" style="background:var(--gold); color:#040507;" title="ورود به پنل مدیریت استودیو">
+            👑 ورود به پنل مدیریت
+          </button>
+          <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-secondary" style="color:var(--gold); border-color:rgba(250,204,21,0.4); background:rgba(250,204,21,0.06);" title="تغییر یا بازنشانی رمز عبور این حساب">
+            🔑 تغییر رمز عبور
+          </button>
+          <button onclick="switchView('store')" class="btn-gold">+ ثبت سفارش جدید</button>
+          <button onclick="logoutMemberAccount()" class="btn-secondary" style="color:#fda4af;">خروج از حساب</button>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+        <div style="padding:20px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:12px;">سفارش‌های کانسپت فعال شما</h3>
+          <div id="memberOrdersContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+        <div style="padding:20px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:12px; color:var(--violet);">دوره‌های فعال و فایل‌های دانلودی</h3>
+          <div id="memberCoursesContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- بخش ۶: پنل مدیریت ادمین کامل فارسی -->
+  <section id="view-admin" class="view-section hidden" dir="rtl" lang="fa">
+    <div class="container">
+      <div id="adminLoginGate" style="max-width:440px; margin:50px auto; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.35); border-radius:20px; padding:30px 24px; text-align:center; box-shadow:0 15px 45px rgba(0,0,0,0.75);">
+        <div style="width:48px; height:48px; border-radius:14px; background:rgba(250,204,21,0.12); border:1px solid rgba(250,204,21,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">👑</div>
+        <h2 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:8px;">ورود اختصاصی مدیر ارشد استودیو</h2>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px; line-height:1.7;">
+          دسترسی به مرکز کنترل استودیو منحصراً از طریق تایید هویت دو مرحله‌ای حساب گوگل مدیریت (<span class="font-mono" style="color:var(--cyan-electric); font-weight:700;">tajinkart@gmail.com</span>) انجام می‌پذیرد.
+        </p>
+        <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; border-radius:10px; background:#0b0f19; border:1px solid rgba(250,204,21,0.4); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; transition:all 0.25s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>ورود مستقیم مدیر با حساب Google</span>
+        </button>
+      </div>
+
+      <div id="adminWorkspace" class="hidden">
+        <div class="section-head">
+          <div>
+            <span class="font-mono" style="font-size:11px; color:var(--gold);">STUDIO_DIRECTOR: SEYED_SOROUSH_TAJ</span>
+            <h2 class="view-hero-title">مرکز کنترل و پنل مدیریت استودیو</h2>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="خروج کامل از حساب و قفل پنل">قفل پنل</button>
+          </div>
+        </div>
+
+        <!-- چیدمان داشبورد ادمین: سایدبار عمودی در سمت راست (RTL) و تب‌ها در سمت چپ -->
+        <div class="admin-dashboard-layout">
+          
+          <!-- سایدبار دسته‌بندی‌ها (سمت راست) -->
+          <aside class="admin-vertical-sidebar">
+            <div class="admin-sidebar-header">
+              <span class="font-mono" style="font-size:10.5px; color:var(--gold);">STUDIO DIRECTOR</span>
+              <h3 style="font-size:14.5px; font-weight:800; color:#fff; margin-top:2px;">منوی مدیریت استودیو</h3>
+            </div>
+            
+                        <nav class="admin-sidebar-menu">
+              <!-- ۱. گالری و آثار استودیو -->
+              <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
+                <span class="admin-nav-icon">🖼️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۱. گالری و آثار استودیو</span>
+                  <span class="admin-nav-sub">پورتفولیو، چیدمان و نمونه‌های زنده</span>
+                </div>
+              </button>
+
+              <!-- ۲. آتلیه، پایپلاین و تعرفه‌ها -->
+              <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
+                <span class="admin-nav-icon">⚡</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۲. آتلیه و قیمت‌گذاری</span>
+                  <span class="admin-nav-sub">پایپلاین‌ها و ماتریس تعرفه‌ها</span>
+                </div>
+              </button>
+
+              <!-- ۳. سفارش‌های دریافتی -->
+              <button type="button" onclick="switchAdminTab('orders', this)" class="admin-nav-item" data-tab="orders">
+                <span class="admin-nav-icon">📋</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۳. سفارش‌های دریافتی</span>
+                  <span class="admin-nav-sub">بریف‌ها، فاکتورها و وضعیت</span>
+                </div>
+              </button>
+
+              <!-- ۴. فروشگاه دارایی‌های دیجیتال -->
+              <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
+                <span class="admin-nav-icon">💎</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۴. فروشگاه دارایی‌ها</span>
+                  <span class="admin-nav-sub">اسست‌ها، براش‌ها و کمیک</span>
+                </div>
+              </button>
+
+              <!-- ۵. اعضا و گزارش‌های مالی -->
+              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
+                <span class="admin-nav-icon">👥</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۵. اعضا و کاربران</span>
+                  <span class="admin-nav-sub">سطوح کاربری و تراکنش‌ها</span>
+                </div>
+              </button>
+
+              <!-- ۶. منشور و قوانین استودیو -->
+              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
+                <span class="admin-nav-icon">⚖️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۶. منشور و قوانین استودیو</span>
+                  <span class="admin-nav-sub">۴ تب مستقل لایسنس و شرایط</span>
+                </div>
+              </button>
+
+              <!-- ۷. مرکز تنظیمات و زیرساخت استودیو -->
+              <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
+                <span class="admin-nav-icon">⚙️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">۷. تنظیمات و زیرساخت</span>
+                  <span class="admin-nav-sub">حضور استودیو، برند، تلگرام و مانیتورینگ</span>
+                </div>
+              </button>
+            </nav>
+          </aside>
+
+          <!-- کانتینر اصلی تب‌های ادمین (همه ۶ تب مستقل و خواهر-برادر) -->
+          <main class="admin-main-panes-holder">
+            <div id="adminTabArtworks">
+          <div class="admin-artworks-fullwidth">
+            <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
+              <div style="margin-bottom:16px;">
+                <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
+                <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید روی کادر + در گرید کلیک کنید یا برای ادیت هر اثر روی کارت آن ضربه بزنید. (همگام‌سازی ابری به صورت ۱۰۰٪ خودکار انجام می‌شود)</span>
+              </div>
+              <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
+            </div>
+
+            <!-- مدیریت فشرده، ارگونومیک و مدرن دسته‌بندی‌های گالری با پالت رنگی نئون -->
+            <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0;">🏷️ دسته‌بندی‌های گالری و پالت رنگی نئون</h4>
+                  <span id="adminCategoryCountBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,240,255,0.2);">۷ دسته فعال</span>
+                </div>
+                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px;">
+                  + افزودن دسته‌بندی جدید
+                </button>
+              </div>
+
+              <!-- ردیف اینلاین و سریع ایجاد دسته جدید با انتخاب رنگ -->
+              <div id="adminInlineAddCategoryRow" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
+                <input type="text" id="adminNewCatTitle" placeholder="عنوان فارسی (مثال: تصویرسازی سه‌بعدی)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:160px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
+                <input type="text" id="adminNewCatId" placeholder="شناسه انگلیسی (مثال: 3d)" class="font-mono" style="font-size:11px; padding:6px 10px; width:130px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:var(--cyan-electric); direction:ltr;" />
+                <div style="display:flex; align-items:center; gap:6px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; padding:4px 8px;">
+                  <span style="font-size:10.5px; color:var(--text-muted);">رنگ نئون:</span>
+                  <input type="color" id="adminNewCatColor" value="#38bdf8" style="width:22px; height:22px; border:none; padding:0; background:transparent; cursor:pointer;" />
+                </div>
+                <button type="button" onclick="adminSubmitNewCategoryInline()" class="btn-gold" style="font-size:11px; padding:6px 14px;">
+                  ✓ ثبت دسته
+                </button>
+                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
+                  انصراف
+                </button>
+              </div>
+
+              <!-- لیست افقی و فشرده دسته‌بندی‌ها به شکل پیل‌های شیک -->
+              <div id="adminGalleryCategoriesList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <!-- داینامیک توسط renderAdminGalleryCategories پر می‌شود -->
+              </div>
+            </div>
+
+            <!-- مدال شناور ادیتور اثر (در حالت عادی باز نیست) -->
+            <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
+              <div class="admin-art-modal-box" onclick="event.stopPropagation()">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                  <h4 style="font-size:15px; font-weight:800; color:var(--iris);" id="adminArtEditorModalTitle">ویرایش آرت‌ورک</h4>
+                  <button type="button" onclick="closeAdminArtEditor()" style="font-size:18px; color:var(--text-muted); cursor:pointer;">✕</button>
+                </div>
+                <div id="adminArtFormFields">
+                  <p style="font-size:12px; color:var(--text-muted);">در حال بارگذاری فرم...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+            <div id="adminTabPipelines" class="hidden">
+          <div class="admin-sketch1-layout">
+            <!-- ستون اول: کارت‌های دسته‌بندی + دکمه افزودن دسته جدید -->
+            <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
+              <h4 style="font-size:13px; font-weight:800; margin-bottom:12px; color:var(--gold);">دسته‌های خدمات</h4>
+              <div id="adminCategoryListCol"></div>
+              <button onclick="adminAddNewCategory()" class="btn-secondary" style="width:100%; margin-top:10px; border-style:dashed; color:var(--gold); font-size:12px; padding:10px;">+ افزودن دسته جدید</button>
+            </div>
+
+            <!-- ستون دوم: باکس‌های مراحل ایجاد شده برای آن دسته + دکمه افزودن مرحله -->
+            <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:14px; font-weight:800;" id="adminCurrentPipeTitle">مراحل پایپلاین</h4>
+                <button onclick="adminAddNewStage()" class="btn-gold" style="font-size:11px; padding:6px 12px;">+ افزودن مرحله جدید</button>
+              </div>
+              <div id="adminStagesGridCol" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+
+            <!-- ستون سوم: ادیتور زنده قیمت و جزئیات مرحله انتخاب شده -->
+            <div class="admin-live-editor-col" style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle); position:sticky; top:90px;" id="adminLiveEditorCol">
+              <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin-bottom:14px;">ویرایشگر پایپلاین و مراحل قیمت‌گذاری</h4>
+              <div id="adminStageEditFormContainer">
+                <p style="font-size:12px; color:var(--text-muted);">یک مرحله را از ستون وسط انتخاب کنید تا مشخصات آن در این بخش ویرایش شود.</p>
+              </div>
+            </div>
+          </div>
+            <!-- جدول ماتریس تعرفه‌ها و ضرایب استودیو (Studio Pricing Matrix) -->
+            <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.6);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                <div>
+                  <h4 style="font-size:14.5px; font-weight:900; color:var(--gold); margin:0 0 4px;">📊 جدول ماتریس قیمت‌گذاری و ضرایب آتلیه (Studio Pricing Matrix)</h4>
+                  <span style="font-size:11.5px; color:var(--text-muted);">مدیریت یکپارچه قیمت پایه، ضرایب کادربندی، افزونه‌ها و درصد تخفیف پکیج‌ها بدون نیاز به اکسل خارجی.</span>
+                </div>
+                <button type="button" onclick="saveStudioPricingMatrixDirect()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; font-weight:800; border-radius:8px; cursor:pointer;">
+                  ✓ ذخیره ماتریس قیمت‌ها
+                </button>
+              </div>
+
+              <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:right;">
+                  <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.12); color:var(--text-muted); font-size:11px;">
+                      <th style="padding:10px 8px;">شاخه و پایپلاین</th>
+                      <th style="padding:10px 8px;">قیمت پایه ($)</th>
+                      <th style="padding:10px 8px;">ضریب تمام‌قد ($)</th>
+                      <th style="padding:10px 8px;">مدل‌شیت ارتوگرافیک ($)</th>
+                      <th style="padding:10px 8px;">افزونه سلاح ($)</th>
+                      <th style="padding:10px 8px;">تخفیف پکیج (%)</th>
+                      <th style="padding:10px 8px;">زمان تحویل</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👤 طراحی کاراکتر و قهرمانان</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch1" value="95" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch1" value="40" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch1" value="75" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch1" value="35" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch1" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🐉 موجودات، تایتان‌ها و هیولاها</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch_creature" value="100" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch_creature" value="45" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch_creature" value="80" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch_creature" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch_creature" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۵ تا ۷ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🏰 طراحی فضا، معماری و دنیا</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch2" value="105" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch2" value="35" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch2" value="65" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch2" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch2" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🎬 کاور و کی‌فریم سینمایی</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch3" value="130" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch3" value="50" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch3" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch3" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch3" value="20" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۵ تا ۸ روز</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">⚔️ تجهیزات و پراپ</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch4" value="70" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch4" value="25" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch4" value="45" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch4" value="20" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch4" value="10" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۳ تا ۵ روز</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👑 مسکات و نشان برند</td>
+                      <td style="padding:10px 8px;"><input type="number" id="matBase_sketch_mascot" value="100" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matFull_sketch_mascot" value="40" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch_mascot" value="60" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch_mascot" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
+                      <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch_mascot" value="10" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+
+            <div id="adminTabProducts" class="hidden">
+          <div class="admin-products-layout">
+            <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <h4 style="font-size:15px; font-weight:800; color:var(--cyan-electric);">مدیریت محصولات و دارایی‌های دیجیتال</h4>
+                  <span style="font-size:11.5px; color:var(--text-muted);">محصولات فروشگاه را مدیریت، قیمت‌گذاری و ویرایش کنید یا دارایی جدید بسازید.</span>
+                </div>
+                <button onclick="adminAddNewProduct()" class="btn-gold" style="font-size:11.5px; padding:7px 14px;">+ افزودن دارایی دیجیتال جدید</button>
+              </div>
+              <div id="adminProductsListContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:12px;"></div>
+            </div>
+
+            <!-- فرم ویرایش زنده دارایی انتخاب شده -->
+            <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle); position:sticky; top:90px;" id="adminProductEditCol">
+              <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin-bottom:12px;">ویرایشگر مشخصات دارایی دیجیتال</h4>
+              <div id="adminProductFormFields">
+                <p style="font-size:12px; color:var(--text-muted);">یک دارایی را انتخاب کنید تا مشخصات آن در این فرم بارگذاری گردد.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+            <div id="adminTabMembers" class="hidden">
+          <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+              <div>
+                <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric); margin:0 0 4px;">👥 مدیریت کاربران، اعضا و تعاملات</h3>
+                <span style="font-size:12px; color:var(--text-muted);">مشاهده مشخصات کاربران ثبت‌نام‌شده، سوابق ورود و ارتباط مستقیم کارفرمایان.</span>
+              </div>
+              <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800;" title="واکشی زنده و همگام‌سازی کاربران ثبت‌شده از دیتابیس ابری Supabase">
+                🔄 همگام‌سازی اعضا از دیتابیس ابری
+              </button>
+            </div>
+
+            <div class="admin-members-grid-v2">
+              
+              <!-- ستون اول (سمت راست در RTL): لیست باریک و جمع‌وجور کاربران -->
+              <div style="background:#06080d; border:1px solid var(--border-subtle); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <input type="text" id="adminMemberSearchInput" placeholder="🔍 جستجوی کاربر (نام، ایمیل)..." style="font-size:11.5px; padding:8px 12px; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" oninput="filterAdminMembers(this.value)" />
+                </div>
+                <div id="adminMembersListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:650px; overflow-y:auto; padding-left:4px;"></div>
+              </div>
+
+              <!-- ستون دوم (سمت چپ): پرونده کامل تعاملات، لاگ و مشخصات کاربر انتخابی -->
+              <div id="adminMemberDetailCol" style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:20px; position:sticky; top:90px;">
+                <div id="adminMemberDetailContent">
+                  <p style="font-size:12.5px; color:var(--text-muted);">یک کاربر را از فهرست سمت راست انتخاب کنید تا پرونده، فعالیت‌ها و بریف‌های وی نمایش داده شود.</p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+            <div id="adminTabOrders" class="hidden">
+          <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+              <div>
+                <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">📦 سفارش‌ها و گزارش مالی جامع استودیو</h3>
+                <span style="font-size:12px; color:var(--text-muted);">پایش زنده وضعیت سفارش‌های کمیسیون، تسویه‌حساب‌ها و حجم مالی پروژه‌ها.</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:11px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="همگام‌سازی زنده با جدول orders در دیتابیس Supabase">
+                  🔄 واکشی زنده سفارش‌ها از کلود
+                </button>
+              </div>
+            </div>
+
+            <!-- کارت‌های شاخص‌های کلیدی مالی و سفارش‌ها (Financial & Order KPIs) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:22px;">
+              <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:var(--gold); font-weight:700; display:block;">💵 مجموع حجم مالی پروژه‌ها:</span>
+                <span id="kpiGrossVolume" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">$۰</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">برآورد ارزی کل سفارش‌های ثبت‌شده</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block;">⚡ پروژه‌های در حال تولید آتلیه:</span>
+                <span id="kpiActiveProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:var(--cyan-electric); display:block; margin-top:4px;">۰ پروژه</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">در مراحل اتود، مدل‌شیت و رندر</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:#10b981; font-weight:700; display:block;">✓ پروژه‌های تسویه‌شده و تحویل:</span>
+                <span id="kpiCompletedProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:#10b981; display:block; margin-top:4px;">۰ تحویل</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">ارسال سورس نهایی PSD و لایسنس</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block;">📝 کل بریف‌های ثبت‌شده:</span>
+                <span id="kpiTotalOrdersCount" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">۰ بریف</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">پایگاه داده ابری و محلی</span>
+              </div>
+            </div>
+
+            <!-- فهرست سفارش‌های استودیو -->
+            <h4 style="font-size:14px; font-weight:800; color:#fff; margin-bottom:12px;">فهرست سفارش‌ها و بریف‌های کارفرمایان:</h4>
+            <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:12px;"></div>
+          </div>
+        </div>
+
+            <!-- ۷. زبانه مدیریت و ویرایشگر منشور قوانین استودیو (Terms & Legal Editor) -->
+        <div id="adminTabTerms" class="hidden">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">ویرایشگر زنده منشور قوانین، لایسنس و شرایط استودیو</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:0;">ویرایش تفکیک‌شده سرفصل‌های حقوقی استودیو؛ بدون نیاز به دستکاری کدهای سایت.</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" onclick="openTermsModal(event)" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+                👁️ پیش‌نمایش در سایت
+              </button>
+              <button type="button" onclick="saveStudioTerms()" class="btn-gold" style="padding:8px 18px; font-size:12px;">
+                💾 ذخیره و انتشار سراسری تمام بخش‌ها
+              </button>
+            </div>
+          </div>
+
+          <!-- ساب‌تب‌های ویرایشگر منشور قوانین استودیو -->
+          <div style="display:flex; gap:8px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
+            <button type="button" onclick="switchAdminTermsEditorTab('account', this)" class="terms-tab-btn active">
+              🛡️ شرایط عمومی و عضویت
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('commission', this)" class="terms-tab-btn">
+              📜 قرارداد سفارش و کمیسیون (ودیعه ۵۰٪)
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('assets', this)" class="terms-tab-btn">
+              💎 لایسنس دارایی‌ها و مارکت‌پلیس
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('academy', this)" class="terms-tab-btn">
+              🎓 ضوابط آکادمی و جامعه هنری
+            </button>
+          </div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:18px;">
+            <!-- بخش ۱: شرایط عمومی -->
+            <div id="adminTermsPane-account" class="admin-terms-editor-pane">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gold);">
+                متن ۱: شرایط عمومی عضویت، حساب کاربری و منع صریح آموزش هوش مصنوعی (Anti-AI):
+              </label>
+              <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <!-- بخش ۲: قرارداد کمیسیون -->
+            <div id="adminTermsPane-commission" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--cyan-electric);">
+                متن ۲: قرارداد رسمی سفارش، قانون ودیعه ۵۰٪، مراحل ادیت و بند رهاسازی سفارش:
+              </label>
+              <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <!-- بخش ۳: لایسنس دارایی‌ها -->
+            <div id="adminTermsPane-assets" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--emerald);">
+                متن ۳: موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA) و شرایط اسقاط انصراف:
+              </label>
+              <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <!-- بخش ۴: آکادمی و کامیونیتی -->
+            <div id="adminTermsPane-academy" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--violet);">
+                متن ۴: ضوابط آکادمی تخصصی طراحی، حقوق معنوی ویدیوها و جامعه هنری:
+              </label>
+              <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+            </div>
+
+            <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <span style="font-size:11.5px; color:var(--text-muted);">💡 هر بخش به صورت جداگانه در پورتال و پنجره قوانین نمایش داده می‌شود.</span>
+              <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ با موفقیت ذخیره شد</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminTabSettings" class="hidden">
+            <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%; box-sizing:border-box;">
+              
+              <!-- هدر مرکز کنترل استودیو -->
+              <div style="margin-bottom:18px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                  <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">🏛️ مرکز کنترل هویت، برندینگ و پیکربندی استودیو TAJINKART</h3>
+                  <span style="font-size:12px; color:var(--text-muted);">مدیریت مستقل نشان استودیو، فاویکون مرورگر، شعار رسمی، شبکه‌های اجتماعی و ربات تلگرام.</span>
+                </div>
+              </div>
+
+              <!-- زیربرگه‌ها (۲ ساب‌تب مجزا) -->
+              <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
+                <button type="button" id="adminSettingsSubTabBtn-identity" onclick="switchSettingsSubTab('identity')" class="settings-subtab-btn active" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                  <span>🏛️ هویت، محتوای استودیو و دیتابیس‌های ابری</span>
+                </button>
+                <button type="button" id="adminSettingsSubTabBtn-social" onclick="switchSettingsSubTab('social')" class="settings-subtab-btn" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                  <span>📡 ربات تلگرام و شبکه‌های اجتماعی</span>
+                </button>
+              </div>
+
+              <form id="adminSettingsForm" onsubmit="event.preventDefault();">
+                
+                <!-- ساب‌تب ۱: هویت، محتوا و برندینگ -->
+                <div id="adminSettingsSubTab-identity" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+                  
+                  <!-- کارت ۱-الف: نشان و آیکون رسمی هدر استودیو (کاملاً مستقل) -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 نشان هدر استودیو (Header Master Crest)</span>
+                      <span class=font-mono style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">HEADER CREST</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">این نشان مستقیماً در بالای نام TAJINKART در صفحه اصلی سایت نمایش داده می‌شود.</p>
+
+                    <!-- بخش کارت موزاییک نشان استودیو همراه با ضربدر حذف و پیش‌نمایش -->
+                    <div id="adminLogoCardContainer">
+                      <!-- حالت فعال -->
+                      <div id="adminLogoActiveCard" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.15); padding:2px 8px; border-radius:4px;">
+                            🦅 نشان فعال استودیو
+                          </span>
+                          <div style="display:flex; align-items:center; gap:8px;">
+                            <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
+                              🔄 تغییر فایل
+                            </button>
+                            <button type="button" onclick="removeStudioLogo()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف نشان (ضربدر)">
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style="position:relative; width:100%; max-height:200px; min-height:130px; background:#020306; border-radius:8px; border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; padding:10px;">
+                          <img id="adminLogoPreviewImg" src="" alt="نشان استودیو" style="max-width:100%; max-height:180px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 0 20px rgba(250,204,21,0.35));" />
+                        </div>
+                      </div>
+
+                      <!-- حالت خالی: زون انتخاب و درگ اند دراپ -->
+                      <div id="adminLogoEmptyDropzone" 
+                           onclick="document.getElementById('adminLogoFileInput').click()"
+                           ondragover="handleLogoDragOver(event)"
+                           ondragleave="handleLogoDragLeave(event)"
+                           ondrop="handleLogoDrop(event)"
+                           style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
+                        <div style="font-size:32px; margin-bottom:6px;">🦅</div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انداختن نشان استودیو</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP (پیش‌نمایش آنی)</div>
+                      </div>
+                    </div>
+                    <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
+
+                    <!-- دکمه تایید و ثبت نشان استودیو -->
+                    <button type="button" onclick="saveStudioLogoSetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ثبت و تایید نشان هدر استودیو
+                    </button>
+                  </div>
+
+                  <!-- کارت ۱-ب: فاویکون اختصاصی تب مرورگر (کاملاً جدا و مستقل) -->
+                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:800; color:var(--cyan-electric);">🌐 فاویکون تب مرورگر (Browser Tab Favicon)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">TAB ICON</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">آیکون کوچک تب مرورگر که در کنار عنوان صفحه نمایش داده می‌شود (مستقل از لوگوی هدر).</p>
+
+                    <!-- کادر پیش‌نمایش و آپلود فاویکون -->
+                    <div id="adminFaviconCardContainer">
+                      <!-- حالت فعال فاویکون -->
+                      <div id="adminFaviconActiveCard" style="display:none; background:#04060a; border:1px solid rgba(0,240,255,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--cyan-electric); background:rgba(0,240,255,0.15); padding:2px 8px; border-radius:4px;">
+                            🌐 فاویکون فعال مرورگر
+                          </span>
+                          <div style="display:flex; align-items:center; gap:8px;">
+                            <button type="button" onclick="document.getElementById('adminFaviconFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
+                              🔄 تغییر فایل
+                            </button>
+                            <button type="button" onclick="removeStudioFavicon()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف فاویکون (ضربدر)">
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- شبیه‌ساز تب مرورگر -->
+                        <div style="background:#020306; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+                          <div id="adminFaviconPreviewBox" style="width:32px; height:32px; border-radius:6px; background:#0b0f19; border:1px solid rgba(0,240,255,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <img id="adminFaviconPreviewImg" src="" style="width:22px; height:22px; object-fit:contain; display:none;" alt="فاویکون" />
+                            <span id="adminFaviconEmptyIcon" style="font-size:16px;">🌐</span>
+                          </div>
+                          <div>
+                            <span style="font-size:11px; color:#fff; font-weight:700; display:block;">TAJINKART | استودیو کانسپت آرت</span>
+                            <span class="font-mono" style="font-size:10px; color:var(--text-muted);">tajinkart.github.io</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- حالت خالی فاویکون -->
+                      <div id="adminFaviconEmptyDropzone"
+                           onclick="document.getElementById('adminFaviconFileInput').click()"
+                           style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(0,240,255,0.4); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
+                        <div style="font-size:32px; margin-bottom:6px;">🌐</div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">انتخاب یا انداختن آیکون فاویکون مرورگر</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">ابعاد پیشنهادی: 32x32 یا 64x64 پیکسل (PNG یا ICO)</div>
+                      </div>
+                    </div>
+                    
+                    <input type="text" id="adminFaviconInput" placeholder="یا وارد کردن آدرس مستقیم فاویکون..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
+                    <input type="file" id="adminFaviconFileInput" accept="image/*" style="display:none;" onchange="handleAdminFaviconUpload(this)" />
+
+                    <!-- دکمه تایید و ثبت فاویکون -->
+                    <button type="button" onclick="saveStudioFaviconSetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ثبت و تایید فاویکون تب مرورگر
+                    </button>
+                  </div>
+
+                                    <!-- کارت ۱-د: مدیریت شعارهای متحرک و عناوین برند هدر استودیو (کاملاً داینامیک) -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px; grid-column:1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                      <div>
+                        <span style="font-size:14px; font-weight:800; color:var(--gold);">⚡ مدیریت عناوین و شعارهای متحرک هدر (Brand Slogans & Taglines)</span>
+                        <span style="display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px;">تغییر متن لوگو، زیرعنوان سبک‌ها (Dark Fantasy / Sci-Fi) و شعارهای چرخشی که در بالای سایت جابجا می‌شوند.</span>
+                      </div>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:3px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">LIVE HERO TYPOGRAPHY</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+                      <div>
+                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">۱. نام اصلی استودیو (Main Brand Title)</label>
+                        <input type="text" id="adminMainBrandTitleInput" class="font-mono" placeholder="TAJINKART" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff;" />
+                      </div>
+                      <div>
+                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">۲. زیرعنوان سبک‌ها و ژانرها (Genre Subtitle)</label>
+                        <input type="text" id="adminGenreSubtitleInput" class="font-mono" placeholder="DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff;" />
+                      </div>
+                    </div>
+
+                    <!-- ویرایشگر جفت‌های چرخشی شعار -->
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <label style="font-size:12px; font-weight:700; color:var(--gold);">۳. لیست شعارهای متحرک و چرخشی هدر (Rotating Tagline Pairs):</label>
+                        <button type="button" onclick="addAdminSloganPairRow()" class="btn-secondary" style="font-size:11px; padding:3px 10px; cursor:pointer;">➕ افزودن جفت شعار جدید</button>
+                      </div>
+                      <div id="adminSloganPairsListContainer" style="display:flex; flex-direction:column; gap:8px;">
+                        <!-- ردیف‌های شعار داینامیک از جاوااسکریپت لود می‌شوند -->
+                      </div>
+                    </div>
+
+                    <!-- دکمه تایید و ثبت شعارها -->
+                    <button type="button" onclick="saveAdminSlogansSettings()" class="btn-gold" style="width:100%; padding:11px; font-size:12.5px; font-weight:800; cursor:pointer;">
+                      ✓ ثبت و ذخیره دائمی عناوین و شعارهای متحرک هدر
+                    </button>
+                  </div>
+
+                  <!-- کارت ۱-ج: ویرایشگر متن و مانیفست «درباره استودیو» در صفحه اول -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; grid-column:1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">📜 ویرایشگر مانیفست و متن «درباره استودیو» (صفحه اصلی)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">ABOUT MANIFESTO</span>
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">تیتر مانیفست:</label>
+                      <input type="text" id="setAboutManifestoTitle" value="درباره استودیو TAJINKART" style="font-size:12px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن بیانیه و فلسفه دنیاسازی استودیو:</label>
+                      <textarea id="setAboutManifestoText" rows="4" style="font-size:11.5px; line-height:1.8; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;">TAJINKART Studio was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: «From Ink to Universe».</textarea>
+                    </div>
+                    <button type="button" onclick="saveAboutStudioManifestoDirect()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                      ✓ ذخیره و به‌روزرسانی متن درباره استودیو
+                    </button>
+                  </div>
+                  <!-- کارت تنظیم دستی وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه (حالت سفر/مرخصی) -->
+                  <div style="background:#06080d; border:1.5px solid rgba(250,204,21,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                      <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:18px;">🎛️</span>
+                          <span style="font-size:14.5px; font-weight:900; color:var(--gold);">کنترل وضعیت حضور، پاسخ‌گویی و پذیرش سفارشات آتلیه</span>
+                        </div>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">تعیین مستقیم نشانگر آنلاین، زمان پاسخ‌دهی یا بستن موقت سفارشات در زمان سفر و مرخصی استودیو.</span>
+                      </div>
+                      <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 پیش‌نمایش زنده</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                      <!-- گزینه ۱: خودکار هوشمند -->
+                      <label style="background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin-top:3px;" checked />
+                        <div>
+                          <strong style="color:#fff; font-size:12px; display:block;">🔄 خودکار (هوشمند ۲۴ ساعته)</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">تعیین وضعیت بر اساس آخرین ورود شما (کمتر از ۲۴ ساعت آنلاین، بیش از آن پاسخ‌دهی ۲۴ ساعته).</span>
+                        </div>
+                      </label>
+
+                      <!-- گزینه ۲: آنلاین و فعال دائم -->
+                      <label style="background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
+                        <div>
+                          <strong style="color:#10b981; font-size:12px; display:block;">🟢 همیشه آنلاین و باز</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">Studio Online • Accepting Briefs & Concept Commissions.</span>
+                        </div>
+                      </label>
+
+                      <!-- گزینه ۳: در حال بررسی با تاخیر -->
+                      <label style="background:#04060a; border:1px solid rgba(251,191,36,0.3); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
+                        <div>
+                          <strong style="color:#fbbf24; font-size:12px; display:block;">🟡 بررسی با تاخیر (Away)</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت.</span>
+                        </div>
+                      </label>
+
+                      <!-- گزینه ۴: حالت مرخصی و سفر استودیو -->
+                      <label style="background:#04060a; border:1px solid rgba(239,68,68,0.35); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
+                        <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
+                        <div>
+                          <strong style="color:#ef4444; font-size:12px; display:block;">🔴 مرخصی و سفر استودیو (بسته)</strong>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارشات موقتاً متوقف است.</span>
+                        </div>
+                      </label>
+                    </div>
+
+                    <!-- کادر متن پیام سفارشی وضعیت -->
+                    <div>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن پیام سفارشی نشانگر وضعیت (اختیاری):</label>
+                      <input type="text" id="setStudioCustomStatusMessage" placeholder="مثلاً: استودیو تا دوشنبه آینده در سفر تحقیقاتی دنیاسازی است و پس از بازگشت پاسخگوی سفارشات خواهد بود." style="font-size:11.5px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:10px 12px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                      <button type="button" onclick="saveStudioAvailabilitySettingsDirect()" class="btn-gold" style="font-size:12px; padding:10px 22px; font-weight:800; border-radius:8px; cursor:pointer;">
+                        ✓ ذخیره و فعال‌سازی فوری وضعیت استودیو
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- مرکز جامع مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو TAJINKART -->
+                  <div style="background:#06080d; border:1.5px solid rgba(16,185,129,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                      <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:18px;">🌐</span>
+                          <span style="font-size:14.5px; font-weight:900; color:#fff;">مرکز مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو</span>
+                        </div>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">پایش بلادرنگ اتصالات دیتابیس، شبکه توزیع محتوا (CDN)، هاست ابری تصاویر و بات تلگرام با امکان سنجش پینگ.</span>
+                      </div>
+                      <button type="button" id="btnPingCloudServices" onclick="pingAllCloudServices()" class="btn-cyan" style="font-size:11.5px; padding:8px 16px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                        ⚡ استعلام زنده و پینگ اتصالات
+                      </button>
+                    </div>
+
+                    <!-- کارت‌های کوچک وضعیت زنده اتصالات با نشانگر وضعیت و پینگ -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">🗄️ پایگاه داده ابری Supabase</strong>
+                          <span id="pingSupabaseBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 برخط</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">جداول سفارشات (orders) و گالری (artworks) همگام</span>
+                      </div>
+
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">🛡️ کلودفلر (Cloudflare CDN)</strong>
+                          <span id="pingCloudflareBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 برخط CDN</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">دامنه tajinkart.space با گواهی امنیتی SSL Full</span>
+                      </div>
+
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">🔐 قفل امنیتی Google OAuth</strong>
+                          <span id="pingGoogleBadge" class="font-mono" style="font-size:10.5px; color:#fbbf24; font-weight:700;">🟢 قفل فرماندهی</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">دسترسی ادمین انحصاری tajinkart@gmail.com</span>
+                      </div>
+
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">📡 ربات مخابره تلگرام</strong>
+                          <span id="pingTelegramBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 آماده مخابره</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">ارسال خودکار بریف‌ها و کانسپت‌ها به کانال‌ها</span>
+                      </div>
+
+                      <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                          <strong style="color:#fff; font-size:12px;">☁️ فضای ابری تصاویر Cloudinary</strong>
+                          <span id="pingCloudinaryBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 متصل</span>
+                        </div>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">آپلود مستقیم تصاویر پروژه با لینک ابری CDN</span>
+                      </div>
+                    </div>
+
+                    <!-- پیکربندی ادغام‌شده فضای ابری تصاویر -->
+                    <div style="background:#04060a; border:1px solid rgba(0,240,255,0.2); border-radius:12px; padding:14px 16px; margin-top:4px;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">⚙️ پیکربندی شناسه فضای ابری تصاویر (Cloudinary Host)</span>
+                        <button type="button" onclick="saveCloudinarySettingsDirect()" class="btn-gold" style="font-size:11px; padding:6px 14px; font-weight:800; border-radius:6px; cursor:pointer;">
+                          ✓ ذخیره تنظیمات فضای ابری
+                        </button>
+                      </div>
+                      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+                        <div>
+                          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Cloud Name:</label>
+                          <input type="text" id="setCloudinaryCloud" class="font-mono" style="font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="tajinkart" />
+                        </div>
+                        <div>
+                          <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Preset (Unsigned):</label>
+                          <input type="text" id="setCloudinaryPreset" class="font-mono" style="font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="erlvtkx9" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- کارت ۱-هـ: شناسه رسمی و دارایی‌های انحصاری خالق اثر و مدیر استودیو (انتقال‌یافته از اعضا) -->
+                  <div style="background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(10,14,24,0.95)); border:1.5px solid rgba(245,158,11,0.45); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px; grid-column:1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                      <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:24px;">👑</span>
+                        <div>
+                          <span style="font-size:14px; font-weight:900; color:#fbbf24; display:block;">سید سروش تاج (خالق اثر و مدیر ارشد استودیو)</span>
+                          <span class="font-mono" style="font-size:11px; color:var(--cyan-electric);">tajinkart@gmail.com</span>
+                        </div>
+                      </div>
+                      <span class="tier-tag tier-creator" style="padding:4px 12px; font-size:11px;">مالکیت ۱۰۰٪ تجاری و معنوی 👑</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin-top:6px;">
+                      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🗝️ حق امتیاز پایپلاین‌ها</span>
+                        <span style="font-size:11px; color:#cbd5e1;">مالکیت کامل شش پایپلاین کانسپت آرت و استودیو</span>
+                      </div>
+                      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🌌 جهان‌های روایی TAJINKART</span>
+                        <span style="font-size:11px; color:#cbd5e1;">حق کپی‌رایت انحصاری جهان‌های اکستوپیا، آرکان و نیواورس</span>
+                      </div>
+                      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🛡️ امنیت و فرماندهی ابری</span>
+                        <span style="font-size:11px; color:#cbd5e1;">دسترسی روت ادمین با تایید ۲ مرحله‌ای گوگل کلود</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- ساب‌تب ۲: شبکه‌های اجتماعی، ربات تلگرام و اتصالات (در ابتدا مخفی) -->
+                <div id="adminSettingsSubTab-social" style="display:none; flex-direction:column; gap:20px;">
+                  
+                  <!-- کارت ۲-الف: ربات تلگرام استودیو -->
+                  <div style="background:#06080d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">🤖 اتصال ربات تلگرام استودیو (@tajinkart_bot)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.12);">ACTIVE BOT</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">توکن ربات و کانال‌های مقصد را وارد کرده و با دکمه اختصاصی زیر مستقیماً ذخیره کنید.</p>
+                    
+                    <div>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token از BotFather):</label>
+                      <input type="text" id="setTgToken" placeholder="مثال: 7123456789:AAFlq..." class="font-mono" style="font-size:11.5px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                    </div>
+
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label style="font-size:11px; color:var(--cyan-electric); font-weight:700;">کانال‌ها یا چت‌های مقصد ارسال:</label>
+                        <button type="button" onclick="addTgChannelField()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
+                          + افزودن کانال / چت دیگر
+                        </button>
+                      </div>
+                      <div id="telegramChannelsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                      <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">می‌توانید آیدی کانال عمومی (مانند tajinkart@) یا شناسه عددی چت را وارد کنید.</p>
+                    </div>
+
+                    <div>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">متن پیش‌فرض ثابت در انتهای پیام‌های تلگرام (فوتر / امضای سراسری):</label>
+                      <textarea id="setTgDefaultFooter" rows="2" placeholder="متنی که می‌خواهید همیشه به صورت پیش‌فرض در انتهای پیام‌های تلگرام به عنوان فوتر/امضا قرار بگیرد (اختیاری)..." style="font-size:11.5px; line-height:1.6; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;"></textarea>
+                    </div>
+
+                    <div style="margin-top:6px;">
+                      <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800;">
+                        ✓ ثبت و ذخیره تنظیمات تلگرام
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- کارت ۲-ج: مرکز اتوماسیون ۱۲ شبکه اجتماعی (POSSE Hub) -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:13px; font-weight:800; color:var(--gold);">📡 مرکز توزیع خودکار سراسری (POSSE 12-Network Hub)</span>
+                      <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.12);">OMNICHANNEL READY</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیدهای ارتباطی و توکن‌های پلتفرم‌ها جهت ارسال خودکار فایل‌های اصلی، آلبوم‌ها و ویدیوها.</p>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎨 ArtStation / Cara API Token:</label>
+                        <input type="password" id="setArtstationCreds" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="Bearer tok_..." />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📌 Pinterest Access Token & Board:</label>
+                        <input type="password" id="setPinterestToken" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="pina_..." />
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🤖 Reddit Client ID & Secret:</label>
+                        <input type="text" id="setRedditCreds" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="client_id:client_secret" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📷 Instagram & Threads Meta Token:</label>
+                        <input type="password" id="setMetaToken" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="EAAG..." />
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🐦 Twitter (X) API Key & Secret:</label>
+                        <input type="password" id="setTwitterKey" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="api_key:secret" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🦋 Bluesky Identifier & App Password:</label>
+                        <input type="text" id="setBlueskyCreds" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="handle.bsky.social:app-pass" />
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">📹 YouTube API Key (Shorts):</label>
+                        <input type="password" id="setYoutubeKey" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="AIzaSy..." />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">🎮 Discord Webhook URL:</label>
+                        <input type="text" id="setDiscordWebhook" class="font-mono" style="font-size:11px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" placeholder="https://discord.com/api/webhooks/..." />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+          </main>
+        </div>
+</div>
+    </div>
+  </section>
+
+  <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
+  <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
+    <!-- کلیدهای ناوبری سریع بین پروژه‌ها به سبک آرت‌استیشن -->
+    <!-- دکمه‌های ناوبری با فلش‌های رو به بیرون (Outward SVG Arrows) که هرگز توسط موتور راست‌به‌چپ وارونه نمی‌شوند -->
+    <button type="button" class="artstation-nav-btn prev" onclick="navigateCaseStudy(-1, event)" title="اثر قبلی (فلش به سمت بیرون چپ)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button type="button" class="artstation-nav-btn next" onclick="navigateCaseStudy(1, event)" title="اثر بعدی (فلش به سمت بیرون راست)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+    <button type="button" onclick="closeArtModalDirect()" class="artstation-close-btn" title="بستن (Esc)">✕</button>
+
+    <div class="artstation-project-layout" onclick="event.stopPropagation()">
+      <!-- ستون اصلی: جریان عمودی تصاویر پروژه با امکان اسکرول به پایین -->
+      <div class="artstation-images-stream" id="caseStudyImagesStream">
+        <!-- تصاویر به صورت خودکار و تمام‌عرض تزریق می‌شوند -->
+      </div>
+
+      <!-- ستون کناری چسبان: تغییر هوشمند توضیحات و فازها همگام با اسکرول تصاویر -->
+      <aside class="artstation-sidebar" id="artStationSidebar">
+        <div class="sidebar-optical-tracker" id="sidebarOpticalTracker" title="رهگیر موقعیت فاز پروژه"></div>
+        <div>
+          <span id="artDetailPhaseIndicator" class="sidebar-phase-badge font-mono">/ CONCEPT PROJECT /</span>
+          <h2 id="artDetailTitle" style="font-size:20px; font-weight:900; color:#fff; line-height:1.35; margin-bottom:10px;"></h2>
+          <div id="artDetailDescBox" class="sidebar-phase-desc-box">
+            <p id="artDetailDesc" style="margin:0; font-size:12px; color:#cbd5e1; line-height:1.8;"></p>
+          </div>
+        </div>
+
+        <div style="background:#05070c; border:1px solid var(--border-subtle); border-radius:12px; padding:12px; font-size:11.5px; display:flex; flex-direction:column; gap:6px;">
+          <div><strong style="color:#fff;">پایپلاین طراحی:</strong> <span id="caseStudyPipeName" style="color:var(--gold); font-weight:700;"></span></div>
+          <div><strong style="color:#fff;">جهان روایی:</strong> <span id="caseStudyLore" style="color:var(--cyan-electric); font-weight:700;">جهان اکستوپیا</span></div>
+        </div>
+
+        <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:12px; font-size:12px; margin-top:6px;">
+          سفارش اثر مشابه در این پایپلاین ←
+        </button>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ذره‌بین متمرکز مرکز صفحه برای بازرسی عمیق جزئیات اثر در دسکتاپ (Centered Focus Magnifier) -->
+  <div id="centeredFocusMagnifierOverlay" class="centered-focus-magnifier-overlay" onclick="closeCenteredMagnifier(event)">
+    <div class="magnifier-header-bar" onclick="event.stopPropagation()">
+      <span id="magnifierPhaseTitle" class="magnifier-title font-mono">بررسی جزئیات کانسپت</span>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="magnifier-hint">🔍 حرکت موس برای هدایت لنز • کلیک یا Esc برای بازگشت</span>
+        <button type="button" onclick="closeCenteredMagnifier()" class="magnifier-close-btn" title="بستن (Esc)">✕</button>
+      </div>
+    </div>
+    <div class="magnifier-viewport" id="magnifierViewport" onclick="closeCenteredMagnifier()">
+      <img id="magnifierActiveImg" src="" alt="بزرگ‌نمایی اثر" />
+    </div>
+  </div>
+
+  <!-- مدال محاسبه‌گر لحظه‌ای سفارش و موتور داینامیک قیمت‌گذاری (Interactive Wizard Accordion) -->
+  <div id="zoomModal" class="zoom-modal" onclick="closeModal(event)">
+    <div class="zoom-window wizard-modal-window" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeModalDirect()" class="modal-corner-close-btn" title="بستن">✕</button>
+      
+      <!-- ستون چپ: پیش‌نمایش، فاکتور زنده و خلاصه سفارش -->
+      <div style="display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+        <div>
+          <div style="aspect-ratio:16/10; background:#020305; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden;">
+            <img id="modalMediaImg" src="" style="width:100%; height:100%; object-fit:cover;" alt="پیش‌نمایش پایپلاین" />
+          </div>
+          <div style="margin-top:12px;">
+            <span class="font-mono" style="font-size:10.5px; color:var(--iris);" id="wizardPipeBadge">ATELIER PIPELINE</span>
+            <h3 id="modalTitle" style="font-size:17px; font-weight:900; color:#fff; margin-top:2px;"></h3>
+            <p id="modalDesc" style="font-size:11.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;"></p>
+          </div>
+        </div>
+
+        <!-- فاکتور داینامیک لحظه‌ای محاسبه‌شده -->
+        <div style="padding:16px; border-radius:14px; background:#06080e; border:1px solid rgba(250,204,21,0.3); display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            <span style="font-size:11.5px; color:var(--text-muted);">مبلغ تخمینی کل سفارش:</span>
+            <span id="modalPrice" class="font-mono" style="font-size:22px; font-weight:900; color:var(--gold);">80</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11.5px;">
+            <span style="color:var(--text-muted);">زمان‌بندی تحویل:</span>
+            <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">۵ تا ۷ روز کاری</span>
+          </div>
+          <div style="font-size:10.5px; color:var(--emerald); display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span>✓</span> <span>فیگور مقایسه ابعاد انسانی به صورت رایگان در شیت نهایی ارائه می‌شود.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ستون راست: فرم ویزارد آکاردئونی مرحله‌به‌مرحله -->
+      <form id="commissionOrderForm" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div style="max-height:68vh; overflow-y:auto; padding-left:4px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="font-size:14.5px; font-weight:900; color:#fff;">محاسبه‌گر مشخصات و اسکوپ پروژه</h4>
+            <button type="button" onclick="closeModalDirect()" style="color:var(--text-muted); font-size:19px;">✕</button>
+          </div>
+
+          <!-- گام ۱: مشخصات پایه و کادربندی -->
+          <div class="wizard-step-card active" id="wizardStep1">
+            <div class="wizard-step-header" onclick="toggleWizardStep(1)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">۱.</span> کادربندی و ضریب پیچیدگی</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div>
+                <label style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">تیپ و سناریوی پروژه (Scope & Archetype):</label>
+                <select id="wizCharacterScope" onchange="recalcWizardPrice()" style="width:100%; font-size:12px; margin-bottom:10px;">
+                  <option value="single" data-usd="0" selected>👤 تک‌کاراکتر مستقل (Hero / Single Character Concept)</option>
+                  <option value="timeline" data-usd="60">⏳ خط زمانی سن و سال کاراکتر (کودکی ➔ جوانی ➔ کهنسالی) (+۶۰$)</option>
+                  <option value="party" data-usd="85">👥 پکیج تیمی / فکشن / خانوادگی (کاراکتر اصلی + همراهان) (+۸۵$)</option>
+                  <option value="redesign" data-usd="15">🔄 بازطراحی و ارتقای کاراکتر قدیمی (Redesign & Evolution) (+۱۵$)</option>
+                </select>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">کادربندی و نما</label>
+                  <select id="wizFraming" onchange="recalcWizardPrice()">
+                    <option value="bust" data-usd="0">پرتره / نیم‌تنه (پایه)</option>
+                    <option value="full" data-usd="40" selected>تمام‌قد پویا (+۴۰$)</option>
+                    <option value="turnaround" data-usd="75">مدل‌شیت ۳۶۰ درجه ارتوگرافیک (+۷۵$)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ضریب پیچیدگی دیزاین</label>
+                  <select id="wizComplexity" onchange="recalcWizardPrice()">
+                    <option value="simple" data-usd="0">ساده (سیلوئت و المان‌های مینیمال)</option>
+                    <option value="medium" data-usd="30" selected>استاندارد پروداکشن (زره و بافت)</option>
+                    <option value="hard" data-usd="60">پیچیده سینمایی (زره سنگین / ارگانیک)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- گام ۲: سطح فیدلیتی و رندرینگ نهایی -->
+          <div class="wizard-step-card active" id="wizardStep2">
+            <div class="wizard-step-header" onclick="toggleWizardStep(2)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">۲.</span> سطح رندرینگ و فازهای اتود</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">فیدلیتی پرداخت و رندرینگ</label>
+                <select id="orderPhaseSelect" onchange="recalcWizardPrice()">
+                  <option value="فاز ۱: اتود اولیه، کشف فرم و سیلوئت" data-usd="-40">فاز ۱: اتود اولیه و کشف سیلوئت</option>
+                  <option value="فاز ۲: لاین‌آرت دقیق فنی و مدل‌شیت" data-usd="-20">فاز ۲: لاین‌آرت فنی و ترن‌اراند</option>
+                  <option value="فاز ۳: سایه‌زنی مقداری و نورپردازی" data-usd="0">فاز ۳: مطالعه مقداری و نورپردازی</option>
+                  <option value="فاز ۴: رندر کامل سینمایی + فایل لایه‌باز PSD" data-usd="50" selected>فاز ۴: رندر مستر سینمایی + لایه‌باز PSD</option>
+                </select>
+              </div>
+              <div style="margin-top:6px; margin-bottom:8px;">
+                <span style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 افزونه‌های پیوسته به همین پرونده (Character Add-ons):</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>طراحی سلاح اختصاصی (+۳۵$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>شیت حالات چهره (+۳۰$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizColorPalette" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>واریاسیون رنگ لباس (+۲۰$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>لایسنس تجاری AAA (+۴۵$)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
+                    <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
+                    <span style="color:#10b981; font-weight:700;">✓ فایل مستر لایه‌باز PSD چاپ ۳۰۰DPI تجاری (رایگان و تضمین‌شده)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- گام ۳: مشخصات کارفرما و بریف متنی -->
+          <div class="wizard-step-card active" id="wizardStep3">
+            <div class="wizard-step-header" onclick="toggleWizardStep(3)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">۳.</span> مشخصات کارفرما و متن بریف</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نام کارفرما / استودیو</label>
+                  <input type="text" id="orderClientName" required placeholder="سید سروش تاج / استودیو نوا" />
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ایمیل یا آیدی تلگرام / شماره</label>
+                  <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com یا ۰۹۱۲..." />
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px;">لینک رفرنس یا مودبورد (اختیاری - Pinterest / Drive / ArtStation)</label>
+                <input type="url" id="orderClientRefLink" class="font-mono" placeholder="https://pinterest.com/... یا لینک گوگل درایو" style="font-size:11.5px;" />
+                <span style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:3px;">
+                  💡 ارسال رفرنس اختیاری است؛ در صورت عدم ارسال، استودیو فرآیند تخصصی تحقیق بصری و استخراج استایل را متناسب با دیدگاه شما انجام خواهد داد.
+                </span>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">توضیحات تکمیلی، جزئیات لور و نکات کلیدی (Lore & Details)</label>
+                <textarea id="orderClientBrief" rows="3" required placeholder="نژاد، سلاح‌ها، زوایا، ویژگی‌های ظاهری و حس کلی اثر..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:14px; width:100%;">
+          ثبت رسمی بریف و ارسال مستقیم به تلگرام مدیر استودیو ←
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- پنجره پورتال اعضا (ورود، ثبت‌نام، و بازیابی رمز عبور) -->
+  <div id="memberModal" onclick="handleMemberModalBackdropClick(event)" style="position:fixed; inset:0; z-index:100; background:rgba(3,4,7,0.92); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:16px;">
+    <div id="memberModalCard" style="max-width:440px; width:100%; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:26px;">
+      
+      <!-- ۱. فرم ورود اعضا -->
+      <div id="authViewLogin">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:17px; font-weight:900;">Studio Member Portal</h3>
+          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
+        </div>
+
+        <!-- دکمه ورود سریع با گوگل همراه با سلب مسئولیت حقوقی استاندارد -->
+        <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border-radius:10px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px; transition:all 0.25s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Quick Sign in with Google</span>
+        </button>
+        <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin:0 0 14px; line-height:1.5;">
+          با کلیک روی ورود گوگل، <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:10.5px; cursor:pointer;">قوانین و شرایط خدمات استودیو</button> را مطالعه نموده و می‌پذیرید.
+        </p>
+
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+          <span style="font-size:11px; color:var(--text-muted);">یا با ایمیل و رمز عبور</span>
+          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+        </div>
+
+        <form id="memberLoginForm" style="display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:5px;">آدرس ایمیل</label>
+            <input type="email" id="loginEmail" required class="font-mono" placeholder="user@domain.com" />
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <label style="font-size:12px;">رمز عبور</label>
+              <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">Forgot Password?</button>
+            </div>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('loginPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">Sign In to Account</button>
+        </form>
+        <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
+          <span>هنوز حسابی ندارید؟</span>
+          <button type="button" onclick="switchAuthView('signup')" class="auth-tab-link" style="font-weight:700;">ثبت‌نام عضویت</button>
+        </div>
+      </div>
+
+      <!-- ۲. فرم ثبت‌نام اعضا -->
+      <div id="authViewSignUp" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:17px; font-weight:900;">ایجاد حساب کاربری</h3>
+          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
+        </div>
+
+        <!-- دکمه ثبت‌نام سریع با گوگل همراه با سلب مسئولیت حقوقی استاندارد -->
+        <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border-radius:10px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px; transition:all 0.25s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>عضویت سریع با حساب Google</span>
+        </button>
+        <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin:0 0 14px; line-height:1.5;">
+          با عضویت از طریق گوگل، <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:10.5px; cursor:pointer;">قوانین و شرایط خدمات استودیو</button> را مطالعه نموده و می‌پذیرید.
+        </p>
+
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+          <span style="font-size:11px; color:var(--text-muted);">یا ثبت‌نام با ایمیل مستقیم</span>
+          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+        </div>
+
+        <form id="memberSignUpForm" style="display:flex; flex-direction:column; gap:14px;">
+          <!-- ۱. فیلد نام یا لقب نمایشی -->
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">نام یا لقب نمایشی شما در استودیو</label>
+            <input type="text" id="signupName" required minlength="3" oninput="handleLiveNameCheck(this.value)" placeholder="مثال: آریا تهرانی یا نام مستعار معتبر" />
+            <div id="signupNameLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
+          </div>
+
+          <!-- ۲. فیلد ایمیل معتبر با اعتبارسنجی زنده در زیر کادر -->
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">آدرس جیمیل یا ایمیل معتبر (شناسه اصلی حساب و بازیابی)</label>
+            <input type="email" id="signupEmail" required oninput="handleLiveEmailCheck(this.value)" class="font-mono" placeholder="username@gmail.com" />
+            <div id="signupEmailLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
+          </div>
+
+          <!-- ۳. فیلد شماره همراه اختیاری با لیست کامل پیش‌شماره‌های بین‌المللی -->
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">شماره تلفن همراه <span style="color:var(--text-muted); font-size:11px;">(اختیاری - جهت اطلاع‌رسانی پیامکی و پشتیبانی سریع)</span></label>
+            <div class="intl-phone-wrapper">
+              <select id="signupCountryCode" onchange="handleLivePhoneCheck()">
+                <option value="+98" selected>🇮🇷 Iran (+98)</option>
+                <option value="+971">🇦🇪 UAE (+971)</option>
+                <option value="+90">🇹🇷 Turkey (+90)</option>
+                <option value="+964">🇮🇶 Iraq (+964)</option>
+                <option value="+93">🇦🇫 Afghanistan (+93)</option>
+                <option value="+374">🇦🇲 Armenia (+374)</option>
+                <option value="+994">🇦🇿 Azerbaijan (+994)</option>
+                <option value="+1">🇺🇸 USA / Canada (+1)</option>
+                <option value="+44">🇬🇧 UK (+44)</option>
+                <option value="+49">🇩🇪 Germany (+49)</option>
+                <option value="+33">🇫🇷 France (+33)</option>
+                <option value="+39">🇮🇹 Italy (+39)</option>
+                <option value="+31">🇳🇱 Netherlands (+31)</option>
+                <option value="+46">🇸🇪 Sweden (+46)</option>
+                <option value="+41">🇨🇭 Switzerland (+41)</option>
+                <option value="+61">🇦🇺 Australia (+61)</option>
+                <option value="+81">🇯🇵 Japan (+81)</option>
+                <option value="+82">🇰🇷 South Korea (+82)</option>
+                <option value="+86">🇨🇳 China (+86)</option>
+                <option value="+91">🇮🇳 India (+91)</option>
+                <option value="+7">🇷🇺 Russia (+7)</option>
+                <option value="+966">🇸🇦 Saudi Arabia (+966)</option>
+                <option value="+974">🇶🇦 Qatar (+974)</option>
+                <option value="+965">🇰🇼 Kuwait (+965)</option>
+                <option value="+968">🇴🇲 Oman (+968)</option>
+                <option value="+973">🇧🇭 Bahrain (+973)</option>
+                <option value="+92">🇵🇰 Pakistan (+92)</option>
+                <option value="+992">🇹🇯 Tajikistan (+992)</option>
+                <option value="+993">🇹🇲 Turkmenistan (+993)</option>
+                <option value="+998">🇺🇿 Uzbekistan (+998)</option>
+                <option value="+55">🇧🇷 Brazil (+55)</option>
+                <option value="+60">🇲🇾 Malaysia (+60)</option>
+                <option value="+65">🇸🇬 Singapore (+65)</option>
+                <option value="+64">🇳🇿 New Zealand (+64)</option>
+                <option value="+47">🇳🇴 Norway (+47)</option>
+                <option value="+45">🇩🇰 Denmark (+45)</option>
+                <option value="+358">🇫🇮 Finland (+358)</option>
+                <option value="+43">🇦🇹 Austria (+43)</option>
+                <option value="+32">🇧🇪 Belgium (+32)</option>
+                <option value="+48">🇵🇱 Poland (+48)</option>
+                <option value="+380">🇺🇦 Ukraine (+380)</option>
+                <option value="+995">🇬🇪 Georgia (+995)</option>
+                <option value="other">🌐 Other / سایر</option>
+              </select>
+              <input type="tel" id="signupPhone" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleLivePhoneCheck();" class="font-mono" placeholder="9123456789 (اختیاری)" />
+            </div>
+            <div id="signupPhoneLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
+          </div>
+
+          <!-- ۴. رمز عبور و تکرار -->
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">رمز عبور حساب</label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="حداقل ۶ کاراکتر ترکیبی" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+            <!-- نوار هوشمند سنجش قدرت رمز عبور -->
+            <div id="signupPassStrengthBox" style="margin-top:6px; display:none;">
+              <div style="height:4px; border-radius:4px; background:#1e293b; overflow:hidden; margin-bottom:4px;">
+                <div id="signupPassStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:10.5px;">
+                <span id="signupPassStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
+                <span id="signupPassStrengthHint" class="font-mono" style="color:var(--text-muted);">ترکیب حروف و عدد</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">تکرار رمز عبور</label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="signupPassConfirm" required minlength="6" class="font-mono" placeholder="تکرار دقیق رمز عبور" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('signupPassConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+          </div>
+
+          <!-- ۵. چک‌باکس واحد قوانین و شرایط خدمات استودیو -->
+          <div style="margin:4px 0 6px; padding:11px 12px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
+            <label style="display:flex; align-items:flex-start; gap:9px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.65;">
+              <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:3px; accent-color:var(--gold); flex-shrink:0;" />
+              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-weight:700;">قوانین و شرایط خدمات استودیو</a> را مطالعه نموده و می‌پذیرم.</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-gold" style="padding:12px; margin-top:2px;">
+            تکمیل ثبت‌نام و ورود به استودیو ←
+          </button>
+        </form>
+        <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
+          <span>حساب دارید؟</span>
+          <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">وارد شوید</button>
+        </div>
+      </div>
+
+      <!-- ۳. فرم بازیابی رمز عبور اعضا -->
+      <div id="authViewForgot" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric);">بازیابی رمز عبور</h3>
+          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
+        </div>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.75;">
+          آدرس ایمیل حساب کاربری خود را وارد نمایید تا لینک اختصاصی بازیابی مستقیماً به صندوق ایمیل شما ارسال گردد.
+        </p>
+
+        <form id="forgotPasswordForm" style="display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">آدرس ایمیل حساب</label>
+            <input type="email" id="forgotIdentifier" required class="font-mono" placeholder="user@domain.com" />
+          </div>
+          <button type="submit" class="btn-gold" style="width:100%; padding:12px; margin-top:4px; background:var(--cyan-electric); color:#000;">
+            ارسال لینک امن بازیابی به ایمیل ←
+          </button>
+        </form>
+        <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px;">
+          <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">بازگشت به صفحه ورود</button>
+        </div>
+      </div>
+
+      <!-- ۴. فرم تعیین رمز عبور جدید -->
+      <div id="authViewResetPassword" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:17px; font-weight:900; color:var(--gold);">🔑 تعیین رمز عبور جدید</h3>
+          <span style="font-size:11px; padding:3px 9px; border-radius:6px; background:rgba(250,204,21,0.12); color:var(--gold); border:1px solid rgba(250,204,21,0.25); font-weight:700;">احراز هویت ایمیل</span>
+        </div>
+        <div style="padding:10px 14px; border-radius:10px; background:rgba(250,204,21,0.08); border:1px solid rgba(250,204,21,0.3); font-size:12px; color:var(--gold); margin-bottom:14px; line-height:1.7;">
+          ✓ هویت شما از طریق لینک ایمیل تایید گردید. لطفاً رمز عبور جدید حسابتان را تعیین فرمایید:
+        </div>
+
+        <form id="setNewPasswordForm" style="display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور جدید</label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="userNewPassword" required minlength="6" oninput="evalPassStrength(this.value, 'userNewPassword')" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('userNewPassword', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+            <!-- نوار داینامیک سنجش قدرت رمز عبور -->
+            <div id="userNewPasswordStrengthBox" style="margin-top:6px; display:none;">
+              <div style="height:4px; border-radius:4px; background:#1e293b; overflow:hidden; margin-bottom:4px;">
+                <div id="userNewPasswordStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:10.5px;">
+                <span id="userNewPasswordStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
+                <span id="userNewPasswordStrengthHint" class="font-mono" style="color:var(--text-muted);">حداقل ۶ کاراکتر</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">تکرار رمز عبور جدید</label>
+            <div style="position:relative; display:flex; align-items:center;">
+              <input type="password" id="userNewPasswordConfirm" required minlength="6" class="font-mono" placeholder="تکرار رمز عبور" style="padding-left:40px;" />
+              <button type="button" onclick="togglePasswordVisibility('userNewPasswordConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-gold" style="width:100%; padding:12px; margin-top:4px;">
+            ✓ ذخیره قطعی رمز جدید و ورود به استودیو
+          </button>
+        </form>
+        <div style="margin-top:14px; text-align:center; border-top:1px solid var(--border-subtle); padding-top:12px;">
+          <button type="button" onclick="cancelPasswordReset()" style="background:none; border:none; color:var(--text-muted); font-size:11.5px; cursor:pointer; padding:6px 14px; border-radius:6px; transition:all 0.2s; text-decoration:underline;" onmouseover="this.style.color='#f43f5e'" onmouseout="this.style.color='var(--text-muted)'">
+            انصراف و لغو بازیابی رمز (خروج امن)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <!-- کشوی اختصاصی تشریح مشخصات و استاندارد فاز پروژه (Phase Scope Drawer) -->
+  <div id="phaseScopeDrawerOverlay" class="phase-scope-drawer-overlay" onclick="closePhaseScopeDrawer(event)">
+    <div class="phase-scope-drawer" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">📐</span>
+          <h3 id="drawerPhaseTitle" style="font-size:16px; font-weight:900; color:var(--gold); margin:0;">مشخصات فاز تخصصی</h3>
+        </div>
+        <button type="button" onclick="closePhaseScopeDrawer()" style="font-size:18px; color:var(--text-muted); cursor:pointer; background:none; border:none; padding:4px 8px;">✕</button>
+      </div>
+
+      <div style="background:#090d16; border:1px solid var(--border-subtle); border-radius:12px; padding:14px;">
+        <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین والد:</span>
+        <div id="drawerPhasePipeline" style="font-size:13px; font-weight:800; color:var(--cyan-electric);">Character Design & Heroes</div>
+      </div>
+
+      <div>
+        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">🎯 هدف و کاربرد صنعتی این مرحله:</h4>
+        <p id="drawerPhasePurpose" style="font-size:12px; color:#cbd5e1; line-height:1.8; text-align:justify; background:#070a12; border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
+          این فاز جهت تولید زوایای سه‌بعدی ارتوگرافیک برای مدلسازان سه‌بعدی یا انیماتورها پیاده‌سازی شده و از اشتباهات مقیاسی در پروداکشن بازی جلوگیری می‌نماید.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">📦 فرمت و استانداردهای تحویلی:</h4>
+        <div id="drawerPhaseDeliverables" style="display:flex; flex-direction:column; gap:6px; font-size:11.5px; color:var(--text-muted);">
+          <div style="padding:8px 10px; background:#070a12; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
+            <span>سورس لایه‌باز تفکیک‌شده (PSD)</span>
+            <span style="color:var(--emerald); font-weight:700;">✓ ۳۰۰ DPI</span>
+          </div>
+          <div style="padding:8px 10px; background:#070a12; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
+            <span>خطوط تراز و گاید ارتوگرافیک</span>
+            <span style="color:var(--emerald); font-weight:700;">✓ تفکیک نماها</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px; margin-top:auto;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <span style="font-size:14px;">💡</span>
+          <strong style="font-size:12px; color:var(--gold);">شرایط سفارش در آتلیه:</strong>
+        </div>
+        <p style="font-size:11px; color:#cbd5e1; line-height:1.7; margin:0 0 12px;">
+          این مرحله به عنوان یک ماژول تخصصی مجزا یا در قالب پکیج جامع پروداکشن در پایپلاین آتلیه قابل سفارش و قیمت‌گذاری است.
+        </p>
+        <button type="button" id="drawerActionBtn" onclick="goToPipelineFromDrawer()" class="btn-gold" style="width:100%; padding:11px; font-size:12px; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span>محاسبه هزینه و سفارش این فاز</span>
+          <span>←</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- توست نوتیفیکیشن -->
+  
+  <!-- پنجره اختصاصی قوانین و شرایط خدمات استودیو (Terms & Legal Modal) -->
+  <div id="termsModal" style="position:fixed; inset:0; z-index:2200; background:rgba(3,4,7,0.94); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:18px;">
+    <div style="max-width:680px; width:100%; max-height:85vh; background:var(--bg-panel); border:1px solid var(--gold); border-radius:20px; padding:28px 24px 22px; overflow-y:auto; box-shadow:0 25px 70px rgba(0,0,0,0.95); position:relative;">
+      <button type="button" onclick="closeTermsModal()" class="modal-corner-close-btn" title="بستن">✕</button>
+      <div style="border-bottom:1px solid var(--border-subtle); padding-bottom:12px; margin-bottom:16px;">
+        <h3 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:4px;">منشور حقوقی و شرایط خدمات TAJINKART</h3>
+        <span class="font-mono" style="font-size:11px; color:var(--text-muted); display:block;">MASTER TERMS OF SERVICE & STUDIO POLICIES</span>
+      </div>
+      
+      <!-- محتوای داینامیک و قابل ویرایش از پنل ادمین -->
+      <div id="termsModalDynamicContent" style="font-size:12.5px; color:#cbd5e1; line-height:1.9; display:flex; flex-direction:column; gap:16px; text-align:justify;">
+        <!-- ۱. اصل صحت اطلاعات و سلب مسئولیت -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱. اصل صحت اطلاعات و سلب مسئولیت اشتباهات کاربر (Accuracy of Information)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">کاربر با ثبت‌نام در وب‌سایت یا ثبت هرگونه سفارش صراحتاً اقرار و ضمانت می‌نماید که کلیه مشخصات هویتی و ارتباطی ارائه‌شده (شامل نام، لقب، آدرس ایمیل و شماره تماس) واقعی، دقیق و متعلق به خود اوست. استودیو تاج‌اینک‌آرت هیچ‌گونه مسئولیتی در قبال تایپ اشتباه آدرس جیمیل، عدم دریافت ایمیل‌های فعال‌سازی، فراموشی رمز عبور، یا از دست رفتن دسترسی به فایل‌ها ناشی از خطای کاربر ندارد و بار حقوقی هرگونه خسارت انحصاراً بر عهده خود کاربر است.</p>
+        </div>
+
+        <!-- ۲. تفکیک قوانین عمومی از قرارداد خرید -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۲. تفکیک قوانین عمومی ورود از قرارداد خرید (ToS vs Commission SLA)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">تایید قوانین در مرحله ثبت‌نام صرفاً به منزله پذیرش مقررات عمومی پلتفرم، سن مجاز (۱۶+ سال) و حفاظت از کلیت مالکیت فکری استودیو است. شروط مالی سنگین نظیر ودیعه ۵۰٪ غیرقابل‌استرداد، ددلاین‌ها، سقف ادیت‌ها و توافقات محرمانگی، منحصراً در لحظه ثبت قطعی فرم سفارش و پیش از پرداخت فعال شده و به امضای طرفین می‌رسد.</p>
+        </div>
+
+        <!-- ۳. شفافیت جغرافیایی و ارتباطات -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۳. شفافیت جغرافیایی، منطقه زمانی و کانال‌های ارتباطی (Regional & Communication Transparency)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت با مدیریت سید سروش تاج به‌صورت مستقل در ایران مستقر بوده و به شکل فریلنس و بین‌المللی با کارفرمایان سراسر جهان همکاری می‌نماید. ساعات کاری رسمی استودیو بر پایه منطقه زمانی ایران (UTC+3:30) تنظیم شده است. در صورت وقوع هرگونه اختلال یا کندی موقت در شبکه زیرساخت اینترنت منطقه‌ای، استودیو از کانال‌های امن و پایدار پشتیبان (شامل تلگرام و ایمیل‌های رمزنگاری‌شده) جهت حفظ پیوستگی ارتباطات استفاده می‌نماید.</p>
+        </div>
+
+        <!-- ۴. روش‌های پرداخت بین‌المللی -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۴. روش‌های پرداخت بین‌المللی و تسویه ارزی (Global Payments & Cryptocurrency)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل تومانی نرخ روز صورت می‌پذیرد.</p>
+        </div>
+
+        <!-- ۵. تضمین اصالت رفرنس‌های مشتری -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۵. تضمین اصالت رفرنس‌های ارسالی مشتری (Client Materials Indemnity)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">مشتری متعهد و ضامن است که تمامی تصاویر، کانسپت‌ها، لوگوها و فایل‌های متنی که به عنوان بریف یا رفرنس به استودیو ارسال می‌کند، یا در مالکیت قانونی اوست یا حق بهره‌برداری از آن‌ها را دارد. در صورت بروز هرگونه ادعای نقض کپی‌رایت توسط اشخاص ثالث علیه استودیو ناشی از مواد ارائه‌شده توسط مشتری، مسئولیت حقوقی و جبران کامل خسارت منحصراً متوجه مشتری خواهد بود.</p>
+        </div>
+
+        <!-- ۶. بند بلاتکلیفی و رهاسازی سفارش -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۶. بند بلاتکلیفی و رهاسازی سفارش (Inactivity & Abandonment Clause)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">پس از ارسال اتودها یا فازهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.</p>
+        </div>
+
+        <!-- ۷. سیاست مدرن هوش مصنوعی -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۷. سیاست مدرن هوش مصنوعی و هدایت هنری (Modern AI Transparency)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت استفاده از فناوری‌های نوین و مدل‌های هوش مصنوعی را به عنوان کپیلوت (دستیار فنی، کدنویسی و تسریع پایپلاین) به کار می‌بندد؛ با این وجود، جهان‌سازی جنسیس، داستان‌ها، نژادها، کاراکترهای اورجینال و هدایت بصری، دستاورد فکری سید سروش تاج است. هرگونه کپی‌برداری تجاری، آموزش مدل‌های اختصاصی (مانند LoRA) جهت بازتولید عامدانه کاراکترهای استودیو، یا جعل هویت تجاری تاج‌اینک‌آرت ممنوع و دارای پیگرد است.</p>
+        </div>
+
+        <!-- ۸. لایسنس دارایی‌ها و ممنوعیت افشا -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۸. لایسنس دارایی‌های دانلودی و ممنوعیت افشا (EULA & Anti-Leak)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">خرید هرگونه دارایی دیجیتال (آرت‌بوک، براش، مدل سه‌بعدی و تکسچر) دسترسی مادام‌العمر شخصی به فایل‌ها و به‌روزرسانی‌های آینده را به خریدار اعطا می‌کند. هرگونه فروش مجدد، اشتراک‌گذاری در کانال‌های عمومی، وب‌سایت‌های تورنت و دانلود غیرمجاز تخلف قطعی بوده و منجر به مسدودسازی دائمی حساب و پیگرد قانونی خواهد شد.</p>
+        </div>
+
+        <!-- ۹. فورس ماژور و زیرساخت ابری -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۹. سلب مسئولیت حوادث قهریه و زیرساخت ابری (Force Majeure)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">سایت بر پایه زیرساخت‌های بین‌المللی GitHub Pages، Supabase و Cloudinary اداره می‌شود. استودیو در قبال اختلالات موقت ناشی از تحریم‌ها، فیلترینگ، قطعی سرورهای بالادستی یا حوادث خارج از کنترل انسانی (فورس ماژور) ضامن خسارت مالی نخواهد بود، هرچند حداکثر تمهیدات جهت حفظ سلامت و بک‌آپ دیتای کاربران اتخاذ شده است.</p>
+        </div>
+
+        <!-- ۱۰. سقف مسئولیت مالی -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۰. سقف مسئولیت مالی و عدم استرداد (Limitation of Liability & No Refund)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">کالاهای دانلودی دیجیتال به دلیل ماهیت دسترسی فوری، پس از خرید غیرقابل‌استرداد هستند. در کلیه دعاوی حقوقی، حداکثر سقف مسئولیت مالی استودیو محدود به همان مبلغ دریافتی از مشتری برای همان سفارش مشخص خواهد بود.</p>
+        </div>
+
+        <!-- ۱۱. حق امضا و نمایش در پورتفولیو -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۱. حق امضا و نمایش در پورتفولیو (Moral Rights & Credit)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت حق نمایش آثار نهایی را در وب‌سایت، شبکه‌های اجتماعی و پورتفولیوی رسمی خود (با ذکر مالکیت تجاری کارفرما) جهت ارتقای برند برای خود محفوظ می‌دارد، مگر آنکه کارفرما پیش از شروع پروژه قرارداد محرمانگی انحصاری (NDA) با هزینه مشخص منعقد کرده باشد.</p>
+        </div>
+
+        <!-- ۱۲. حل اختلاف و داوری -->
+        <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۲. حل و فصل اختلافات و داوری (Dispute Resolution)</h4>
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">طرفین متعهد می‌شوند پیش از هرگونه اقدام حقوقی، ظرف مدت ۳۰ روز از طریق مکاتبه رسمی با پشتیبانی استودیو و مذاکره دوستانه نسبت به حل اختلاف اقدام نمایند.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; text-align:center; border-top:1px solid var(--border-subtle); padding-top:16px;">
+        <button type="button" onclick="closeTermsModal()" class="btn-gold" style="width:100%; padding:12px;">متوجه شدم و می‌پذیرم</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <!-- فوتر تک‌خطی دارک با لینک‌های حقوقی و رده‌بندی سنی -->
+  <footer style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:20px 32px; text-align:center;">
+    <div style="max-width:1440px; margin:0 auto; font-size:12px; color:var(--text-muted); display:flex; justify-content:center; align-items:center;">
+      <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
+    </div>
+  </footer>
+  <script src="data.js?v=18.1.0"></script>
+  <script src="app.js?v=18.1.0"></script>
+
+  <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
+  <div id="mobileBottomNav">
+    <button onclick="switchView('showcase')" class="mob-nav-btn active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      <span>گالری</span>
+    </button>
+    <button onclick="switchView('store')" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+      <span>فروشگاه</span>
+    </button>
+    <button onclick="switchView('genesis')" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+      <span>جنسیس</span>
+    </button>
+    <button onclick="switchView('academy')" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
+      <span>آکادمی</span>
+    </button>
+    <button onclick="handleMembersIconClick()" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      <span>پورتال اعضا</span>
+    </button>
+  </div>
+
+
+
+
+  <div id="instagramPinchBackdrop" class="instagram-pinch-backdrop"></div>
+</body>
+</html>
