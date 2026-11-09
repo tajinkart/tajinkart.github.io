@@ -7244,3 +7244,234 @@ window.saveAdminCategoryEdit = function() {
     showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
   }
 };
+
+
+
+// ==============================================================================
+// RELEASE V18.6.0: HIGH-VISIBILITY COSMIC DUST & BILINGUAL CATEGORIES ENGINE
+// ==============================================================================
+
+// تعریف پیش‌فرض دسته‌بندی‌های دوزبانه (فارسی و انگلیسی)
+const BILINGUAL_GALLERY_CATEGORIES = [
+  { id: 'character', titleFA: 'طراحی کاراکتر و قهرمانان', titleEN: 'Character Design & Heroes', color: '#facc15' },
+  { id: 'environment', titleFA: 'طراحی محیط، فضا و دنیاسازی', titleEN: 'Environment & Worlds', color: '#38bdf8' },
+  { id: 'creature', titleFA: 'موجودات، تایتان‌ها و هیولاها', titleEN: 'Creatures, Titans & Monsters', color: '#10b981' },
+  { id: 'keyframe', titleFA: 'کی‌فریم‌های سینمایی و کاور', titleEN: 'Cinematic Keyframes & Covers', color: '#f43f5e' },
+  { id: 'props', titleFA: 'پراپ‌ها، سلاح‌ها و تجهیزات', titleEN: 'Props, Weapons & Artifacts', color: '#a855f7' },
+  { id: 'comic', titleFA: 'کمیک، مانگا و استوری‌بورد', titleEN: 'Comics, Manga & Storyboards', color: '#fb923c' },
+  { id: 'mascot', titleFA: 'مسکات استودیو و نشان‌های برند', titleEN: 'Studio Mascot & Brand Crest', color: '#ec4899' }
+];
+
+// همگام‌سازی دسته‌بندی‌ها با ساختار دوزبانه
+(function initBilingualCategories() {
+  try {
+    let saved = localStorage.getItem('tajinkart_gallery_categories_v2');
+    if (saved) {
+      galleryCategories = JSON.parse(saved);
+    } else {
+      galleryCategories = BILINGUAL_GALLERY_CATEGORIES.map(c => ({
+        ...c,
+        title: c.titleEN
+      }));
+      localStorage.setItem('tajinkart_gallery_categories_v2', JSON.stringify(galleryCategories));
+    }
+  } catch(e) {
+    galleryCategories = BILINGUAL_GALLERY_CATEGORIES.map(c => ({ ...c, title: c.titleEN }));
+  }
+})();
+
+// بازنویسی موتور پارتیکل‌ها با تضمین دیده‌شدن ۱۰۰٪ و گرافیک بالا (DPR Aware)
+window.initAmbientParticles = function() {
+  const canvas = document.getElementById('ambientParticleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  let width = (canvas.width = window.innerWidth * dpr);
+  let height = (canvas.height = window.innerHeight * dpr);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth * dpr;
+    height = canvas.height = window.innerHeight * dpr;
+  }, { passive: true });
+
+  const colors = [
+    'rgba(250, 204, 21, 0.9)',    // طلایی تابناک
+    'rgba(0, 240, 255, 0.85)',    // نئون سیان
+    'rgba(255, 87, 34, 0.85)',    // فلیم مرجانی
+    'rgba(168, 85, 247, 0.85)',   // بنفش کیهانی
+    'rgba(255, 255, 255, 0.9)'    // غبار سفید درخشان
+  ];
+
+  const particleCount = window.innerWidth <= 768 ? 40 : 80;
+  const particles = [];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: (Math.random() * 2.5 + 1.2) * dpr,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 0.45 * dpr,
+      vy: -(Math.random() * 0.65 + 0.25) * dpr,
+      pulse: Math.random() * Math.PI,
+      pulseSpeed: Math.random() * 0.03 + 0.015
+    });
+  }
+
+  function renderParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx + Math.sin(p.pulse) * 0.35 * dpr;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+
+      if (p.y < -20) {
+        p.y = height + 20;
+        p.x = Math.random() * width;
+      }
+      if (p.x < -20) p.x = width + 20;
+      if (p.x > width + 20) p.x = -20;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 10 * dpr;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(renderParticles);
+  }
+
+  renderParticles();
+};
+
+// اجرای آنی بدون تاخیر
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initAmbientParticles);
+} else {
+  setTimeout(window.initAmbientParticles, 20);
+}
+
+// منوی All Artworks با پشتیبانی دوزبانه
+window.renderFloatingCategoryDropdown = function() {
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (!dropdown) return;
+
+  const isFA = (typeof currentSiteLang !== 'undefined' && currentSiteLang === 'fa');
+  const allLabel = isFA ? 'همه آثار استودیو' : 'All Artworks';
+
+  let itemsHtml = `
+    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', '${allLabel}')">
+      <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
+      <span class="cat-item-text">${allLabel}</span>
+    </div>
+  `;
+
+  galleryCategories.forEach(cat => {
+    const isActive = currentGalleryFilter === cat.id;
+    const color = cat.color || '#38bdf8';
+    const displayTitle = isFA ? (cat.titleFA || cat.title) : (cat.titleEN || cat.title);
+    itemsHtml += `
+      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${displayTitle}')">
+        <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
+        <span class="cat-item-text">${displayTitle}</span>
+      </div>
+    `;
+  });
+
+  dropdown.innerHTML = itemsHtml;
+};
+
+// ویرایشگر خطی دسته‌بندی‌ها در پنل ادمین (اولی فارسی، دومی انگلیسی)
+window.renderAdminGalleryCategories = function() {
+  const container = document.getElementById('adminGalleryCategoriesList');
+  if (!container) return;
+  const badge = document.getElementById('adminCategoryCountBadge');
+  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
+
+  container.innerHTML = galleryCategories.map((cat) => {
+    const color = cat.color || '#38bdf8';
+    const faTitle = cat.titleFA || cat.title || '';
+    const enTitle = cat.titleEN || cat.id || '';
+    return `
+      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}66; border-radius:20px; padding:7px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="کلیک برای باز شدن کادر ویرایش این دسته">
+        <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
+        <span style="font-size:12.5px; font-weight:700; color:#fff;">${faTitle}</span>
+        <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">[${enTitle}]</span>
+        <span style="font-size:11px; opacity:0.7;">✏️</span>
+      </div>
+    `;
+  }).join('');
+};
+
+window.openAdminCategoryEdit = function(catId) {
+  const cat = galleryCategories.find(c => c.id === catId);
+  if (!cat) return;
+
+  const row = document.getElementById('adminInlineEditCategoryRow');
+  const origIdInput = document.getElementById('adminEditCatOriginalId');
+  const titleFAInput = document.getElementById('adminEditCatTitleFA');
+  const titleENInput = document.getElementById('adminEditCatTitleEN');
+  const idInput = document.getElementById('adminEditCatId');
+  const colorInput = document.getElementById('adminEditCatColor');
+  const colorPicker = document.getElementById('adminEditCatColorPicker');
+
+  if (origIdInput) origIdInput.value = cat.id;
+  if (titleFAInput) titleFAInput.value = cat.titleFA || cat.title || '';
+  if (titleENInput) titleENInput.value = cat.titleEN || cat.id || '';
+  if (idInput) idInput.value = cat.id;
+  if (colorInput) colorInput.value = cat.color || '#38bdf8';
+  if (colorPicker) colorPicker.value = cat.color || '#38bdf8';
+
+  if (row) {
+    row.style.display = 'block';
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+};
+
+window.closeAdminCategoryEditForm = function() {
+  const row = document.getElementById('adminInlineEditCategoryRow');
+  if (row) row.style.display = 'none';
+};
+
+window.saveAdminCategoryEdit = function() {
+  const origIdInput = document.getElementById('adminEditCatOriginalId');
+  const titleFAInput = document.getElementById('adminEditCatTitleFA');
+  const titleENInput = document.getElementById('adminEditCatTitleEN');
+  const idInput = document.getElementById('adminEditCatId');
+  const colorInput = document.getElementById('adminEditCatColor');
+
+  const origId = origIdInput ? origIdInput.value : '';
+  const newTitleFA = titleFAInput ? titleFAInput.value.trim() : '';
+  const newTitleEN = titleENInput ? titleENInput.value.trim() : '';
+  const newId = idInput ? idInput.value.trim().toLowerCase() : '';
+  const newColor = colorInput ? colorInput.value.trim() : '#38bdf8';
+
+  if (!newTitleFA || !newTitleEN || !newId) {
+    showToast('عنوان فارسی، عنوان انگلیسی و شناسه دسته نمی‌تواند خالی باشد.', 'warning', 3000);
+    return;
+  }
+
+  const catIdx = galleryCategories.findIndex(c => c.id === origId);
+  if (catIdx !== -1) {
+    galleryCategories[catIdx].titleFA = newTitleFA;
+    galleryCategories[catIdx].titleEN = newTitleEN;
+    galleryCategories[catIdx].title = newTitleEN; // عنوان پیش‌فرض عمومی
+    galleryCategories[catIdx].id = newId;
+    galleryCategories[catIdx].color = newColor;
+
+    try {
+      localStorage.setItem('tajinkart_gallery_categories_v2', JSON.stringify(galleryCategories));
+    } catch(e) {}
+    
+    window.renderAdminGalleryCategories();
+    window.renderFloatingCategoryDropdown();
+    window.closeAdminCategoryEditForm();
+    showToast(`دسته‌بندی «${newTitleFA}» (${newTitleEN}) با موفقیت ذخیره شد! ✓`, 'success', 3500);
+  }
+};

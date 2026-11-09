@@ -25,13 +25,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=18.5.0">
+  <link rel="stylesheet" href="style.css?v=18.6.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c76a19f07a524a87b5a19808d4b38d38"}'></script>
 </head>
 <body data-view="showcase">
+  <!-- بوم پارتیکل‌های معلق کیهانی و جوهر استودیو (Ambient Cosmic & Ink Particles) -->
+  <canvas id="ambientParticleCanvas"></canvas>
 
   <!-- ۱. نشان شناور برند در بالا-چپ همراه با سوئیچر زبان -->
   <div id="topCenterBrandBar">
@@ -821,26 +823,40 @@
                 </button>
               </div>
 
-                            <!-- فرم ویرایش کامل و شیک دسته‌بندی گالری (دقیقاً بالای لیست) -->
-              <div id="adminInlineEditCategoryRow" style="display:none; margin-bottom:14px; background:#06080d; border:1.5px solid var(--cyan-electric); border-radius:12px; padding:14px 18px; box-shadow:0 0 25px rgba(0,240,255,0.2);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                  <span style="font-size:13px; font-weight:800; color:var(--cyan-electric);">✏️ ویرایش مشخصات دسته‌بندی گالری</span>
-                  <button type="button" onclick="closeAdminCategoryEditForm()" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer;">✕</button>
+                                          <!-- فرم ویرایش دوزبانه دسته‌بندی گالری (اولی فارسی، دومی انگلیسی) -->
+              <div id="adminInlineEditCategoryRow" style="display:none; margin-bottom:14px; background:#06080d; border:1.5px solid var(--cyan-electric); border-radius:12px; padding:16px 18px; box-shadow:0 0 25px rgba(0,240,255,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <span style="font-size:13.5px; font-weight:800; color:var(--cyan-electric);">✏️ ویرایش مشخصات دوزبانه دسته‌بندی گالری</span>
+                  <button type="button" onclick="closeAdminCategoryEditForm()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;" title="بستن">✕</button>
                 </div>
                 <input type="hidden" id="adminEditCatOriginalId" />
-                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-                  <input type="text" id="adminEditCatTitle" placeholder="نام نمایشی دسته (مثال: کاراکتر و قهرمانان)" style="font-size:12.5px; padding:8px 12px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#fff; min-width:200px; flex:1;" />
-                  <input type="text" id="adminEditCatId" class="font-mono" placeholder="شناسه لاتین (Slug)" style="font-size:12.5px; padding:8px 12px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#fff; width:130px;" />
-                  <div style="display:inline-flex; align-items:center; gap:6px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 10px;" title="رنگ نئون دسته">
-                    <span style="font-size:11px; color:#94a3b8;">رنگ:</span>
-                    <input type="color" id="adminEditCatColorPicker" onchange="document.getElementById('adminEditCatColor').value = this.value" style="width:26px; height:26px; border:none; padding:0; background:transparent; cursor:pointer;" />
-                    <input type="text" id="adminEditCatColor" class="font-mono" style="width:75px; background:none; border:none; color:#fff; font-size:11.5px;" />
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:14px;">
+                  <div>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:var(--gold); margin-bottom:5px;">۱. عنوان به زبان فارسی (نسخه داخلی استودیو):</label>
+                    <input type="text" id="adminEditCatTitleFA" placeholder="مثال: طراحی کاراکتر و قهرمانان" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#fff; direction:rtl;" />
                   </div>
-                  <button type="button" onclick="saveAdminCategoryEdit()" class="btn-gold" style="font-size:12px; padding:8px 18px; font-weight:800; cursor:pointer;">
-                    💾 ذخیره تغییرات دسته‌بندی
-                  </button>
-                  <button type="button" onclick="closeAdminCategoryEditForm()" class="btn-secondary" style="font-size:12px; padding:8px 14px; cursor:pointer;">
+                  <div>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:var(--cyan-electric); margin-bottom:5px;">۲. English Category Title (Public Site):</label>
+                    <input type="text" id="adminEditCatTitleEN" class="font-mono" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#fff; direction:ltr;" />
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:5px;">۳. شناسه لاتین دسته (Slug):</label>
+                    <input type="text" id="adminEditCatId" class="font-mono" placeholder="character" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#fff;" />
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:5px;">۴. رنگ نئون دسته:</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <input type="color" id="adminEditCatColorPicker" onchange="document.getElementById('adminEditCatColor').value = this.value" style="width:36px; height:36px; border:none; padding:0; background:transparent; cursor:pointer;" />
+                      <input type="text" id="adminEditCatColor" class="font-mono" style="flex:1; padding:9px 12px; background:#020306; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#fff; font-size:12.5px;" />
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                  <button type="button" onclick="closeAdminCategoryEditForm()" class="btn-secondary" style="font-size:12px; padding:9px 18px; cursor:pointer;">
                     انصراف
+                  </button>
+                  <button type="button" onclick="saveAdminCategoryEdit()" class="btn-gold" style="font-size:12px; padding:9px 24px; font-weight:800; cursor:pointer;">
+                    💾 ذخیره تغییرات دسته‌بندی
                   </button>
                 </div>
               </div>
@@ -2283,8 +2299,8 @@
       </button>
     </div>
   </footer>
-  <script src="data.js?v=18.5.0"></script>
-  <script src="app.js?v=18.5.0"></script>
+  <script src="data.js?v=18.6.0"></script>
+  <script src="app.js?v=18.6.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

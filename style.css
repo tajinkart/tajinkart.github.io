@@ -4859,3 +4859,70 @@ body {
     width: 240px !important;
   }
 }
+
+
+
+/* ==============================================================================
+   RELEASE V18.6.0: AMBIENT PARTICLES (Z-INDEX 50), DOCK LEFT-ALIGN & BILINGUAL CATS
+   ============================================================================== */
+
+/* بوم پارتیکل‌های کیهانی و غبار شناور در سراسر صفحه روی تمام پس‌زمینه‌ها */
+#ambientParticleCanvas {
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 50 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* تراز قطعی متن تمام دکمه‌های داک (Showcase, Portal, Store, Genesis, Academy, Society) */
+#rightVerticalNav .right-exp-btn,
+.right-exp-btn {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+#rightVerticalNav .right-exp-text,
+.right-exp-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  text-align: left !important;
+  direction: ltr !important;
+  padding-left: 14px !important;
+  padding-right: 8px !important;
+  white-space: nowrap !important;
+}
+
+#rightVerticalNav .right-exp-title,
+.right-exp-title {
+  display: block !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  direction: ltr !important;
+  width: 100% !important;
+}
+
+#rightVerticalNav .right-exp-sub,
+.right-exp-sub {
+  display: block !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.2 !important;
+  margin-top: 2px !important;
+  text-align: left !important;
+  direction: ltr !important;
+  width: 100% !important;
+}
