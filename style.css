@@ -4487,14 +4487,7 @@ body {
     padding: 6px !important;
   }
 
-  #rightVerticalNav.dock-open .right-exp-btn {
-    width: 100% !important;
-    height: 52px !important;
-    border-radius: 14px !important;
-    padding: 0 14px !important;
-    flex-direction: row-reverse !important;
-    justify-content: flex-start !important;
-  }
+  /* Removed 52px tall rectangular button override */
 
   #rightVerticalNav.dock-open .right-exp-text {
     opacity: 1 !important;
@@ -6030,5 +6023,261 @@ body.in-admin-view #rightVerticalNav,
     padding: 8px !important;
     position: absolute !important;
     top: 0 !important;
+  }
+}
+
+
+
+/* ==============================================================================
+   RELEASE V20.0.0: THE ULTIMATE HALOGEN GLOW, ROTATING TRIGGER & PERFECT CIRCULAR DOCK
+   ============================================================================== */
+
+/* ۱. انیمیشن چرخش و هالوژن سه‌خط آبی استودیو */
+#dockMasterTrigger {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  background: rgba(8, 12, 20, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1.5px solid var(--cyan-electric) !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.45), inset 0 0 8px rgba(0, 240, 255, 0.2) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--cyan-electric) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+  flex-shrink: 0 !important;
+  z-index: 10000 !important;
+  box-sizing: border-box !important;
+}
+
+#dockMasterTrigger svg {
+  width: 22px !important;
+  height: 22px !important;
+  stroke: var(--cyan-electric) !important;
+  stroke-width: 2 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#dockMasterTrigger:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.75), inset 0 0 12px rgba(0, 240, 255, 0.35) !important;
+}
+
+/* وقتی داک باز است، سه خط با چرخش نرم ۹۰ درجه تبدیل به ضربدر شیک می‌شود */
+#rightVerticalNav.dock-open #dockMasterTrigger {
+  transform: rotate(90deg) scale(1.06) !important;
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.7) !important;
+}
+
+/* ۲. سیستم هالوژن‌های نئونی اختصاصی برای هر آیکون (همان هالوژن باشکوه مدنظر) */
+.right-exp-btn {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 44px !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  background: rgba(8, 11, 18, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1.5px solid var(--border-subtle) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+              opacity 0.22s ease, 
+              width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s ease, 
+              border-color 0.25s ease !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+}
+
+/* هالوژن نئونی دکمه‌ها در هاور و حالت فعال */
+.right-exp-btn.home-theme:hover,
+.right-exp-btn.home-theme.active {
+  border-color: var(--coral-flame) !important;
+  box-shadow: 0 0 22px rgba(255, 87, 34, 0.65), 0 0 40px rgba(255, 87, 34, 0.25) !important;
+}
+.right-exp-btn.home-theme .right-exp-icon {
+  background: rgba(255, 87, 34, 0.14) !important;
+  color: var(--coral-flame) !important;
+}
+
+.right-exp-btn.cyan-theme:hover,
+.right-exp-btn.cyan-theme.active {
+  border-color: var(--cyan-electric) !important;
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.65), 0 0 40px rgba(0, 240, 255, 0.25) !important;
+}
+.right-exp-btn.cyan-theme .right-exp-icon {
+  background: rgba(0, 240, 255, 0.14) !important;
+  color: var(--cyan-electric) !important;
+}
+
+.right-exp-btn.gold-theme:hover,
+.right-exp-btn.gold-theme.active {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 22px rgba(250, 204, 21, 0.65), 0 0 40px rgba(250, 204, 21, 0.25) !important;
+}
+.right-exp-btn.gold-theme .right-exp-icon {
+  background: rgba(250, 204, 21, 0.14) !important;
+  color: var(--gold) !important;
+}
+
+.right-exp-btn.crimson-theme:hover,
+.right-exp-btn.crimson-theme.active {
+  border-color: var(--crimson) !important;
+  box-shadow: 0 0 22px rgba(244, 63, 94, 0.65), 0 0 40px rgba(244, 63, 94, 0.25) !important;
+}
+.right-exp-btn.crimson-theme .right-exp-icon {
+  background: rgba(244, 63, 94, 0.14) !important;
+  color: var(--crimson) !important;
+}
+
+.right-exp-btn.purple-theme:hover,
+.right-exp-btn.purple-theme.active {
+  border-color: var(--violet) !important;
+  box-shadow: 0 0 22px rgba(168, 85, 247, 0.65), 0 0 40px rgba(168, 85, 247, 0.25) !important;
+}
+.right-exp-btn.purple-theme .right-exp-icon {
+  background: rgba(168, 85, 247, 0.14) !important;
+  color: var(--violet) !important;
+}
+
+.right-exp-btn.emerald-theme:hover,
+.right-exp-btn.emerald-theme.active {
+  border-color: var(--emerald) !important;
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 0 40px rgba(16, 185, 129, 0.25) !important;
+}
+.right-exp-btn.emerald-theme .right-exp-icon {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: var(--emerald) !important;
+}
+
+/* آیکون مرکزی */
+.right-exp-icon {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  border: none !important;
+}
+
+/* ۳. انیمیشن جهشی پاپ‌این و جمع شدن (Spring Pop-In) */
+#rightVerticalNav.dock-collapsed:not(.dock-open) .right-exp-btn {
+  opacity: 0 !important;
+  transform: scale(0.5) translateY(-14px) !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+#rightVerticalNav.dock-open .right-exp-btn {
+  opacity: 1 !important;
+  transform: scale(1) translateY(0) !important;
+  pointer-events: auto !important;
+  height: 44px !important;
+  width: 44px !important;
+  margin-top: 6px !important;
+}
+
+/* ۴. دسکتاپ: باز در هیرو، هاور بازشونده، جمع‌شونده با اسکرول */
+@media (min-width: 769px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 22px !important;
+    top: 22px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
+    display: none !important;
+  }
+
+  #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  /* هاور دسکتاپ: کپسول گسترش می‌یابد به چپ */
+  .right-exp-btn:hover {
+    width: auto !important;
+    border-radius: 999px !important;
+    aspect-ratio: auto !important;
+    padding: 0 18px 0 6px !important;
+  }
+
+  .right-exp-text {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    direction: ltr !important;
+    padding-left: 14px !important;
+    padding-right: 8px !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+    transition: opacity 0.25s ease, max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .right-exp-btn:hover .right-exp-text {
+    opacity: 1 !important;
+    max-width: 220px !important;
+  }
+}
+
+/* ۵. موبایل: ایزوله کامل، ۱۰۰٪ دایره‌ای، فاصله ۱۸ پیکسل از لبه راست بدون بریدگی */
+@media (max-width: 768px) {
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 18px !important;
+    top: 18px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  #dockMasterTrigger {
+    display: flex !important;
+  }
+
+  /* دکمه‌ها در موبایل منحصراً دایره‌های ۴۴ پیکسلی هستند */
+  #rightVerticalNav .right-exp-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #rightVerticalNav .right-exp-text {
+    display: none !important;
   }
 }

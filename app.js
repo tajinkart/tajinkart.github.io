@@ -2945,8 +2945,7 @@ window.switchView = function(vKey) {
     if (catMenu) catMenu.style.display = 'block';
     renderShowcaseGrid();
     if (homeBtn) homeBtn.classList.add('hidden');
-    if (window.scrollY <= 140) {
-      if (dock) dock.classList.remove('dock-collapsed');
+    if (window.scrollY <= 140 && window.innerWidth > 768) { if (dock) dock.classList.remove("dock-collapsed");
       if (topBar) topBar.classList.remove('visible');
     } else {
       if (topBar) topBar.classList.add('visible');
@@ -2974,9 +2973,9 @@ function handleOptimizedScroll() {
   const dock = document.getElementById('rightVerticalNav');
   const topBar = document.getElementById('topCenterBrandBar');
 
-  // ۱. قانون قفل موبایل: اسکرول در موبایل هرگز نباید داک را باز کند! همیشه بسته روی سه خط می‌ماند
+  // ۱. قانون فولادین موبایل: اسکرول موبایل ۱۰۰٪ بی‌اثر است و هرگز داک را باز نمی‌کند!
   if (window.innerWidth <= 768) {
-    if (dock && !dock.classList.contains('dock-open')) {
+    if (dock) {
       dock.classList.add('dock-collapsed');
     }
     return;
