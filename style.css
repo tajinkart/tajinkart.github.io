@@ -4439,22 +4439,28 @@ body {
   }
 
   /* در حالت باز روی موبایل: دراور تمام‌قد روان با متن‌های درشت و واضح */
-  #rightVerticalNav.dock-open .dock-buttons-container {
+    /* حذف قطعی هرگونه سایدبار ۲۹۰ پیکسلی و کادر مشکی تمام‌صفحه در موبایل */
+  #rightVerticalNav.dock-open .dock-buttons-container,
+  #rightVerticalNav .dock-buttons-container,
+  .dock-buttons-container {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    max-width: 44px !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
     display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 290px !important;
-    max-width: 85vw !important;
-    background: rgba(8, 11, 18, 0.98) !important;
-    backdrop-filter: blur(25px) !important;
-    border-left: 1px solid var(--border-subtle) !important;
-    padding: 22px 18px !important;
-    box-shadow: -15px 0 50px rgba(0, 0, 0, 0.9) !important;
-    z-index: 10002 !important;
-    overflow-y: auto !important;
-    animation: drawerSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    animation: none !important;
   }
 
   @keyframes drawerSlideIn {
@@ -5517,5 +5523,80 @@ body {
     position: absolute !important;
     top: 0 !important;
     box-sizing: border-box !important;
+  }
+}
+
+
+
+/* ==============================================================================
+   RELEASE V19.1.0: PERMANENT REMOVAL OF 290PX BLACK MOBILE SIDEBAR OVERLAY
+   ============================================================================== */
+@media (max-width: 768px) {
+  /* لغو ۱۰۰٪ سایدبار مشکی موبایل */
+  #rightVerticalNav.dock-open .dock-buttons-container,
+  #rightVerticalNav .dock-buttons-container,
+  .dock-buttons-container {
+    position: static !important;
+    width: auto !important;
+    max-width: 44px !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #rightVerticalNav {
+    position: fixed !important;
+    right: 12px !important;
+    top: 14px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    width: auto !important;
+    max-width: 44px !important;
+    background: transparent !important;
+  }
+
+  /* دکمه‌ها منحصراً آیکون‌های گرد ۴۲ پیکسلی هستند بدون هیچ متن یا کادر مشکی اضافه */
+  #rightVerticalNav .right-exp-btn,
+  .right-exp-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    border: 1.5px solid var(--border-subtle) !important;
+  }
+
+  #rightVerticalNav .right-exp-text,
+  .right-exp-text {
+    display: none !important;
+    max-width: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    visibility: hidden !important;
+  }
+
+  #rightVerticalNav .right-exp-icon,
+  .right-exp-icon {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
   }
 }
