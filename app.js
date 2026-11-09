@@ -230,54 +230,79 @@ try {
 const SUPABASE_PROJECT_URL = 'https://ahuasiouokvtryzxohri.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_dyUVO6elCOkL_a3Mukm0Ww_4XZNLohX';
 
-if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
-  window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      flowType: 'implicit',
-      detectSessionInUrl: true,
-      persistSession: true,
-      autoRefreshToken: true
-    }
-  });
-
-  // شنونده متمرکز رویدادهای احراز هویت Supabase
-  window.supabaseClient.auth.onAuthStateChange((event, session) => {
-    console.log('[Supabase Central Auth Event]', event);
-    if (event === 'PASSWORD_RECOVERY') {
-      isRecoveryFlowActive = true;
-      triggerPasswordResetModal();
-      return;
-    }
-
-    if (event === 'SIGNED_OUT') {
-      currentMember = null;
-      const labelEl = document.getElementById('rightMemberLabel');
-      if (labelEl) labelEl.textContent = 'حساب اعضا';
-      const adminGate = document.getElementById('adminLoginGate');
-      const adminWorkspace = document.getElementById('adminWorkspace');
-      if (adminWorkspace) adminWorkspace.classList.add('hidden');
-      if (adminGate) adminGate.classList.remove('hidden');
-      return;
-    }
-
-    if (session && session.user) {
-      if (isRecoveryFlowActive) {
-        // در حالت بازیابی رمز، نشست برای ثبت رمز آماده است اما ویو نباید به ادمین یا داشبورد بپرد
-        applyLoggedInMember(session.user, false);
-      } else {
-        // تشخیص قطعی ورود تازه از طریق گوگل (چه توکن هنوز در هش باشد چه کلاینت آن را پردازش کرده باشد)
-        const isFromGoogleRedirect = sessionStorage.getItem('tajinkart_google_signing_in') === 'true' ||
-                                     event === 'SIGNED_IN' ||
-                                     (window.location.hash.includes('access_token=') && !window.location.hash.includes('type=recovery'));
-        
-        sessionStorage.removeItem('tajinkart_google_signing_in');
-        applyLoggedInMember(session.user, isFromGoogleRedirect);
-        if (window.location.hash.includes('access_token=')) {
-          try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+window.ensureSupabaseClient = function() {
+  if (window.supabaseClient && window.supabaseClient.auth) return window.supabaseClient;
+  
+  if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
+    try {
+      window.supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          flowType: 'implicit',
+          detectSessionInUrl: true,
+          persistSession: true,
+          autoRefreshToken: true
         }
+      });
+
+      // شنونده متمرکز رویدادهای احراز هویت Supabase
+      window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('[Supabase Central Auth Event]', event);
+        if (event === 'PASSWORD_RECOVERY') {
+          isRecoveryFlowActive = true;
+          triggerPasswordResetModal();
+          return;
+        }
+
+        if (event === 'SIGNED_OUT') {
+          currentMember = null;
+          const labelEl = document.getElementById('rightMemberLabel');
+          if (labelEl) labelEl.textContent = 'حساب اعضا';
+          const adminGate = document.getElementById('adminLoginGate');
+          const adminWorkspace = document.getElementById('adminWorkspace');
+          if (adminWorkspace) adminWorkspace.classList.add('hidden');
+          if (adminGate) adminGate.classList.remove('hidden');
+          return;
+        }
+
+        if (session && session.user) {
+          if (isRecoveryFlowActive) {
+            applyLoggedInMember(session.user, false);
+          } else {
+            const isFromGoogleRedirect = sessionStorage.getItem('tajinkart_google_signing_in') === 'true' ||
+                                         event === 'SIGNED_IN' ||
+                                         (window.location.hash.includes('access_token=') && !window.location.hash.includes('type=recovery'));
+            
+            sessionStorage.removeItem('tajinkart_google_signing_in');
+            applyLoggedInMember(session.user, isFromGoogleRedirect);
+            if (window.location.hash.includes('access_token=')) {
+              try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+            }
+          }
+        }
+      });
+
+      console.log('[Supabase Client] Initialized successfully.');
+      return window.supabaseClient;
+    } catch(err) {
+      console.warn('[Supabase Client Init Error]', err);
+    }
+  }
+  return null;
+};
+
+// راه‌اندازی اولیه و خودترمیم شونده
+window.ensureSupabaseClient();
+if (!window.supabaseClient) {
+  let retryCount = 0;
+  const retryTimer = setInterval(() => {
+    retryCount++;
+    if (window.ensureSupabaseClient() || retryCount > 20) {
+      clearInterval(retryTimer);
+      if (window.supabaseClient && typeof initSupabaseAuthSession === 'function') {
+        initSupabaseAuthSession();
       }
     }
-  });
+  }, 250);
 }
 
 // =========================================================
@@ -452,6 +477,7 @@ function checkEmailRecoveryFlow() {
 
 
 async function initSupabaseAuthSession() {
+  if (!window.supabaseClient && window.ensureSupabaseClient) window.ensureSupabaseClient();
   if (!window.supabaseClient || !window.supabaseClient.auth) return;
   try {
     const { data } = await window.supabaseClient.auth.getSession();
@@ -4609,8 +4635,14 @@ async function syncArtworkOrderToSupabase() {
 
 
 window.handleGoogleSignIn = async function() {
+  if (!window.supabaseClient) window.ensureSupabaseClient();
   if (!window.supabaseClient || !window.supabaseClient.auth) {
-    showToast('سرویس احراز هویت در دسترس نیست. لطفاً با ایمیل ثبت‌نام کنید.', 'error');
+    // تلاش مجدد در صورت تاخیر شبکه
+    await new Promise(r => setTimeout(r, 400));
+    if (window.ensureSupabaseClient) window.ensureSupabaseClient();
+  }
+  if (!window.supabaseClient || !window.supabaseClient.auth) {
+    showToast('سرویس احراز هویت در حال اتصال است، لطفاً مجدداً کلیک کنید.', 'info');
     return;
   }
   showToast('در حال انتقال به صفحه امن ورود گوگل...', 'info');
@@ -6323,3 +6355,27 @@ window.saveCloudinarySettingsDirect = function() {
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   showToast('تنظیمات فضای ابری تصاویر (Cloudinary) با موفقیت ذخیره شد! ✓', 'success', 3500);
 };
+
+// ==============================================================================
+// موتور هوشمند انطباق منطقه‌ای و تشخیص خودکار ارز بر اساس لوکیشن (Cloudflare Geo)
+// ==============================================================================
+async function detectUserGeoLocation() {
+  try {
+    const res = await fetch('/cdn-cgi/trace', { cache: 'no-store' });
+    if (res.ok) {
+      const text = await res.text();
+      const locMatch = text.match(/loc=([A-Z]{2})/i);
+      if (locMatch && locMatch[1]) {
+        const country = locMatch[1].toUpperCase();
+        console.log('[TAJINKART Geo Engine] Detected visitor country:', country);
+        if (country === 'IR') {
+          if (typeof setCurrencyMode === 'function') setCurrencyMode('TOMAN');
+        } else {
+          if (typeof setCurrencyMode === 'function') setCurrencyMode('USD');
+        }
+      }
+    }
+  } catch(e) {
+    console.log('[TAJINKART Geo Engine] Trace fallback active.');
+  }
+}
