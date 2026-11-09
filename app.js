@@ -4936,19 +4936,16 @@ window.evalPassStrength = function(pass, prefix) {
   }
   box.style.display = 'block';
 
-  // بررسی الگوهای به‌شدت ناامن و متوالی مانند 123456، aaaaaa، password
   const isSequential = /^(123456|12345678|abcdef|qwerty|111111|000000|password)/i.test(pass);
   const isOnlyDigits = /^[0-9]+$/.test(pass);
   const isOnlyLetters = /^[a-zA-Z]+$/.test(pass);
 
-  // محاسبه تنوع گونه‌های کاراکتری
   const hasLower = /[a-z]/.test(pass);
   const hasUpper = /[A-Z]/.test(pass);
   const hasNumber = /[0-9]/.test(pass);
   const hasSpecial = /[^A-Za-z0-9]/.test(pass);
   const varietyCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
 
-  // اگر کمتر از ۶ کاراکتر باشد یا فقط عدد/فقط حروف متوالی باشد -> قطعاً ضعیف
   if (pass.length < 6 || isSequential || (pass.length <= 8 && isOnlyDigits) || (pass.length <= 7 && isOnlyLetters)) {
     bar.style.width = '25%';
     bar.style.background = 'var(--crimson)';
@@ -4958,42 +4955,38 @@ window.evalPassStrength = function(pass, prefix) {
     return;
   }
 
-  // سطح متوسط: حداقل ۶ تا ۷ کاراکتر با تنوع حداقل ۲ نوع (مثلاً حرف + عدد)
   if (pass.length >= 6 && varietyCount === 2) {
     bar.style.width = '50%';
     bar.style.background = 'var(--amber)';
     text.textContent = 'Security Level: Medium';
     text.style.color = 'var(--amber)';
-    if (hint) hint.textContent = 'افزودن حروف بزرگ و نمادها (@#!%)';
+    if (hint) hint.textContent = 'Add uppercase letters & symbols (@#!%)';
     return;
   }
 
-  // سطح خوب: حداقل ۸ کاراکتر با تنوع ۳ نوع
   if (pass.length >= 8 && varietyCount >= 3 && !hasSpecial) {
     bar.style.width = '75%';
     bar.style.background = 'var(--cyan-electric)';
-    text.textContent = 'سطح امنیت: خوب و استاندارد';
+    text.textContent = 'Security Level: Strong';
     text.style.color = 'var(--cyan-electric)';
-    if (hint) hint.textContent = 'برای ارتقا به حداکثر، نماد خاص اضافه کنید';
+    if (hint) hint.textContent = 'Add special symbols for maximum security';
     return;
   }
 
-  // سطح عالی: حداقل ۸ کاراکتر به بالا با تنوع کامل ۴ نوع (کوچک، بزرگ، عدد، نماد)
   if (pass.length >= 8 && varietyCount >= 3 && hasSpecial) {
     bar.style.width = '100%';
     bar.style.background = 'var(--emerald)';
-    text.textContent = 'سطح امنیت: فوق‌العاده قوی و نفوذناپذیر ✓';
+    text.textContent = 'Security Level: Excellent ✓';
     text.style.color = 'var(--emerald)';
-    if (hint) hint.textContent = 'بالاترین مقاومت در برابر سرقت';
+    if (hint) hint.textContent = 'Maximum protection standard';
     return;
   }
 
-  // حالت پیش‌فرض برای طول بالا
   bar.style.width = '75%';
   bar.style.background = 'var(--cyan-electric)';
-  text.textContent = 'سطح امنیت: مناسب';
+  text.textContent = 'Security Level: Good';
   text.style.color = 'var(--cyan-electric)';
-  if (hint) hint.textContent = 'مقاوم و قابل قبول';
+  if (hint) hint.textContent = 'Acceptable security level';
 };
 
 
@@ -5047,7 +5040,7 @@ window.handleLiveEmailCheck = function(emailVal) {
   const localExists = siteMembersData.some(m => m.email && m.email.toLowerCase() === cleanEmail);
   if (localExists) {
     notice.style.color = 'var(--crimson)';
-    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> این ایمیل قبلاً در استودیو ثبت شده است';
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> This email is already registered';
     emailInput.style.borderColor = 'var(--crimson)';
     return;
   }
@@ -5064,21 +5057,21 @@ window.handleLiveEmailCheck = function(emailVal) {
 
         if (data && data.email) {
           notice.style.color = 'var(--crimson)';
-          notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> این ایمیل قبلاً در سیستم ثبت‌نام شده است';
+          notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> This email is already registered';
           emailInput.style.borderColor = 'var(--crimson)';
         } else {
           notice.style.color = 'var(--emerald)';
-          notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> فرمت ایمیل معتبر و آزاد است';
+          notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> Email is valid and available';
           emailInput.style.borderColor = 'var(--emerald)';
         }
       } catch(e) {
         notice.style.color = 'var(--emerald)';
-        notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> فرمت ایمیل معتبر است';
+        notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> Email format is valid';
         emailInput.style.borderColor = 'var(--emerald)';
       }
     } else {
       notice.style.color = 'var(--emerald)';
-      notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> فرمت ایمیل معتبر است';
+      notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> Email format is valid';
       emailInput.style.borderColor = 'var(--emerald)';
     }
   }, 350);
@@ -5105,11 +5098,11 @@ window.handleLivePhoneCheck = function() {
   // پذیرش انعطاف‌پذیر انواع شماره‌های بین‌المللی و محلی (بین ۷ تا ۱۵ رقم)
   if (val.length >= 7 && val.length <= 15) {
     notice.style.color = 'var(--emerald)';
-    notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> شماره تلفن معتبر است';
+    notice.innerHTML = '<span style="color:var(--emerald); font-weight:700;">✓</span> Phone number is valid';
     phoneInput.style.borderColor = 'var(--emerald)';
   } else {
     notice.style.color = 'var(--crimson)';
-    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> طول شماره تلفن نامعتبر است (' + val.length + ' رقم - استاندارد: بین ۷ تا ۱۵ رقم)';
+    notice.innerHTML = '<span style="color:var(--crimson); font-weight:700;">✕</span> Invalid length (' + val.length + ' digits - standard: 7 to 15 digits)';
     phoneInput.style.borderColor = 'var(--crimson)';
   }
 };
@@ -5132,11 +5125,11 @@ window.handleLiveNameCheck = function(nameVal) {
 
   if (val.length < 2) {
     notice.style.color = 'var(--crimson)';
-    notice.textContent = '✕ نام حداقل باید ۲ حرف باشد';
+    notice.textContent = '✕ Minimum 2 characters required';
     nameInput.style.borderColor = 'var(--crimson)';
   } else {
     notice.style.color = 'var(--emerald)';
-    notice.textContent = '✓ نام معتبر است';
+    notice.textContent = '✓ Name is valid';
     nameInput.style.borderColor = 'var(--emerald)';
   }
 };

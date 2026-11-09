@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=20.4.0">
+  <link rel="stylesheet" href="style.css?v=20.5.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -1887,146 +1887,135 @@
       
       <!-- ۱. فرم ورود اعضا -->
       <div id="authViewLogin">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h3 style="font-size:17px; font-weight:900;">Studio Member Portal</h3>
-          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
-        </div>
-
-        <!-- دکمه ورود سریع با گوگل همراه با سلب مسئولیت حقوقی استاندارد -->
-        <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border-radius:10px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px; transition:all 0.25s;">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <span>Quick Sign in with Google</span>
-        </button>
-        <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin:0 0 14px; line-height:1.5;">
-          با کلیک روی ورود گوگل، <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:10.5px; cursor:pointer;">قوانین و شرایط خدمات استودیو</button> را مطالعه نموده و می‌پذیرید.
-        </p>
-
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
-          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
-          <span style="font-size:11px; color:var(--text-muted);">یا با ایمیل و رمز عبور</span>
-          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:17px; font-weight:900; letter-spacing:0.5px; color:#fff;">Studio Member Portal</h3>
+          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted); background:none; border:none; cursor:pointer;">✕</button>
         </div>
 
         <form id="memberLoginForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:5px;">آدرس ایمیل</label>
-            <input type="email" id="loginEmail" required class="font-mono" placeholder="user@domain.com" />
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#cbd5e1; font-weight:600;">Email Address</label>
+            <input type="email" id="loginEmail" required class="font-mono" placeholder="artist@domain.com" style="width:100%; padding:11px 14px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-              <label style="font-size:12px;">رمز عبور</label>
-              <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">Forgot Password?</button>
+              <label style="font-size:12px; color:#cbd5e1; font-weight:600;">Password</label>
+              <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric); background:none; border:none; cursor:pointer;">Forgot Password?</button>
             </div>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" style="padding-left:40px;" />
-              <button type="button" onclick="togglePasswordVisibility('loginPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+              <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" style="width:100%; padding:11px 40px 11px 14px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
+              <button type="button" onclick="togglePasswordVisibility('loginPass', this)" style="position:absolute; right:10px; color:var(--text-muted); background:none; border:none; padding:4px; font-size:16px; cursor:pointer;" title="Show/Hide Password">👁️</button>
             </div>
           </div>
-          <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">Sign In to Account</button>
+          <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px; font-weight:700; font-size:13px;">Sign In to Account</button>
         </form>
-        <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
-          <span>هنوز حسابی ندارید؟</span>
-          <button type="button" onclick="switchAuthView('signup')" class="auth-tab-link" style="font-weight:700;">ثبت‌نام عضویت</button>
+
+        <!-- جداکننده ورود گوگل در پایین فرم -->
+        <div style="display:flex; align-items:center; gap:10px; margin:16px 0 12px;">
+          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+          <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">or continue with</span>
+          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+        </div>
+
+        <!-- دکمه ورود سریع با گوگل در پایین -->
+        <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border-radius:10px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:8px; transition:all 0.25s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Sign in with Google</span>
+        </button>
+        <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin:0 0 14px; line-height:1.5;">
+          By continuing, you agree to the <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:10.5px; cursor:pointer; background:none; border:none; padding:0;">Studio Terms of Service</button>.
+        </p>
+
+        <div style="margin-top:14px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
+          <span>Don't have an account?</span>
+          <button type="button" onclick="switchAuthView('signup')" class="auth-tab-link" style="font-weight:700; color:var(--gold); background:none; border:none; cursor:pointer;">Sign Up</button>
         </div>
       </div>
 
       <!-- ۲. فرم ثبت‌نام اعضا -->
       <div id="authViewSignUp" class="hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h3 style="font-size:17px; font-weight:900;">ایجاد حساب کاربری</h3>
-          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
-        </div>
-
-        <!-- دکمه ثبت‌نام سریع با گوگل همراه با سلب مسئولیت حقوقی استاندارد -->
-        <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border-radius:10px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px; transition:all 0.25s;">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <span>عضویت سریع با حساب Google</span>
-        </button>
-        <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin:0 0 14px; line-height:1.5;">
-          با عضویت از طریق گوگل، <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:10.5px; cursor:pointer;">قوانین و شرایط خدمات استودیو</button> را مطالعه نموده و می‌پذیرید.
-        </p>
-
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
-          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
-          <span style="font-size:11px; color:var(--text-muted);">یا ثبت‌نام با ایمیل مستقیم</span>
-          <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:17px; font-weight:900; letter-spacing:0.5px; color:#fff;">Create Studio Account</h3>
+          <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted); background:none; border:none; cursor:pointer;">✕</button>
         </div>
 
         <form id="memberSignUpForm" style="display:flex; flex-direction:column; gap:14px;">
           <!-- ۱. فیلد نام یا لقب نمایشی -->
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">نام یا لقب نمایشی شما در استودیو</label>
-            <input type="text" id="signupName" required minlength="3" oninput="handleLiveNameCheck(this.value)" placeholder="مثال: آریا تهرانی یا نام مستعار معتبر" />
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#cbd5e1; font-weight:600;">Display Name / Artist Handle</label>
+            <input type="text" id="signupName" required minlength="3" oninput="handleLiveNameCheck(this.value)" placeholder="e.g. Seyed Soroush or Artist Handle" style="width:100%; padding:11px 14px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
             <div id="signupNameLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
           </div>
 
-          <!-- ۲. فیلد ایمیل معتبر با اعتبارسنجی زنده در زیر کادر -->
+          <!-- ۲. فیلد ایمیل معتبر -->
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">آدرس جیمیل یا ایمیل معتبر (شناسه اصلی حساب و بازیابی)</label>
-            <input type="email" id="signupEmail" required oninput="handleLiveEmailCheck(this.value)" class="font-mono" placeholder="username@gmail.com" />
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#cbd5e1; font-weight:600;">Email Address (Account ID & Invoices)</label>
+            <input type="email" id="signupEmail" required oninput="handleLiveEmailCheck(this.value)" class="font-mono" placeholder="username@gmail.com" style="width:100%; padding:11px 14px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
             <div id="signupEmailLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
           </div>
 
-          <!-- ۳. فیلد شماره همراه اختیاری با لیست کامل پیش‌شماره‌های بین‌المللی -->
+          <!-- ۳. فیلد شماره همراه با لیست کشویی و امکان تایپ هر کد دلخواه -->
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">شماره تلفن همراه <span style="color:var(--text-muted); font-size:11px;">(اختیاری - جهت اطلاع‌رسانی پیامکی و پشتیبانی سریع)</span></label>
-            <div class="intl-phone-wrapper">
-              <select id="signupCountryCode" onchange="handleLivePhoneCheck()">
-                <option value="+98" selected>🇮🇷 Iran (+98)</option>
-                <option value="+971">🇦🇪 UAE (+971)</option>
-                <option value="+90">🇹🇷 Turkey (+90)</option>
-                <option value="+964">🇮🇶 Iraq (+964)</option>
-                <option value="+93">🇦🇫 Afghanistan (+93)</option>
-                <option value="+374">🇦🇲 Armenia (+374)</option>
-                <option value="+994">🇦🇿 Azerbaijan (+994)</option>
-                <option value="+1">🇺🇸 USA / Canada (+1)</option>
-                <option value="+44">🇬🇧 UK (+44)</option>
-                <option value="+49">🇩🇪 Germany (+49)</option>
-                <option value="+33">🇫🇷 France (+33)</option>
-                <option value="+39">🇮🇹 Italy (+39)</option>
-                <option value="+31">🇳🇱 Netherlands (+31)</option>
-                <option value="+46">🇸🇪 Sweden (+46)</option>
-                <option value="+41">🇨🇭 Switzerland (+41)</option>
-                <option value="+61">🇦🇺 Australia (+61)</option>
-                <option value="+81">🇯🇵 Japan (+81)</option>
-                <option value="+82">🇰🇷 South Korea (+82)</option>
-                <option value="+86">🇨🇳 China (+86)</option>
-                <option value="+91">🇮🇳 India (+91)</option>
-                <option value="+7">🇷🇺 Russia (+7)</option>
-                <option value="+966">🇸🇦 Saudi Arabia (+966)</option>
-                <option value="+974">🇶🇦 Qatar (+974)</option>
-                <option value="+965">🇰🇼 Kuwait (+965)</option>
-                <option value="+968">🇴🇲 Oman (+968)</option>
-                <option value="+973">🇧🇭 Bahrain (+973)</option>
-                <option value="+92">🇵🇰 Pakistan (+92)</option>
-                <option value="+992">🇹🇯 Tajikistan (+992)</option>
-                <option value="+993">🇹🇲 Turkmenistan (+993)</option>
-                <option value="+998">🇺🇿 Uzbekistan (+998)</option>
-                <option value="+55">🇧🇷 Brazil (+55)</option>
-                <option value="+60">🇲🇾 Malaysia (+60)</option>
-                <option value="+65">🇸🇬 Singapore (+65)</option>
-                <option value="+64">🇳🇿 New Zealand (+64)</option>
-                <option value="+47">🇳🇴 Norway (+47)</option>
-                <option value="+45">🇩🇰 Denmark (+45)</option>
-                <option value="+358">🇫🇮 Finland (+358)</option>
-                <option value="+43">🇦🇹 Austria (+43)</option>
-                <option value="+32">🇧🇪 Belgium (+32)</option>
-                <option value="+48">🇵🇱 Poland (+48)</option>
-                <option value="+380">🇺🇦 Ukraine (+380)</option>
-                <option value="+995">🇬🇪 Georgia (+995)</option>
-                <option value="other">🌐 Other / سایر</option>
-              </select>
-              <input type="tel" id="signupPhone" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleLivePhoneCheck();" class="font-mono" placeholder="9123456789 (اختیاری)" />
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#cbd5e1; font-weight:600;">Mobile Phone Number <span style="color:var(--text-muted); font-size:11px; font-weight:400;">(Optional - For SMS & updates)</span></label>
+            <div class="intl-phone-wrapper" style="display:flex; gap:8px; direction:ltr !important; align-items:center;">
+              <div style="position:relative; width:135px; min-width:125px;">
+                <input type="text" id="signupCountryCode" list="countryCodeList" class="font-mono" value="+98" placeholder="+98" style="width:100%; padding:11px 10px; font-size:12px; background:#06080c; color:var(--text-main); border:1px solid var(--border-subtle); border-radius:10px; direction:ltr; text-align:left; box-sizing:border-box;" title="Country Code (type or select)" onchange="handleLivePhoneCheck()" />
+                <datalist id="countryCodeList">
+                  <option value="+98">🇮🇷 Iran (+98)</option>
+                  <option value="+971">🇦🇪 UAE (+971)</option>
+                  <option value="+90">🇹🇷 Turkey (+90)</option>
+                  <option value="+964">🇮🇶 Iraq (+964)</option>
+                  <option value="+93">🇦🇫 Afghanistan (+93)</option>
+                  <option value="+374">🇦🇲 Armenia (+374)</option>
+                  <option value="+994">🇦🇿 Azerbaijan (+994)</option>
+                  <option value="+1">🇺🇸 USA / Canada (+1)</option>
+                  <option value="+44">🇬🇧 UK (+44)</option>
+                  <option value="+49">🇩🇪 Germany (+49)</option>
+                  <option value="+33">🇫🇷 France (+33)</option>
+                  <option value="+39">🇮🇹 Italy (+39)</option>
+                  <option value="+31">🇳🇱 Netherlands (+31)</option>
+                  <option value="+46">🇸🇪 Sweden (+46)</option>
+                  <option value="+41">🇨🇭 Switzerland (+41)</option>
+                  <option value="+61">🇦🇺 Australia (+61)</option>
+                  <option value="+81">🇯🇵 Japan (+81)</option>
+                  <option value="+82">🇰🇷 South Korea (+82)</option>
+                  <option value="+86">🇨🇳 China (+86)</option>
+                  <option value="+91">🇮🇳 India (+91)</option>
+                  <option value="+7">🇷🇺 Russia (+7)</option>
+                  <option value="+966">🇸🇦 Saudi Arabia (+966)</option>
+                  <option value="+974">🇶🇦 Qatar (+974)</option>
+                  <option value="+965">🇰🇼 Kuwait (+965)</option>
+                  <option value="+968">🇴🇲 Oman (+968)</option>
+                  <option value="+973">🇧🇭 Bahrain (+973)</option>
+                  <option value="+92">🇵🇰 Pakistan (+92)</option>
+                  <option value="+992">🇹🇯 Tajikistan (+992)</option>
+                  <option value="+993">🇹🇲 Turkmenistan (+993)</option>
+                  <option value="+998">🇺🇿 Uzbekistan (+998)</option>
+                  <option value="+55">🇧🇷 Brazil (+55)</option>
+                  <option value="+60">🇲🇾 Malaysia (+60)</option>
+                  <option value="+65">🇸🇬 Singapore (+65)</option>
+                  <option value="+64">🇳🇿 New Zealand (+64)</option>
+                  <option value="+47">🇳🇴 Norway (+47)</option>
+                  <option value="+45">🇩🇰 Denmark (+45)</option>
+                  <option value="+358">🇫🇮 Finland (+358)</option>
+                  <option value="+43">🇦🇹 Austria (+43)</option>
+                  <option value="+32">🇧🇪 Belgium (+32)</option>
+                  <option value="+48">🇵🇱 Poland (+48)</option>
+                  <option value="+380">🇺🇦 Ukraine (+380)</option>
+                  <option value="+995">🇬🇪 Georgia (+995)</option>
+                </datalist>
+              </div>
+              <input type="tel" id="signupPhone" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleLivePhoneCheck();" class="font-mono" placeholder="9123456789 (optional)" style="flex:1; padding:11px 12px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
             </div>
             <div id="signupPhoneLiveNotice" style="font-size:11px; margin-top:5px; display:none;"></div>
           </div>
 
-          <!-- ۴. رمز عبور و تکرار -->
+          <!-- ۴. رمز عبور و تکرار همراه با آیکون در سمت راست -->
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">رمز عبور حساب</label>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#cbd5e1; font-weight:600;">Account Password</label>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="حداقل ۶ کاراکتر ترکیبی" style="padding-left:40px;" />
-              <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+              <input type="password" id="signupPass" required minlength="6" oninput="evalPassStrength(this.value, 'signupPass')" class="font-mono" placeholder="Minimum 6 characters" style="width:100%; padding:11px 40px 11px 14px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
+              <button type="button" onclick="togglePasswordVisibility('signupPass', this)" style="position:absolute; right:10px; color:var(--text-muted); background:none; border:none; padding:4px; font-size:16px; cursor:pointer;" title="Show/Hide Password">👁️</button>
             </div>
             <!-- نوار هوشمند سنجش قدرت رمز عبور -->
             <div id="signupPassStrengthBox" style="margin-top:6px; display:none;">
@@ -2034,35 +2023,35 @@
                 <div id="signupPassStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
               </div>
               <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                <span id="signupPassStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
-                <span id="signupPassStrengthHint" class="font-mono" style="color:var(--text-muted);">ترکیب حروف و عدد</span>
+                <span id="signupPassStrengthText" style="color:var(--text-muted);">Security Level: Weak</span>
+                <span id="signupPassStrengthHint" class="font-mono" style="color:var(--text-muted);">Letters & Numbers</span>
               </div>
             </div>
           </div>
 
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:5px; color:#e2e8f0;">تکرار رمز عبور</label>
+            <label style="font-size:12px; display:block; margin-bottom:5px; color:#cbd5e1; font-weight:600;">Confirm Password</label>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="signupPassConfirm" required minlength="6" class="font-mono" placeholder="تکرار دقیق رمز عبور" style="padding-left:40px;" />
-              <button type="button" onclick="togglePasswordVisibility('signupPassConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
+              <input type="password" id="signupPassConfirm" required minlength="6" class="font-mono" placeholder="Re-enter password" style="width:100%; padding:11px 40px 11px 14px; background:#06080c; border:1px solid var(--border-subtle); border-radius:10px; color:#fff; direction:ltr; text-align:left; box-sizing:border-box;" />
+              <button type="button" onclick="togglePasswordVisibility('signupPassConfirm', this)" style="position:absolute; right:10px; color:var(--text-muted); background:none; border:none; padding:4px; font-size:16px; cursor:pointer;" title="Show/Hide Password">👁️</button>
             </div>
           </div>
 
-          <!-- ۵. چک‌باکس واحد قوانین و شرایط خدمات استودیو -->
+          <!-- ۵. چک‌باکس قوانین و شرایط به انگلیسی -->
           <div style="margin:4px 0 6px; padding:11px 12px; background:#06080d; border:1px solid var(--border-subtle); border-radius:10px;">
-            <label style="display:flex; align-items:flex-start; gap:9px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.65;">
+            <label style="display:flex; align-items:flex-start; gap:9px; font-size:11.5px; color:#cbd5e1; cursor:pointer; line-height:1.65; direction:ltr; text-align:left;">
               <input type="checkbox" id="signupAgreeTerms" required style="width:16px; height:16px; margin-top:3px; accent-color:var(--gold); flex-shrink:0;" />
-              <span>کلیه <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-weight:700;">قوانین و شرایط خدمات استودیو</a> را مطالعه نموده و می‌پذیرم.</span>
+              <span>I have read and agree to the <a href="#view-terms" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-weight:700;">Studio Terms of Service & Privacy Policy</a>.</span>
             </label>
           </div>
 
-          <button type="submit" class="btn-gold" style="padding:12px; margin-top:2px;">
-            تکمیل ثبت‌نام و ورود به استودیو ←
+          <button type="submit" class="btn-gold" style="padding:12px; margin-top:2px; font-weight:700; font-size:13px;">
+            Complete Registration & Enter Studio →
           </button>
         </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
-          <span>حساب دارید؟</span>
-          <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">وارد شوید</button>
+          <span>Already have an account?</span>
+          <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700; color:var(--gold); background:none; border:none; cursor:pointer;">Sign In</button>
         </div>
       </div>
 
@@ -2300,8 +2289,8 @@
       </button>
     </div>
   </footer>
-  <script src="data.js?v=20.4.0"></script>
-  <script src="app.js?v=20.4.0"></script>
+  <script src="data.js?v=20.5.0"></script>
+  <script src="app.js?v=20.5.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
