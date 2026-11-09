@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <!-- ریدایرکت خودکار و انحصاری به دامنه رسمی تاج اینک آرت (Exclusive tajinkart.space) -->
   <link rel=canonical href="https://tajinkart.space/" />
@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=15.1.0">
+  <link rel="stylesheet" href="style.css?v=16.0.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -52,14 +52,14 @@
 
   <!-- ۱. نشان شناور برند در بالا-چپ همراه با سوئیچر زبان -->
   <div id="topCenterBrandBar">
-    <button onclick="switchView('showcase')" class="top-center-pill" title="صفحه اصلی">
+    <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
       <span class="top-dot"></span>
       <span>TAJINKART</span>
     </button>
 
     <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان برند TAJINKART -->
     <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="فیلتر دسته‌بندی آثار">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks">
         <span id="currentCategoryPillLabel">All Artworks</span>
         <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
       </button>
@@ -82,7 +82,7 @@
     </div>
 
     <!-- دکمه بازگشت به خانه با رنگ متمایز آتشین (Coral Flame) -->
-    <button id="rightDockHomeBtn" onclick="switchView('showcase')" class="right-exp-btn home-theme hidden" title="صفحه اصلی">
+    <button id="rightDockHomeBtn" onclick="switchView('showcase')" class="right-exp-btn home-theme hidden" title="Home / Showcase">
       <span class="right-exp-icon">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -186,7 +186,7 @@
       <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">FROM INK TO UNIVERSE</div>
       <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" style="margin-top:2px;" title="وضعیت ارتباطی و پذیرش سفارشات در آتلیه">
         <span class="status-pulse-dot"></span>
-        <span id="studioLiveStatusText">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است</span>
+        <span id="studioLiveStatusText">Studio Online • Accepting Briefs & Concept Commissions</span>
       </div>
     </div>
 
@@ -205,7 +205,7 @@
             </div>
             
             <h2 style="font-size:24px; font-weight:900; color:#fff; margin-bottom:8px; line-height:1.4;">
-              درباره استودیو <span style="color:var(--gold);">TAJINKART</span>
+              About <span style="color:var(--gold);">TAJINKART</span> Studio
             </h2>
             <p style="font-size:14px; font-weight:700; color:var(--cyan-electric); margin-bottom:14px;">
               سید سروش تاج • مدیر استودیو، طراح ارشد کانسپت آرت و معمار جهان‌های روایی
@@ -287,9 +287,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">01.</span>
-                  <span>طراحی کاراکتر و شخصیت</span>
+                  <span>Character & Heroes</span>
                 </div>
-                <div class="service-nav-desc">سیلوئت‌های دقیق، اتودهای مفهومی، مدل‌شیت ۳۶۰ درجه و رندرهای نهایی سینمایی.</div>
+                <div class="service-nav-desc">Thumbnail silhouettes, concept exploration, 360° model sheets, and master cinematic renders.</div>
               </div>
             </div>
 
@@ -299,9 +299,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">02.</span>
-                  <span>موجودات و هیولاها</span>
+                  <span>Creatures & Bosses</span>
                 </div>
-                <div class="service-nav-desc">زیست‌شناسی تخیلی، آناتومی درندگان، بافت‌های پوست و فلس و نورپردازی کلوزآپ.</div>
+                <div class="service-nav-desc">Speculative biology, predatory locomotion, jaw diagrams, tactile scales, and human scale comparison.</div>
               </div>
             </div>
 
@@ -311,9 +311,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">03.</span>
-                  <span>طراحی فضا و معماری دنیا</span>
+                  <span>Environment & Worlds</span>
                 </div>
-                <div class="service-nav-desc">معماری دارک‌فانتزی، اسست‌های مدولار صحنه، تنظیم عمق اتمسفر و تامب‌نیل‌های ارزشی.</div>
+                <div class="service-nav-desc">Dark-fantasy architecture, modular level-design kits, depth haze, and wide atmospheric establishing shots.</div>
               </div>
             </div>
 
@@ -323,9 +323,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">04.</span>
-                  <span>کاور و کی‌فریم سینمایی</span>
+                  <span>Keyframes & Covers</span>
                 </div>
-                <div class="service-nav-desc">طراحی جلد کتاب‌های مصور، کاور آلبوم موسیقی، پوسترهای داستانی و صفحات اسپلش.</div>
+                <div class="service-nav-desc">Flagship game splash art, dramatic narrative battle moments, and commercial book/album covers.</div>
               </div>
             </div>
 
@@ -335,9 +335,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">05.</span>
-                  <span>تجهیزات، پراپ و UI</span>
+                  <span>Props, Weapons & Relics</span>
                 </div>
-                <div class="service-nav-desc">سلاح‌ها و تجهیزات جادویی، المان‌های HUD دارک‌فانتزی، آیکون‌های مهارت و نقش‌های قبیله‌ای.</div>
+                <div class="service-nav-desc">Hero weapons, enchanted artifacts, inventory loot sets, and dark-fantasy HUD frames.</div>
               </div>
             </div>
 
@@ -347,9 +347,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">07.</span>
-                  <span>مسکات، نشان تجاری و کرست</span>
+                  <span>Brand Mascot & Crest</span>
                 </div>
-                <div class="service-nav-desc">طراحی نماد انحصاری برندها، مسکات بازی و نشان رسمی با راهنمای هویت بصری.</div>
+                <div class="service-nav-desc">Custom brand mascot creation, gaming emblems, and studio crests with visual identity guidelines.</div>
               </div>
             </div>
 
@@ -359,9 +359,9 @@
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">06.</span>
-                  <span>کمیک، مانگا و استوری‌بورد</span>
+                  <span>Comics & Sequential</span>
                 </div>
-                <div class="service-nav-desc">دکوپاژ و پنینگ صحنه‌ها، چینش حباب‌های گفتگو، جوهرزنی خطی مانگا و صفحات تمام‌رنگی.</div>
+                <div class="service-nav-desc">Cinematic storyboarding, authentic inked manga line-art with screentones, and full-color webtoon pages.</div>
               </div>
             </div>
           </div>
@@ -531,14 +531,14 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <h2 class="view-hero-title">جهان اورجینال و داستان‌های جنسیس</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">فصل‌های داستان، اهداف توسعه و نقشه راه پیشرفت دنیای دارک‌فانتزی جنسیس.</p>
+          <h2 class="view-hero-title">Genesis Universe & Graphic Lore</h2>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">Original dark fantasy universe, narrative chapters, and world progression roadmap.</p>
         </div>
       </div>
 
       <div class="genesis-hero">
         <p style="font-size:13.5px; color:#cbd5e1; line-height:1.8; max-width:860px;">
-          یک پروژه مستقل توسعه جهان و داستان‌پردازی دارک فانتزی. پیش‌درآمد را مطالعه کرده و با حمایت از پروژه، فصل‌های بعدی، روستر کاراکترهای جدید و بسته‌های دیجیتال کلکسیونی را باز کنید.
+          An independent dark-fantasy worldbuilding and storytelling franchise. Explore the prologue chapters, concept art, and unlock upcoming character rosters and digital collector editions.
         </p>
 
         <div style="margin-top:20px;">
@@ -665,7 +665,7 @@
   </section>
 
   <!-- بخش ۶: پنل مدیریت ادمین کامل فارسی -->
-  <section id="view-admin" class="view-section hidden">
+  <section id="view-admin" class="view-section hidden" dir="rtl" lang="fa">
     <div class="container">
       <div id="adminLoginGate" style="max-width:440px; margin:50px auto; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.35); border-radius:20px; padding:30px 24px; text-align:center; box-shadow:0 15px 45px rgba(0,0,0,0.75);">
         <div style="width:48px; height:48px; border-radius:14px; background:rgba(250,204,21,0.12); border:1px solid rgba(250,204,21,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">👑</div>
@@ -1261,7 +1261,7 @@
                     </div>
                     <div>
                       <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن بیانیه و فلسفه دنیاسازی استودیو:</label>
-                      <textarea id="setAboutManifestoText" rows="4" style="font-size:11.5px; line-height:1.8; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;">استودیو تاج‌اینک‌آرت (TAJINKART) متولد اشتیاق بی‌پایان به خلق دنیاهای فانتزی تاریک، سایبرپانک و اساطیری است. با بیش از یک دهه تمرکز بر توسعه کانسپت‌های بصری، هدف آتلیه فراتر از تصویرگری صرف است؛ ما زبان بصری کامل، منطق معماری، متریال‌ها و هویت زیستی جهان‌های بازی و سینما را از نخستین قطره جوهر تا بی‌نهایت کیهان مهندسی می‌کنیم: «From Ink to Universe».</textarea>
+                      <textarea id="setAboutManifestoText" rows="4" style="font-size:11.5px; line-height:1.8; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;">TAJINKART Studio was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: «From Ink to Universe».</textarea>
                     </div>
                     <button type="button" onclick="saveAboutStudioManifestoDirect()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
                       ✓ ذخیره و به‌روزرسانی متن درباره استودیو
@@ -1295,7 +1295,7 @@
                         <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
                         <div>
                           <strong style="color:#10b981; font-size:12px; display:block;">🟢 همیشه آنلاین و باز</strong>
-                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است.</span>
+                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">Studio Online • Accepting Briefs & Concept Commissions.</span>
                         </div>
                       </label>
 
@@ -1769,14 +1769,14 @@
       <!-- ۱. فرم ورود اعضا -->
       <div id="authViewLogin">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h3 style="font-size:17px; font-weight:900;">ورود اعضای استودیو</h3>
+          <h3 style="font-size:17px; font-weight:900;">Studio Member Portal</h3>
           <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
         </div>
 
         <!-- دکمه ورود سریع با گوگل همراه با سلب مسئولیت حقوقی استاندارد -->
         <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border-radius:10px; background:#0b0f19; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; margin-bottom:6px; transition:all 0.25s;">
           <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <span>ورود سریع با حساب Google</span>
+          <span>Quick Sign in with Google</span>
         </button>
         <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin:0 0 14px; line-height:1.5;">
           با کلیک روی ورود گوگل، <button type="button" onclick="openTermsModal(event)" style="color:var(--gold); text-decoration:underline; font-size:10.5px; cursor:pointer;">قوانین و شرایط خدمات استودیو</button> را مطالعه نموده و می‌پذیرید.
@@ -1796,14 +1796,14 @@
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
               <label style="font-size:12px;">رمز عبور</label>
-              <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">فراموشی رمز عبور؟</button>
+              <button type="button" onclick="switchAuthView('forgot')" class="auth-tab-link" style="font-size:11px; color:var(--cyan-electric);">Forgot Password?</button>
             </div>
             <div style="position:relative; display:flex; align-items:center;">
               <input type="password" id="loginPass" required class="font-mono" placeholder="••••••••" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('loginPass', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
             </div>
           </div>
-          <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">ورود به حساب کاربری</button>
+          <button type="submit" class="btn-gold" style="padding:12px; margin-top:4px;">Sign In to Account</button>
         </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px; display:flex; justify-content:center; gap:8px;">
           <span>هنوز حسابی ندارید؟</span>
@@ -2174,8 +2174,8 @@
       <div>تمامی حقوق مادی و معنوی آثار هنری، کانسپت‌ها و جهان‌های خلق‌شده منحصراً متعلق به استودیو TAJINKART © 2026 است.</div>
     </div>
   </footer>
-  <script src="data.js?v=15.1.0"></script>
-  <script src="app.js?v=15.1.0"></script>
+  <script src="data.js?v=16.0.0"></script>
+  <script src="app.js?v=16.0.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

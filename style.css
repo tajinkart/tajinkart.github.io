@@ -3953,3 +3953,25 @@ body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
 .dock-store-wrapper.active .dock-store-in-place-accordion {
   display: flex !important;
 }
+
+/* ==============================================================================
+   v16.0.0: پیکربندی بین‌المللی عمومی LTR و حفظ انحصاری RTL در پنل ادمین
+   ============================================================================== */
+html[lang="en"] body {
+  direction: ltr;
+  text-align: left;
+}
+
+/* پنل ادمین اختصاصی مدیر استودیو منحصراً فارسی و راست به چپ */
+#view-admin, 
+#view-admin *,
+.admin-dashboard-layout, 
+#adminWorkspace,
+.admin-art-modal-box {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: 'Vazirmatn', sans-serif !important;
+}
+.admin-nav-item {
+  text-align: right !important;
+}

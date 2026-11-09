@@ -3,13 +3,13 @@
 // موتور داینامیک دسته‌بندی‌های گالری آثار استودیو (Studio Gallery Categories Engine)
 // ==============================================================================
 const DEFAULT_GALLERY_CATEGORIES = [
-  { id: 'character', title: 'کاراکتر دیزاین', color: '#facc15' },
-  { id: 'environment', title: 'کانسپت و فضا', color: '#38bdf8' },
-  { id: 'creature', title: 'موجودات و هیولا', color: '#10b981' },
-  { id: 'keyframe', title: 'کی‌فریم و کاور', color: '#f43f5e' },
-  { id: 'props', title: 'تجهیزات و پراپ', color: '#a855f7' },
-  { id: 'comic', title: 'کمیک و وب‌تون', color: '#fb923c' },
-  { id: '2d', title: 'تصویرسازی ۲ بعدی', color: '#ec4899' }
+  { id: 'character', title: 'Character Design', color: '#facc15' },
+  { id: 'environment', title: 'Environment & Worlds', color: '#38bdf8' },
+  { id: 'creature', title: 'Creatures & Monsters', color: '#10b981' },
+  { id: 'keyframe', title: 'Keyframes & Covers', color: '#f43f5e' },
+  { id: 'props', title: 'Props, Weapons & UI', color: '#a855f7' },
+  { id: 'comic', title: 'Comics & Manga', color: '#fb923c' },
+  { id: 'mascot', title: 'Brand Mascot & Crest', color: '#ec4899' }
 ];
 
 let galleryCategories = [];
@@ -31,7 +31,7 @@ window.renderFloatingCategoryDropdown = function() {
     <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'همه آثار')">
       <span style="display:flex; align-items:center; gap:8px;">
         <span style="width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
-        <span>همه آثار</span>
+        <span>All Artworks</span>
       </span>
     </div>
   `;
@@ -1804,13 +1804,13 @@ window.renderShowcaseGrid = function() {
     // برچسب زیرین هویت اثر: نمایش پکیج پروداکشن در آثار چندفازی یا شاخه کانسپت
     let subLabel = '';
     if (art.phases && Array.isArray(art.phases) && art.phases.length > 1) {
-      subLabel = `پکیج جامع پروداکشن • ${art.phases.length} شیت کانسپت`;
+      subLabel = `Production Case Study • ${art.phases.length} Sheets`;
     } else {
       const catObj = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories))
         ? galleryCategories.find(c => c.id === activeKey || c.id === (PIPELINE_TO_CATEGORY_MAP[activeKey] || ''))
         : null;
-      const catFa = catObj ? catObj.name : (PIPELINE_TO_CATEGORY_MAP[activeKey] || 'کانسپت آرت');
-      subLabel = `${catFa} • ${activeKey.toUpperCase()}`;
+      const catName = catObj ? (catObj.title || catObj.name) : activeKey.toUpperCase();
+      subLabel = `${catName} Concept`;
     }
 
     return `
@@ -2044,10 +2044,10 @@ function renderArtStationProject(art) {
     streamHtml += `
       <div class="production-pack-card">
         
-        <h3 class="pack-title">سفارش پکیج کامل این پروژه</h3>
-        <p class="pack-desc">تولید کامل این زنجیره کانسپت (شامل تمامی اتودها، مدل‌شیت‌ها و فضاسازی‌های این اثر) به صورت یکپارچه با فرمول تعرفه آتلیه.</p>
+        <h3 class="pack-title">Order Full Production Case Study</h3>
+        <p class="pack-desc">Commission this complete concept art pipeline (including exploratory thumbnails, orthographic sheets, and final renders) directly through the studio calculator.</p>
         <button type="button" onclick="orderProjectPack('${art.id}')" class="btn-gold pack-order-btn">
-          سفارش این پکیج در محاسبه‌گر آتلیه ←
+          Inquire / Order in Studio Calculator ←
         </button>
       </div>
     `;
