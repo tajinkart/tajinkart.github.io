@@ -7838,3 +7838,18 @@ window.switchView = function(viewKey) {
 
 
 
+
+
+window.handleGenesisClick = function(e) {
+  if (e) e.preventDefault();
+  closeDockMobile();
+  showToast('بخش جنسیس در حال توسعه است و به زودی رونمایی می‌شود (Genesis Lore — Coming Soon)', 'info');
+  switchView('genesis');
+};
+
+window.handleAcademyClick = function(e) {
+  if (e) e.preventDefault();
+  closeDockMobile();
+  showToast('آکادمی در حال آماده‌سازی است و به زودی آغاز به کار خواهد کرد (Academy — Coming Soon)', 'info');
+  switchView('academy');
+};

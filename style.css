@@ -6028,10 +6028,10 @@ body.in-admin-view #rightVerticalNav,
 
 
 /* ==============================================================================
-   RELEASE V20.6.0: OPTIMUS BRAND FONT IN MODALS, CRISP SOLID DOCK BORDERS & NON-STICKING MOBILE GLOW
+   RELEASE V20.7.0: GENESIS & ACADEMY COMING SOON BADGES & MOBILE DOCK TEXT LABELS
    ============================================================================== */
 
-/* ۱. اعمال فونت سراسری و اصیل استودیو (OptimusPrinceps) در تمامی بخش‌های پورتال اعضا */
+/* ۱. اعمال فونت سراسری استودیو (OptimusPrinceps) در تمامی بخش‌های پورتال اعضا */
 #memberModal,
 #memberModal h3,
 #memberModal label,
@@ -6052,7 +6052,7 @@ body.in-admin-view #rightVerticalNav,
   opacity: 0.65 !important;
 }
 
-/* ۲. خط محیطی شارپ و دقیق دور آیکون‌های داک دقیقاً مثل نشان تاژین کارت (Crisp Solid Border + Halogen Glow) */
+/* ۲. خط محیطی شارپ و توپر ۱.۵px دور تمام آیکون‌های داک با هاله هالوژن متناسب */
 .right-exp-btn.home-theme {
   border: 1.5px solid var(--coral-flame) !important;
   box-shadow: 0 0 12px rgba(255, 87, 34, 0.35), inset 0 0 6px rgba(255, 87, 34, 0.18) !important;
@@ -6127,7 +6127,7 @@ body.in-admin-view #rightVerticalNav,
 
 /* ۳. معماری دسکتاپ (صفحات بالای 768px):
    - داک کلاً باز می‌ماند (بدون سه خط)
-   - هاور موس روی هر دکمه، کپسول متن و عنوان را به سمت چپ باز می‌کند (Hover Text Expansion) */
+   - هاور موس روی هر دکمه، کپسول متن و عنوان را به سمت چپ باز می‌کند */
 @media (min-width: 769px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6181,8 +6181,8 @@ body.in-admin-view #rightVerticalNav,
   .right-exp-btn:hover {
     width: auto !important;
     min-width: 44px !important;
-    max-width: 260px !important;
-    padding-left: 6px !important;
+    max-width: 280px !important;
+    padding-left: 8px !important;
   }
 
   #rightVerticalNav .right-exp-icon,
@@ -6219,7 +6219,7 @@ body.in-admin-view #rightVerticalNav,
   #rightVerticalNav .right-exp-btn:hover .right-exp-text,
   .right-exp-btn:hover .right-exp-text {
     opacity: 1 !important;
-    max-width: 200px !important;
+    max-width: 220px !important;
     pointer-events: auto !important;
   }
 
@@ -6239,9 +6239,8 @@ body.in-admin-view #rightVerticalNav,
 }
 
 /* ۴. معماری موبایل (صفحات تا 768px):
-   - سه خط دایره‌ای ۴۴px با خط محیطی شارپ فیروزه‌ای ۱.۵px
-   - رفع مشکل ماندن دائمی هالوژن پررنگ: نور آرام و متین می‌ماند و گیر نمی‌کند
-   - تمام آیکون‌ها خط محیطی ۱.۵px دقیق با رنگ اختصاصی خود دارند */
+   - داک در حالت بسته: فقط سه خط ۴۴px
+   - داک در حالت باز (dock-open): دکمه‌ها به‌صورت کپسولی با نوشته واضح و خوانا باز می‌شوند تا کاربر بداند چه گزینه‌ای را انتخاب می‌کند */
 @media (max-width: 768px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6252,8 +6251,8 @@ body.in-admin-view #rightVerticalNav,
     flex-direction: column !important;
     align-items: flex-end !important;
     gap: 10px !important;
-    width: 44px !important;
-    max-width: 44px !important;
+    width: auto !important;
+    max-width: 280px !important;
   }
 
   #dockMasterTrigger {
@@ -6274,10 +6273,8 @@ body.in-admin-view #rightVerticalNav,
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
   }
 
-  /* لمس لحظه‌ای دکمه سه خط */
   #dockMasterTrigger:active {
     transform: scale(0.92) !important;
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.45) !important;
   }
 
   #rightVerticalNav.dock-open #dockMasterTrigger svg {
@@ -6285,65 +6282,83 @@ body.in-admin-view #rightVerticalNav,
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* در حالت بسته روی موبایل: دکمه‌ها مخفی هستند */
   #rightVerticalNav:not(.dock-open) .dock-buttons-container {
     display: none !important;
   }
 
+  /* در حالت باز روی موبایل: نمایش کانتینر گزینه‌ها */
   #rightVerticalNav.dock-open .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-end !important;
-    gap: 10px !important;
-    width: 44px !important;
+    gap: 9px !important;
+    width: auto !important;
     padding: 0 !important;
     margin-top: 8px !important;
   }
 
-  #rightVerticalNav .right-exp-btn,
-  .right-exp-btn {
-    width: 44px !important;
+  /* در حالت باز روی موبایل: دکمه‌ها به شکل کپسول باز می‌شوند تا عنوان هر بخش خوانا و قابل لمس باشد */
+  #rightVerticalNav.dock-open .right-exp-btn,
+  .dock-open .right-exp-btn {
+    width: auto !important;
     min-width: 44px !important;
-    max-width: 44px !important;
+    max-width: 250px !important;
     height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    border-radius: 50% !important;
-    aspect-ratio: 1 / 1 !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    border-radius: 999px !important;
     display: flex !important;
+    flex-direction: row-reverse !important;
     align-items: center !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+    padding: 0 0 0 14px !important;
+    margin: 0 !important;
     background: rgba(9, 12, 18, 0.95) !important;
     backdrop-filter: blur(14px) !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
   }
 
-  /* بازخورد لمسی ملایم بدون قفل شدن نور پررنگ */
-  #rightVerticalNav .right-exp-btn:active,
-  .right-exp-btn:active {
-    transform: scale(0.92) !important;
+  #rightVerticalNav.dock-open .right-exp-btn:active,
+  .dock-open .right-exp-btn:active {
+    transform: scale(0.94) !important;
   }
 
-  #rightVerticalNav .right-exp-text,
-  .right-exp-text {
+  /* نمایش متن در حالت باز روی موبایل */
+  #rightVerticalNav.dock-open .right-exp-text,
+  .dock-open .right-exp-text {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    direction: ltr !important;
+    padding-left: 10px !important;
+    padding-right: 4px !important;
+    white-space: nowrap !important;
+    opacity: 1 !important;
+    max-width: 180px !important;
+    pointer-events: auto !important;
+  }
+
+  #rightVerticalNav:not(.dock-open) .right-exp-text {
     display: none !important;
     max-width: 0 !important;
     opacity: 0 !important;
   }
 
-  #rightVerticalNav .right-exp-icon,
-  .right-exp-icon {
+  #rightVerticalNav .right-exp-icon {
     width: 44px !important;
     height: 44px !important;
+    min-width: 44px !important;
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border: none !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
   }
 
   /* خط محیطی ۱.۵px شارپ به همراه هاله متین و دلنشین در موبایل */
