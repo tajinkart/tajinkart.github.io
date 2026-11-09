@@ -4582,3 +4582,132 @@ body {
   color: #fff !important;
   box-shadow: 0 0 16px var(--gold-glow) !important;
 }
+
+
+
+/* ==============================================================================
+   RELEASE V18.4.0: DESKTOP STORE FLYOUT, PARTICLES, CLEAN CATEGORIES & STORE TYPOGRAPHY
+   ============================================================================== */
+
+/* بوم پارتیکل‌های کیهانی و جوهر شناور در پس‌زمینه سراسری */
+#ambientParticleCanvas {
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* زیرمنوی دو قسمتی استور روی دسکتاپ: با هاور یا کلیک فوراً سمت چپ ظاهر می‌شود */
+@media (min-width: 769px) {
+  .dock-store-wrapper {
+    position: relative !important;
+  }
+  
+  .dock-store-wrapper:hover .dock-store-flyout-menu,
+  .dock-store-wrapper.active .dock-store-flyout-menu {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: absolute !important;
+    right: calc(100% + 12px) !important;
+    top: 0 !important;
+    z-index: 10000 !important;
+    width: 240px !important;
+  }
+}
+
+/* آیکون در سمت راست و نوشته‌ها تراز در سمت چپ در تمام باکس‌های داک */
+.dock-flyout-sub-btn {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 10px 14px !important;
+  direction: ltr !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+.dock-flyout-sub-btn .sub-btn-icon {
+  font-size: 20px !important;
+  margin-left: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.dock-flyout-sub-btn .sub-btn-text {
+  display: flex !important;
+  flex-direction: column !important;
+  text-align: left !important;
+  align-items: flex-start !important;
+  flex: 1 !important;
+}
+
+.dock-flyout-sub-btn .sub-btn-text strong {
+  font-family: var(--font-brand) !important;
+  font-size: 13.5px !important;
+  letter-spacing: 0.04em !important;
+}
+
+.dock-flyout-sub-btn .sub-btn-text span {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  margin-top: 2px !important;
+}
+
+/* منوی کشویی All Artworks: تراز ۱۰۰٪ چپ‌چین، نقطه رنگی در چپ، بدون تبدیل به مربع */
+.floating-cat-dropdown {
+  direction: ltr !important;
+  text-align: left !important;
+  min-width: 260px !important;
+  width: max-content !important;
+  padding: 8px !important;
+  border-radius: 14px !important;
+  background: rgba(8, 12, 20, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9) !important;
+}
+
+.cat-dropdown-item {
+  direction: ltr !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  color: #94a3b8 !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+.cat-dropdown-item:hover,
+.cat-dropdown-item.active {
+  background: rgba(250, 204, 21, 0.12) !important;
+  color: #ffffff !important;
+  transform: none !important;
+}
+
+/* فونت OptimusPrinceps روی تمام بخش‌های فروشگاه و آتلیه */
+#view-store,
+#view-store h2,
+#view-store h3,
+#view-store h4,
+.service-nav-card,
+.service-nav-title,
+.pipeline-tile,
+.pipeline-tile-title,
+.sketch-workbench-header,
+.sketch-banner-title {
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.04em !important;
+}
