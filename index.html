@@ -1,35 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <!-- ریدایرکت خودکار و انحصاری به دامنه رسمی تاج اینک آرت (Exclusive tajinkart.space) -->
-  <link rel=canonical href="https://tajinkart.space/" />
-  <script>
-    if (window.location.hostname === 'tajinkart.github.io') {
-      window.location.replace('https://tajinkart.space' + window.location.pathname + window.location.search + window.location.hash);
-    }
-  </script>
-  <!-- محافظت فوق‌العاده سطح مرورگر در برابر مسدودسازی حافظه یا خطاهای دسترسی -->
+  <!-- پشتیبانی همزمان و بدون مسدودسازی از دامنه اختصاصی و گیت‌هاب -->
+  <link rel="canonical" href="https://tajinkart.space/" />
+    <!-- محافظت فوق‌العاده سطح مرورگر در برابر مسدودسازی حافظه یا خطاهای دسترسی -->
   <script>
     (function() {
+      window._memStorage = {};
       try {
         var k = '__tajin_test__';
         window.localStorage.setItem(k, k);
         window.localStorage.removeItem(k);
       } catch (e) {
-        var mem = {};
-        var fake = {
-          getItem: function(k) { return mem[k] || null; },
-          setItem: function(k, v) { mem[k] = String(v); },
-          removeItem: function(k) { delete mem[k]; },
-          clear: function() { mem = {}; }
-        };
-        try {
-          Object.defineProperty(window, 'localStorage', { value: fake, configurable: true });
-          Object.defineProperty(window, 'sessionStorage', { value: fake, configurable: true });
-        } catch (err) {
-          window.localStorage = fake;
-          window.sessionStorage = fake;
-        }
+        window._isStorageBlocked = true;
       }
     })();
   </script>
@@ -42,8 +25,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=18.2.0">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css?v=18.3.0">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c76a19f07a524a87b5a19808d4b38d38"}'></script>
@@ -2277,8 +2260,8 @@
       </button>
     </div>
   </footer>
-  <script src="data.js?v=18.2.0"></script>
-  <script src="app.js?v=18.2.0"></script>
+  <script src="data.js?v=18.3.0"></script>
+  <script src="app.js?v=18.3.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
