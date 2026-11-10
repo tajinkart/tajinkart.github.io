@@ -29,8 +29,6 @@ window.safeSetStorage = safeSetStorage;
 
 
 const KEYS = {
-  CATEGORIES: 'tajinkart_gallery_categories_v2',
-  GENRES: 'tajinkart_gallery_genres_v1',
   ORDERS: 'tajinkart_orders_fa_v2',
   SETTINGS: 'tajinkart_settings_fa_v2',
   ARTWORKS: 'tajinkart_artworks_fa_v2',
@@ -39,25 +37,8 @@ const KEYS = {
   MEMBERS: 'tajinkart_members_fa_v2',
   DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2'
 };
-if (typeof window !== "undefined") window.KEYS = KEYS;
-if (typeof global !== "undefined") global.KEYS = KEYS;
 
 var currentView = 'showcase';
-var currentGalleryFilter = 'all';
-var currentGenreFilter = 'all';
-window.currentGalleryFilter = 'all';
-window.currentGenreFilter = 'all';
-
-// ژانرهای پیش‌فرض استودیو (Studio Universe Themes & Genres)
-const DEFAULT_GALLERY_GENRES = [
-  { id: 'dark_fantasy', title: 'Dark Fantasy', color: '#f43f5e' },
-  { id: 'scifi_cyberpunk', title: 'Sci-Fi & Cyberpunk', color: '#00f0ff' },
-  { id: 'post_apocalyptic', title: 'Post-Apocalyptic', color: '#f59e0b' },
-  { id: 'high_fantasy', title: 'High Fantasy & Mythic', color: '#a855f7' },
-  { id: 'space_opera', title: 'Space Opera & Cosmic', color: '#38bdf8' },
-  { id: 'steampunk', title: 'Steampunk & Retro', color: '#eab308' }
-];
-if (typeof window !== 'undefined') window.DEFAULT_GALLERY_GENRES = DEFAULT_GALLERY_GENRES;
 var currentMember = null;
 var comicCurrentPage = 1;
 var activeModalItem = {};
@@ -77,7 +58,7 @@ var siteSettings = {
   tgToken: '',
   tgChat: '',
   adminPass: 'tajinkart',
-  commissionCapacity: '2 of 3 Atelier Capacity Slots Reserved'
+  commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
 };
 try {
   const _s = safeGetStorage(KEYS.SETTINGS);
@@ -93,95 +74,7 @@ window.siteSettings = siteSettings;
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
 // بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
 // کانسپت‌های پیش‌فرض و غنی استودیو (Fallback جهت تضمین عدم خالی شدن گالری)
-const DEFAULT_STUDIO_ARTWORKS = [
-  {
-    id: 9,
-    genre: 'dark_fantasy',
-    title: 'Rook Knight: Sovereign Vanguard of Extopia',
-    shortSlug: 'Rook Knight',
-    desc: 'Flagship character concept exploration featuring heavy biomechanical plate armor, ceremonial dark cloak, and high-frequency energy blade engineered for close-quarters breach combat in the desolate citadel trenches of Extopia.',
-    image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85',
-    category: 'character',
-    tag: 'character',
-    pipelineKey: 'sketch1',
-    phases: [
-      {
-        name: 'Master Keyframe Render 300DPI',
-        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85',
-        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85',
-        pipelineKey: 'sketch1',
-        subcategory: 'Hero / Main Concept (Full IP)'
-      },
-      {
-        name: '360° Orthographic Model Sheet',
-        img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1400&q=85',
-        image: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1400&q=85',
-        pipelineKey: 'sketch1',
-        subcategory: 'Orthographic 3D Model Sheet'
-      }
-    ]
-  },
-  {
-    id: 10,
-    genre: 'dark_fantasy',
-    title: 'Gorgon Queen: Abyssal Empress of the Drowned Mire',
-    shortSlug: 'Gorgon Queen',
-    desc: 'Bio-luminescent reptilian character exploration combining serpentine locomotion anatomy with ancient ceremonial regalia and necrotic soul-energy channeling.',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
-    category: 'character',
-    tag: 'character',
-    pipelineKey: 'sketch1',
-    phases: [
-      {
-        name: 'Master Keyframe Render 300DPI',
-        img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
-        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
-        pipelineKey: 'sketch1',
-        subcategory: 'Hero / Main Concept (Full IP)'
-      }
-    ]
-  },
-  {
-    id: 11,
-    genre: 'dark_fantasy',
-    title: 'Citadel of the Ashborn: Sunless Horizon',
-    shortSlug: 'Citadel of Ash',
-    desc: 'Wide-angle cinematic establishing environment concept illustrating the monumental gothic architecture and brutalist volcanic spires of the central bastion in the Genesis Universe.',
-    image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=85',
-    category: 'environment',
-    tag: 'environment',
-    pipelineKey: 'sketch2',
-    phases: [
-      {
-        name: 'Cinematic Matte Painting 300DPI',
-        img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=85',
-        image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=85',
-        pipelineKey: 'sketch2',
-        subcategory: 'Exterior Establishing Shot'
-      }
-    ]
-  },
-  {
-    id: 12,
-    genre: 'scifi_cyberpunk',
-    title: 'Leviathan of the Void: Abyssal Apex Behemoth',
-    shortSlug: 'Void Leviathan',
-    desc: 'Creature design exploration exploring speculative predatory anatomy, chitinous armor plating, and human scale comparison for high-end cinematic creature production.',
-    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=85',
-    category: 'creature',
-    tag: 'creature',
-    pipelineKey: 'sketch_creature',
-    phases: [
-      {
-        name: 'Master Creature Keyframe 300DPI',
-        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=85',
-        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=85',
-        pipelineKey: 'sketch_creature',
-        subcategory: 'Predatory Locomotion & Anatomy'
-      }
-    ]
-  }
-];
+const DEFAULT_STUDIO_ARTWORKS = [];
 
 var storedArtworks = [];
 try {
@@ -192,7 +85,7 @@ try {
   storedArtworks = [];
 }
 var showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
-if (!showcaseArtworks || showcaseArtworks.length === 0) {
+if (showcaseArtworks.length === 0) {
   showcaseArtworks = JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
 }
 window.showcaseArtworks = showcaseArtworks;
@@ -573,7 +466,7 @@ var ordersList = [];
 try {
   const _storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS));
   if (Array.isArray(_storedOrders)) {
-    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'Studio Nova' && !String(o.client).includes('Nova'));
+    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'استودیو نوا' && !String(o.client).includes('نوا'));
   }
 } catch(e) {
   ordersList = [];
@@ -593,42 +486,42 @@ var siteMembersData = [];
 let _defaultMembers = [
   {
     id: 101,
-    name: 'Seyed Soroush Taj',
+    name: 'سید سروش تاج',
     email: 'soroush@tajinkart.com',
     contact: '09120000000',
     tier: 'VIP',
     balance: ',450',
     withdrawn: ',200',
     assetsBought: [
-      'Genesis Graphic Novel: Chapters 1 to 3 + Master PSDs',
-      'Master Brush Engine & Rust Alphas (64 Set)',
-      'Rook Knight 2D Game Sprite Animation Pack'
+      'کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD',
+      'موتور براش، بافت و آلفای زنگ‌زدگی (۶۴ عددی)',
+      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ'
     ],
     totalSpent: '20'
   },
   {
     id: 102,
-    name: 'Paya Games Studio',
+    name: 'استودیو پایا گیمز',
     email: 'director@payagames.ir',
     contact: '09350000000',
     tier: 'PRO',
     balance: '50',
     withdrawn: '50',
     assetsBought: [
-      'Rook Knight 2D Game Sprite Animation Pack',
-      'Cinematic Video Loops & 4K Splash Sequences'
+      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ',
+      'لوپ‌های ویدیویی منوی بازی و اسپلش سینمایی 4K'
     ],
     totalSpent: '90'
   },
   {
     id: 103,
-    name: 'Arya Kian',
+    name: 'آریا کیان',
     email: 'aria@gmail.com',
     contact: '09190000000',
     tier: 'STANDARD',
     balance: '/usr/bin/bash',
     withdrawn: '/usr/bin/bash',
-    assetsBought: ['Master Brush Engine & Monster Skin Alphas'],
+    assetsBought: ['موتور براش، بافت و آلفای زنگ‌زدگی و پوست هیولا'],
     totalSpent: '9'
   }
 ];

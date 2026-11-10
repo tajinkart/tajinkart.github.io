@@ -2796,19 +2796,12 @@ textarea:-webkit-autofill {
 
 /* مخفی‌سازی قطعی و ۱۰۰٪ پیل دسته‌بندی در تمام صفحات غیر از گالری صفحه اول */
 body:not([data-view="showcase"]) #floatingGalleryCategoryMenu,
-body:not([data-view="showcase"]) #floatingGalleryGenreMenu,
 body[data-view="store"] #floatingGalleryCategoryMenu,
-body[data-view="store"] #floatingGalleryGenreMenu,
 body[data-view="genesis"] #floatingGalleryCategoryMenu,
-body[data-view="genesis"] #floatingGalleryGenreMenu,
 body[data-view="academy"] #floatingGalleryCategoryMenu,
-body[data-view="academy"] #floatingGalleryGenreMenu,
 body[data-view="society"] #floatingGalleryCategoryMenu,
-body[data-view="society"] #floatingGalleryGenreMenu,
 body[data-view="admin"] #floatingGalleryCategoryMenu,
-body[data-view="admin"] #floatingGalleryGenreMenu,
-body[data-view="member-dashboard"] #floatingGalleryCategoryMenu,
-body[data-view="member-dashboard"] #floatingGalleryGenreMenu {
+body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   display: none !important;
 }
 
@@ -2886,19 +2879,12 @@ body[data-view="member-dashboard"] #floatingGalleryGenreMenu {
 
 /* مخفی‌سازی کامل پیل دسته‌بندی در خارج از صفحه اصلی گالری */
 body:not([data-view="showcase"]) #floatingGalleryCategoryMenu,
-body:not([data-view="showcase"]) #floatingGalleryGenreMenu,
 body[data-view="store"] #floatingGalleryCategoryMenu,
-body[data-view="store"] #floatingGalleryGenreMenu,
 body[data-view="genesis"] #floatingGalleryCategoryMenu,
-body[data-view="genesis"] #floatingGalleryGenreMenu,
 body[data-view="academy"] #floatingGalleryCategoryMenu,
-body[data-view="academy"] #floatingGalleryGenreMenu,
 body[data-view="society"] #floatingGalleryCategoryMenu,
-body[data-view="society"] #floatingGalleryGenreMenu,
 body[data-view="admin"] #floatingGalleryCategoryMenu,
-body[data-view="admin"] #floatingGalleryGenreMenu,
-body[data-view="member-dashboard"] #floatingGalleryCategoryMenu,
-body[data-view="member-dashboard"] #floatingGalleryGenreMenu {
+body[data-view="member-dashboard"] #floatingGalleryCategoryMenu {
   display: none !important;
 }
 
@@ -6073,14 +6059,12 @@ body.in-admin-view #rightVerticalNav,
   max-width: max-content !important;
 }
 
-body:not([data-view="showcase"]) #floatingGalleryCategoryMenu,
-body:not([data-view="showcase"]) #floatingGalleryGenreMenu {
+body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   display: none !important;
 }
 
 /* پیل دسته‌بندی آثار با هاله هالوژن کاملاً درخشان و روشن زیر آن */
 #currentCategoryPillBtn,
-#currentGenrePillBtn,
 .floating-cat-pill {
   display: inline-flex !important;
   align-items: center !important;
@@ -7592,79 +7576,4 @@ font {
 .goog-text-highlight {
   background: transparent !important;
   box-shadow: none !important;
-}
-
-
-/* ==============================================================================
-   TAJINKART BULLETPROOF DESKTOP DOCK NAVIGATION OVERRIDE (v22.3.1)
-   Always visible, hover-expandable, clickable across all views on screens > 768px
-   ============================================================================== */
-@media (min-width: 769px) {
-  #rightVerticalNav {
-    position: fixed !important;
-    right: 20px !important;
-    top: 20px !important;
-    z-index: 99999 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 10px !important;
-    direction: ltr !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-  }
-
-  body.in-admin-view #rightVerticalNav {
-    display: none !important;
-  }
-
-  #rightVerticalNav #dockMasterTrigger {
-    display: none !important;
-  }
-
-  #rightVerticalNav .dock-buttons-container,
-  #rightVerticalNav.dock-collapsed .dock-buttons-container,
-  #rightVerticalNav.dock-collapsed:not(.dock-open) .dock-buttons-container {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 10px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    transform: none !important;
-  }
-
-  #rightVerticalNav .right-exp-btn,
-  #rightVerticalNav.dock-collapsed .right-exp-btn,
-  #rightVerticalNav.dock-collapsed:not(.dock-open) .right-exp-btn {
-    display: flex !important;
-    flex-direction: row-reverse !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    height: 46px !important;
-    min-width: 46px !important;
-    width: 46px !important;
-    padding: 0 !important;
-    border-radius: 999px !important;
-    background: rgba(8, 11, 18, 0.94) !important;
-    backdrop-filter: blur(16px) !important;
-    border: 1.5px solid var(--border-subtle) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75) !important;
-    transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s !important;
-    overflow: hidden !important;
-    text-decoration: none !important;
-    cursor: pointer !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transform: none !important;
-    box-sizing: border-box !important;
-  }
-
-  #rightVerticalNav .right-exp-btn:hover {
-    width: auto !important;
-    min-width: 46px !important;
-    padding: 0 18px 0 6px !important;
-  }
 }
