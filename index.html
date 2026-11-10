@@ -35,36 +35,36 @@
   <!-- بوم پارتیکل‌های معلق کیهانی و جوهر استودیو (Ambient Cosmic & Ink Particles) -->
   <canvas id="ambientParticleCanvas"></canvas>
 
-  <!-- ۱. نشان شناور برند در بالا-چپ همراه با سرچ‌بار داینامیک و سوئیچر دسته‌بندی -->
+    <!-- ۱. نشان شناور برند در بالا-چپ همراه با سوئیچر دسته‌بندی و سوئیچر ژانر -->
   <div id="topCenterBrandBar">
     <div class="top-brand-controls-row">
+      <!-- دکمه خانه / برند -->
       <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
         <span class="top-dot"></span>
         <span>TAJINKART</span>
       </button>
 
-      <!-- نوار جستجوی پیشرفته آثار و ژانرها با آیکون بازشونده در گوشه چپ -->
-      <div id="gallerySearchWrapper" class="gallery-search-wrapper" title="Click to search artworks, genres & lore">
-        <button type="button" id="gallerySearchTriggerBtn" class="gallery-search-icon-btn" onclick="toggleGallerySearchBar(event)" title="Search Artworks, Genres & Lore">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
-          </svg>
-        </button>
-        <div class="gallery-search-input-box">
-          <input type="text" id="gallerySearchInput" placeholder="Search artworks, genres, lore..." oninput="searchGalleryArtworks(this.value)" autocomplete="off" />
-          <button type="button" class="gallery-search-clear-btn" onclick="clearGallerySearch(event)" title="Clear Search">✕</button>
-        </div>
-      </div>
-
-      <!-- فهرست شناور دسته‌بندی و ژانرهای آثار -->
+      <!-- ۱. فهرست شناور دسته‌بندی آثار (All Artworks) -->
       <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-        <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category or Genre">
+        <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
           <span id="currentCategoryPillLabel">All Artworks</span>
-          <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
         </button>
 
         <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
           <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+        </div>
+      </div>
+
+      <!-- ۲. فهرست شناور ژانرهای استودیو (All Genres) دقیقاً مشابه دکمه‌های بالا -->
+      <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
+        <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
+          <span id="currentGenrePillLabel">All Genres</span>
+          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
+        </button>
+
+        <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
+          <!-- داینامیک توسط renderFloatingGenreDropdown لود می‌شود -->
         </div>
       </div>
     </div>
@@ -2519,7 +2519,7 @@
           <span>🌐</span>
           <span>Translate:</span>
         </span>
-        <div id="google_translate_element"></div>
+        <!-- moved to floating widget -->
       </div>
     </div>
   </footer>
@@ -2563,6 +2563,7 @@
         if (window.google && window.google.translate) {
           new window.google.translate.TranslateElement({
             pageLanguage: 'en',
+            includedLanguages: 'fa,en,ar,tr,fr,de,es,ru,ja,ko,zh-CN,it,pt,nl,sv,pl,hi,id',
             autoDisplay: false,
             layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
           }, 'google_translate_element');
@@ -2573,5 +2574,154 @@
     };
   </script>
   <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <!-- ویجت شناور گوگل ترنسلیت با آیکون در گوشه چپ پایین، نوار سرچ و پشتیبانی کامل از زبان فارسی -->
+  <div id="floatingGoogleTranslateWidget" class="floating-translate-widget">
+    <!-- پنجره بازشونده جستجو و انتخاب زبان -->
+    <div id="googleTranslateMenuFlyout" class="google-translate-flyout hidden">
+      <div class="lang-flyout-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:16px;">🌐</span>
+          <span style="font-size:12.5px; font-weight:800; color:var(--gold);">Select Language / انتخاب زبان</span>
+        </div>
+        <button type="button" onclick="toggleGoogleTranslateMenu(event)" class="lang-close-btn" title="Close">✕</button>
+      </div>
+
+      <!-- نوار جستجوی اختصاصی زبان‌ها -->
+      <div class="lang-search-wrapper">
+        <input type="text" id="googleTranslateSearchInput" placeholder="🔍 Search language / جستجوی زبان..." oninput="filterGoogleTranslateLanguages(this.value)" autocomplete="off" />
+      </div>
+
+      <!-- فهرست زبان‌ها با فارسی در صدر لیست -->
+      <div id="googleTranslateLanguagesList" class="lang-options-scroll">
+        <div class="lang-option-card priority-lang" onclick="selectStudioLanguage('fa', 'FA', 'فارسی')">
+          <span class="lang-flag">🇮🇷</span>
+          <div class="lang-names">
+            <span class="lang-native" style="color:var(--gold); font-weight:800;">فارسی</span>
+            <span class="lang-eng">Persian</span>
+          </div>
+          <span class="lang-badge">FA</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('en', 'EN', 'English')">
+          <span class="lang-flag">🇬🇧</span>
+          <div class="lang-names">
+            <span class="lang-native">English</span>
+            <span class="lang-eng">Original</span>
+          </div>
+          <span class="lang-badge">EN</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('ar', 'AR', 'العربية')">
+          <span class="lang-flag">🇦🇪</span>
+          <div class="lang-names">
+            <span class="lang-native">العربية</span>
+            <span class="lang-eng">Arabic</span>
+          </div>
+          <span class="lang-badge">AR</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('tr', 'TR', 'Türkçe')">
+          <span class="lang-flag">🇹🇷</span>
+          <div class="lang-names">
+            <span class="lang-native">Türkçe</span>
+            <span class="lang-eng">Turkish</span>
+          </div>
+          <span class="lang-badge">TR</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('fr', 'FR', 'Français')">
+          <span class="lang-flag">🇫🇷</span>
+          <div class="lang-names">
+            <span class="lang-native">Français</span>
+            <span class="lang-eng">French</span>
+          </div>
+          <span class="lang-badge">FR</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('de', 'DE', 'Deutsch')">
+          <span class="lang-flag">🇩🇪</span>
+          <div class="lang-names">
+            <span class="lang-native">Deutsch</span>
+            <span class="lang-eng">German</span>
+          </div>
+          <span class="lang-badge">DE</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('es', 'ES', 'Español')">
+          <span class="lang-flag">🇪🇸</span>
+          <div class="lang-names">
+            <span class="lang-native">Español</span>
+            <span class="lang-eng">Spanish</span>
+          </div>
+          <span class="lang-badge">ES</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('ru', 'RU', 'Русский')">
+          <span class="lang-flag">🇷🇺</span>
+          <div class="lang-names">
+            <span class="lang-native">Русский</span>
+            <span class="lang-eng">Russian</span>
+          </div>
+          <span class="lang-badge">RU</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('ja', 'JA', '日本語')">
+          <span class="lang-flag">🇯🇵</span>
+          <div class="lang-names">
+            <span class="lang-native">日本語</span>
+            <span class="lang-eng">Japanese</span>
+          </div>
+          <span class="lang-badge">JA</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('ko', 'KO', '한국어')">
+          <span class="lang-flag">🇰🇷</span>
+          <div class="lang-names">
+            <span class="lang-native">한국어</span>
+            <span class="lang-eng">Korean</span>
+          </div>
+          <span class="lang-badge">KO</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('zh-CN', 'ZH', '中文')">
+          <span class="lang-flag">🇨🇳</span>
+          <div class="lang-names">
+            <span class="lang-native">中文 (简体)</span>
+            <span class="lang-eng">Chinese</span>
+          </div>
+          <span class="lang-badge">ZH</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('it', 'IT', 'Italiano')">
+          <span class="lang-flag">🇮🇹</span>
+          <div class="lang-names">
+            <span class="lang-native">Italiano</span>
+            <span class="lang-eng">Italian</span>
+          </div>
+          <span class="lang-badge">IT</span>
+        </div>
+
+        <div class="lang-option-card" onclick="selectStudioLanguage('pt', 'PT', 'Português')">
+          <span class="lang-flag">🇵🇹</span>
+          <div class="lang-names">
+            <span class="lang-native">Português</span>
+            <span class="lang-eng">Portuguese</span>
+          </div>
+          <span class="lang-badge">PT</span>
+        </div>
+      </div>
+
+      <!-- کانتینر فنی پیش‌فرض گوگل جهت اتصال موتور ترجمه -->
+      <div id="google_translate_element" style="display:none;"></div>
+    </div>
+
+    <!-- دکمه شناور گوشه چپ پایین با آیکون کره زمین و برچسب زبان فعال -->
+    <button type="button" id="googleTranslateTriggerBtn" onclick="toggleGoogleTranslateMenu(event)" class="floating-lang-trigger-btn" title="Translate Website / تغییر زبان">
+      <span class="lang-globe-icon">🌐</span>
+      <span id="activeLanguageLabel" class="lang-active-text">EN</span>
+    </button>
+  </div>
+
 </body>
 </html>

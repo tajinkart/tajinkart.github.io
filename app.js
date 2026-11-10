@@ -112,7 +112,7 @@ window.adminSubmitNewGenreInline = function() {
   if (input) input.value = '';
   window.adminToggleAddGenreForm();
   window.renderAdminStudioGenres();
-  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   showToast(`Genre '${val}' added successfully!`, 'success');
 };
 
@@ -126,7 +126,7 @@ window.adminDeleteStudioGenre = function(genreName) {
     localStorage.setItem('tajinkart_studio_genres_v1', JSON.stringify(studioGenres));
   } catch(e) {}
   window.renderAdminStudioGenres();
-  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   showToast(`Genre '${genreName}' removed.`, 'info');
 };
 
@@ -299,7 +299,7 @@ window.adminSubmitNewCategoryInline = function() {
 
   renderAdminGalleryCategories();
   try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast(`Category "${title}" added successfully.`, 'success', 3500);
 };
@@ -311,7 +311,7 @@ window.adminUpdateCategoryColor = function(catId, newColor) {
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
     renderAdminGalleryCategories();
     try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     if (currentGalleryFilter === catId) {
       filterGalleryByCategory(catId, cat.title);
@@ -329,7 +329,7 @@ window.adminDeleteGalleryCategory = function(catId) {
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   renderAdminGalleryCategories();
   try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast(`Category "${catName}" deleted.`, 'info');
 };
@@ -343,7 +343,7 @@ window.openChatConsultation = function() {
 // اجرای لود اولیه در هنگام آماده شدن صفحه
 document.addEventListener('DOMContentLoaded', () => {
   try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   renderAdminGalleryCategories();
   if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
@@ -3546,7 +3546,7 @@ window.switchAdminTab = function(tabKey, btn) {
     b.classList.toggle('active', b.getAttribute('data-tab') === tabKey);
   });
 
-  if (tabKey === 'artworks') { renderAdminSketch2(); if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories(); }
+  if (tabKey === 'artworks') { renderAdminSketch2(); if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories(); if (typeof renderAdminStudioGenres === 'function') renderAdminStudioGenres(); }
   if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
@@ -3710,6 +3710,7 @@ window.adminAddNewCategory = function() {
 
 // اسکچ ۲: مدیریت گالری آثار (همراه با چیدمان با درگ اند دراپ و پیش‌نمایش کادر)
 function renderAdminSketch2() {
+  if (typeof renderAdminStudioGenres === 'function') renderAdminStudioGenres();
   const container = document.getElementById('adminMosaicTilesContainer');
   if (!container) return;
 
@@ -7157,7 +7158,7 @@ window.adminEditCategoryTitle = function(catId) {
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
     renderAdminGalleryCategories();
     try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     showToast(`Category title updated to "${cat.title}". ✓`, 'success', 2500);
   }
@@ -7812,7 +7813,7 @@ window.saveAdminCategoryEdit = function() {
     safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
     window.renderAdminGalleryCategories();
     try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`Category "${newTitle}" updated successfully! ✓`, 'success', 3500);
@@ -8059,7 +8060,7 @@ window.saveAdminCategoryEdit = function() {
     safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
     window.renderAdminGalleryCategories();
     try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`Category "${newTitle}" updated successfully! ✓`, 'success', 3500);
@@ -8347,7 +8348,7 @@ window.saveAdminCategoryEdit = function() {
     
     window.renderAdminGalleryCategories();
     try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`Category "${newTitleEN}" saved successfully! ✓`, 'success', 3500);
@@ -8739,7 +8740,7 @@ window.adminDeleteCurrentEditingCategory = function() {
   closeAdminCategoryEditForm();
   if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
   if (typeof renderFloatingCategoryDropdown === 'function') try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
-  renderFloatingCategoryDropdown();
+  renderFloatingCategoryDropdown(); if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   if (currentGalleryFilter === origId) {
     filterGalleryByCategory('all', 'All Artworks');
@@ -8852,3 +8853,249 @@ window.handlePhaseUnifiedCategoryChange = function(phaseIdx, pipeKey) {
   p.subcategory = subcats[0] || 'Standard Concept Execution';
   renderAdminStagingPhasesOnly();
 };
+
+
+// ==============================================================================
+// TOP BAR GENRE DROPDOWN CONTROLLER (All Genres Pill & Filter)
+// ==============================================================================
+window.renderFloatingGenreDropdown = function() {
+  const dropdown = document.getElementById('genreFilterDropdown');
+  if (!dropdown) return;
+
+  const isAll = (currentGalleryGenreFilter === 'all');
+  let html = `
+    <div class="cat-dropdown-item ${isAll ? 'active' : ''}" onclick="filterGalleryByGenre('all')">
+      <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+      <span class="cat-item-text">All Genres</span>
+    </div>
+  `;
+
+  const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres)) ? studioGenres : DEFAULT_STUDIO_GENRES;
+  genres.forEach(g => {
+    const isActive = (currentGalleryGenreFilter === g);
+    html += `
+      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByGenre('${g}')">
+        <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+        <span class="cat-item-text">${g}</span>
+      </div>
+    `;
+  });
+
+  dropdown.innerHTML = html;
+};
+
+window.toggleGenreFilterMenu = function(e) {
+  if (e) e.stopPropagation();
+  // Close category dropdown if open
+  const catDropdown = document.getElementById('categoryFilterDropdown');
+  if (catDropdown) catDropdown.classList.add('hidden');
+
+  const dropdown = document.getElementById('genreFilterDropdown');
+  if (dropdown) dropdown.classList.toggle('hidden');
+};
+
+window.filterGalleryByGenre = function(genreName) {
+  currentGalleryGenreFilter = genreName;
+  const labelEl = document.getElementById('currentGenrePillLabel');
+  if (labelEl) {
+    labelEl.textContent = (genreName === 'all') ? 'All Genres' : genreName;
+  }
+
+  const pillBtn = document.getElementById('currentGenrePillBtn');
+  if (pillBtn) {
+    const isFiltered = (genreName !== 'all');
+    pillBtn.style.setProperty('--pill-accent-color', isFiltered ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.2)', 'important');
+    pillBtn.style.setProperty('border-color', isFiltered ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.25)', 'important');
+    pillBtn.style.setProperty('box-shadow', isFiltered ? '0 0 16px rgba(0,240,255,0.5)' : 'none', 'important');
+  }
+
+  const dropdown = document.getElementById('genreFilterDropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  renderShowcaseGrid();
+  const gEl = document.getElementById('showcaseGrid');
+  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
+};
+
+document.addEventListener('click', (e) => {
+  const genreMenu = document.getElementById('floatingGalleryGenreMenu');
+  if (genreMenu && !genreMenu.contains(e.target)) {
+    const dropdown = document.getElementById('genreFilterDropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+  }
+});
+
+// Also close genre dropdown when opening category dropdown
+const origToggleCategoryFilterMenu = window.toggleCategoryFilterMenu;
+window.toggleCategoryFilterMenu = function(e) {
+  const genreDropdown = document.getElementById('genreFilterDropdown');
+  if (genreDropdown) genreDropdown.classList.add('hidden');
+  if (typeof origToggleCategoryFilterMenu === 'function') {
+    origToggleCategoryFilterMenu(e);
+  } else {
+    const dropdown = document.getElementById('categoryFilterDropdown');
+    if (dropdown) dropdown.classList.toggle('hidden');
+  }
+};
+
+
+// ==============================================================================
+// FLOATING GOOGLE TRANSLATE CONTROLLER (Bottom-Left with Search & Persian)
+// ==============================================================================
+window.toggleGoogleTranslateMenu = function(e) {
+  if (e) e.stopPropagation();
+  const flyout = document.getElementById('googleTranslateMenuFlyout');
+  if (!flyout) return;
+  const isHidden = flyout.classList.toggle('hidden');
+  if (!isHidden) {
+    const searchInput = document.getElementById('googleTranslateSearchInput');
+    if (searchInput) {
+      searchInput.value = '';
+      window.filterGoogleTranslateLanguages('');
+      setTimeout(() => searchInput.focus(), 100);
+    }
+  }
+};
+
+window.filterGoogleTranslateLanguages = function(query) {
+  const q = (query || '').trim().toLowerCase();
+  const items = document.querySelectorAll('#googleTranslateLanguagesList .lang-option-card');
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = (!q || text.includes(q)) ? 'flex' : 'none';
+  });
+};
+
+window.selectStudioLanguage = function(langCode, shortLabel, fullLabel) {
+  const lbl = document.getElementById('activeLanguageLabel');
+  if (lbl) lbl.textContent = shortLabel;
+
+  try {
+    localStorage.setItem('tajinkart_user_lang', langCode);
+    localStorage.setItem('tajinkart_user_lang_label', shortLabel);
+  } catch(e) {}
+
+  // 1. Try to set the native Google Translate select box
+  let selectChanged = false;
+  const combo = document.querySelector('.goog-te-combo');
+  if (combo) {
+    combo.value = langCode;
+    combo.dispatchEvent(new Event('change'));
+    selectChanged = true;
+  }
+
+  // 2. Set googtrans cookie for persistence
+  const host = window.location.hostname;
+  const cookieVal = (langCode === 'en') ? '/en/en' : `/en/${langCode}`;
+  document.cookie = `googtrans=${cookieVal}; path=/;`;
+  if (host) {
+    document.cookie = `googtrans=${cookieVal}; domain=.${host}; path=/;`;
+  }
+
+  // Close flyout
+  const flyout = document.getElementById('googleTranslateMenuFlyout');
+  if (flyout) flyout.classList.add('hidden');
+
+  showToast(`Language set to ${fullLabel}`, 'info', 2500);
+
+  // If combo wasn't ready or if user selected a language requiring reload to initialize translate frame
+  if (!selectChanged || !document.querySelector('.goog-te-banner-frame')) {
+    setTimeout(() => {
+      window.location.reload();
+    }, 450);
+  }
+};
+
+document.addEventListener('click', (e) => {
+  const widget = document.getElementById('floatingGoogleTranslateWidget');
+  if (widget && !widget.contains(e.target)) {
+    const flyout = document.getElementById('googleTranslateMenuFlyout');
+    if (flyout) flyout.classList.add('hidden');
+  }
+});
+
+// Sync language button label on page load
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const savedLabel = localStorage.getItem('tajinkart_user_lang_label');
+    if (savedLabel) {
+      const lbl = document.getElementById('activeLanguageLabel');
+      if (lbl) lbl.textContent = savedLabel;
+    } else {
+      // Check cookies
+      const match = document.cookie.match(/googtrans=\/en\/([a-zA-Z\-]+)/);
+      if (match && match[1]) {
+        const cCode = match[1].toUpperCase();
+        const lbl = document.getElementById('activeLanguageLabel');
+        if (lbl) lbl.textContent = (cCode === 'FA') ? 'FA' : (cCode === 'ZH-CN' ? 'ZH' : cCode);
+      }
+    }
+    if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
+  } catch(e) {}
+});
+
+
+// Robust Admin Studio Genres Controller
+window.adminToggleAddGenreForm = function() {
+  const row = document.getElementById('adminInlineAddGenreRow');
+  if (!row) return;
+  const isHidden = (row.style.display === 'none' || getComputedStyle(row).display === 'none');
+  row.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) {
+    const input = document.getElementById('adminNewGenreTitle');
+    if (input) setTimeout(() => input.focus(), 100);
+  }
+};
+
+window.adminSubmitNewGenreInline = function() {
+  const input = document.getElementById('adminNewGenreTitle');
+  const val = input ? input.value.trim() : '';
+  if (!val) {
+    showToast('Please enter a genre name.', 'warning');
+    return;
+  }
+  if (!Array.isArray(studioGenres)) studioGenres = [...DEFAULT_STUDIO_GENRES];
+  if (studioGenres.some(g => g.toLowerCase() === val.toLowerCase())) {
+    showToast('This genre already exists in studio directory.', 'info');
+    return;
+  }
+  studioGenres.push(val);
+  try {
+    localStorage.setItem('tajinkart_studio_genres_v1', JSON.stringify(studioGenres));
+  } catch(e) {}
+  if (input) input.value = '';
+  window.adminToggleAddGenreForm();
+  window.renderAdminStudioGenres();
+  if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
+  showToast(`Genre '${val}' added successfully!`, 'success');
+};
+
+window.adminDeleteStudioGenre = function(genreName) {
+  if (!Array.isArray(studioGenres) || studioGenres.length <= 1) {
+    showToast('At least one studio genre must remain active.', 'warning');
+    return;
+  }
+  studioGenres = studioGenres.filter(g => g !== genreName);
+  try {
+    localStorage.setItem('tajinkart_studio_genres_v1', JSON.stringify(studioGenres));
+  } catch(e) {}
+  window.renderAdminStudioGenres();
+  if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
+  showToast(`Genre '${genreName}' removed.`, 'info');
+};
+
+window.renderAdminStudioGenres = function() {
+  const container = document.getElementById('adminStudioGenresList');
+  if (!container) return;
+  const badge = document.getElementById('adminGenreCountBadge');
+  if (badge) badge.textContent = `${studioGenres.length} Active Genres`;
+
+  container.innerHTML = studioGenres.map((g) => `
+    <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;">
+      <span style="color:var(--cyan-electric); font-size:11px;">🌌</span>
+      <span style="font-weight:700;">${g}</span>
+      <button type="button" onclick="adminDeleteStudioGenre('${g}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px; line-height:1;" title="Delete this genre" onmouseover="this.style.color='var(--crimson)'" onmouseout="this.style.color='var(--text-muted)'">✕</button>
+    </div>
+  `).join('');
+};
+
