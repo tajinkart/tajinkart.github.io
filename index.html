@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=22.7.0">
+  <link rel="stylesheet" href="style.css?v=22.9.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -941,7 +941,7 @@
               <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
                 <span class="admin-nav-icon">👥</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">3. Members & Client Dossiers</span>
+                  <span class="admin-nav-title">3. Inquiries & Client Dossiers</span>
                   <span class="admin-nav-sub">Client Inquiries & Briefs</span>
                 </div>
               </button>
@@ -1246,6 +1246,48 @@
         </div>
 
             <div id="adminTabMembers" class="hidden">
+<div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+              <div>
+                <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">📦 Studio Inquiries & Financial Telemetry</h3>
+                <span style="font-size:12px; color:var(--text-muted);">Real-time monitoring of commission briefs, project milestones, and gross volume.</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:11px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="Live synchronization with orders table in Supabase DB">
+                  🔄 Fetch Inquiries from Cloud DB
+                </button>
+              </div>
+            </div>
+
+            <!-- کارت‌های شاخص‌های کلیدی مالی و سفارش‌ها (Financial & Order KPIs) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:22px;">
+              <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:var(--gold); font-weight:700; display:block;">💵 Gross Project Volume:</span>
+                <span id="kpiGrossVolume" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">$0</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Estimated total value of registered inquiries</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block;">⚡ Active Atelier Projects:</span>
+                <span id="kpiActiveProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:var(--cyan-electric); display:block; margin-top:4px;">0 Active</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">In thumbnail, linework & master render stages</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:#10b981; font-weight:700; display:block;">✓ Completed Deliveries:</span>
+                <span id="kpiCompletedProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:#10b981; display:block; margin-top:4px;">0 Delivered</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Final master PSD source & license handed over</span>
+              </div>
+              <div style="background:#06080d; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px 16px;">
+                <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block;">📝 Total Registered Briefs:</span>
+                <span id="kpiTotalOrdersCount" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">0 Inquiries</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Cloud database & client records</span>
+              </div>
+            </div>
+
+            <!-- فهرست سفارش‌های استودیو -->
+            <h4 style="font-size:14px; font-weight:800; color:#fff; margin-bottom:12px;">Client Inquiries & Briefs Stream:</h4>
+            <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:12px;"></div>
+          
+<div style="height:20px;"></div>
           <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
@@ -1277,50 +1319,6 @@
 
             </div>
 
-          </div>
-        </div>
-
-            <div id="adminTabOrders" class="hidden">
-          <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
-              <div>
-                <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">📦 Studio Inquiries & Financial Telemetry</h3>
-                <span style="font-size:12px; color:var(--text-muted);">Real-time monitoring of commission briefs, project milestones, and gross volume.</span>
-              </div>
-              <div style="display:flex; gap:8px;">
-                <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:11px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="Live synchronization with orders table in Supabase DB">
-                  🔄 Fetch Inquiries from Cloud DB
-                </button>
-              </div>
-            </div>
-
-            <!-- کارت‌های شاخص‌های کلیدی مالی و سفارش‌ها (Financial & Order KPIs) -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:22px;">
-              <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:var(--gold); font-weight:700; display:block;">💵 Gross Project Volume:</span>
-                <span id="kpiGrossVolume" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">/usr/bin/bash</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Estimated total value of registered inquiries</span>
-              </div>
-              <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block;">⚡ Active Atelier Projects:</span>
-                <span id="kpiActiveProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:var(--cyan-electric); display:block; margin-top:4px;">0 Active</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">In thumbnail, linework & master render stages</span>
-              </div>
-              <div style="background:#06080d; border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:#10b981; font-weight:700; display:block;">✓ Completed Deliveries:</span>
-                <span id="kpiCompletedProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:#10b981; display:block; margin-top:4px;">0 Delivered</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Final master PSD source & license handed over</span>
-              </div>
-              <div style="background:#06080d; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block;">📝 Total Registered Briefs:</span>
-                <span id="kpiTotalOrdersCount" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">0 Inquiries</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Cloud database & client records</span>
-              </div>
-            </div>
-
-            <!-- فهرست سفارش‌های استودیو -->
-            <h4 style="font-size:14px; font-weight:800; color:#fff; margin-bottom:12px;">Client Inquiries & Briefs Stream:</h4>
-            <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:12px;"></div>
           </div>
         </div>
 
@@ -2526,12 +2524,12 @@
       </div>
     </footer>
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
-  <script src="data.js?v=22.7.0"></script>
-  <script src="core.js?v=22.7.0"></script>
-  <script src="gallery.js?v=22.7.0"></script>
-  <script src="portal.js?v=22.7.0"></script>
-  <script src="admin.js?v=22.7.0"></script>
-  <script src="translate.js?v=22.7.0"></script>
+  <script src="data.js?v=22.9.0"></script>
+  <script src="core.js?v=22.9.0"></script>
+  <script src="gallery.js?v=22.9.0"></script>
+  <script src="portal.js?v=22.9.0"></script>
+  <script src="admin.js?v=22.9.0"></script>
+  <script src="translate.js?v=22.9.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
@@ -2589,14 +2587,14 @@
       <div class="lang-flyout-header">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:16px;">🌐</span>
-          <span style="font-size:12.5px; font-weight:800; color:var(--gold);">Select Language / انتخاب زبان</span>
+          <span style="font-size:12.5px; font-weight:800; color:var(--gold);">Select Language</span>
         </div>
         <button type="button" onclick="toggleGoogleTranslateMenu(event)" class="lang-close-btn" title="Close">✕</button>
       </div>
 
       <!-- نوار جستجوی زبان‌ها -->
       <div class="lang-search-wrapper">
-        <input type="text" id="googleTranslateSearchInput" placeholder="🔍 Search language / جستجو..." oninput="filterGoogleTranslateLanguages(this.value)" autocomplete="off" />
+        <input type="text" id="googleTranslateSearchInput" placeholder="🔍 Search language..." oninput="filterGoogleTranslateLanguages(this.value)" autocomplete="off" />
       </div>
 
       <!-- فهرست الفبایی زبان‌ها همراه با فارسی -->
@@ -2620,7 +2618,7 @@
         <div class="lang-option-card" data-lang="ja" data-search="japanese 日本語 ja" onclick="selectStudioLanguage('ja', 'JA', '日本語')"><span class="lang-flag">🇯🇵</span><div class="lang-names"><span class="lang-native">日本語</span><span class="lang-eng">Japanese</span></div><span class="lang-badge">JA</span></div>
         <div class="lang-option-card" data-lang="ko" data-search="korean 한국어 ko" onclick="selectStudioLanguage('ko', 'KO', '한국어')"><span class="lang-flag">🇰🇷</span><div class="lang-names"><span class="lang-native">한국어</span><span class="lang-eng">Korean</span></div><span class="lang-badge">KO</span></div>
         <div class="lang-option-card" data-lang="no" data-search="norwegian norsk no" onclick="selectStudioLanguage('no', 'NO', 'Norsk')"><span class="lang-flag">🇳🇴</span><div class="lang-names"><span class="lang-native">Norsk</span><span class="lang-eng">Norwegian</span></div><span class="lang-badge">NO</span></div>
-        <div class="lang-option-card" data-lang="fa" data-search="persian (farsi) فارسی fa farsi" onclick="selectStudioLanguage('fa', 'FA', 'فارسی')"><span class="lang-flag">🇮🇷</span><div class="lang-names"><span class="lang-native" style="color:var(--gold); font-weight:800;">فارسی</span><span class="lang-eng">Persian (Farsi)</span></div><span class="lang-badge">FA</span></div>
+        <div class="lang-option-card" data-lang="fa" data-search="persian (farsi) فارسی fa farsi" onclick="selectStudioLanguage('fa', 'FA', 'فارسی')"><span class="lang-flag">🇮🇷</span><div class="lang-names"><span class="lang-native">فارسی</span><span class="lang-eng">Persian (Farsi)</span></div><span class="lang-badge">FA</span></div>
         <div class="lang-option-card" data-lang="pl" data-search="polish polski pl" onclick="selectStudioLanguage('pl', 'PL', 'Polski')"><span class="lang-flag">🇵🇱</span><div class="lang-names"><span class="lang-native">Polski</span><span class="lang-eng">Polish</span></div><span class="lang-badge">PL</span></div>
         <div class="lang-option-card" data-lang="pt" data-search="portuguese português pt" onclick="selectStudioLanguage('pt', 'PT', 'Português')"><span class="lang-flag">🇵🇹</span><div class="lang-names"><span class="lang-native">Português</span><span class="lang-eng">Portuguese</span></div><span class="lang-badge">PT</span></div>
         <div class="lang-option-card" data-lang="ru" data-search="russian русский ru" onclick="selectStudioLanguage('ru', 'RU', 'Русский')"><span class="lang-flag">🇷🇺</span><div class="lang-names"><span class="lang-native">Русский</span><span class="lang-eng">Russian</span></div><span class="lang-badge">RU</span></div>
@@ -2635,7 +2633,7 @@
     </div>
 
     <!-- دقیقاً دکمه زرد رنگ استودیو منتقل‌شده به گوشه چپ پایین -->
-    <button type="button" id="googleTranslateTriggerBtn" onclick="toggleGoogleTranslateMenu(event)" class="atelier-translate-wrapper floating-lang-trigger-btn" title="Translate Website / تغییر زبان">
+    <button type="button" id="googleTranslateTriggerBtn" onclick="toggleGoogleTranslateMenu(event)" class="atelier-translate-wrapper floating-lang-trigger-btn" title="Translate Website">
       <span class="atelier-translate-label" style="display:inline-flex; align-items:center; gap:6px;">
         <span style="font-size:16px;">🌐</span>
         <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:800; color:var(--gold); letter-spacing:0.08em;">TRANSLATE:</span>

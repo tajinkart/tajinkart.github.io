@@ -593,31 +593,80 @@ Current Status: ${o.status}
   showToast(`Invoice for Inquiry #${o.id} downloaded. 📄`, 'success');
 };
 
-function renderAdminLists() {
+window.renderAdminLists = function() {
   const ordEl = document.getElementById('adminOrdersList');
+  const orders = (typeof ordersList !== 'undefined' && Array.isArray(ordersList)) ? ordersList : (window.ordersList || []);
+
+  // Update KPI counters
+  const totalCountEl = document.getElementById('kpiTotalOrdersCount');
+  if (totalCountEl) totalCountEl.textContent = `${orders.length} Inquiries`;
+
+  let gross = 0;
+  let activeCount = 0;
+  let completedCount = 0;
+
+  orders.forEach(o => {
+    let val = 0;
+    if (typeof o.usdVal === 'number') val = o.usdVal;
+    else if (typeof o.price === 'string') {
+      const match = o.price.match(/[0-9,]+/);
+      if (match) val = parseInt(match[0].replace(/,/g, ''), 10) || 0;
+    }
+    gross += val;
+    if (o.status && o.status.includes('Completed')) {
+      completedCount++;
+    } else {
+      activeCount++;
+    }
+  });
+
+  const grossEl = document.getElementById('kpiGrossVolume');
+  if (grossEl) grossEl.textContent = `$${gross.toLocaleString()}`;
+
+  const activeEl = document.getElementById('kpiActiveProjectsCount');
+  if (activeEl) activeEl.textContent = `${activeCount} Active`;
+
+  const compEl = document.getElementById('kpiCompletedProjectsCount');
+  if (compEl) compEl.textContent = `${completedCount} Delivered`;
+
   if (ordEl) {
-    ordEl.innerHTML = ordersList.map((o, idx) => `
-      <div style="padding:14px; background:#06080c; border-radius:12px; border:1px solid rgba(250,204,21,0.25);">
-        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700;">
-          <span>${o.client} <span class="font-mono" style="color:var(--text-muted); font-size:11px;">(${o.contact})</span></span>
-          <span class="font-mono" style="color:var(--gold);">${o.pkg}</span>
+    if (orders.length === 0) {
+      ordEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#06080d; border-radius:12px; border:1px solid rgba(255,255,255,0.06);">No commission inquiries registered yet. When clients submit project briefs from the Atelier or Commission Calculator, they appear here live.</div>`;
+      return;
+    }
+
+    ordEl.innerHTML = orders.map((o, idx) => `
+      <div style="padding:16px; background:#06080d; border-radius:14px; border:1px solid rgba(250,204,21,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; flex-wrap:wrap; gap:8px;">
+          <div>
+            <span style="font-size:14px; color:#fff; font-weight:800;">${o.client || 'Client'}</span>
+            <span class="font-mono" style="color:var(--text-muted); font-size:11.5px; margin-left:6px;">(${o.contact || o.email || 'No contact'})</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="font-mono" style="color:var(--gold); font-size:13px; font-weight:800;">${o.pkg || 'Custom Package'}</span>
+            <button type="button" onclick="downloadInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-radius:6px;" title="Download Invoice">📄 Invoice</button>
+          </div>
         </div>
-        <div style="font-size:12px; color:var(--cyan-electric); margin:4px 0;">Selected Phase: ${o.phase || 'Standard'}</div>
-        <div style="color:var(--text-muted); font-size:12.5px; margin:4px 0; line-height:1.6;">${o.brief}</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:11.5px;">
-          <span style="color:var(--amber);">Project Status: <strong>${o.status}</strong></span>
-          <select onchange="updateOrderStatus(${idx}, this.value)" style="width:auto; padding:4px 8px; font-size:11.5px;">
-            <option value="Brief Received" ${o.status === 'Brief Received' ? 'selected' : ''}>Brief Received</option>
-            <option value="Phase 1: Thumbnails" ${o.status === 'Phase 1: Thumbnails' ? 'selected' : ''}>Phase 1: Thumbnails</option>
-            <option value="Phase 2: Linework" ${o.status === 'Phase 2: Linework' ? 'selected' : ''}>Phase 2: Linework</option>
-            <option value="Phase 3: Render & Lighting" ${o.status === 'Phase 3: Render & Lighting' ? 'selected' : ''}>Phase 3: Render & Lighting</option>
-            <option value="Final Delivery & Completed" ${o.status === 'Final Delivery & Completed' ? 'selected' : ''}>Final Delivery & Completed</option>
-          </select>
+        <div style="font-size:12px; color:var(--cyan-electric); margin:6px 0; font-weight:600;">Selected Phase: ${o.phase || 'Standard Concept Execution'}</div>
+        <div style="color:#cbd5e1; font-size:12px; margin:6px 0; line-height:1.7; background:#020306; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">${o.brief || 'No briefing details provided.'}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08); font-size:12px; flex-wrap:wrap; gap:8px;">
+          <span style="color:var(--amber); font-weight:700;">Status: <span style="color:#fff;">${o.status || 'Brief Received'}</span></span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11px; color:var(--text-muted);">Update Stage:</span>
+            <select onchange="updateOrderStatus(${idx}, this.value)" style="width:auto; padding:5px 10px; font-size:11.5px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
+              <option value="Brief Received" ${o.status === 'Brief Received' ? 'selected' : ''}>Brief Received</option>
+              <option value="Phase 1: Thumbnails" ${o.status === 'Phase 1: Thumbnails' ? 'selected' : ''}>Phase 1: Thumbnails</option>
+              <option value="Phase 2: Linework" ${o.status === 'Phase 2: Linework' ? 'selected' : ''}>Phase 2: Linework</option>
+              <option value="Phase 3: Render & Lighting" ${o.status === 'Phase 3: Render & Lighting' ? 'selected' : ''}>Phase 3: Render & Lighting</option>
+              <option value="Final Delivery & Completed" ${o.status === 'Final Delivery & Completed' ? 'selected' : ''}>Final Delivery & Completed</option>
+            </select>
+          </div>
         </div>
       </div>
     `).join('');
   }
-}
+};
+function renderAdminLists() { window.renderAdminLists(); }
 
 window.updateOrderStatus = function(idx, newStatus) {
   ordersList[idx].status = newStatus;

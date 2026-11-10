@@ -1,6 +1,6 @@
 // ==============================================================================
 // TAJINKART STUDIO — TRANSLATE MODULE (translate.js)
-// Floating Google Translate Controller (Alphabetical, Searchable Persian & Multi-Language)
+// Floating Google Translate Controller (Alphabetical, Searchable & Multi-Language)
 // ==============================================================================
 
 window.toggleGoogleTranslateMenu = function(e) {
@@ -21,12 +21,65 @@ window.toggleGoogleTranslateMenu = function(e) {
   }
 };
 
+// فیلتر هوشمند و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف واردشده
 window.filterGoogleTranslateLanguages = function(query) {
   const q = (query || '').trim().toLowerCase();
-  const cards = document.querySelectorAll('#googleTranslateLanguagesList .lang-option-card');
+  const container = document.getElementById('googleTranslateLanguagesList');
+  if (!container) return;
+  const cards = Array.from(container.querySelectorAll('.lang-option-card'));
+
+  if (!q) {
+    // بازگردانی چیدمان الفبایی پیش‌فرض در صورت خالی بودن باکس
+    cards.forEach(card => {
+      card.style.display = 'flex';
+    });
+    return;
+  }
+
+  // امتیازدهی به نتایج جهت بالا آوردن زبان‌های منطبق با حرف اول
+  const scored = [];
+
   cards.forEach(card => {
-    const searchData = (card.getAttribute('data-search') || card.textContent).toLowerCase();
-    card.style.display = (!q || searchData.includes(q)) ? 'flex' : 'none';
+    const langCode = (card.getAttribute('data-lang') || '').toLowerCase();
+    const searchData = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+    const nativeName = (card.querySelector('.lang-native')?.textContent || '').toLowerCase();
+    const engName = (card.querySelector('.lang-eng')?.textContent || '').toLowerCase();
+
+    let score = 0;
+
+    // ۱. بیشترین اولویت: کد زبان دقیقاً با حرف شروع شود (مثلاً en با e)
+    if (langCode.startsWith(q)) {
+      score = 40;
+    }
+    // ۲. اولویت بسیار بالا: نام انگلیسی زبان دقیقاً با حرف شروع شود (مثلاً English با e)
+    else if (engName.startsWith(q)) {
+      score = 30;
+    }
+    // ۳. اولویت بالا: نام بومی زبان با حرف شروع شود (مثلاً Español با e)
+    else if (nativeName.startsWith(q)) {
+      score = 25;
+    }
+    // ۴. یکی از کلمات داخل دیتا-سرچ با ورودی شروع شود
+    else if (searchData.split(/\s+/).some(w => w.startsWith(q))) {
+      score = 15;
+    }
+    // ۵. صرفاً شامل ورودی باشد
+    else if (searchData.includes(q)) {
+      score = 5;
+    }
+
+    if (score > 0) {
+      card.style.display = 'flex';
+      scored.push({ card, score });
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // مرتب‌سازی و انتقال موارد منطبق‌تر به بالای لیست
+  scored.sort((a, b) => b.score - a.score);
+  scored.forEach(item => {
+    container.appendChild(item.card);
   });
 };
 
@@ -77,8 +130,7 @@ document.addEventListener('click', (e) => {
   if (widget && !widget.contains(e.target)) {
     const flyout = document.getElementById('googleTranslateMenuFlyout');
     if (flyout) flyout.classList.add('hidden');
-  const widget = document.getElementById('floatingGoogleTranslateWidget');
-  if (widget) widget.classList.remove('open');
+    if (widget) widget.classList.remove('open');
   }
 });
 

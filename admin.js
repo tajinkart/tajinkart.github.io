@@ -203,9 +203,28 @@ window.filterAdminMembers = function(val) {
   renderAdminSketch3(val);
 };
 
-window.logoutAdmin = function() {
-  switchView('showcase');
-  showToast('Signed out of director account. Console locked.', 'info', 4000);
+window.logoutAdmin = async function() {
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  if (adminWorkspace) adminWorkspace.classList.add('hidden');
+  const adminGate = document.getElementById('adminLoginGate');
+  if (adminGate) adminGate.classList.remove('hidden');
+
+  try {
+    if (window.supabaseClient && window.supabaseClient.auth) {
+      await window.supabaseClient.auth.signOut();
+    }
+  } catch(e) {}
+
+  window.currentMember = null;
+  try {
+    sessionStorage.removeItem('tajinkart_admin_unlocked');
+    localStorage.removeItem('tajinkart_admin_unlocked');
+    localStorage.removeItem('tajinkart_member_session');
+  } catch(e) {}
+
+  if (typeof switchView === 'function') switchView('showcase');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Studio Command Console locked and signed out. ✓', 'info', 3000);
 };
 
 setTimeout(() => {
@@ -1039,7 +1058,7 @@ window.switchAdminTab = function(tabKey, btn) {
   if (tabKey === 'artworks') { renderAdminSketch2(); if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories(); if (typeof renderAdminStudioGenres === 'function') renderAdminStudioGenres(); }
   if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
-  if (tabKey === 'members') renderAdminSketch3();
+  if (tabKey === 'members') { renderAdminSketch3(); if (typeof window.renderAdminLists === 'function') window.renderAdminLists(); }
   if (tabKey === 'orders') { tabKey = 'members'; switchAdminTab('members'); return; }
   if (tabKey === 'settings') renderAdminSettingsTab();
   if (tabKey === 'terms') renderAdminTerms();

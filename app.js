@@ -2076,6 +2076,117 @@ document.addEventListener('touchend', (e) => {
     pinchPanY = 0;
   }
 }, { passive: true });
+
+
+// ==============================================================================
+// همگام‌سازی دوطرفه آثار با پایگاه داده ابری Supabase
+// ==============================================================================
+window.syncArtworksFromSupabase = async function() {
+  if (!window.supabaseClient) {
+    if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+    if (!window.supabaseClient) return;
+  }
+
+  try {
+    const { data: cloudArtworks, error } = await window.supabaseClient
+      .from('artworks')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) {
+      console.warn('Supabase fetch error, fallback to local cache:', error);
+      return;
+    }
+
+    let deletedIds = [];
+    try {
+      const delKey = (typeof KEYS !== 'undefined' && KEYS.DELETED_ARTWORKS) ? KEYS.DELETED_ARTWORKS : 'tajinkart_deleted_artworks_v2';
+      deletedIds = JSON.parse(localStorage.getItem(delKey) || '[]').map(Number);
+    } catch(e) { deletedIds = []; }
+    const deletedSet = new Set(deletedIds);
+
+    // ۱. اگر کلود آثاری دارد، دیتابیس ابری منبع حقیقت است
+    if (cloudArtworks && cloudArtworks.length > 0) {
+      // پاکسازی ردیف‌های تستی ۱ تا ۸
+      const mockRows = cloudArtworks.filter(row => Number(row.id) <= 8);
+      if (mockRows.length > 0) {
+        window.supabaseClient.from('artworks').delete().lte('id', 8).then(() => {});
+      }
+
+      const itemsToPurge = cloudArtworks.filter(row => deletedSet.has(Number(row.id)));
+      if (itemsToPurge.length > 0) {
+        itemsToPurge.forEach(row => {
+          window.supabaseClient.from('artworks').delete().eq('id', row.id).then(() => {});
+        });
+      }
+
+      const validRows = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
+
+      if (validRows.length > 0) {
+        const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {};
+        showcaseArtworks = validRows.map(row => {
+          const pipe = row.pipeline_key || 'sketch1';
+          const mappedCat = row.category || row.tag || pipeMap[pipe] || 'character';
+          return {
+            id: Number(row.id),
+            orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
+            tag: mappedCat,
+            category: mappedCat,
+            shortSlug: row.short_slug || row.title,
+            title: row.title,
+            desc: row.desc_text || '',
+            pipelineKey: pipe,
+            genre: row.genre || 'Dark Fantasy',
+            image: row.image,
+            colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
+            lore: row.lore || 'Extopia Universe',
+            phases: row.phases || []
+          };
+        }).sort((a, b) => {
+          if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
+          return b.id - a.id;
+        });
+
+        window.showcaseArtworks = showcaseArtworks;
+        const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
+        safeSetStorage(artKey, JSON.stringify(showcaseArtworks));
+        if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+        if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+        console.log('Automated cloud sync complete. Active artworks:', showcaseArtworks.length);
+        return;
+      }
+    }
+
+    // ۲. در صورتی که دیتابیس خالی است، بارگذاری کارهای محلی در کلود
+    const localArtworks = (showcaseArtworks || []).filter(item => !deletedSet.has(Number(item.id)));
+    if (localArtworks.length > 0 && (!cloudArtworks || cloudArtworks.length === 0) && deletedSet.size === 0) {
+      const rowsToInsert = localArtworks.map(a => ({
+        id: a.id,
+        tag: a.tag || 'character',
+        short_slug: a.shortSlug || a.title,
+        title: a.title,
+        desc_text: a.desc || '',
+        pipeline_key: a.pipelineKey || 'sketch1',
+        genre: a.genre || 'Dark Fantasy',
+        image: a.image,
+        color_space: a.colorSpace || 'Master 4K / 16-Bit ProPhoto RGB',
+        lore: a.lore || 'Extopia Universe',
+        phases: a.phases || []
+      }));
+      await window.supabaseClient.from('artworks').upsert(rowsToInsert);
+    }
+  } catch (err) {
+    console.warn('Auto-sync execution error:', err);
+  }
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
+  });
+} else {
+  setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
+}
 // ==============================================================================
 // TAJINKART STUDIO — PORTAL, STORE & COMMISSIONS MODULE (portal.js)
 // Member Portal, Auth Modals, Commission Calculator Wizard, Products Vault
@@ -2671,31 +2782,80 @@ Current Status: ${o.status}
   showToast(`Invoice for Inquiry #${o.id} downloaded. 📄`, 'success');
 };
 
-function renderAdminLists() {
+window.renderAdminLists = function() {
   const ordEl = document.getElementById('adminOrdersList');
+  const orders = (typeof ordersList !== 'undefined' && Array.isArray(ordersList)) ? ordersList : (window.ordersList || []);
+
+  // Update KPI counters
+  const totalCountEl = document.getElementById('kpiTotalOrdersCount');
+  if (totalCountEl) totalCountEl.textContent = `${orders.length} Inquiries`;
+
+  let gross = 0;
+  let activeCount = 0;
+  let completedCount = 0;
+
+  orders.forEach(o => {
+    let val = 0;
+    if (typeof o.usdVal === 'number') val = o.usdVal;
+    else if (typeof o.price === 'string') {
+      const match = o.price.match(/[0-9,]+/);
+      if (match) val = parseInt(match[0].replace(/,/g, ''), 10) || 0;
+    }
+    gross += val;
+    if (o.status && o.status.includes('Completed')) {
+      completedCount++;
+    } else {
+      activeCount++;
+    }
+  });
+
+  const grossEl = document.getElementById('kpiGrossVolume');
+  if (grossEl) grossEl.textContent = `$${gross.toLocaleString()}`;
+
+  const activeEl = document.getElementById('kpiActiveProjectsCount');
+  if (activeEl) activeEl.textContent = `${activeCount} Active`;
+
+  const compEl = document.getElementById('kpiCompletedProjectsCount');
+  if (compEl) compEl.textContent = `${completedCount} Delivered`;
+
   if (ordEl) {
-    ordEl.innerHTML = ordersList.map((o, idx) => `
-      <div style="padding:14px; background:#06080c; border-radius:12px; border:1px solid rgba(250,204,21,0.25);">
-        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700;">
-          <span>${o.client} <span class="font-mono" style="color:var(--text-muted); font-size:11px;">(${o.contact})</span></span>
-          <span class="font-mono" style="color:var(--gold);">${o.pkg}</span>
+    if (orders.length === 0) {
+      ordEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#06080d; border-radius:12px; border:1px solid rgba(255,255,255,0.06);">No commission inquiries registered yet. When clients submit project briefs from the Atelier or Commission Calculator, they appear here live.</div>`;
+      return;
+    }
+
+    ordEl.innerHTML = orders.map((o, idx) => `
+      <div style="padding:16px; background:#06080d; border-radius:14px; border:1px solid rgba(250,204,21,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; flex-wrap:wrap; gap:8px;">
+          <div>
+            <span style="font-size:14px; color:#fff; font-weight:800;">${o.client || 'Client'}</span>
+            <span class="font-mono" style="color:var(--text-muted); font-size:11.5px; margin-left:6px;">(${o.contact || o.email || 'No contact'})</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="font-mono" style="color:var(--gold); font-size:13px; font-weight:800;">${o.pkg || 'Custom Package'}</span>
+            <button type="button" onclick="downloadInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-radius:6px;" title="Download Invoice">📄 Invoice</button>
+          </div>
         </div>
-        <div style="font-size:12px; color:var(--cyan-electric); margin:4px 0;">Selected Phase: ${o.phase || 'Standard'}</div>
-        <div style="color:var(--text-muted); font-size:12.5px; margin:4px 0; line-height:1.6;">${o.brief}</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:11.5px;">
-          <span style="color:var(--amber);">Project Status: <strong>${o.status}</strong></span>
-          <select onchange="updateOrderStatus(${idx}, this.value)" style="width:auto; padding:4px 8px; font-size:11.5px;">
-            <option value="Brief Received" ${o.status === 'Brief Received' ? 'selected' : ''}>Brief Received</option>
-            <option value="Phase 1: Thumbnails" ${o.status === 'Phase 1: Thumbnails' ? 'selected' : ''}>Phase 1: Thumbnails</option>
-            <option value="Phase 2: Linework" ${o.status === 'Phase 2: Linework' ? 'selected' : ''}>Phase 2: Linework</option>
-            <option value="Phase 3: Render & Lighting" ${o.status === 'Phase 3: Render & Lighting' ? 'selected' : ''}>Phase 3: Render & Lighting</option>
-            <option value="Final Delivery & Completed" ${o.status === 'Final Delivery & Completed' ? 'selected' : ''}>Final Delivery & Completed</option>
-          </select>
+        <div style="font-size:12px; color:var(--cyan-electric); margin:6px 0; font-weight:600;">Selected Phase: ${o.phase || 'Standard Concept Execution'}</div>
+        <div style="color:#cbd5e1; font-size:12px; margin:6px 0; line-height:1.7; background:#020306; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">${o.brief || 'No briefing details provided.'}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08); font-size:12px; flex-wrap:wrap; gap:8px;">
+          <span style="color:var(--amber); font-weight:700;">Status: <span style="color:#fff;">${o.status || 'Brief Received'}</span></span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11px; color:var(--text-muted);">Update Stage:</span>
+            <select onchange="updateOrderStatus(${idx}, this.value)" style="width:auto; padding:5px 10px; font-size:11.5px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
+              <option value="Brief Received" ${o.status === 'Brief Received' ? 'selected' : ''}>Brief Received</option>
+              <option value="Phase 1: Thumbnails" ${o.status === 'Phase 1: Thumbnails' ? 'selected' : ''}>Phase 1: Thumbnails</option>
+              <option value="Phase 2: Linework" ${o.status === 'Phase 2: Linework' ? 'selected' : ''}>Phase 2: Linework</option>
+              <option value="Phase 3: Render & Lighting" ${o.status === 'Phase 3: Render & Lighting' ? 'selected' : ''}>Phase 3: Render & Lighting</option>
+              <option value="Final Delivery & Completed" ${o.status === 'Final Delivery & Completed' ? 'selected' : ''}>Final Delivery & Completed</option>
+            </select>
+          </div>
         </div>
       </div>
     `).join('');
   }
-}
+};
+function renderAdminLists() { window.renderAdminLists(); }
 
 window.updateOrderStatus = function(idx, newStatus) {
   ordersList[idx].status = newStatus;
@@ -4299,9 +4459,28 @@ window.filterAdminMembers = function(val) {
   renderAdminSketch3(val);
 };
 
-window.logoutAdmin = function() {
-  switchView('showcase');
-  showToast('Signed out of director account. Console locked.', 'info', 4000);
+window.logoutAdmin = async function() {
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  if (adminWorkspace) adminWorkspace.classList.add('hidden');
+  const adminGate = document.getElementById('adminLoginGate');
+  if (adminGate) adminGate.classList.remove('hidden');
+
+  try {
+    if (window.supabaseClient && window.supabaseClient.auth) {
+      await window.supabaseClient.auth.signOut();
+    }
+  } catch(e) {}
+
+  window.currentMember = null;
+  try {
+    sessionStorage.removeItem('tajinkart_admin_unlocked');
+    localStorage.removeItem('tajinkart_admin_unlocked');
+    localStorage.removeItem('tajinkart_member_session');
+  } catch(e) {}
+
+  if (typeof switchView === 'function') switchView('showcase');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Studio Command Console locked and signed out. ✓', 'info', 3000);
 };
 
 setTimeout(() => {
@@ -5135,7 +5314,7 @@ window.switchAdminTab = function(tabKey, btn) {
   if (tabKey === 'artworks') { renderAdminSketch2(); if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories(); if (typeof renderAdminStudioGenres === 'function') renderAdminStudioGenres(); }
   if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
-  if (tabKey === 'members') renderAdminSketch3();
+  if (tabKey === 'members') { renderAdminSketch3(); if (typeof window.renderAdminLists === 'function') window.renderAdminLists(); }
   if (tabKey === 'orders') { tabKey = 'members'; switchAdminTab('members'); return; }
   if (tabKey === 'settings') renderAdminSettingsTab();
   if (tabKey === 'terms') renderAdminTerms();
@@ -7589,7 +7768,7 @@ window.saveStudioModeDirect = function(mode, event) {
 
 // ==============================================================================
 // TAJINKART STUDIO — TRANSLATE MODULE (translate.js)
-// Floating Google Translate Controller (Alphabetical, Searchable Persian & Multi-Language)
+// Floating Google Translate Controller (Alphabetical, Searchable & Multi-Language)
 // ==============================================================================
 
 window.toggleGoogleTranslateMenu = function(e) {
@@ -7610,12 +7789,65 @@ window.toggleGoogleTranslateMenu = function(e) {
   }
 };
 
+// فیلتر هوشمند و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف واردشده
 window.filterGoogleTranslateLanguages = function(query) {
   const q = (query || '').trim().toLowerCase();
-  const cards = document.querySelectorAll('#googleTranslateLanguagesList .lang-option-card');
+  const container = document.getElementById('googleTranslateLanguagesList');
+  if (!container) return;
+  const cards = Array.from(container.querySelectorAll('.lang-option-card'));
+
+  if (!q) {
+    // بازگردانی چیدمان الفبایی پیش‌فرض در صورت خالی بودن باکس
+    cards.forEach(card => {
+      card.style.display = 'flex';
+    });
+    return;
+  }
+
+  // امتیازدهی به نتایج جهت بالا آوردن زبان‌های منطبق با حرف اول
+  const scored = [];
+
   cards.forEach(card => {
-    const searchData = (card.getAttribute('data-search') || card.textContent).toLowerCase();
-    card.style.display = (!q || searchData.includes(q)) ? 'flex' : 'none';
+    const langCode = (card.getAttribute('data-lang') || '').toLowerCase();
+    const searchData = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+    const nativeName = (card.querySelector('.lang-native')?.textContent || '').toLowerCase();
+    const engName = (card.querySelector('.lang-eng')?.textContent || '').toLowerCase();
+
+    let score = 0;
+
+    // ۱. بیشترین اولویت: کد زبان دقیقاً با حرف شروع شود (مثلاً en با e)
+    if (langCode.startsWith(q)) {
+      score = 40;
+    }
+    // ۲. اولویت بسیار بالا: نام انگلیسی زبان دقیقاً با حرف شروع شود (مثلاً English با e)
+    else if (engName.startsWith(q)) {
+      score = 30;
+    }
+    // ۳. اولویت بالا: نام بومی زبان با حرف شروع شود (مثلاً Español با e)
+    else if (nativeName.startsWith(q)) {
+      score = 25;
+    }
+    // ۴. یکی از کلمات داخل دیتا-سرچ با ورودی شروع شود
+    else if (searchData.split(/\s+/).some(w => w.startsWith(q))) {
+      score = 15;
+    }
+    // ۵. صرفاً شامل ورودی باشد
+    else if (searchData.includes(q)) {
+      score = 5;
+    }
+
+    if (score > 0) {
+      card.style.display = 'flex';
+      scored.push({ card, score });
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // مرتب‌سازی و انتقال موارد منطبق‌تر به بالای لیست
+  scored.sort((a, b) => b.score - a.score);
+  scored.forEach(item => {
+    container.appendChild(item.card);
   });
 };
 
@@ -7666,8 +7898,7 @@ document.addEventListener('click', (e) => {
   if (widget && !widget.contains(e.target)) {
     const flyout = document.getElementById('googleTranslateMenuFlyout');
     if (flyout) flyout.classList.add('hidden');
-  const widget = document.getElementById('floatingGoogleTranslateWidget');
-  if (widget) widget.classList.remove('open');
+    if (widget) widget.classList.remove('open');
   }
 });
 

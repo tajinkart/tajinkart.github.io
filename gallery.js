@@ -1103,3 +1103,114 @@ document.addEventListener('touchend', (e) => {
     pinchPanY = 0;
   }
 }, { passive: true });
+
+
+// ==============================================================================
+// همگام‌سازی دوطرفه آثار با پایگاه داده ابری Supabase
+// ==============================================================================
+window.syncArtworksFromSupabase = async function() {
+  if (!window.supabaseClient) {
+    if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+    if (!window.supabaseClient) return;
+  }
+
+  try {
+    const { data: cloudArtworks, error } = await window.supabaseClient
+      .from('artworks')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) {
+      console.warn('Supabase fetch error, fallback to local cache:', error);
+      return;
+    }
+
+    let deletedIds = [];
+    try {
+      const delKey = (typeof KEYS !== 'undefined' && KEYS.DELETED_ARTWORKS) ? KEYS.DELETED_ARTWORKS : 'tajinkart_deleted_artworks_v2';
+      deletedIds = JSON.parse(localStorage.getItem(delKey) || '[]').map(Number);
+    } catch(e) { deletedIds = []; }
+    const deletedSet = new Set(deletedIds);
+
+    // ۱. اگر کلود آثاری دارد، دیتابیس ابری منبع حقیقت است
+    if (cloudArtworks && cloudArtworks.length > 0) {
+      // پاکسازی ردیف‌های تستی ۱ تا ۸
+      const mockRows = cloudArtworks.filter(row => Number(row.id) <= 8);
+      if (mockRows.length > 0) {
+        window.supabaseClient.from('artworks').delete().lte('id', 8).then(() => {});
+      }
+
+      const itemsToPurge = cloudArtworks.filter(row => deletedSet.has(Number(row.id)));
+      if (itemsToPurge.length > 0) {
+        itemsToPurge.forEach(row => {
+          window.supabaseClient.from('artworks').delete().eq('id', row.id).then(() => {});
+        });
+      }
+
+      const validRows = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
+
+      if (validRows.length > 0) {
+        const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {};
+        showcaseArtworks = validRows.map(row => {
+          const pipe = row.pipeline_key || 'sketch1';
+          const mappedCat = row.category || row.tag || pipeMap[pipe] || 'character';
+          return {
+            id: Number(row.id),
+            orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
+            tag: mappedCat,
+            category: mappedCat,
+            shortSlug: row.short_slug || row.title,
+            title: row.title,
+            desc: row.desc_text || '',
+            pipelineKey: pipe,
+            genre: row.genre || 'Dark Fantasy',
+            image: row.image,
+            colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
+            lore: row.lore || 'Extopia Universe',
+            phases: row.phases || []
+          };
+        }).sort((a, b) => {
+          if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
+          return b.id - a.id;
+        });
+
+        window.showcaseArtworks = showcaseArtworks;
+        const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
+        safeSetStorage(artKey, JSON.stringify(showcaseArtworks));
+        if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+        if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+        console.log('Automated cloud sync complete. Active artworks:', showcaseArtworks.length);
+        return;
+      }
+    }
+
+    // ۲. در صورتی که دیتابیس خالی است، بارگذاری کارهای محلی در کلود
+    const localArtworks = (showcaseArtworks || []).filter(item => !deletedSet.has(Number(item.id)));
+    if (localArtworks.length > 0 && (!cloudArtworks || cloudArtworks.length === 0) && deletedSet.size === 0) {
+      const rowsToInsert = localArtworks.map(a => ({
+        id: a.id,
+        tag: a.tag || 'character',
+        short_slug: a.shortSlug || a.title,
+        title: a.title,
+        desc_text: a.desc || '',
+        pipeline_key: a.pipelineKey || 'sketch1',
+        genre: a.genre || 'Dark Fantasy',
+        image: a.image,
+        color_space: a.colorSpace || 'Master 4K / 16-Bit ProPhoto RGB',
+        lore: a.lore || 'Extopia Universe',
+        phases: a.phases || []
+      }));
+      await window.supabaseClient.from('artworks').upsert(rowsToInsert);
+    }
+  } catch (err) {
+    console.warn('Auto-sync execution error:', err);
+  }
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
+  });
+} else {
+  setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
+}
