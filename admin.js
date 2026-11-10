@@ -904,6 +904,12 @@ window.confirmSaveArtwork = async function() {
       }
       
       closeAdminArtEditor();
+      if (typeof currentGalleryFilter !== 'undefined') currentGalleryFilter = 'all';
+      if (typeof currentGalleryGenreFilter !== 'undefined') currentGalleryGenreFilter = 'all';
+      const catLabel = document.getElementById('currentCategoryPillLabel');
+      if (catLabel) catLabel.textContent = 'All Artworks';
+      const genreLabel = document.getElementById('currentGenrePillLabel');
+      if (genreLabel) genreLabel.textContent = 'All Genres';
       if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
       if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
       showToast('New artwork added to showcase gallery successfully! ✓', 'success');

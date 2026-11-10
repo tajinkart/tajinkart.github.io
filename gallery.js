@@ -293,7 +293,8 @@ window.renderShowcaseGrid = function() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
 
-  const filteredArtworks = showcaseArtworks.filter(art => {
+  const allArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks) && window.showcaseArtworks.length > 0) ? window.showcaseArtworks : (showcaseArtworks || []);
+  const filteredArtworks = allArts.filter(art => {
     // 1. Category Filter
     if (currentGalleryFilter && currentGalleryFilter !== 'all') {
       const cat = art.category || art.tag || (art.pipelineKey ? (PIPELINE_TO_CATEGORY_MAP[art.pipelineKey] || 'character') : 'character');
@@ -1106,7 +1107,7 @@ document.addEventListener('touchend', (e) => {
 
 
 // ==============================================================================
-// همگام‌سازی دوطرفه آثار با پایگاه داده ابری Supabase
+// همگام‌سازی دوطرفه و ادغام هوشمند آثار (بدون حذف کارهای جدید ذخیره‌شده محلی)
 // ==============================================================================
 window.syncArtworksFromSupabase = async function() {
   if (!window.supabaseClient) {
@@ -1121,7 +1122,7 @@ window.syncArtworksFromSupabase = async function() {
       .order('id', { ascending: false });
 
     if (error) {
-      console.warn('Supabase fetch error, fallback to local cache:', error);
+      console.warn('Supabase fetch error, maintaining local cache:', error);
       return;
     }
 
@@ -1132,75 +1133,76 @@ window.syncArtworksFromSupabase = async function() {
     } catch(e) { deletedIds = []; }
     const deletedSet = new Set(deletedIds);
 
-    // ۱. اگر کلود آثاری دارد، دیتابیس ابری منبع حقیقت است
-    if (cloudArtworks && cloudArtworks.length > 0) {
-      // پاکسازی ردیف‌های تستی ۱ تا ۸
-      const mockRows = cloudArtworks.filter(row => Number(row.id) <= 8);
-      if (mockRows.length > 0) {
-        window.supabaseClient.from('artworks').delete().lte('id', 8).then(() => {});
-      }
+    // واکشی کارهای فعلی محلی (جهت ادغام و عدم حذف کارهای جدید اضافه شده در ادمین)
+    const localArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks) && window.showcaseArtworks.length > 0)
+      ? window.showcaseArtworks
+      : (typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks) ? showcaseArtworks : []);
 
-      const itemsToPurge = cloudArtworks.filter(row => deletedSet.has(Number(row.id)));
-      if (itemsToPurge.length > 0) {
-        itemsToPurge.forEach(row => {
-          window.supabaseClient.from('artworks').delete().eq('id', row.id).then(() => {});
+    const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {};
+    const mergedMap = new Map();
+
+    // ۱. ابتدا کارهای کلود معتبر را نگاشت و اضافه می‌کنیم
+    if (cloudArtworks && Array.isArray(cloudArtworks)) {
+      const validCloud = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
+      validCloud.forEach(row => {
+        const pipe = row.pipeline_key || 'sketch1';
+        const mappedCat = row.category || row.tag || pipeMap[pipe] || 'character';
+        mergedMap.set(Number(row.id), {
+          id: Number(row.id),
+          orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
+          tag: mappedCat,
+          category: mappedCat,
+          shortSlug: row.short_slug || row.title,
+          title: row.title,
+          desc: row.desc_text || '',
+          pipelineKey: pipe,
+          genre: row.genre || 'Dark Fantasy',
+          image: row.image,
+          colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
+          lore: row.lore || 'Extopia Universe',
+          phases: row.phases || []
         });
-      }
-
-      const validRows = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
-
-      if (validRows.length > 0) {
-        const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {};
-        showcaseArtworks = validRows.map(row => {
-          const pipe = row.pipeline_key || 'sketch1';
-          const mappedCat = row.category || row.tag || pipeMap[pipe] || 'character';
-          return {
-            id: Number(row.id),
-            orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
-            tag: mappedCat,
-            category: mappedCat,
-            shortSlug: row.short_slug || row.title,
-            title: row.title,
-            desc: row.desc_text || '',
-            pipelineKey: pipe,
-            genre: row.genre || 'Dark Fantasy',
-            image: row.image,
-            colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
-            lore: row.lore || 'Extopia Universe',
-            phases: row.phases || []
-          };
-        }).sort((a, b) => {
-          if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
-          return b.id - a.id;
-        });
-
-        window.showcaseArtworks = showcaseArtworks;
-        const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
-        safeSetStorage(artKey, JSON.stringify(showcaseArtworks));
-        if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
-        if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
-        console.log('Automated cloud sync complete. Active artworks:', showcaseArtworks.length);
-        return;
-      }
+      });
     }
 
-    // ۲. در صورتی که دیتابیس خالی است، بارگذاری کارهای محلی در کلود
-    const localArtworks = (showcaseArtworks || []).filter(item => !deletedSet.has(Number(item.id)));
-    if (localArtworks.length > 0 && (!cloudArtworks || cloudArtworks.length === 0) && deletedSet.size === 0) {
-      const rowsToInsert = localArtworks.map(a => ({
-        id: a.id,
-        tag: a.tag || 'character',
-        short_slug: a.shortSlug || a.title,
-        title: a.title,
-        desc_text: a.desc || '',
-        pipeline_key: a.pipelineKey || 'sketch1',
-        genre: a.genre || 'Dark Fantasy',
-        image: a.image,
-        color_space: a.colorSpace || 'Master 4K / 16-Bit ProPhoto RGB',
-        lore: a.lore || 'Extopia Universe',
-        phases: a.phases || []
-      }));
-      await window.supabaseClient.from('artworks').upsert(rowsToInsert);
+    // ۲. کارهای جدید محلی را به ادغام اضافه می‌کنیم و اگر در کلود نیستند، بک‌آپ می‌گیریم
+    localArts.forEach(art => {
+      const artId = Number(art.id);
+      if (artId > 8 && !deletedSet.has(artId)) {
+        if (!mergedMap.has(artId)) {
+          mergedMap.set(artId, art);
+          // ثبت خودکار اثر محلی جدید در دیتابیس ابری
+          if (window.supabaseClient) {
+            window.supabaseClient.from('artworks').upsert([{
+              id: art.id,
+              tag: art.tag || 'character',
+              short_slug: art.shortSlug || art.title,
+              title: art.title,
+              desc_text: art.desc || '',
+              pipeline_key: art.pipelineKey || 'sketch1',
+              genre: art.genre || 'Dark Fantasy',
+              image: art.image,
+              color_space: art.colorSpace || 'Master 4K / 16-Bit ProPhoto RGB',
+              phases: art.phases || []
+            }]).then(() => {}).catch(() => {});
+          }
+        }
+      }
+    });
+
+    const finalArtworks = Array.from(mergedMap.values()).sort((a, b) => {
+      if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
+      return b.id - a.id;
+    });
+
+    if (finalArtworks.length > 0) {
+      showcaseArtworks = finalArtworks;
+      window.showcaseArtworks = finalArtworks;
+      const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
+      safeSetStorage(artKey, JSON.stringify(finalArtworks));
+      if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+      if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+      console.log('Automated two-way cloud sync merged complete. Artworks count:', finalArtworks.length);
     }
   } catch (err) {
     console.warn('Auto-sync execution error:', err);
