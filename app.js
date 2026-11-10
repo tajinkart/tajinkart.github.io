@@ -2392,14 +2392,14 @@ window.recalcWizardPrice = function() {
 let currentStoreFilterType = 'all';
 
 const ASSET_CAT_DESCRIPTIONS = {
-  'all': 'مخزن دارایی‌های دیجیتال استودیو شامل ۷ شاخه اسست‌های دوبعدی بازی، براش‌های تخصصی، کیت‌های UI، کمیک‌های لایه‌باز، لوپ‌های 4K، فایل‌های پرینت ۳D و بسته‌های FX.',
-  'بسته‌های اسست بازی و اسپریت ۲D': 'اسپرایت‌شیت‌های کاراکتر و انیمیشن‌های چندجهته (حرکت، حمله، آسیب، مرگ) بهینه‌شده برای Unity و Godot به همراه تایل‌ست‌ها و لایه‌های پارالاکس.',
-  'موتور براش، تکسچر و استمپ‌های کانسپت آرت': 'ست‌های اختصاصی براش فتوشاپ (.ABR) و پروکریت برای رندر متریال‌های زنگ‌زدگی، چرم کهنه، فلس و بافت‌های آلفای یکپارچه (Seamless Alphas).',
-  'کیت‌های پراپ، آیکون و اینترفیس بازی': 'پکیج‌های آیکون مهارت جادویی، شیشه‌های معجون، فریم‌های دارک‌فانتزی HUD و المان‌های RPG با رزولوشن 256x256 و 512x512 ترنسپرنت.',
-  'کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر': 'چپترهای کمیک با رزولوشن فوق‌العاده بالا به همراه فایل‌های تفکیک‌شده لایه‌باز PSD، آرت‌بوک‌های لور جهان جنسیس و یادداشت‌های کارگردانی.',
-  'فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش': 'ویدیوهای لوپ پیوسته بدون درز (Seamless 4K MP4 / WebM) مناسب برای منوی اصلی بازی‌ها، والپیپر استیم و پس‌زمینه‌های تیزر تبلیغاتی.',
-  'فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی': 'فایل‌های بهینه‌سازی‌شده .STL و .OBJ سر هیولاها و مینیاتوری‌های دارک‌فانتزی مناسب پرینترهای رزینی همراه با بیس‌مش خام (Base Mesh) برای ZBrush.',
-  'اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری': 'فایل‌های PNG ترنسپرنت و ویدیوهای لوپ بلک‌اسکرین از ذرات معلق اتر، مه سنگین، باران گوگردی و پاشش خون آماده استفاده در فتوشاپ و افتر افکت.'
+  'all': 'Atelier digital asset vault containing 7 standard branches: 2D game sprites, specialized brush engines, UI kits, layered comic PSDs, 4K loops, 3D print STLs, and FX particle bundles.',
+  '2D Game Sprites & Characters': 'Character sprite sheets and multi-directional animations (Idle, Walk, Attack, Death) optimized for Unity and Godot with seamless parallax layers.',
+  'Brush Engines & Textures': 'Custom Photoshop (.ABR) and Procreate brush packs for rendering weathered metals, aged leather, reptilian scales, and 4K seamless alphas.',
+  'Prop Kits, Icons & UI': 'Magic skill icon libraries, alchemy vials, dark fantasy HUD frames, and RPG equipment interfaces in transparent PNG (256x256 & 512x512).',
+  'Comics & Master PSDs': 'Full comic graphic novel chapters with separated PSD layers, worldbuilding lorebooks, and studio director notes.',
+  '4K Cinematic Loops': 'Seamless 60FPS 4K video loops for video game title menus, live streaming backdrops, Steam dynamic wallpapers, and commercial cinematic title sequences.',
+  '3D Print & STL Models': 'High-poly STL sculpts for resin 3D printing with pre-supported hollowed variants + raw ZBrush (.ZTL / .OBJ) sculpt files for game artists.',
+  'FX & Atmosphere Overlays': 'High-resolution transparent PNG & 4K ProRes video overlays including drifting embers, sulfurous acid mist, heavy rain, and weapon impact dust.'
 };
 
 window.filterStoreAssets = function(type, el) {
@@ -2452,7 +2452,7 @@ function renderProductsWithList(list) {
   if (!grid) return;
 
   if (list.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1; padding:40px; text-align:center; color:var(--text-muted); font-size:13px;">هیچ آیتمی در این دسته‌بندی یافت نشد.</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1; padding:40px; text-align:center; color:var(--text-muted); font-size:13px;">No assets found in this category.</div>`;
     return;
   }
 
@@ -2470,12 +2470,12 @@ function renderProductsWithList(list) {
             <p style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.65;">${p.desc}</p>
             <div class="lore-key-tag">
               <span>🔑</span>
-              <span>${p.loreKey || 'جهان جنسیس • دسترسی لور مادام‌العمر'}</span>
+              <span>${p.loreKey || 'Genesis Canon • Lifetime Lore Access'}</span>
             </div>
           </div>
           <div style="display:flex; align-items:center; justify-content:space-between; padding-top:12px; border-top:1px solid var(--border-subtle);">
             <span class="font-mono" style="font-size:16px; font-weight:800; color:var(--gold);">${priceStr}</span>
-            <button onclick="downloadDigitalAsset('${p.title}')" class="btn-gold" style="padding:8px 14px; font-size:11px; background:var(--cyan-electric); color:#000;">دریافت و آنلاک لایسنس ←</button>
+            <button onclick="downloadDigitalAsset('${p.title}')" class="btn-gold" style="padding:8px 14px; font-size:11px; background:var(--cyan-electric); color:#000;">Unlock & Download License →</button>
           </div>
         </div>
       </div>
@@ -4066,9 +4066,9 @@ function renderMemberDashboard() {
   const nameEl = document.getElementById('dashMemberName');
   if (nameEl) {
     if (!currentMember) {
-      nameEl.innerHTML = 'مهمان ویژه آتلیه <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; border:1px solid rgba(0,240,255,0.3); padding:2px 8px; border-radius:999px;">پیش‌نمایش کنسول ✨</span>';
+      nameEl.innerHTML = 'Guest Collector <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; border:1px solid rgba(0,240,255,0.3); padding:2px 8px; border-radius:999px;">Console Preview ✨</span>';
     } else if (isDirector) {
-      nameEl.innerHTML = 'سید سروش تاج <span style="font-size:11px; color:var(--gold); font-weight:800; border:1px solid rgba(250,204,21,0.35); padding:2px 8px; border-radius:999px;">مدیر استودیو 👑</span>';
+      nameEl.innerHTML = 'Seyed Soroush Taj <span style="font-size:11px; color:var(--gold); font-weight:800; border:1px solid rgba(250,204,21,0.35); padding:2px 8px; border-radius:999px;">Studio Director 👑</span>';
     } else {
       nameEl.textContent = currentMember.name;
     }
@@ -4099,12 +4099,12 @@ function renderMemberDashboard() {
     if (isDirector) {
       halo.classList.add('director-halo');
       glyph.textContent = '👑';
-      rank.textContent = 'سطح دسترسی: مدیر ارشد آتلیه و طراح دنیا';
+      rank.textContent = 'Clearance: Studio Director & Lead Worldbuilder 👑';
       badge.classList.add('director-rank');
     } else {
       halo.classList.remove('director-halo');
       glyph.textContent = '⚔️';
-      rank.textContent = currentMember ? 'سطح دسترسی ۳: موکل ارشد و حامی آتلیه' : 'سطح دسترسی آزمایشی: پایشگر آتلیه';
+      rank.textContent = currentMember ? 'Clearance Level 3: Vanguard Client & Collector' : 'Clearance Level 1: Atelier Seeker';
       badge.classList.remove('director-rank');
     }
   }
@@ -4136,11 +4136,11 @@ function renderMemberDashboard() {
   ) : [];
 
   const STAGES = [
-    { id: 1, label: 'بریف و آرکی‌تایپ', hint: 'تحلیل نیازمندی‌ها در آتلیه' },
-    { id: 2, label: 'ودیعه ۵۰٪ تایید شد', hint: 'رزرو تقویم طراح' },
-    { id: 3, label: 'اتودهای سیلوئت', hint: 'فاز اکتشاف فرم و لاین‌آرت' },
-    { id: 4, label: 'رندر مستر ۳۰۰DPI', hint: 'نورپردازی کیاروسکورو و متریال' },
-    { id: 5, label: 'تسویه و سورس PSD', hint: 'فایل لایه‌باز 4K UHD' }
+    { id: 1, label: 'Brief & Scope', hint: 'Atelier Requirements Analysis' },
+    { id: 2, label: '50% Retainer', hint: 'Artist Calendar Reserved' },
+    { id: 3, label: 'Silhouette & Lines', hint: 'Form Exploration & Turnaround' },
+    { id: 4, label: '300DPI Master', hint: 'Chiaroscuro & Material Render' },
+    { id: 5, label: 'Final PSD Source', hint: 'Full Layered 4K Handover' }
   ];
 
   const ordersToRender = userOrders.length > 0 ? userOrders : [{
@@ -4168,7 +4168,7 @@ function renderMemberDashboard() {
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
               <span style="font-size:15px; font-weight:900; color:#fff; display:block;">${o.pkg || 'سفارش اختصاصی کانسپت آرت'}</span>
-              <span class="font-mono" style="font-size:11px; color:var(--gold); margin-top:3px; display:block;">شناسه بریف: #${o.id} • هزینه برآورد: ${o.price || 'توافقی'}</span>
+              <span class="font-mono" style="font-size:11px; color:var(--gold); margin-top:3px; display:block;">Brief CID: #${o.id} • Quote: ${o.price || 'توافقی'}</span>
             </div>
             <span style="background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.35); padding:4px 14px; border-radius:999px; font-size:11.5px; font-weight:800; letter-spacing:0.3px;">
               ${o.status || 'بریف دریافت شد'}
@@ -4199,15 +4199,15 @@ function renderMemberDashboard() {
           </div>
 
           <div style="color:#cbd5e1; font-size:12px; line-height:1.8; background:rgba(255,255,255,0.02); padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
-            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">خلاصه بریف و توافقات آتلیه:</strong>
+            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Brief Summary & Scope Specifications:</strong>
             ${o.brief || 'طراحی تخصصی کانسپت آرت و دنیاسازی در استودیو تاجین‌کارت با بالاترین استانداردهای صنعتی.'}
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
-            <span>فاز کنونی: <strong style="color:#fff;">${o.phase || 'استاندارد ۳۰۰DPI'}</strong></span>
-            <span>تحویل نهایی: <strong style="color:#fff;">${o.timeline || 'طبق زمان‌بندی پروژه'}</strong></span>
+            <span>Current Phase: <strong style="color:#fff;">${o.phase || 'استاندارد ۳۰۰DPI'}</strong></span>
+            <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'طبق زمان‌بندی پروژه'}</strong></span>
             <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--gold); color:var(--gold);">
-              📄 دریافت فاکتور رسمی
+              📄 Download Invoice
             </button>
           </div>
 
@@ -4267,11 +4267,11 @@ function renderMemberDashboard() {
         <h5 class="codex-card-title">${v.title}</h5>
         <p class="codex-card-desc">${v.desc}</p>
         <div class="codex-card-meta">
-          <span>حجم فایل: <strong class="font-mono" style="color:#fff;">${v.size}</strong></span>
-          <span>مجوز: <strong style="color:var(--emerald);">${v.license}</strong></span>
+          <span>File Size: <strong class="font-mono" style="color:#fff;">${v.size}</strong></span>
+          <span>License: <strong style="color:var(--emerald);">${v.license}</strong></span>
         </div>
         <button type="button" class="btn-codex-download" onclick="triggerVaultAssetDownload('${v.title}', '${v.format}')">
-          ⚡ دانلود مستقیم دارایی دیجیتال
+          ⚡ Download Digital Asset
         </button>
       </div>
     `).join('');
@@ -4295,15 +4295,15 @@ window.setAtelierProductionLayer = function(layerMode) {
     if (layerMode === 'silhouette') {
       img.classList.add('layer-mode-silhouette');
       if (btnSil) btnSil.classList.add('active');
-      if (telemetry) telemetry.textContent = 'لایه فعال: L1 • سیلوئت اولیه و اکسپلوریشن فرم';
+      if (telemetry) telemetry.textContent = 'Active Layer: L1 • Initial Silhouette & Form Exploration';
     } else if (layerMode === 'value') {
       img.classList.add('layer-mode-value');
       if (btnVal) btnVal.classList.add('active');
-      if (telemetry) telemetry.textContent = 'لایه فعال: L2 • نورپردازی کیاروسکورو و متریال اولیه';
+      if (telemetry) telemetry.textContent = 'Active Layer: L2 • Chiaroscuro Value & Material Study';
     } else if (layerMode === 'master') {
       img.classList.add('layer-mode-master');
       if (btnMas) btnMas.classList.add('active');
-      if (telemetry) telemetry.textContent = 'لایه فعال: L3 • رندر مستر ۳۰۰DPI با افکت‌های نهایی';
+      if (telemetry) telemetry.textContent = 'Active Layer: L3 • Master 300DPI Print-Ready Keyframe';
     }
   }
 };
@@ -4319,7 +4319,7 @@ window.openAtelierPinNote = function(pinId, event) {
 
 // ثبت پین جدید بر روی بوم
 window.toggleAtelierPinDropper = function() {
-  showToast('حالت ثبت بازخورد فعال شد: بر روی هر نقطه از بوم کلیک فرمایید تا پین یادداشت ثبت گردد.', 'info', 4000);
+  showToast('Pin Feedback Mode Active: Click anywhere on the canvas to drop a revision pin.', 'info', 4000);
   const wrapper = document.getElementById('atelierCanvasWrapper');
   if (!wrapper) return;
 
@@ -4328,7 +4328,7 @@ window.toggleAtelierPinDropper = function() {
     const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
     const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
 
-    const note = prompt('یادداشت یا بازخورد خود را برای این نقطه از آرت‌ورک ثبت فرمایید:');
+    const note = prompt('Enter your pinpoint revision note for this artwork coordinate:');
     if (note && note.trim()) {
       const pinCount = document.querySelectorAll('.atelier-pin-hotspot').length + 1;
       const newPin = document.createElement('div');
@@ -4345,7 +4345,7 @@ window.toggleAtelierPinDropper = function() {
         </div>
       `;
       wrapper.appendChild(newPin);
-      showToast(`پین شماره ${pinCount} با موفقیت ثبت شد و در پرونده پروژه لحاظ گردید. ✨`, 'success');
+      showToast(`Feedback Pin #${pinCount} registered successfully on canvas. ✨`, 'success');
     }
     wrapper.removeEventListener('click', clickHandler);
   };

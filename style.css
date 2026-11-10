@@ -7456,3 +7456,24 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85), 0 0 22px var(--tile-accent, rgba(250, 204, 21, 0.35)) !important;
   transform: translateY(-2px) !important;
 }
+
+
+/* ==========================================================================
+   UNIFIED BRAND TYPOGRAPHY: OptimusPrinceps (v21.4.0)
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6,
+.view-hero-title,
+.stage-heading,
+.store-pane-title,
+.desc-card-title,
+.atelier-member-name,
+.sec-card-title,
+.codex-card-title,
+.pipeline-tile-title,
+.service-nav-title,
+.top-center-pill span:last-child,
+.right-exp-title {
+  font-family: var(--font-brand) !important;
+  letter-spacing: 0.05em !important;
+}

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=21.3.0">
+  <link rel="stylesheet" href="style.css?v=21.4.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -410,124 +410,124 @@
       <!-- تب ۲: فروشگاه دارایی‌های دیجیتال (با طراحی کاملاً همگام با سفارشات کانسپت) -->
       <div id="storePaneProducts" class="hidden">
         
-        <!-- توضیحات مجزا و دقیق اختصاصی برای دارایی‌های دیجیتال -->
+        <!-- Official Digital Assets Vault Header -->
         <div class="panel-intro-banner cyan-border">
           <div>
-            <strong style="color:var(--cyan-electric); display:block; margin-bottom:4px; font-size:14px;">💎 مخزن رسمی دارایی‌های دیجیتال، اسست‌های بازی و ابزارهای تولید:</strong>
-            آرشیو دارایی‌های دیجیتال آماده تجاری، شامل بسته‌های اسپرایت انیمیشنی دوبعدی برای موتورهای Unity و Godot، جلدهای کمیک با لایه‌های تفکیک‌شده PSD، براش‌های تخصصی نقاشی دیجیتال و فوتیج‌های لوپ سینمایی با لایسنس تجاری دائمی.
+            <strong style="color:var(--cyan-electric); display:block; margin-bottom:4px; font-size:14px;">💎 Official Digital Assets Vault & Game Production Toolkits:</strong>
+            Production-ready commercial digital assets, including multi-directional 2D sprite sheets for Unity & Godot, layered PSD master files, specialized digital painting brush engines, and seamless 4K video loops with perpetual commercial licensing.
           </div>
         </div>
 
         <div class="comm-studio-layout">
-                    <!-- سایدبار دسته‌های دارایی با ۷ شاخه استاندارد Master Spec v2.1 -->
+          <!-- Digital Asset Categories Sidebar -->
           <div class="studio-side-tabs" id="assetCategoryTabs">
 
             <div onclick="filterStoreAssets('all', this)" class="service-nav-card cyan-card active" data-asset-cat="all">
-              <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="همه دارایی‌ها" />
+              <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="All Atelier Assets" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">00.</span>
-                  <span>همه دارایی‌های استودیو</span>
+                  <span>All Atelier Assets</span>
                 </div>
-                <div class="service-nav-desc">آرشیو کامل پکیج‌ها، سورس‌های لایه‌باز و فایل‌های آماده تولید تجاری.</div>
+                <div class="service-nav-desc">Complete archive of production packs, layered PSD files, and commercial game assets.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('بسته‌های اسست بازی و اسپریت ۲D', this)" class="service-nav-card cyan-card" data-asset-cat="بسته‌های اسست بازی و اسپریت ۲D">
-              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="اسست بازی" />
+            <div onclick="filterStoreAssets('2D Game Sprites & Characters', this)" class="service-nav-card cyan-card" data-asset-cat="2D Game Sprites & Characters">
+              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="2D Game Sprites" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">01.</span>
-                  <span>اسست بازی و اسپریت ۲D</span>
+                  <span>2D Game Sprites & Characters</span>
                 </div>
-                <div class="service-nav-desc">اسپرایت‌شیت‌های کاراکتر، انیمیشن‌های چندجهته بهینه‌شده برای Unity و Godot.</div>
+                <div class="service-nav-desc">Character sprite sheets and multi-directional animations optimized for Unity and Godot.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('موتور براش، تکسچر و استمپ‌های کانسپت آرت', this)" class="service-nav-card cyan-card" data-asset-cat="موتور براش، تکسچر و استمپ‌های کانسپت آرت">
-              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="موتور براش" />
+            <div onclick="filterStoreAssets('Brush Engines & Textures', this)" class="service-nav-card cyan-card" data-asset-cat="Brush Engines & Textures">
+              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="Brush Engines" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">02.</span>
-                  <span>موتور براش، بافت و آلفا</span>
+                  <span>Brush Engines & Textures</span>
                 </div>
-                <div class="service-nav-desc">ست‌های براش فتوشاپ و پروکریت برای متریال زنگ‌زدگی، فلس، پوست و مه اتمسفریک.</div>
+                <div class="service-nav-desc">Custom Photoshop (.ABR) & Procreate brushes for rust, scales, hide, and atmospheric fog.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('کیت‌های پراپ، آیکون و اینترفیس بازی', this)" class="service-nav-card cyan-card" data-asset-cat="کیت‌های پراپ، آیکون و اینترفیس بازی">
-              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="پراپ و UI" />
+            <div onclick="filterStoreAssets('Prop Kits, Icons & UI', this)" class="service-nav-card cyan-card" data-asset-cat="Prop Kits, Icons & UI">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="Prop Kits & UI" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">03.</span>
-                  <span>کیت‌های پراپ، آیکون و UI</span>
+                  <span>Prop Kits, Icons & UI</span>
                 </div>
-                <div class="service-nav-desc">آیکون‌های مهارت جادویی، معجون‌ها، فریم‌های دارک‌فانتزی HUD و اینونتوری.</div>
+                <div class="service-nav-desc">Magic skill icons, alchemy vials, dark fantasy HUD frames, and inventory elements.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر', this)" class="service-nav-card cyan-card" data-asset-cat="کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر">
-              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="کمیک و ناول" />
+            <div onclick="filterStoreAssets('Comics & Master PSDs', this)" class="service-nav-card cyan-card" data-asset-cat="Comics & Master PSDs">
+              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="Comics & Master PSDs" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">04.</span>
-                  <span>کمیک، آرت‌بوک و مستر PSD</span>
+                  <span>Comics & Master PSDs</span>
                 </div>
-                <div class="service-nav-desc">چپترهای کمیک با لایه‌های تفکیک‌شده PSD، آرت‌بوک لور و یادداشت‌های کارگردانی.</div>
+                <div class="service-nav-desc">Full comic chapters with separated PSD layers, worldbuilding lorebooks, and director notes.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش', this)" class="service-nav-card cyan-card" data-asset-cat="فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش">
-              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="لوپ سینمایی" />
+            <div onclick="filterStoreAssets('4K Cinematic Loops', this)" class="service-nav-card cyan-card" data-asset-cat="4K Cinematic Loops">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="4K Cinematic Loops" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">05.</span>
-                  <span>لوپ‌های سینمایی 4K</span>
+                  <span>4K Cinematic Loops</span>
                 </div>
-                <div class="service-nav-desc">ویدیوهای لوپ بدون درز مناسب منوی اصلی بازی، والپیپر استیم و تیزرهای تبلیغاتی.</div>
+                <div class="service-nav-desc">Seamless looping background videos for game menus, Steam dynamic wallpapers, and teasers.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی', this)" class="service-nav-card cyan-card" data-asset-cat="فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی">
-              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="پرینت ۳D" />
+            <div onclick="filterStoreAssets('3D Print & STL Models', this)" class="service-nav-card cyan-card" data-asset-cat="3D Print & STL Models">
+              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="3D Print & STL Models" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">06.</span>
-                  <span>پرینت ۳D و مینیاتوری STL</span>
+                  <span>3D Print & STL Models</span>
                 </div>
-                <div class="service-nav-desc">فایل‌های STL و OBJ سر هیولاها برای پرینترهای رزینی همراه با بیس‌مش خام ZBrush.</div>
+                <div class="service-nav-desc">High-poly monster bust STL & OBJ files for resin 3D printers with raw ZBrush base meshes.</div>
               </div>
             </div>
 
-            <div onclick="filterStoreAssets('اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری', this)" class="service-nav-card cyan-card" data-asset-cat="اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری">
-              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="افکت FX" />
+            <div onclick="filterStoreAssets('FX & Atmosphere Overlays', this)" class="service-nav-card cyan-card" data-asset-cat="FX & Atmosphere Overlays">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="FX & Overlays" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--cyan-electric);">07.</span>
-                  <span>اوورلی ذرات و افکت FX</span>
+                  <span>FX & Atmosphere Overlays</span>
                 </div>
-                <div class="service-nav-desc">ذرات معلق اتر، مه سنگین، باران گوگردی و پاشش خون در فرمت PNG ترنسپرنت و بلک‌اسکرین.</div>
+                <div class="service-nav-desc">Floating aether particles, dense volumetric fog, acid rain, and blood splatters in transparent PNG & ProRes.</div>
               </div>
             </div>
 
           </div>
 
-          <!-- میزکار نمایش اسست‌ها -->
+          <!-- Digital Assets Workbench -->
           <div class="sketch-workbench" id="assetWorkbenchArea">
             <div class="sketch-workbench-header">
               <div>
                 <div class="sketch-banner-title">
-                  <span style="color:var(--cyan-electric);">مخزن دارایی‌های دیجیتال</span>
+                  <span style="color:var(--cyan-electric);">Digital Assets Vault</span>
                   <span style="color:var(--border-subtle);">/</span>
-                  <span id="currentAssetCategoryTitle" style="color:#fff;">همه آیتم‌ها</span>
+                  <span id="currentAssetCategoryTitle" style="color:#fff;">All Assets</span>
                 </div>
                 <p id="assetCategoryDynamicNote" style="font-size:12.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;">
-                  کلیه دارایی‌های این مخزن همراه با فایل‌های مستر باکیفیت و مجوز رسمی استفاده تجاری بدون محدودیت در بازی‌ها و پروژه‌ها ارائه می‌گردند.
+                  All assets in this vault include high-resolution master source files and perpetual royalty-free commercial licenses for games, film, and media.
                 </p>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <input type="text" id="assetSearchBox" placeholder="🔍 جستجو در اسست‌ها..." oninput="searchStoreAssets(this.value)" style="width:190px; padding:6px 12px; font-size:11.5px; border-radius:8px;" />
-                <span class="font-mono" style="font-size:11px; color:var(--cyan-electric); padding:6px 12px; border-radius:8px; background:rgba(0,240,255,0.1); border:1px solid rgba(0,240,255,0.3);" id="assetCountBadge">5 ASSETS AVAILABLE</span>
+                <input type="text" id="assetSearchBox" placeholder="🔍 Search digital assets..." oninput="searchStoreAssets(this.value)" style="width:200px; padding:6px 12px; font-size:11.5px; border-radius:8px;" />
+                <span class="font-mono" style="font-size:11px; color:var(--cyan-electric); padding:6px 12px; border-radius:8px; background:rgba(0,240,255,0.1); border:1px solid rgba(0,240,255,0.3);" id="assetCountBadge">7 ASSETS AVAILABLE</span>
               </div>
             </div>
 
@@ -647,10 +647,10 @@
   </section>
 
     <!-- بخش ۵: کنسول فرمان آتلیه و داشبورد اعضا (Genesis Codex / Atelier Workstation Console) -->
-  <section id="view-member-dashboard" class="view-section hidden" dir="rtl" lang="fa">
+  <section id="view-member-dashboard" class="view-section hidden">
     <div class="container member-console-container">
       
-      <!-- ۱. هدر سندی و هویت آتلیه (Atelier Dossier & Clearance Header) -->
+      <!-- 1. Atelier Dossier & Clearance Header -->
       <div class="atelier-dossier-card">
         <div class="atelier-dossier-profile">
           <div class="atelier-avatar-halo" id="dashAvatarHalo">
@@ -660,196 +660,194 @@
           <div class="atelier-identity-meta">
             <div class="atelier-rank-badge" id="dashClearanceBadge">
               <span class="rank-dot"></span>
-              <span id="dashClearanceRank">سطح دسترسی: آتلیه فعال</span>
+              <span id="dashClearanceRank">Clearance Level: Active Atelier</span>
             </div>
-            <h2 class="atelier-member-name" id="dashMemberName">کاربر گرامی</h2>
-            <div class="atelier-meta-coords">
-              <span>شناسه هویت: <strong id="dashMemberEmail" class="font-mono">user@atelier.space</strong></span>
+            <h2 class="atelier-member-name" id="dashMemberName">Valued Client</h2>
+            <div class="atelier-meta-coords font-mono">
+              <span>Identity CID: <strong id="dashMemberEmail">user@tajinkart.space</strong></span>
               <span class="coord-divider">•</span>
-              <span>کانال ارتباطی: <strong id="dashMemberContact" class="font-mono">ارتباط مستقیم</strong></span>
+              <span>Comm Channel: <strong id="dashMemberContact">Direct Studio Comm</strong></span>
               <span class="coord-divider">•</span>
-              <span class="atelier-protocol-badge">پروتکل: GENESIS v21.0</span>
+              <span class="atelier-protocol-badge">Protocol: GENESIS v21.4</span>
             </div>
           </div>
         </div>
         
         <div class="atelier-quick-actions">
-          <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-atelier-gold hidden" title="ورود به پنل مدیریت استودیو">
-            👑 ورود به مرکز فرمان مدیریت
+          <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-atelier-gold hidden" title="Enter Studio Command Console">
+            👑 Studio Command Console
           </button>
-          <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-atelier-cipher" title="تنظیم یا بازنشانی کلید رمزنگاری حساب">
-            🔑 ماتریس امنیت و کلید رمز
+          <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-atelier-cipher" title="Update Account Cipher Key">
+            🔑 Security Matrix & Cipher Key
           </button>
-          <button onclick="switchView('store')" class="btn-atelier-accent" title="ارسال سفارش و بریف جدید برای آتلیه">
-            + ثبت بریف کانسپت جدید
+          <button onclick="switchView('store')" class="btn-atelier-accent" title="Submit a New Concept Brief">
+            + New Commission Brief
           </button>
-          <button onclick="logoutMemberAccount()" class="btn-atelier-disconnect" title="قطع اتصال نشست کاری">
-            خروج از نشست
+          <button onclick="logoutMemberAccount()" class="btn-atelier-disconnect" title="Disconnect Workstation Session">
+            Disconnect Session
           </button>
         </div>
       </div>
 
-      <!-- ۲. استیج تعاملی بوم پروداکشن (Interactive Multi-Layer Artifact Inspector) -->
+      <!-- 2. Interactive Multi-Layer Artifact Inspector -->
       <div class="atelier-stage-module">
         <div class="atelier-stage-header">
           <div class="stage-title-wrap">
             <span class="stage-terminal-tag">STATION // PRODUCTION CANVAS</span>
-            <h3 class="stage-heading">استیج پایش چندلایه‌ای کانسپت آرت و اتودهای زنده پروژه</h3>
+            <h3 class="stage-heading">Multi-Layer Concept Art & Live Production Stage</h3>
           </div>
           
-          <!-- کلیدهای سوئیچ لایه تولید -->
-          <div class="atelier-layer-controls" role="group" aria-label="انتخاب لایه پروداکشن">
+          <!-- Layer Switch Controls -->
+          <div class="atelier-layer-controls" role="group" aria-label="Production Layer Selection">
             <button type="button" class="layer-pill-btn active" id="btnLayerSilhouette" onclick="setAtelierProductionLayer('silhouette')">
               <span class="layer-num">L1</span>
-              <span>سیلوئت و لاین‌آرت</span>
+              <span>Silhouette & Linework</span>
             </button>
             <button type="button" class="layer-pill-btn" id="btnLayerValue" onclick="setAtelierProductionLayer('value')">
               <span class="layer-num">L2</span>
-              <span>نورپردازی و حجم</span>
+              <span>Value & Lighting</span>
             </button>
             <button type="button" class="layer-pill-btn" id="btnLayerMaster" onclick="setAtelierProductionLayer('master')">
               <span class="layer-num">L3</span>
-              <span>رندر مستر ۳۰۰DPI</span>
+              <span>300DPI Master Render</span>
             </button>
           </div>
         </div>
 
         <div class="atelier-canvas-viewport" id="atelierCanvasViewport">
-          <!-- تصویر بوم کانسپت آرت -->
           <div class="atelier-canvas-wrapper" id="atelierCanvasWrapper">
-            <img id="atelierStageArtworkImg" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85" alt="کانسپت آرت فعال آتلیه" class="atelier-stage-img layer-mode-silhouette">
+            <img id="atelierStageArtworkImg" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85" alt="Active Production Concept Art" class="atelier-stage-img layer-mode-silhouette">
             <div class="canvas-grid-overlay" id="canvasGridOverlay"></div>
             
-            <!-- پین‌های بازخورد زنده بر بوم آرت‌ورک -->
-            <div class="atelier-pin-hotspot pin-1" id="atelierPin1" style="top: 28%; left: 34%;" onclick="openAtelierPinNote(1, event)" title="مشاهده بازخورد پین شماره ۱">
+            <!-- Pinpoint Revision Hotspots -->
+            <div class="atelier-pin-hotspot pin-1" id="atelierPin1" style="top: 28%; left: 34%;" onclick="openAtelierPinNote(1, event)" title="View Feedback Pin #1">
               <span class="pin-beacon"></span>
-              <span class="pin-core">۱</span>
+              <span class="pin-core">1</span>
               <div class="pin-hover-card">
-                <strong>پین ۱: زاویه بازتاب نور زره</strong>
-                <p>هایلایت‌های استیل آب‌دیده طبق پالت رنگی سایان کالیبره و تثبیت شد.</p>
+                <strong>Pin 1: Armor Specular Highlight</strong>
+                <p>Tempered steel reflections calibrated and locked to 480nm cyan palette.</p>
               </div>
             </div>
 
-            <div class="atelier-pin-hotspot pin-2" id="atelierPin2" style="top: 62%; left: 68%;" onclick="openAtelierPinNote(2, event)" title="مشاهده بازخورد پین شماره ۲">
+            <div class="atelier-pin-hotspot pin-2" id="atelierPin2" style="top: 62%; left: 68%;" onclick="openAtelierPinNote(2, event)" title="View Feedback Pin #2">
               <span class="pin-beacon"></span>
-              <span class="pin-core">۲</span>
+              <span class="pin-core">2</span>
               <div class="pin-hover-card">
-                <strong>پین ۲: سلاح بیومکانیکال</strong>
-                <p>سیلوئت تیغه و هسته انرژی نئون با تایید موکل در فاز اتود تایید شد.</p>
+                <strong>Pin 2: Biomechanical Blade Core</strong>
+                <p>Blade contour and energy core illumination approved during linework phase.</p>
               </div>
             </div>
 
-            <div class="atelier-pin-hotspot pin-3" id="atelierPin3" style="top: 45%; left: 52%;" onclick="openAtelierPinNote(3, event)" title="مشاهده بازخورد پین شماره ۳">
+            <div class="atelier-pin-hotspot pin-3" id="atelierPin3" style="top: 45%; left: 52%;" onclick="openAtelierPinNote(3, event)" title="View Feedback Pin #3">
               <span class="pin-beacon"></span>
-              <span class="pin-core">۳</span>
+              <span class="pin-core">3</span>
               <div class="pin-hover-card">
-                <strong>پین ۳: بافت پارچه شنل تیره</strong>
-                <p>ساییدگی‌ها و الیاف کتان کهنه برای تطابق با اقلیم اکستوپیا به لایه نهایی اضافه گردید.</p>
+                <strong>Pin 3: Weathered Cloak Fabric</strong>
+                <p>Heavy canvas fraying and distress added for Extopia climate compatibility.</p>
               </div>
             </div>
 
-            <!-- نشانگر تله‌متری گوشه‌ها -->
             <span class="canvas-bracket bracket-tl">[+]</span>
             <span class="canvas-bracket bracket-tr">[+]</span>
             <span class="canvas-bracket bracket-bl">REC // 4K</span>
             <span class="canvas-bracket bracket-br">DCI-P3 16-BIT</span>
           </div>
 
-          <!-- نوار وضعیت زنده بوم -->
-          <div class="atelier-canvas-telemetry">
+          <!-- Canvas Telemetry -->
+          <div class="atelier-canvas-telemetry font-mono">
             <div class="telemetry-items">
-              <span class="telemetry-chip active-layer" id="telemetryActiveLayer">لایه فعال: L1 • سیلوئت اولیه و اکسپلوریشن فرم</span>
-              <span class="telemetry-chip">رزولوشن خروجی: 3840×2160 (4K UHD)</span>
-              <span class="telemetry-chip">عمق رنگ: 16-Bit ProPhoto RGB</span>
-              <span class="telemetry-chip">وضعیت سورس: 300DPI Layered Master PSD</span>
+              <span class="telemetry-chip active-layer" id="telemetryActiveLayer">Active Layer: L1 • Silhouette & Form Exploration</span>
+              <span class="telemetry-chip">Resolution: 3840×2160 (4K UHD)</span>
+              <span class="telemetry-chip">Color Depth: 16-Bit ProPhoto RGB</span>
+              <span class="telemetry-chip">Master Standard: 300DPI Layered Master PSD</span>
             </div>
             <div class="telemetry-actions">
               <button type="button" class="btn-telemetry-action" onclick="toggleAtelierPinDropper()">
-                📍 ثبت بازخورد نقطه‌ای بر روی بوم
+                📍 Drop Pinpoint Note on Canvas
               </button>
               <button type="button" class="btn-telemetry-action" onclick="window.open(document.getElementById('atelierStageArtworkImg').src, '_blank')">
-                🔍 بزرگنمایی تمام‌صفحه
+                🔍 Fullscreen Zoom
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ۳. ماتریس زبانه‌ها و ماژول‌های کنسول (Console Sub-Nav Matrix) -->
+      <!-- 3. Console Sub-Nav Tabs -->
       <div class="atelier-tabs-wrapper">
         <div class="atelier-tab-nav" role="tablist">
           <button type="button" class="atelier-tab-btn active" id="tabBtnPipelines" onclick="switchAtelierConsoleTab('pipelines')">
             <span class="tab-icon">⚡</span>
-            <span>جریان فعال پروژه‌ها و رهگیری تولید</span>
-            <span class="tab-count-badge" id="dashPipelineCount">۱</span>
+            <span>Active Commission Pipelines</span>
+            <span class="tab-count-badge" id="dashPipelineCount">1</span>
           </button>
           <button type="button" class="atelier-tab-btn" id="tabBtnCodex" onclick="switchAtelierConsoleTab('codex')">
             <span class="tab-icon">💎</span>
-            <span>خزانه دارایی‌های دیجیتال و فایل‌های دانلودی</span>
-            <span class="tab-count-badge" id="dashCodexCount">۴</span>
+            <span>Digital Artifacts & Vault Downloads</span>
+            <span class="tab-count-badge" id="dashCodexCount">4</span>
           </button>
           <button type="button" class="atelier-tab-btn" id="tabBtnSecurity" onclick="switchAtelierConsoleTab('security')">
             <span class="tab-icon">🛡️</span>
-            <span>ماتریس امنیت و رمزنگاری هویت</span>
+            <span>Security Matrix & Protocols</span>
           </button>
         </div>
 
-        <!-- محتوای زبانه ۱: خطوط تولید و سفارش‌ها -->
+        <!-- Tab 1: Pipelines -->
         <div class="atelier-tab-pane active" id="panePipelines">
           <div class="pane-head-bar">
             <div>
-              <h4 class="pane-heading">پایپلاین‌های در جریان و رهگیری ۵ گام صنعتی</h4>
-              <p class="pane-sub">وضعیت پیشرفت بریف‌های سفارشی، فازهای طراحی و فایل‌های نهایی آماده تحویل</p>
+              <h4 class="pane-heading">Active Production Pipelines & 5-Step Progress Stepper</h4>
+              <p class="pane-sub">Real-time status tracking for bespoke briefs, creative stages, and deliverables.</p>
             </div>
             <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-atelier-invoice">
-              📄 دریافت نمونه پیش‌فاکتور رسمی استودیو
+              📄 Download Official Studio Invoice Specimen
             </button>
           </div>
           <div id="memberOrdersContainer" class="atelier-orders-stream"></div>
         </div>
 
-        <!-- محتوای زبانه ۲: دارایی‌های دانلودی و کدکس -->
+        <!-- Tab 2: Digital Vault -->
         <div class="atelier-tab-pane" id="paneCodex">
           <div class="pane-head-bar">
             <div>
-              <h4 class="pane-heading">آرشیو دارایی‌های دیجیتال، دوره‌ها و فایل‌های آنلاک شده</h4>
-              <p class="pane-sub">مسترکلاس‌های ویدئویی، ست‌های براش استودیو و اسناد لور جهان جنسیس</p>
+              <h4 class="pane-heading">Unlocked Digital Assets, Masterclasses & Lore Files</h4>
+              <p class="pane-sub">Curated video masterclasses, studio brush engines, and Genesis universe manuscripts.</p>
             </div>
           </div>
           <div id="memberCoursesContainer" class="atelier-codex-grid"></div>
         </div>
 
-        <!-- محتوای زبانه ۳: ماتریس امنیت -->
+        <!-- Tab 3: Security Matrix -->
         <div class="atelier-tab-pane" id="paneSecurity">
           <div class="pane-head-bar">
             <div>
-              <h4 class="pane-heading">پروتکل‌های امنیتی، تایید هویت و کلیدهای رمزنگاری</h4>
-              <p class="pane-sub">مدیریت اطلاعات ارتباطی استودیو و تنظیمات ورود دو مرحله‌ای</p>
+              <h4 class="pane-heading">Security Protocols, Authentication & Cipher Settings</h4>
+              <p class="pane-sub">Direct studio communication channels and encrypted access credentials.</p>
             </div>
           </div>
           <div class="atelier-security-grid">
             <div class="security-card">
-              <h5 class="sec-card-title">🔐 رمزنگاری و گذرواژه حساب</h5>
-              <p class="sec-card-desc">برای حفظ امنیت بریف‌های محرمانه و مالکیت معنوی طرح‌ها، از گذرواژه‌های قدرتمند با پروتکل هش پیشرفته استفاده فرمایید.</p>
+              <h5 class="sec-card-title">🔐 Account Password & Encryption</h5>
+              <p class="sec-card-desc">Protect your confidential production briefs and IP documentation using strong salted passwords.</p>
               <div class="sec-actions">
                 <button type="button" onclick="openChangePasswordModal()" class="btn-atelier-accent" style="width:100%;">
-                  🔑 تغییر یا ایجاد رمز عبور جدید
+                  🔑 Update or Create Password
                 </button>
               </div>
             </div>
             <div class="security-card">
-              <h5 class="sec-card-title">🌐 تایید هویت Google OAuth</h5>
-              <p class="sec-card-desc">اتصال حساب کاربری شما با استانداردهای رسمی امنیتی گوگل تایید گردیده و دسترسی آنی بدون نیاز به ذخیره رمز را فراهم می‌آورد.</p>
+              <h5 class="sec-card-title">🌐 Google OAuth Verification</h5>
+              <p class="sec-card-desc">Your account is connected via official Google security standards for instant passwordless sign-in.</p>
               <div id="secGoogleStatusBadge" class="sec-status-pill verified">
-                ✓ حساب شما با تاییدیه Google امن است
+                ✓ Account Verified via Google Security
               </div>
             </div>
             <div class="security-card">
-              <h5 class="sec-card-title">📡 پروتکل ارتباطی با آتلیه</h5>
-              <p class="sec-card-desc">کانال اصلی تبادل فایل‌های حجیم و هماهنگی جلسات بررسی اتود با طراح ارشد استودیو.</p>
-              <div class="sec-contact-display">
-                <span>ارتباط استودیو: <strong>tajinkart@gmail.com</strong></span>
-                <span>پشتیبانی تلگرام: <strong>@tajinkart</strong></span>
+              <h5 class="sec-card-title">📡 Studio Direct Communication</h5>
+              <p class="sec-card-desc">Official channels for high-volume file transfer and real-time revision reviews with the studio director.</p>
+              <div class="sec-contact-display font-mono">
+                <span>Email: <strong>tajinkart@gmail.com</strong></span>
+                <span>Telegram: <strong>@tajinkart</strong></span>
               </div>
             </div>
           </div>
@@ -1878,12 +1876,12 @@
         </div>
 
         <div style="background:#05070c; border:1px solid var(--border-subtle); border-radius:12px; padding:12px; font-size:11.5px; display:flex; flex-direction:column; gap:6px;">
-          <div><strong style="color:#fff;">پایپلاین طراحی:</strong> <span id="caseStudyPipeName" style="color:var(--gold); font-weight:700;"></span></div>
-          <div><strong style="color:#fff;">جهان روایی:</strong> <span id="caseStudyLore" style="color:var(--cyan-electric); font-weight:700;">جهان اکستوپیا</span></div>
+          <div><strong style="color:#fff;">Design Pipeline:</strong> <span id="caseStudyPipeName" style="color:var(--gold); font-weight:700;"></span></div>
+          <div><strong style="color:#fff;">Narrative World:</strong> <span id="caseStudyLore" style="color:var(--cyan-electric); font-weight:700;">Extopia Universe</span></div>
         </div>
 
         <button id="caseStudyDeepLinkBtn" onclick="deepLinkToPipeline()" class="btn-gold" style="width:100%; padding:12px; font-size:12px; margin-top:6px;">
-          سفارش اثر مشابه در این پایپلاین ←
+          Commission Artwork in this Pipeline →
         </button>
       </aside>
     </div>
@@ -1892,9 +1890,9 @@
   <!-- ذره‌بین متمرکز مرکز صفحه برای بازرسی عمیق جزئیات اثر در دسکتاپ (Centered Focus Magnifier) -->
   <div id="centeredFocusMagnifierOverlay" class="centered-focus-magnifier-overlay" onclick="closeCenteredMagnifier(event)">
     <div class="magnifier-header-bar" onclick="event.stopPropagation()">
-      <span id="magnifierPhaseTitle" class="magnifier-title font-mono">بررسی جزئیات کانسپت</span>
+      <span id="magnifierPhaseTitle" class="magnifier-title font-mono">Case Study Details</span>
       <div style="display:flex; align-items:center; gap:16px;">
-        <span class="magnifier-hint">🔍 حرکت موس برای هدایت لنز • کلیک یا Esc برای بازگشت</span>
+        <span class="magnifier-hint">🔍 Hover to Pan Lens • Click or Esc to Close</span>
         <button type="button" onclick="closeCenteredMagnifier()" class="magnifier-close-btn" title="بستن (Esc)">✕</button>
       </div>
     </div>
@@ -1929,7 +1927,7 @@
           </div>
           <div style="display:flex; justify-content:space-between; font-size:11.5px;">
             <span style="color:var(--text-muted);">Production Timeline:</span>
-            <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">۵ تا ۷ روز کاری</span>
+            <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">5 to 7 business days</span>
           </div>
           <div style="font-size:10.5px; color:var(--emerald); display:flex; align-items:center; gap:4px; margin-top:4px;">
             <span>✓</span> <span>Standard human scale reference figure included free on final model sheet.</span>
@@ -2065,7 +2063,7 @@
     </div>
   </div>
 
-  <!-- پنجره پورتال اعضا (ورود، ثبت‌نام، و بازیابی رمز عبور) -->
+  <!-- پنجره پورتال اعضا (ورود، ثبت‌نام، و Reset Account Password) -->
   <div id="memberModal" onclick="handleMemberModalBackdropClick(event)" style="position:fixed; inset:0; z-index:100; background:rgba(3,4,7,0.92); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:16px;">
     <div id="memberModalCard" style="max-width:440px; width:100%; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:26px;">
       
@@ -2239,45 +2237,45 @@
         </div>
       </div>
 
-      <!-- ۳. فرم بازیابی رمز عبور اعضا -->
+      <!-- ۳. فرم Reset Account Password اعضا -->
       <div id="authViewForgot" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric);">بازیابی رمز عبور</h3>
+          <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric);">Reset Account Password</h3>
           <button onclick="closeMemberModal()" style="font-size:18px; color:var(--text-muted);">✕</button>
         </div>
         <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.75;">
-          آدرس ایمیل حساب کاربری خود را وارد نمایید تا لینک اختصاصی بازیابی مستقیماً به صندوق ایمیل شما ارسال گردد.
+          Enter your account email to receive a secure password recovery link directly in your inbox.
         </p>
 
         <form id="forgotPasswordForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">آدرس ایمیل حساب</label>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">Account Email Address</label>
             <input type="email" id="forgotIdentifier" required class="font-mono" placeholder="user@domain.com" />
           </div>
           <button type="submit" class="btn-gold" style="width:100%; padding:12px; margin-top:4px; background:var(--cyan-electric); color:#000;">
-            ارسال لینک امن بازیابی به ایمیل ←
+            Send Secure Recovery Link to Email →
           </button>
         </form>
         <div style="margin-top:16px; text-align:center; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:14px;">
-          <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">بازگشت به صفحه ورود</button>
+          <button type="button" onclick="switchAuthView('login')" class="auth-tab-link" style="font-weight:700;">Back to Sign In</button>
         </div>
       </div>
 
-      <!-- ۴. فرم تعیین رمز عبور جدید -->
+      <!-- ۴. فرم تعیین New Password -->
       <div id="authViewResetPassword" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h3 style="font-size:17px; font-weight:900; color:var(--gold);">🔑 تعیین رمز عبور جدید</h3>
-          <span style="font-size:11px; padding:3px 9px; border-radius:6px; background:rgba(250,204,21,0.12); color:var(--gold); border:1px solid rgba(250,204,21,0.25); font-weight:700;">احراز هویت ایمیل</span>
+          <h3 style="font-size:17px; font-weight:900; color:var(--gold);">🔑 Set New Account Password</h3>
+          <span style="font-size:11px; padding:3px 9px; border-radius:6px; background:rgba(250,204,21,0.12); color:var(--gold); border:1px solid rgba(250,204,21,0.25); font-weight:700;">Email Verification</span>
         </div>
         <div style="padding:10px 14px; border-radius:10px; background:rgba(250,204,21,0.08); border:1px solid rgba(250,204,21,0.3); font-size:12px; color:var(--gold); margin-bottom:14px; line-height:1.7;">
-          ✓ هویت شما از طریق لینک ایمیل تایید گردید. لطفاً رمز عبور جدید حسابتان را تعیین فرمایید:
+          ✓ Email verified successfully. Please enter your new secure password:
         </div>
 
         <form id="setNewPasswordForm" style="display:flex; flex-direction:column; gap:12px;">
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">رمز عبور جدید</label>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">New Password</label>
             <div style="position:relative; display:flex; align-items:center;">
-              <input type="password" id="userNewPassword" required minlength="6" oninput="evalPassStrength(this.value, 'userNewPassword')" class="font-mono" placeholder="حداقل ۶ کاراکتر" style="padding-left:40px;" />
+              <input type="password" id="userNewPassword" required minlength="6" oninput="evalPassStrength(this.value, 'userNewPassword')" class="font-mono" placeholder="Minimum 6 characters" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('userNewPassword', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
             </div>
             <!-- نوار داینامیک سنجش قدرت رمز عبور -->
@@ -2286,25 +2284,25 @@
                 <div id="userNewPasswordStrengthBar" style="height:100%; width:0%; transition:all 0.3s ease; background:var(--crimson);"></div>
               </div>
               <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                <span id="userNewPasswordStrengthText" style="color:var(--text-muted);">سطح امنیت: ضعیف</span>
-                <span id="userNewPasswordStrengthHint" class="font-mono" style="color:var(--text-muted);">حداقل ۶ کاراکتر</span>
+                <span id="userNewPasswordStrengthText" style="color:var(--text-muted);">Security Level: Weak</span>
+                <span id="userNewPasswordStrengthHint" class="font-mono" style="color:var(--text-muted);">Minimum 6 characters</span>
               </div>
             </div>
           </div>
           <div>
-            <label style="font-size:12px; display:block; margin-bottom:4px;">تکرار رمز عبور جدید</label>
+            <label style="font-size:12px; display:block; margin-bottom:4px;">Confirm New Password</label>
             <div style="position:relative; display:flex; align-items:center;">
               <input type="password" id="userNewPasswordConfirm" required minlength="6" class="font-mono" placeholder="تکرار رمز عبور" style="padding-left:40px;" />
               <button type="button" onclick="togglePasswordVisibility('userNewPasswordConfirm', this)" style="position:absolute; left:10px; color:var(--text-muted); padding:4px; font-size:16px; cursor:pointer;" title="نمایش/مخفی‌سازی رمز">👁️</button>
             </div>
           </div>
           <button type="submit" class="btn-gold" style="width:100%; padding:12px; margin-top:4px;">
-            ✓ ذخیره قطعی رمز جدید و ورود به استودیو
+            ✓ Save New Password & Enter Studio
           </button>
         </form>
         <div style="margin-top:14px; text-align:center; border-top:1px solid var(--border-subtle); padding-top:12px;">
           <button type="button" onclick="cancelPasswordReset()" style="background:none; border:none; color:var(--text-muted); font-size:11.5px; cursor:pointer; padding:6px 14px; border-radius:6px; transition:all 0.2s; text-decoration:underline;" onmouseover="this.style.color='#f43f5e'" onmouseout="this.style.color='var(--text-muted)'">
-            انصراف و لغو بازیابی رمز (خروج امن)
+            Cancel Recovery (Safe Exit)
           </button>
         </div>
       </div>
@@ -2318,33 +2316,33 @@
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:18px;">📐</span>
-          <h3 id="drawerPhaseTitle" style="font-size:16px; font-weight:900; color:var(--gold); margin:0;">مشخصات فاز تخصصی</h3>
+          <h3 id="drawerPhaseTitle" style="font-size:16px; font-weight:900; color:var(--gold); margin:0;">Production Phase Specifications</h3>
         </div>
         <button type="button" onclick="closePhaseScopeDrawer()" style="font-size:18px; color:var(--text-muted); cursor:pointer; background:none; border:none; padding:4px 8px;">✕</button>
       </div>
 
       <div style="background:#090d16; border:1px solid var(--border-subtle); border-radius:12px; padding:14px;">
-        <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">پایپلاین والد:</span>
+        <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Parent Pipeline:</span>
         <div id="drawerPhasePipeline" style="font-size:13px; font-weight:800; color:var(--cyan-electric);">Character Design & Heroes</div>
       </div>
 
       <div>
-        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">🎯 هدف و کاربرد صنعتی این مرحله:</h4>
+        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">🎯 Production Objective & Application:</h4>
         <p id="drawerPhasePurpose" style="font-size:12px; color:#cbd5e1; line-height:1.8; text-align:justify; background:#070a12; border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
-          این فاز جهت تولید زوایای سه‌بعدی ارتوگرافیک برای مدلسازان سه‌بعدی یا انیماتورها پیاده‌سازی شده و از اشتباهات مقیاسی در پروداکشن بازی جلوگیری می‌نماید.
+          This phase produces 360° orthographic turnaround angles and scale references for 3D character modelers and animators, preventing proportion drift in game engines.
         </p>
       </div>
 
       <div>
-        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">📦 فرمت و استانداردهای تحویلی:</h4>
+        <h4 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">📦 Deliverables & File Standards:</h4>
         <div id="drawerPhaseDeliverables" style="display:flex; flex-direction:column; gap:6px; font-size:11.5px; color:var(--text-muted);">
           <div style="padding:8px 10px; background:#070a12; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
-            <span>سورس لایه‌باز تفکیک‌شده (PSD)</span>
-            <span style="color:var(--emerald); font-weight:700;">✓ ۳۰۰ DPI</span>
+            <span>Layered Master PSD Source File</span>
+            <span style="color:var(--emerald); font-weight:700;">✓ 300 DPI</span>
           </div>
           <div style="padding:8px 10px; background:#070a12; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
-            <span>خطوط تراز و گاید ارتوگرافیک</span>
-            <span style="color:var(--emerald); font-weight:700;">✓ تفکیک نماها</span>
+            <span>Orthographic Alignment Guides</span>
+            <span style="color:var(--emerald); font-weight:700;">✓ Separated Turnaround Views</span>
           </div>
         </div>
       </div>
@@ -2352,13 +2350,13 @@
       <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px; margin-top:auto;">
         <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
           <span style="font-size:14px;">💡</span>
-          <strong style="font-size:12px; color:var(--gold);">شرایط سفارش در آتلیه:</strong>
+          <strong style="font-size:12px; color:var(--gold);">Atelier Commission Terms:</strong>
         </div>
         <p style="font-size:11px; color:#cbd5e1; line-height:1.7; margin:0 0 12px;">
-          این مرحله به عنوان یک ماژول تخصصی مجزا یا در قالب پکیج جامع پروداکشن در پایپلاین آتلیه قابل سفارش و قیمت‌گذاری است.
+          This phase is available as an individual production module or bundled within full IP character concept packages.
         </p>
         <button type="button" id="drawerActionBtn" onclick="goToPipelineFromDrawer()" class="btn-gold" style="width:100%; padding:11px; font-size:12px; display:flex; align-items:center; justify-content:center; gap:8px;">
-          <span>محاسبه هزینه و سفارش این فاز</span>
+          <span>Calculate Scope & Commission Phase →</span>
           <span>←</span>
         </button>
       </div>
@@ -2373,87 +2371,89 @@
     <div style="max-width:680px; width:100%; max-height:85vh; background:var(--bg-panel); border:1px solid var(--gold); border-radius:20px; padding:28px 24px 22px; overflow-y:auto; box-shadow:0 25px 70px rgba(0,0,0,0.95); position:relative;">
       <button type="button" onclick="closeTermsModal()" class="modal-corner-close-btn" title="بستن">✕</button>
       <div style="border-bottom:1px solid var(--border-subtle); padding-bottom:12px; margin-bottom:16px;">
-        <h3 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:4px;">منشور حقوقی و شرایط خدمات TAJINKART</h3>
+        <h3 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:4px;">TAJINKART Atelier Legal Charter & Terms of Service</h3>
         <span class="font-mono" style="font-size:11px; color:var(--text-muted); display:block;">MASTER TERMS OF SERVICE & STUDIO POLICIES</span>
       </div>
       
       <!-- محتوای داینامیک و قابل ویرایش از پنل ادمین -->
       <div id="termsModalDynamicContent" style="font-size:12.5px; color:#cbd5e1; line-height:1.9; display:flex; flex-direction:column; gap:16px; text-align:justify;">
-        <!-- ۱. اصل صحت اطلاعات و سلب مسئولیت -->
+        <!-- 1. Accuracy of Information -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱. اصل صحت اطلاعات و سلب مسئولیت اشتباهات کاربر (Accuracy of Information)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">کاربر با ثبت‌نام در وب‌سایت یا ثبت هرگونه سفارش صراحتاً اقرار و ضمانت می‌نماید که کلیه مشخصات هویتی و ارتباطی ارائه‌شده (شامل نام، لقب، آدرس ایمیل و شماره تماس) واقعی، دقیق و متعلق به خود اوست. استودیو تاج‌اینک‌آرت هیچ‌گونه مسئولیتی در قبال تایپ اشتباه آدرس جیمیل، عدم دریافت ایمیل‌های فعال‌سازی، فراموشی رمز عبور، یا از دست رفتن دسترسی به فایل‌ها ناشی از خطای کاربر ندارد و بار حقوقی هرگونه خسارت انحصاراً بر عهده خود کاربر است.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">1. Accuracy of Information & User Identity Warranty</h4>
+          <p style="margin:0;">By registering or submitting any project brief, the client explicitly warrants that all identity and contact credentials (name, email, telegram handle) are accurate and authentic. TAJINKART assumes no liability for missed communications or delayed deliveries resulting from client clerical errors.</p>
         </div>
 
-        <!-- ۲. تفکیک قوانین عمومی از قرارداد خرید -->
+        <!-- 2. General Terms vs Commission SLA -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۲. تفکیک قوانین عمومی ورود از قرارداد خرید (ToS vs Commission SLA)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">تایید قوانین در مرحله ثبت‌نام صرفاً به منزله پذیرش مقررات عمومی پلتفرم، سن مجاز (۱۶+ سال) و حفاظت از کلیت مالکیت فکری استودیو است. شروط مالی سنگین نظیر ودیعه ۵۰٪ غیرقابل‌استرداد، ددلاین‌ها، سقف ادیت‌ها و توافقات محرمانگی، منحصراً در لحظه ثبت قطعی فرم سفارش و پیش از پرداخت فعال شده و به امضای طرفین می‌رسد.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">2. General Terms vs. Production Commission SLA</h4>
+          <p style="margin:0;">Platform registration signifies adherence to general community conduct and copyright protection. Binding production conditions, including the non-refundable 50% retainer, project deadlines, revision caps, and NDAs, take legal effect upon formal brief confirmation and invoice settlement.</p>
         </div>
 
-        <!-- ۳. شفافیت جغرافیایی و ارتباطات -->
+        <!-- 3. Regional & Communication Transparency -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۳. شفافیت جغرافیایی، منطقه زمانی و کانال‌های ارتباطی (Regional & Communication Transparency)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت با مدیریت سید سروش تاج به‌صورت مستقل در ایران مستقر بوده و به شکل فریلنس و بین‌المللی با کارفرمایان سراسر جهان همکاری می‌نماید. ساعات کاری رسمی استودیو بر پایه منطقه زمانی ایران (UTC+3:30) تنظیم شده است. در صورت وقوع هرگونه اختلال یا کندی موقت در شبکه زیرساخت اینترنت منطقه‌ای، استودیو از کانال‌های امن و پایدار پشتیبان (شامل تلگرام و ایمیل‌های رمزنگاری‌شده) جهت حفظ پیوستگی ارتباطات استفاده می‌نماید.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">3. Regional & Communication Transparency</h4>
+          <p style="margin:0;">TAJINKART is an independent concept art and visual development atelier directed by Seyed Soroush Taj, collaborating globally with international studios. The atelier maintains redundant encrypted backup channels (Telegram & PGP email) to ensure seamless, real-time client communications across international timezones.</p>
         </div>
 
-        <!-- ۴. روش‌های پرداخت بین‌المللی -->
+        <!-- 4. Global Payments & Currency Settlement -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۴. روش‌های پرداخت بین‌المللی و تسویه ارزی (Global Payments & Cryptocurrency)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل تومانی نرخ روز صورت می‌پذیرد.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">4. Global Payments & Currency Settlement</h4>
+          <p style="margin:0;">International clients may settle retainers and final deliverables via major cryptocurrencies (USDT TRC20/ERC20) or mutually agreed international wire transfers. Remittance transaction and gas fees are the responsibility of the payer.</p>
         </div>
 
-        <!-- ۵. تضمین اصالت رفرنس‌های مشتری -->
+        <!-- 5. Client Materials & Reference Indemnity -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۵. تضمین اصالت رفرنس‌های ارسالی مشتری (Client Materials Indemnity)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">مشتری متعهد و ضامن است که تمامی تصاویر، کانسپت‌ها، لوگوها و فایل‌های متنی که به عنوان بریف یا رفرنس به استودیو ارسال می‌کند، یا در مالکیت قانونی اوست یا حق بهره‌برداری از آن‌ها را دارد. در صورت بروز هرگونه ادعای نقض کپی‌رایت توسط اشخاص ثالث علیه استودیو ناشی از مواد ارائه‌شده توسط مشتری، مسئولیت حقوقی و جبران کامل خسارت منحصراً متوجه مشتری خواهد بود.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">5. Client Materials & Reference Indemnity</h4>
+          <p style="margin:0;">The client warrants that all lore, concept sketches, logos, and reference materials supplied for creative direction are legally owned or authorized for commercial development. The client indemnifies TAJINKART against any third-party intellectual property claims.</p>
         </div>
 
-        <!-- ۶. بند بلاتکلیفی و رهاسازی سفارش -->
+        <!-- 6. Inactivity & Project Abandonment -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۶. بند بلاتکلیفی و رهاسازی سفارش (Inactivity & Abandonment Clause)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">پس از ارسال اتودها یا فازهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">6. Inactivity & Project Abandonment Clause</h4>
+          <p style="margin:0;">Following milestone submissions, the client agrees to provide feedback within 14 business days. In the event of 30 consecutive calendar days of client silence, the project is deemed abandoned; the 50% retainer is retained for reserved studio capacity, and the brief is formally closed.</p>
         </div>
 
-        <!-- ۷. سیاست مدرن هوش مصنوعی -->
+        <!-- 7. Modern AI Transparency & Artistic Direction -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۷. سیاست مدرن هوش مصنوعی و هدایت هنری (Modern AI Transparency)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت استفاده از فناوری‌های نوین و مدل‌های هوش مصنوعی را به عنوان کپیلوت (دستیار فنی، کدنویسی و تسریع پایپلاین) به کار می‌بندد؛ با این وجود، جهان‌سازی جنسیس، داستان‌ها، نژادها، کاراکترهای اورجینال و هدایت بصری، دستاورد فکری سید سروش تاج است. هرگونه کپی‌برداری تجاری، آموزش مدل‌های اختصاصی (مانند LoRA) جهت بازتولید عامدانه کاراکترهای استودیو، یا جعل هویت تجاری تاج‌اینک‌آرت ممنوع و دارای پیگرد است.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">7. Modern AI Transparency & Original IP Direction</h4>
+          <p style="margin:0;">TAJINKART employs cutting-edge AI models strictly as technical copilots (workflow acceleration, coding, and thumbnail ideation). The Genesis universe, lore, characters, and master digital brushwork represent the original intellectual property of Seyed Soroush Taj. Training custom models (e.g., LoRAs) on studio assets is strictly prohibited.</p>
         </div>
 
-        <!-- ۸. لایسنس دارایی‌ها و ممنوعیت افشا -->
+        <!-- 8. Digital Assets EULA & Anti-Piracy -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۸. لایسنس دارایی‌های دانلودی و ممنوعیت افشا (EULA & Anti-Leak)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">خرید هرگونه دارایی دیجیتال (آرت‌بوک، براش، مدل سه‌بعدی و تکسچر) دسترسی مادام‌العمر شخصی به فایل‌ها و به‌روزرسانی‌های آینده را به خریدار اعطا می‌کند. هرگونه فروش مجدد، اشتراک‌گذاری در کانال‌های عمومی، وب‌سایت‌های تورنت و دانلود غیرمجاز تخلف قطعی بوده و منجر به مسدودسازی دائمی حساب و پیگرد قانونی خواهد شد.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">8. Digital Vault Assets EULA & Anti-Piracy License</h4>
+          <p style="margin:0;">Purchasing digital assets (artbooks, brush packs, 3D models, and master PSDs) grants a perpetual single-seat commercial license. Reselling, public sharing on forums, or redistributing via torrents constitutes copyright infringement and results in immediate permanent account termination.</p>
         </div>
 
-        <!-- ۹. فورس ماژور و زیرساخت ابری -->
+        <!-- 9. Cloud Infrastructure & Force Majeure -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۹. سلب مسئولیت حوادث قهریه و زیرساخت ابری (Force Majeure)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">سایت بر پایه زیرساخت‌های بین‌المللی GitHub Pages، Supabase و Cloudinary اداره می‌شود. استودیو در قبال اختلالات موقت ناشی از تحریم‌ها، فیلترینگ، قطعی سرورهای بالادستی یا حوادث خارج از کنترل انسانی (فورس ماژور) ضامن خسارت مالی نخواهد بود، هرچند حداکثر تمهیدات جهت حفظ سلامت و بک‌آپ دیتای کاربران اتخاذ شده است.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">9. Cloud Infrastructure & Force Majeure</h4>
+          <p style="margin:0;">The platform operates on enterprise cloud infrastructure (GitHub Pages, Cloudflare, Supabase, Cloudinary). TAJINKART implements daily distributed backups but assumes no financial liability for global backbone disruptions outside human control.</p>
         </div>
 
-        <!-- ۱۰. سقف مسئولیت مالی -->
+        <!-- 10. Limitation of Liability & Digital Goods -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۰. سقف مسئولیت مالی و عدم استرداد (Limitation of Liability & No Refund)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">کالاهای دانلودی دیجیتال به دلیل ماهیت دسترسی فوری، پس از خرید غیرقابل‌استرداد هستند. در کلیه دعاوی حقوقی، حداکثر سقف مسئولیت مالی استودیو محدود به همان مبلغ دریافتی از مشتری برای همان سفارش مشخص خواهد بود.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">10. Limitation of Liability & Digital Goods Policy</h4>
+          <p style="margin:0;">Due to immediate delivery, digital asset purchases are final and non-refundable. For custom commissions, total studio liability is strictly limited to the actual fee received for that specific commission.</p>
         </div>
 
-        <!-- ۱۱. حق امضا و نمایش در پورتفولیو -->
+        <!-- 11. Moral Rights & Portfolio Attribution -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۱. حق امضا و نمایش در پورتفولیو (Moral Rights & Credit)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">استودیو تاج‌اینک‌آرت حق نمایش آثار نهایی را در وب‌سایت، شبکه‌های اجتماعی و پورتفولیوی رسمی خود (با ذکر مالکیت تجاری کارفرما) جهت ارتقای برند برای خود محفوظ می‌دارد، مگر آنکه کارفرما پیش از شروع پروژه قرارداد محرمانگی انحصاری (NDA) با هزینه مشخص منعقد کرده باشد.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">11. Moral Rights & Portfolio Attribution</h4>
+          <p style="margin:0;">TAJINKART retains the moral right to display final concept art in its official portfolio and studio publications (with full client IP credit), unless an exclusive confidential non-disclosure agreement (NDA) has been formally executed prior to production.</p>
         </div>
 
-        <!-- ۱۲. حل اختلاف و داوری -->
+        <!-- 12. Dispute Resolution -->
         <div style="background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px;">
-          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">۱۲. حل و فصل اختلافات و داوری (Dispute Resolution)</h4>
-          <p style="font-size:12px; color:#cbd5e1; line-height:1.85; margin:0; text-align:justify;">طرفین متعهد می‌شوند پیش از هرگونه اقدام حقوقی، ظرف مدت ۳۰ روز از طریق مکاتبه رسمی با پشتیبانی استودیو و مذاکره دوستانه نسبت به حل اختلاف اقدام نمایند.</p>
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin-bottom:8px;">12. Dispute Resolution & Informal Arbitration</h4>
+          <p style="margin:0;">Both parties agree to pursue informal good-faith negotiations via official studio channels for a minimum period of 30 days prior to initiating formal legal dispute proceedings.</p>
         </div>
       </div>
 
-      <div style="margin-top:24px; text-align:center; border-top:1px solid var(--border-subtle); padding-top:16px;">
-        <button type="button" onclick="closeTermsModal()" class="btn-gold" style="width:100%; padding:12px;">متوجه شدم و می‌پذیرم</button>
+      <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+        <button type="button" onclick="closeTermsModal()" class="btn-gold" style="padding:10px 24px; font-size:12.5px; font-weight:800;">
+          I Understand & Accept Terms
+        </button>
       </div>
     </div>
   </div>
@@ -2472,26 +2472,26 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=21.3.0"></script>
-  <script src="app.js?v=21.3.0"></script>
+  <script src="data.js?v=21.4.0"></script>
+  <script src="app.js?v=21.4.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
     <button onclick="switchView('showcase')" class="mob-nav-btn active">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-      <span>گالری</span>
+      <span>Showcase</span>
     </button>
     <button onclick="switchView('store')" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
-      <span>فروشگاه</span>
+      <span>Atelier</span>
     </button>
     <button onclick="switchView('genesis')" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
-      <span>جنسیس</span>
+      <span>Genesis</span>
     </button>
     <button onclick="switchView('academy')" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
-      <span>آکادمی</span>
+      <span>Academy</span>
     </button>
     <button onclick="handleMembersIconClick()" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>

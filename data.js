@@ -360,69 +360,68 @@ var PIPELINE_DATA = {
 // مخزن دارایی‌های دیجیتال مبتنی بر ۷ شاخه استاندارد سند مستر TAJINKART
 var digitalStoreProducts = [];
 let _initialProds = [
-
   {
     id: 1,
-    title: 'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ (Rook Knight)',
+    title: 'Rook Knight 2D Game Sprite & Multi-Directional Animation Pack',
     price: 39,
-    type: 'بسته‌های اسست بازی و اسپریت ۲D',
-    loreKey: 'جهان اکستوپیا • آنلاک لور اسکواد کلاغ‌ها',
+    type: '2D Game Sprites & Characters',
+    loreKey: 'Extopia Universe • Rook Squad Elite Cadre',
     img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80',
-    desc: 'اسپرایت‌شیت‌های کاراکتر همراه با انیمیشن‌های چندجهته (حرکت، حمله خنجری، شیرجه هوایی و مرگ)، بهینه‌شده برای Unity و Godot همراه با لایه‌های پس‌زمینه پارالاکس.'
+    desc: 'Complete character sprite sheets with multi-directional animations (Idle, Run, Dagger Strike, Aerial Dive, Death) optimized for Unity and Godot with parallax background layers.'
   },
   {
     id: 2,
-    title: 'موتور براش، بافت و آلفای زنگ‌زدگی و پوست هیولا (۶۴ عددی)',
+    title: 'Concept Art Master Brush Engine, Rust Textures & Monster Alphas (64 Set)',
     price: 19,
-    type: 'موتور براش، تکسچر و استمپ‌های کانسپت آرت',
-    loreKey: 'جهان اکستوپیا • تکنیک‌های مات‌پینتینگ استودیو',
+    type: 'Brush Engines & Textures',
+    loreKey: 'Extopia Universe • Studio Matte Painting Techniques',
     img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=700&q=80',
-    desc: 'ست براش فتوشاپ (.ABR) و پروکریت برای رندر متریال‌های زنگ‌زدگی، چرم کهنه، فلس و پوست لجن‌گرفته هیولاها به همراه بافت‌های آلفا یکپارچه (Seamless Alphas).'
+    desc: 'Proprietary Photoshop (.ABR) and Procreate brush pack designed for rendering weathered metals, aged leather, reptilian scales, and monster hide with 4K seamless alphas.'
   },
   {
     id: 3,
-    title: 'کیت پراپ و المان‌های HUD دارک‌فانتزی (۱۲۰ آیکون + فریم)',
+    title: 'Dark Fantasy Prop Kit & HUD Icon Interface Library (120 Icons + Frames)',
     price: 34,
-    type: 'کیت‌های پراپ، آیکون و اینترفیس بازی',
-    loreKey: 'جهان جنسیس • نشان‌های رونیک باستانی',
+    type: 'Prop Kits, Icons & UI',
+    loreKey: 'Genesis Universe • Ancient Runic Insignias',
     img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80',
-    desc: 'پکیج آیکون‌های مهارت جادویی، معجون‌ها، تجهیزات افسانه‌ای، فریم اینونتوری و نوارهای مانا و سلامت در فرمت PNG ترنسپرنت (رزولوشن 256x256 و 512x512).'
+    desc: 'Magic skill icons, alchemy vials, legendary relics, inventory equipment frames, and status gauges in transparent PNG format (256x256 and 512x512).'
   },
   {
     id: 4,
-    title: 'کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD',
-    price: 24,
-    type: 'کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر',
-    loreKey: 'جهان جنسیس • دسترسی به قلب تپنده لور کایلو',
-    img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80',
-    desc: 'چپترهای کمیک با رزولوشن فوق‌العاده بالا به همراه فایل‌های تفکیک‌شده لایه‌باز PSD برای تحلیل لایه‌ها، آرت‌بوک لور و اتودهای اولیه به صورت PDF آماده چاپ.'
+    title: 'Genesis Graphic Lore Prologue Chapter & Layered PSD Collector Edition',
+    price: 29,
+    type: 'Comics & Master PSDs',
+    loreKey: 'Genesis Universe • Canon Lore Chapter',
+    img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=700&q=80',
+    desc: 'Complete 24-page prologue graphic novel chapter with full layered PSD source files (character lines, lighting, color flats, dialogue) and 4K digital wallpapers.'
   },
   {
     id: 5,
-    title: 'لوپ‌های ویدیویی منوی بازی و اسپلش سینمایی 4K بی‌پایان',
-    price: 29,
-    type: 'فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش',
-    loreKey: 'جهان اکستوپیا • اتمسفر مگاسازه رووکری',
-    img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=700&q=80',
-    desc: 'ویدیوهای لوپ پیوسته بدون درز (Seamless 4K MP4 / WebM) مناسب برای منوی اصلی بازی‌ها، پس‌زمینه استیم، اوورلی استریم توییچ و تیزرهای تبلیغاتی.'
+    title: 'Cinematic Dark Ambient Background Loops (8 Seamless 4K Loops)',
+    price: 45,
+    type: '4K Cinematic Loops',
+    loreKey: 'Extopia Universe • Industrial Slums & Citadel Shrines',
+    img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80',
+    desc: 'Seamless 60FPS 4K video loops for video game title menus, live streaming backdrops, Steam dynamic wallpapers, and commercial cinematic title sequences.'
   },
   {
     id: 6,
-    title: 'فایل پرینت ۳ بعدی مینیاتوری کایمرای اعماق (.STL و .OBJ)',
-    price: 28,
-    type: 'فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی',
-    loreKey: 'جهان جنسیس • مینیاتوری رومیزی و بیس‌مش ZBrush',
+    title: 'Abyssal Behemoth Resin 3D Print STL Model & ZBrush Sculpt Base-Mesh',
+    price: 35,
+    type: '3D Print & STL Models',
+    loreKey: 'Extopia Universe • Deep Trench Apex Predators',
     img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=700&q=80',
-    desc: 'فایل‌های بهینه‌سازی‌شده .STL و .OBJ سر و پیکره کایمرا مناسب برای پرینترهای رزینی به همراه بیس‌مش خام (Base Mesh) با توپولوژی استاندارد جهت مجسمه‌سازی ZBrush.'
+    desc: 'High-poly STL sculpt for resin 3D printing with pre-supported hollowed variants + raw ZBrush (.ZTL / .OBJ) sculpt file for game artists and mini collectors.'
   },
   {
     id: 7,
-    title: 'بسته اوورلی ذرات، مه سمی و باران گوگردی (Atmospheric FX Pack)',
-    price: 22,
-    type: 'اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری',
-    loreKey: 'جهان اکستوپیا • چرخه‌های اقلیمی چهارگانه',
-    img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80',
-    desc: 'فایل‌های PNG ترنسپرنت و ویدیوهای لوپ بلک‌اسکرین از ذرات معلق اتر، مه سنگین گوگردی، باران اسیدی و پاشش خون آماده استفاده با مد Screen یا Linear Dodge.'
+    title: 'Volumetric Fog, Blood Splatter & Ember VFX Overlay Library (45 Assets)',
+    price: 24,
+    type: 'FX & Atmosphere Overlays',
+    loreKey: 'Atelier Production Pipeline • Visual Effects Toolkit',
+    img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80',
+    desc: 'High-resolution transparent PNG & 4K ProRes video overlays including drifting embers, sulfurous acid mist, heavy rain, and weapon impact dust.'
   }
 ];
 
