@@ -28,26 +28,25 @@ window.renderFloatingCategoryDropdown = function() {
   if (!dropdown) return;
 
   let itemsHtml = `
-    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'همه آثار')">
-      <span style="display:flex; align-items:center; gap:8px;">
-        <span style="width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
-        <span>All Artworks</span>
-      </span>
+    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
+      <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
+      <span class="cat-item-text">All Artworks</span>
     </div>
   `;
 
-  galleryCategories.forEach(cat => {
-    const isActive = currentGalleryFilter === cat.id;
-    const color = cat.color || '#38bdf8';
-    itemsHtml += `
-      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${cat.title}')">
-        <span style="display:flex; align-items:center; gap:8px;">
-          <span style="width:7px; height:7px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color};"></span>
-          <span>${cat.title}</span>
-        </span>
-      </div>
-    `;
-  });
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    galleryCategories.forEach(cat => {
+      const isActive = currentGalleryFilter === cat.id;
+      const color = cat.color || '#38bdf8';
+      const title = cat.titleEN || cat.title || cat.id;
+      itemsHtml += `
+        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+          <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
+          <span class="cat-item-text">${title}</span>
+        </div>
+      `;
+    });
+  }
 
   dropdown.innerHTML = itemsHtml;
 };
@@ -115,6 +114,7 @@ window.adminSubmitNewCategoryInline = function() {
   adminToggleAddCategoryForm();
 
   renderAdminGalleryCategories();
+  try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast(`دسته‌بندی «${title}» با موفقیت افزوده شد.`, 'success', 3500);
@@ -126,7 +126,8 @@ window.adminUpdateCategoryColor = function(catId, newColor) {
     cat.color = newColor;
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
     renderAdminGalleryCategories();
-    renderFloatingCategoryDropdown();
+    try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
+  renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     if (currentGalleryFilter === catId) {
       filterGalleryByCategory(catId, cat.title);
@@ -143,6 +144,7 @@ window.adminDeleteGalleryCategory = function(catId) {
   galleryCategories = galleryCategories.filter(c => c.id !== catId);
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   renderAdminGalleryCategories();
+  try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast(`دسته‌بندی «${catName}» حذف شد.`, 'info');
@@ -156,6 +158,7 @@ window.openChatConsultation = function() {
 
 // اجرای لود اولیه در هنگام آماده شدن صفحه
 document.addEventListener('DOMContentLoaded', () => {
+  try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   renderAdminGalleryCategories();
@@ -425,7 +428,7 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
       closeMemberModal();
       renderMemberDashboard();
       switchView('member-dashboard');
-      showToast(`خوش آمدید، ${currentMember.name}! حساب کاربری شما با موفقیت فعال شد. ✨`, 'success', 5000);
+      showToast(`Welcome back, ${currentMember.name}! Session authenticated successfully. ✨`, 'success', 5000);
     }
   }
 }
@@ -453,7 +456,7 @@ function triggerPasswordResetModal() {
       resetView.classList.remove('hidden');
     }
     if (!hasShownResetToast) {
-      showToast('هویت شما از طریق ایمیل تایید شد. لطفاً رمز عبور جدید حسابتان را تعیین فرمایید.', 'info', 6000);
+      showToast('Email identity confirmed. Please set your new secure password.', 'info', 6000);
       hasShownResetToast = true;
     }
   }
@@ -1752,7 +1755,7 @@ window.renderShowcaseGrid = function() {
 
     let tileImg = imgSrc;
     let targetPhaseIdx = 0;
-    let displayTitle = (currentSiteLanguage === "fa" && art.titleFa && art.titleFa.trim()) ? art.titleFa : art.title;
+    let displayTitle = art.title || "Untitled Concept";
     let displaySlug = slug;
     let activeKey = art.tag || art.category || art.pipelineKey || 'character';
 
@@ -1903,7 +1906,7 @@ window.orderProjectPack = function(artId) {
   switchView('store');
   const pipeKey = art ? (art.pipelineKey || 'sketch1') : 'sketch1';
   selectPipeline(pipeKey);
-  showToast('پکیج کامل پروداکشن این اثر در محاسبه‌گر آتلیه بارگذاری شد.', 'success', 4500);
+  showToast('Full production package loaded into atelier scope calculator.', 'success', 4500);
 };
 
 window.openArtModalByIndex = function(idx) {
@@ -2217,7 +2220,7 @@ window.deepLinkToPipeline = function() {
   switchView('store');
   switchStoreTab('commissions', document.querySelector('.store-dual-nav .store-dual-btn'));
   selectPipeline(pipeKey, null, true);
-  showToast('پایپلاین تخصصی سفارش این اثر باز شد.', 'info');
+  showToast('Commission pipeline opened for this concept project.', 'info');
 };
 
 // closeArtModalDirect handled uniformly above
@@ -2484,7 +2487,7 @@ function renderProductsWithList(list) {
 }
 
 window.downloadDigitalAsset = function(title) {
-  showToast(`دارایی «${title}» همراه با لایسنس دائمی و کلید لور به داشبورد شما اضافه شد.`, 'success');
+  showToast(`Asset "${title}" with perpetual commercial license unlocked to your dashboard. ✨`, 'success');
   if (currentMember) {
     if (!currentMember.assetsBought) currentMember.assetsBought = [];
     if (!currentMember.assetsBought.includes(title)) {
@@ -3240,7 +3243,7 @@ window.cancelPasswordReset = async function() {
     if (modal) modal.style.display = 'none';
     switchView('showcase');
     try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
-    showToast('فرآیند بازیابی لغو شد.', 'info');
+    showToast('Recovery process cancelled.', 'info');
   }
 };
 
@@ -3266,7 +3269,7 @@ window.logoutMemberAccount = async function() {
   currentMember = null;
   const labelEl = document.getElementById('rightMemberLabel');
   if (labelEl) labelEl.textContent = 'Portal';
-  showToast('از حساب کاربری خارج شدید.', 'info');
+  showToast('Signed out of account session.', 'info');
   switchView('showcase');
 };
 
@@ -4580,7 +4583,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ورود مدیر استودیو منحصراً از طریق تایید هویت Google OAuth انجام می‌شود
 
-      showToast('در حال تایید هویت و ورود به استودیو...', 'info');
+      showToast('Authenticating credentials and signing into atelier...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -4592,9 +4595,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (error) {
             console.warn('[Supabase Auth Error]', error);
             if (error.message.includes('Invalid login credentials')) {
-              showToast('ایمیل یا رمز عبور وارد شده نادرست است.', 'error');
+              showToast('Invalid email address or password.', 'error');
             } else if (error.message.includes('Email not confirmed')) {
-              showToast('ایمیل تایید نشده است. لطفاً لینک فعال‌سازی ایمیل را بررسی کنید.', 'info');
+              showToast('Email not confirmed. Please check your verification link.', 'info');
             } else {
               showToast(error.message || 'خطا در ورود به حساب.', 'error');
             }
@@ -4603,7 +4606,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (data && data.user) {
             applyLoggedInMember(data.user, true);
-            showToast(`خوش آمدید، ${currentMember.name}`, 'success');
+            showToast(`Welcome back, ${currentMember.name}!`, 'success');
             return;
           }
         } catch (authErr) {
@@ -4618,7 +4621,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeMemberModal();
       renderMemberDashboard();
       switchView('member-dashboard');
-      showToast(`خوش آمدید، ${currentMember.name}`, 'success');
+      showToast(`Welcome back, ${currentMember.name}!`, 'success');
     });
   }
 
@@ -4638,7 +4641,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // ۱. اعتبارسنجی نام کاربری (ممانعت از نام‌های جعلی یا حروف تکراری متوالی)
       const isRepeatedName = /(.)\1{2,}/.test(name);
       if (name.length < 3 || isRepeatedName) {
-        showToast('نام وارد شده نامعتبر است! لطفاً یک نام یا لقب معتبر (حداقل ۳ حرف بدون تکرار متوالی کاراکتر) وارد فرمایید.', 'error');
+        showToast('Invalid display name. Please enter a valid handle (minimum 3 characters).', 'error');
         document.getElementById('signupName')?.focus();
         return;
       }
@@ -4646,7 +4649,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // ۲. اعتبارسنجی دقیق سینتکس و پسوند ایمیل
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(email)) {
-        showToast('آدرس ایمیل نامعتبر است! لطفاً یک ایمیل کامل با دامنه معتبر (مانند user@gmail.com) وارد فرمایید.', 'error');
+        showToast('Invalid email address. Please provide a valid email (e.g. user@domain.com).', 'error');
         document.getElementById('signupEmail')?.focus();
         return;
       }
@@ -4673,14 +4676,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ۲. اعتبارسنجی قدرت رمز
       if (password.length < 6 || /^(123456|12345678|111111|000000)$/.test(password) || /^[0-9]+$/.test(password)) {
-        showToast('رمز عبور بسیار ضعیف است! رمز عبور نمی‌تواند صرفاً از ارقام ساده یا ترتیبی تشکیل شود؛ لطفاً از ترکیب حروف و عدد استفاده کنید.', 'error');
+        showToast('Password is too weak. Please use an alphanumeric combination of at least 6 characters.', 'error');
         document.getElementById('signupPass')?.focus();
         return;
       }
 
       // ۳. تطابق رمز عبور و تکرار آن
       if (password !== passwordConfirm) {
-        showToast('رمز عبور و تکرار آن یکسان نیستند! لطفاً مجدداً بررسی فرمایید.', 'error');
+        showToast('Passwords do not match. Please verify and retype.', 'error');
         document.getElementById('signupPassConfirm')?.focus();
         return;
       }
@@ -4688,12 +4691,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // ۴. بررسی تایید قوانین استودیو (بررسی تیک چک‌باکس)
       const agreeBox = document.getElementById('signupAgreeTerms');
       if (!agreeBox || !agreeBox.checked) {
-        showToast('لطفاً تیک مطالعه و پذیرش قوانین و شرایط خدمات استودیو را علامت بزنید.', 'error');
+        showToast('Please review and accept the studio terms of service.', 'error');
         agreeBox?.focus();
         return;
       }
 
-      showToast('در حال تایید مشخصات و ایجاد حساب در پورتال استودیو...', 'info');
+      showToast('Creating and registering account in studio portal...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -4714,7 +4717,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('[Supabase SignUp Error]', error);
             const msg = (error.message || '').toLowerCase();
             if (msg.includes('already registered') || msg.includes('already exists') || error.status === 422) {
-              showToast('این آدرس ایمیل قبلاً در استودیو ثبت‌نام شده است. لطفاً وارد حساب خود شوید.', 'error', 6000);
+              showToast('This email is already registered. Please sign in to your account.', 'error', 6000);
               switchAuthView('login');
               const loginEmailEl = document.getElementById('loginEmail');
               if (loginEmailEl) loginEmailEl.value = email;
@@ -4766,9 +4769,9 @@ document.addEventListener('DOMContentLoaded', () => {
             switchView('member-dashboard');
             const isConfirmed = !!(data.user.email_confirmed_at || data.user.confirmed_at || data.session);
             if (!isConfirmed) {
-              showToast('حساب ایجاد شد! جهت تایید هویت و صدور لایسنس، لطفاً لینک ارسالی به ایمیل خود را تایید نمایید.', 'warning', 8000);
+              showToast('Account created! Please check your inbox to confirm your email verification link.', 'warning', 8000);
             } else {
-              showToast('حساب کاربری شما با موفقیت ایجاد شد! خوش آمدید.', 'success');
+              showToast('Account registered successfully! Welcome to TAJINKART.', 'success');
             }
             return;
           }
@@ -4795,7 +4798,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeMemberModal();
       renderMemberDashboard();
       switchView('member-dashboard');
-      showToast('حساب کاربری جدید ایجاد شد.', 'success');
+      showToast('New studio account created successfully.', 'success');
     });
   }
 
@@ -4851,7 +4854,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      showToast('در حال صدور لینک امن بازیابی به ایمیل شما...', 'info');
+      showToast('Generating secure password recovery link...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -4866,7 +4869,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          showToast('لینک امن بازیابی رمز عبور با موفقیت به ایمیل شما صادر شد. صندوق ورودی (یا اسپم) را بررسی فرمایید.', 'success', 7000);
+          showToast('Password reset link sent to your email. Please check your inbox or spam folder.', 'success', 7000);
           switchAuthView('login');
           return;
         } catch (err) {
@@ -4923,7 +4926,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      showToast('در حال اعتبارسنجی نشست و ذخیره رمز جدید...', 'info');
+      showToast('Validating session and saving new password...', 'info');
 
       if (window.supabaseClient && window.supabaseClient.auth) {
         try {
@@ -4987,7 +4990,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('memberModal');
             if (modal) modal.style.display = 'none';
             applyLoggedInMember(data.user, true);
-            showToast('رمز عبور جدید با موفقیت ذخیره شد. خوش آمدید!', 'success', 6000);
+            showToast('New password saved successfully. Welcome back!', 'success', 6000);
             return;
           }
         } catch (updateErr) {
@@ -6934,7 +6937,8 @@ window.adminEditCategoryTitle = function(catId) {
     cat.title = newTitle.trim();
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
     renderAdminGalleryCategories();
-    renderFloatingCategoryDropdown();
+    try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
+  renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     showToast(`نام دسته به «${cat.title}» تغییر یافت. ✓`, 'success', 2500);
   }
@@ -6962,7 +6966,8 @@ document.addEventListener('click', (e) => {
 // ==============================================================================
 // موتور بومی دو زبانه هوشمند استودیو (Native Bilingual Geo Engine)
 // ==============================================================================
-var currentSiteLanguage = safeGetStorage('tajinkart_lang') || 'en';
+var currentSiteLanguage = 'en';
+try { safeSetStorage('tajinkart_lang', 'en'); localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
 
 const I18N_STRINGS = {
   en: {
@@ -6988,26 +6993,26 @@ const I18N_STRINGS = {
     store_sub_prod: 'Commercial production-ready asset packs, layered PSD master files, brushes, and 3D STL print models.'
   },
   fa: {
-    brand_slogan: 'از جوهر تا بی‌نهایت کیهان',
-    all_artworks: 'همه آثار گالری',
-    status_online: 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است',
-    status_vacation: 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است',
-    dock_home_title: 'صفحه اصلی',
-    dock_home_sub: 'آرشیو آثار و گالری',
-    dock_members_title: 'Member Portal',
-    dock_members_sub: 'ورود / عضویت',
-    dock_store_title: 'آتلیه و فروشگاه',
-    dock_store_sub: 'کانسپت و اسست‌ها',
-    dock_store_comm: '🎨 سفارش کانسپت (آتلیه)',
-    dock_store_prod: '💎 دارایی‌های دیجیتال',
-    dock_genesis_title: 'جهان جنسیس',
-    dock_genesis_sub: 'کمیک و داستان',
-    dock_academy_title: 'آکادمی استودیو',
-    dock_academy_sub: 'کارگاه‌ها و آموزش',
-    store_title_comm: 'آتلیه کانسپت و توسعه بصری استودیو',
-    store_sub_comm: 'پذیرش پروژه‌های پیش‌تولید بازی، کانسپت سینمایی و طراحی دنیا زیر نظر مستقیم سید سروش تاج.',
-    store_title_prod: 'مخزن رسمی دارایی‌های دیجیتال و اسست‌های استودیو',
-    store_sub_prod: 'آرشیو دارایی‌های دیجیتال آماده تجاری، سورس‌های لایه‌باز PSD، موتور براش و فایل‌های پرینت سه‌بعدی.'
+    brand_slogan: 'FROM INK TO UNIVERSE',
+    all_artworks: 'All Artworks',
+    status_online: 'Studio Online • Accepting Briefs & Concept Commissions',
+    status_vacation: 'Studio Away / Capacity Full • Inquiries Reviewed Shortly',
+    dock_home_title: 'Showcase',
+    dock_home_sub: 'Concept Gallery & IP',
+    dock_members_title: 'Members',
+    dock_members_sub: 'Client Portal',
+    dock_store_title: 'Atelier & Store',
+    dock_store_sub: 'Commissions & Assets',
+    dock_store_comm: '🎨 Concept Commissions',
+    dock_store_prod: '💎 Digital Assets Vault',
+    dock_genesis_title: 'Genesis Lore',
+    dock_genesis_sub: 'Original Universe & Manga',
+    dock_academy_title: 'Academy',
+    dock_academy_sub: 'Workshops & Mentorship',
+    store_title_comm: 'Concept Art & Visual Development Atelier',
+    store_sub_comm: 'Pre-production for games, cinematic concept art, and entertainment design directed by Seyed Soroush Taj.',
+    store_title_prod: 'Official Digital Assets & Production Vault',
+    store_sub_prod: 'Commercial production-ready asset packs, layered PSD master files, brushes, and 3D STL print models.'
   }
 };
 
@@ -7438,21 +7443,24 @@ window.renderFloatingCategoryDropdown = function() {
 
   let itemsHtml = `
     <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
-      <span style="width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold); flex-shrink:0;"></span>
-      <span style="font-family:var(--font-brand); letter-spacing:0.04em; white-space:nowrap;">All Artworks</span>
+      <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
+      <span class="cat-item-text">All Artworks</span>
     </div>
   `;
 
-  galleryCategories.forEach(cat => {
-    const isActive = currentGalleryFilter === cat.id;
-    const color = cat.color || '#38bdf8';
-    itemsHtml += `
-      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${cat.title}')">
-        <span style="width:8px; height:8px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
-        <span style="font-family:var(--font-brand); letter-spacing:0.04em; white-space:nowrap;">${cat.title}</span>
-      </div>
-    `;
-  });
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    galleryCategories.forEach(cat => {
+      const isActive = currentGalleryFilter === cat.id;
+      const color = cat.color || '#38bdf8';
+      const title = cat.titleEN || cat.title || cat.id;
+      itemsHtml += `
+        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+          <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
+          <span class="cat-item-text">${title}</span>
+        </div>
+      `;
+    });
+  }
 
   dropdown.innerHTML = itemsHtml;
 };
@@ -7529,7 +7537,8 @@ window.saveAdminCategoryEdit = function() {
 
     safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
     window.renderAdminGalleryCategories();
-    window.renderFloatingCategoryDropdown();
+    try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
+  renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
@@ -7631,16 +7640,19 @@ window.renderFloatingCategoryDropdown = function() {
     </div>
   `;
 
-  galleryCategories.forEach(cat => {
-    const isActive = currentGalleryFilter === cat.id;
-    const color = cat.color || '#38bdf8';
-    itemsHtml += `
-      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${cat.title}')">
-        <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
-        <span class="cat-item-text">${cat.title}</span>
-      </div>
-    `;
-  });
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    galleryCategories.forEach(cat => {
+      const isActive = currentGalleryFilter === cat.id;
+      const color = cat.color || '#38bdf8';
+      const title = cat.titleEN || cat.title || cat.id;
+      itemsHtml += `
+        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+          <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
+          <span class="cat-item-text">${title}</span>
+        </div>
+      `;
+    });
+  }
 
   dropdown.innerHTML = itemsHtml;
 };
@@ -7717,7 +7729,8 @@ window.saveAdminCategoryEdit = function() {
 
     safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
     window.renderAdminGalleryCategories();
-    window.renderFloatingCategoryDropdown();
+    try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
+  renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
@@ -7842,27 +7855,26 @@ window.renderFloatingCategoryDropdown = function() {
   const dropdown = document.getElementById('categoryFilterDropdown');
   if (!dropdown) return;
 
-  const isFA = (typeof currentSiteLang !== 'undefined' && currentSiteLang === 'fa');
-  const allLabel = isFA ? 'همه آثار استودیو' : 'All Artworks';
-
   let itemsHtml = `
-    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', '${allLabel}')">
+    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
       <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
-      <span class="cat-item-text">${allLabel}</span>
+      <span class="cat-item-text">All Artworks</span>
     </div>
   `;
 
-  galleryCategories.forEach(cat => {
-    const isActive = currentGalleryFilter === cat.id;
-    const color = cat.color || '#38bdf8';
-    const displayTitle = isFA ? (cat.titleFA || cat.title) : (cat.titleEN || cat.title);
-    itemsHtml += `
-      <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${displayTitle}')">
-        <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
-        <span class="cat-item-text">${displayTitle}</span>
-      </div>
-    `;
-  });
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    galleryCategories.forEach(cat => {
+      const isActive = currentGalleryFilter === cat.id;
+      const color = cat.color || '#38bdf8';
+      const title = cat.titleEN || cat.title || cat.id;
+      itemsHtml += `
+        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+          <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
+          <span class="cat-item-text">${title}</span>
+        </div>
+      `;
+    });
+  }
 
   dropdown.innerHTML = itemsHtml;
 };
@@ -7950,7 +7962,8 @@ window.saveAdminCategoryEdit = function() {
     } catch(e) {}
     
     window.renderAdminGalleryCategories();
-    window.renderFloatingCategoryDropdown();
+    try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
+  renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`دسته‌بندی «${newTitleFA}» (${newTitleEN}) با موفقیت ذخیره شد! ✓`, 'success', 3500);
@@ -8341,7 +8354,8 @@ window.adminDeleteCurrentEditingCategory = function() {
   
   closeAdminCategoryEditForm();
   if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
-  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof renderFloatingCategoryDropdown === 'function') try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
+  renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   if (currentGalleryFilter === origId) {
     filterGalleryByCategory('all', 'All Artworks');
