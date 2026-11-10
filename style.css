@@ -238,26 +238,10 @@ nav a, nav button,
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    #rightVerticalNav.dock-open .right-exp-btn {
-      opacity: 1 !important;
-      transform: scale(1) translateY(0) !important;
-      pointer-events: auto !important;
-      height: 44px !important;
-      padding: 3px !important;
-      margin-top: 4px !important;
-      border: 1px solid var(--border-subtle) !important;
-    }
+    
 
     @media (hover: hover) and (pointer: fine) {
-      #rightVerticalNav.dock-collapsed:hover .right-exp-btn {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        pointer-events: auto;
-        height: 44px;
-        padding: 3px;
-        margin-top: 4px;
-        border: 1px solid var(--border-subtle);
-      }
+      
     }
 
     /* دکمه‌های داک با سازگاری کامل راست به چپ (RTL): آیکون سمت راست، متن باز شونده به چپ */
@@ -2087,15 +2071,7 @@ nav a, nav button,
   }
 
   /* باز شدن با کلیک روی آیکون در حالت جمع‌شده */
-  #rightVerticalNav.dock-open .right-exp-btn {
-    opacity: 1 !important;
-    height: 44px !important;
-    padding: 3px !important;
-    margin-top: 4px !important;
-    border: 1px solid var(--border-subtle) !important;
-    pointer-events: auto !important;
-    transform: scale(1) translateY(0) !important;
-  }
+  
 
   #stickyBrandHero {
     height: 52vh !important;
@@ -6028,97 +6004,127 @@ body.in-admin-view #rightVerticalNav,
 
 
 /* ==============================================================================
-   RELEASE V20.11.0: TRANSLUCENT OBSIDIAN ICONS, DESKTOP 3-LINE COLLAPSE & CLEAN MOBILE CIRCLES
+   RELEASE V20.12.0: PURE TRANSPARENT GLASS CIRCLES & INDESTRUCTIBLE COLORED BORDERS
    ============================================================================== */
 
-/* ۱. استایل کلی دکمه‌های داک: پس‌زمینه شیشه‌ای نیمه‌شفاف تیره تا ذرات کیهانی از پشت آن مشخص باشند */
+/* ۱. استایل کلی دکمه‌های داک: کاملاً شفاف در حالت عادی تا ذرات معلق گرد و غبار دقیقاً از پشت آیکون‌ها رد شوند */
+#rightVerticalNav .right-exp-btn,
+#rightVerticalNav.dock-open .right-exp-btn,
+#rightVerticalNav.dock-collapsed .right-exp-btn,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn,
 .right-exp-btn {
-  background: rgba(6, 8, 14, 0.72) !important;
-  backdrop-filter: blur(10px) !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
               box-shadow 0.25s ease, 
               background 0.25s ease,
               border-color 0.25s ease !important;
 }
 
-/* آیکون در حالت عادی: پس‌زمینه رنگی ندارد تا ذرات گرد و غبار از پشت آن عبور کنند */
+#rightVerticalNav .right-exp-icon,
 .right-exp-icon {
   background: transparent !important;
   border: none !important;
   transition: background 0.25s ease, color 0.25s ease !important;
 }
 
-/* ۲. خط محیطی شارپ و مشخص ۱.۵ پیکسلی با رنگ غنی اختصاصی هر بخش */
+/* ۲. خط محیطی شارپ و مشخص ۱.۵ پیکسلی با رنگ‌های غنی و غیرپاستیلی در تمام حالت‌ها (بالای صفحه، اسکرول، باز و بسته) */
+#rightVerticalNav .right-exp-btn.home-theme,
+#rightVerticalNav.dock-open .right-exp-btn.home-theme,
+#rightVerticalNav.dock-collapsed .right-exp-btn.home-theme,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn.home-theme,
 .right-exp-btn.home-theme,
 #rightDockHomeBtn {
   border: 1.5px solid #ff4500 !important;
-  box-shadow: 0 0 12px rgba(255, 69, 0, 0.32), inset 0 0 5px rgba(255, 69, 0, 0.15) !important;
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.35), inset 0 0 5px rgba(255, 69, 0, 0.15) !important;
 }
+#rightVerticalNav .right-exp-btn.home-theme .right-exp-icon,
 .right-exp-btn.home-theme .right-exp-icon { color: #ff4500 !important; }
-.right-exp-btn.home-theme:hover .right-exp-icon { background: rgba(255, 69, 0, 0.22) !important; }
-.right-exp-btn.home-theme:hover {
-  box-shadow: 0 0 20px rgba(255, 69, 0, 0.65), 0 0 35px rgba(255, 69, 0, 0.3), inset 0 0 8px rgba(255, 69, 0, 0.22) !important;
-}
 
+#rightVerticalNav .right-exp-btn.cyan-theme,
+#rightVerticalNav.dock-open .right-exp-btn.cyan-theme,
+#rightVerticalNav.dock-collapsed .right-exp-btn.cyan-theme,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn.cyan-theme,
 .right-exp-btn.cyan-theme {
   border: 1.5px solid #00f0ff !important;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.32), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
 }
+#rightVerticalNav .right-exp-btn.cyan-theme .right-exp-icon,
 .right-exp-btn.cyan-theme .right-exp-icon { color: #00f0ff !important; }
-.right-exp-btn.cyan-theme:hover .right-exp-icon { background: rgba(0, 240, 255, 0.22) !important; }
-.right-exp-btn.cyan-theme:hover {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.65), 0 0 35px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(0, 240, 255, 0.22) !important;
-}
 
+#rightVerticalNav .right-exp-btn.gold-theme,
+#rightVerticalNav.dock-open .right-exp-btn.gold-theme,
+#rightVerticalNav.dock-collapsed .right-exp-btn.gold-theme,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn.gold-theme,
 .right-exp-btn.gold-theme,
 #dockStoreMainBtn {
   border: 1.5px solid #f59e0b !important;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.32), inset 0 0 5px rgba(245, 158, 11, 0.15) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35), inset 0 0 5px rgba(245, 158, 11, 0.15) !important;
 }
-.right-exp-btn.gold-theme .right-exp-icon,
+#rightVerticalNav .right-exp-btn.gold-theme .right-exp-icon,
 #dockStoreMainBtn .right-exp-icon { color: #f59e0b !important; }
-.right-exp-btn.gold-theme:hover .right-exp-icon,
-#dockStoreMainBtn:hover .right-exp-icon { background: rgba(245, 158, 11, 0.22) !important; }
-.right-exp-btn.gold-theme:hover,
-#dockStoreMainBtn:hover {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.65), 0 0 35px rgba(245, 158, 11, 0.3), inset 0 0 8px rgba(245, 158, 11, 0.22) !important;
-}
 
+#rightVerticalNav .right-exp-btn.crimson-theme,
+#rightVerticalNav.dock-open .right-exp-btn.crimson-theme,
+#rightVerticalNav.dock-collapsed .right-exp-btn.crimson-theme,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn.crimson-theme,
 .right-exp-btn.crimson-theme {
   border: 1.5px solid #e11d48 !important;
-  box-shadow: 0 0 12px rgba(225, 29, 72, 0.32), inset 0 0 5px rgba(225, 29, 72, 0.15) !important;
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.35), inset 0 0 5px rgba(225, 29, 72, 0.15) !important;
 }
+#rightVerticalNav .right-exp-btn.crimson-theme .right-exp-icon,
 .right-exp-btn.crimson-theme .right-exp-icon { color: #e11d48 !important; }
-.right-exp-btn.crimson-theme:hover .right-exp-icon { background: rgba(225, 29, 72, 0.22) !important; }
-.right-exp-btn.crimson-theme:hover {
-  box-shadow: 0 0 20px rgba(225, 29, 72, 0.65), 0 0 35px rgba(225, 29, 72, 0.3), inset 0 0 8px rgba(225, 29, 72, 0.22) !important;
-}
 
+#rightVerticalNav .right-exp-btn.purple-theme,
+#rightVerticalNav.dock-open .right-exp-btn.purple-theme,
+#rightVerticalNav.dock-collapsed .right-exp-btn.purple-theme,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn.purple-theme,
 .right-exp-btn.purple-theme {
   border: 1.5px solid #9333ea !important;
-  box-shadow: 0 0 12px rgba(147, 51, 234, 0.32), inset 0 0 5px rgba(147, 51, 234, 0.15) !important;
+  box-shadow: 0 0 12px rgba(147, 51, 234, 0.35), inset 0 0 5px rgba(147, 51, 234, 0.15) !important;
 }
+#rightVerticalNav .right-exp-btn.purple-theme .right-exp-icon,
 .right-exp-btn.purple-theme .right-exp-icon { color: #9333ea !important; }
-.right-exp-btn.purple-theme:hover .right-exp-icon { background: rgba(147, 51, 234, 0.22) !important; }
-.right-exp-btn.purple-theme:hover {
-  box-shadow: 0 0 20px rgba(147, 51, 234, 0.65), 0 0 35px rgba(147, 51, 234, 0.3), inset 0 0 8px rgba(147, 51, 234, 0.22) !important;
-}
 
+#rightVerticalNav .right-exp-btn.emerald-theme,
+#rightVerticalNav.dock-open .right-exp-btn.emerald-theme,
+#rightVerticalNav.dock-collapsed .right-exp-btn.emerald-theme,
+#rightVerticalNav.dock-collapsed.dock-open .right-exp-btn.emerald-theme,
 .right-exp-btn.emerald-theme {
   border: 1.5px solid #059669 !important;
-  box-shadow: 0 0 12px rgba(5, 150, 105, 0.32), inset 0 0 5px rgba(5, 150, 105, 0.15) !important;
+  box-shadow: 0 0 12px rgba(5, 150, 105, 0.35), inset 0 0 5px rgba(5, 150, 105, 0.15) !important;
 }
+#rightVerticalNav .right-exp-btn.emerald-theme .right-exp-icon,
 .right-exp-btn.emerald-theme .right-exp-icon { color: #059669 !important; }
-.right-exp-btn.emerald-theme:hover .right-exp-icon { background: rgba(5, 150, 105, 0.22) !important; }
-.right-exp-btn.emerald-theme:hover {
-  box-shadow: 0 0 20px rgba(5, 150, 105, 0.65), 0 0 35px rgba(5, 150, 105, 0.3), inset 0 0 8px rgba(5, 150, 105, 0.22) !important;
+
+#dockMasterTrigger {
+  border: 1.5px solid #00f0ff !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
+  color: #00f0ff !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
+}
+
+#dockMasterTrigger:focus,
+#dockMasterTrigger:focus-visible {
+  outline: none !important;
 }
 
 /* ۳. معماری دسکتاپ (صفحات بالای 768px):
-   - بالای صفحه: ۶ آیکون باز، سه خط مخفی
-   - با اسکرول به پایین (>100px): دکمه‌ها جمع می‌شوند به سه خط
-   - کلیک روی سه خط: باز شدن مجدد دکمه‌ها
-   - هاور روی هر دکمه: باز شدن کپسول متن به سمت چپ */
+   - بالای صفحه: ۶ آیکون دایره‌ای شفاف با خط رنگی
+   - اسکرول به پایین (>100px): جمع شدن به سه خط
+   - کلیک روی سه خط: باز شدن ۶ آیکون دقیقاً با همان خطوط رنگی شارپ
+   - هاور ماوس روی هر آیکون: پر شدن پس‌زمینه و باز شدن کپسول متن به سمت چپ */
 @media (min-width: 769px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6131,12 +6137,11 @@ body.in-admin-view #rightVerticalNav,
     gap: 10px !important;
   }
 
-  /* کلید سه خط در بالای صفحه دسکتاپ مخفی است */
+  /* در بالای صفحه، سه خط مخفی و ۶ دکمه باز هستند */
   #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
     display: none !important;
   }
 
-  /* در بالای صفحه، ۶ آیکون باز و در دسترس هستند */
   #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
@@ -6153,17 +6158,6 @@ body.in-admin-view #rightVerticalNav,
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 50% !important;
-    aspect-ratio: 1 / 1 !important;
-    background: rgba(6, 8, 14, 0.72) !important;
-    border: 1.5px solid #00f0ff !important;
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
-    color: #00f0ff !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
   }
 
   #rightVerticalNav.dock-collapsed:not(.dock-open) .dock-buttons-container {
@@ -6178,7 +6172,9 @@ body.in-admin-view #rightVerticalNav,
     margin-top: 8px !important;
   }
 
+  /* ساختار دکمه در دسکتاپ: در حالت استراحت دایره ۴۴ پیکسل شفاف */
   #rightVerticalNav .right-exp-btn,
+  #rightVerticalNav.dock-open .right-exp-btn,
   .right-exp-btn {
     display: flex !important;
     flex-direction: row-reverse !important;
@@ -6195,16 +6191,26 @@ body.in-admin-view #rightVerticalNav,
     cursor: pointer !important;
   }
 
+  /* با هاور موس، کپسول متن باز شده و پس‌زمینه تیره محتوا را خوانا می‌سازد */
   #rightVerticalNav .right-exp-btn:hover,
   .right-exp-btn:hover {
     width: auto !important;
     min-width: 44px !important;
     max-width: 280px !important;
     padding-left: 8px !important;
+    background: rgba(8, 11, 18, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
   }
 
-  #rightVerticalNav .right-exp-icon,
-  .right-exp-icon {
+  #rightVerticalNav .right-exp-btn.home-theme:hover .right-exp-icon { background: rgba(255, 69, 0, 0.22) !important; }
+  #rightVerticalNav .right-exp-btn.cyan-theme:hover .right-exp-icon { background: rgba(0, 240, 255, 0.22) !important; }
+  #rightVerticalNav .right-exp-btn.gold-theme:hover .right-exp-icon,
+  #dockStoreMainBtn:hover .right-exp-icon { background: rgba(245, 158, 11, 0.22) !important; }
+  #rightVerticalNav .right-exp-btn.crimson-theme:hover .right-exp-icon { background: rgba(225, 29, 72, 0.22) !important; }
+  #rightVerticalNav .right-exp-btn.purple-theme:hover .right-exp-icon { background: rgba(147, 51, 234, 0.22) !important; }
+  #rightVerticalNav .right-exp-btn.emerald-theme:hover .right-exp-icon { background: rgba(5, 150, 105, 0.22) !important; }
+
+  #rightVerticalNav .right-exp-icon {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -6256,9 +6262,9 @@ body.in-admin-view #rightVerticalNav,
 }
 
 /* ۴. معماری موبایل (صفحات تا 768px):
-   - داک در حالت بسته: فقط سه خط با پس‌زمینه نیمه‌شفاف
-   - کلیک روی سه خط: باز شدن ۶ آیکون دایره‌ای تمیز و شیک بدون متن اضافی
-   - کلیک دوباره روی سه خط: بسته شدن داک و خاموش شدن کامل نور آبی کلید سه خط */
+   - داک بسته: فقط سه خط ۴۴px شفاف با خط فیروزه‌ای
+   - داک باز: ۶ آیکون دایره‌ای خالص ۴۴px شفاف با خطوط محیطی رنگی دقیقاً مثل دسکتاپ
+   - کلیک دوباره روی سه خط: بسته شدن داک و خاموش شدن ۱۰۰٪ نور آبی کلید */
 @media (max-width: 768px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6273,46 +6279,12 @@ body.in-admin-view #rightVerticalNav,
     max-width: 44px !important;
   }
 
-  #dockMasterTrigger {
-    display: flex !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    border-radius: 50% !important;
-    aspect-ratio: 1 / 1 !important;
-    background: rgba(6, 8, 14, 0.72) !important;
-    backdrop-filter: blur(8px) !important;
-    border: 1.5px solid #00f0ff !important;
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
-    color: #00f0ff !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    outline: none !important;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, box-shadow 0.25s ease !important;
-  }
-
-  #dockMasterTrigger:focus {
-    outline: none !important;
-  }
-
-  /* هنگام باز بودن داک، سه خط می‌چرخد و پس‌زمینه ملایم می‌گیرد */
-  #rightVerticalNav.dock-open #dockMasterTrigger {
-    background: rgba(0, 240, 255, 0.18) !important;
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.45) !important;
-  }
-
-  #rightVerticalNav.dock-open #dockMasterTrigger svg {
-    transform: rotate(90deg);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
   /* در حالت بسته روی موبایل: دکمه‌ها مخفی هستند */
   #rightVerticalNav:not(.dock-open) .dock-buttons-container {
     display: none !important;
   }
 
+  /* در حالت باز روی موبایل: ۶ دایره شیک و شفاف در یک ستون */
   #rightVerticalNav.dock-open .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
@@ -6323,10 +6295,10 @@ body.in-admin-view #rightVerticalNav,
     margin-top: 8px !important;
   }
 
-  /* روی گوشی دکمه‌ها دایره‌های خالص و بی‌نقص ۴۴ پیکسلی هستند (متن حذف شد طبق دستور کاربر) */
+  /* دکمه‌های دایره‌ای خالص ۴۴px در موبایل با شفافیت کامل */
   #rightVerticalNav.dock-open .right-exp-btn,
-  .dock-open .right-exp-btn,
-  #rightVerticalNav .right-exp-btn {
+  #rightVerticalNav .right-exp-btn,
+  .right-exp-btn {
     width: 44px !important;
     min-width: 44px !important;
     max-width: 44px !important;
@@ -6335,16 +6307,18 @@ body.in-admin-view #rightVerticalNav,
     max-height: 44px !important;
     border-radius: 50% !important;
     aspect-ratio: 1 / 1 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
   }
 
-  /* حذف کامل نوشته‌ها روی موبایل برای خلوت ماندن صفحه */
+  /* حذف قطعی متن‌ها در موبایل */
   #rightVerticalNav .right-exp-text,
   .right-exp-text {
     display: none !important;
