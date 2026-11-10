@@ -967,12 +967,14 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(checkInitialHashRoute, 40);
 }
+
+
 // ==============================================================================
 // TAJINKART STUDIO — GALLERY & SHOWCASE MODULE (gallery.js)
 // Showcase Grid, Categories & Genres Filters, Case Study Lightbox, Zoom
 // ==============================================================================
 
-const DEFAULT_STUDIO_GENRES = [
+var DEFAULT_STUDIO_GENRES = window.DEFAULT_STUDIO_GENRES || [
   'Dark Fantasy',
   'Cyberpunk',
   'Sci-Fi',
@@ -986,7 +988,7 @@ const DEFAULT_STUDIO_GENRES = [
   'Historical & Military'
 ];
 
-let studioGenres = [];
+var studioGenres = window.studioGenres || [];
 try {
   studioGenres = JSON.parse(localStorage.getItem('tajinkart_studio_genres_v1')) || DEFAULT_STUDIO_GENRES;
   if (!Array.isArray(studioGenres) || studioGenres.length === 0) studioGenres = DEFAULT_STUDIO_GENRES;
@@ -995,7 +997,7 @@ try {
 }
 window.studioGenres = studioGenres;
 
-const SIX_PIPELINE_CATEGORIES = [
+var SIX_PIPELINE_CATEGORIES = window.SIX_PIPELINE_CATEGORIES || [
   { id: 'character', title: 'Character Design & Heroes', titleEN: 'Character Design & Heroes', color: '#facc15', pipeKey: 'sketch1' },
   { id: 'creature', title: 'Creatures, Titans & Monsters', titleEN: 'Creatures, Titans & Monsters', color: '#10b981', pipeKey: 'sketch_creature' },
   { id: 'environment', title: 'Environment, Worlds & Architecture', titleEN: 'Environment, Worlds & Architecture', color: '#38bdf8', pipeKey: 'sketch2' },
@@ -1004,14 +1006,14 @@ const SIX_PIPELINE_CATEGORIES = [
   { id: 'comic', title: 'Comics, Manga & Sequential Art', titleEN: 'Comics, Manga & Sequential Art', color: '#fb923c', pipeKey: 'sketch5' }
 ];
 
-let galleryCategories = SIX_PIPELINE_CATEGORIES;
+var galleryCategories = window.galleryCategories || SIX_PIPELINE_CATEGORIES;
 try {
   localStorage.setItem('tajinkart_gallery_categories_v1', JSON.stringify(SIX_PIPELINE_CATEGORIES));
 } catch(e) {}
 window.galleryCategories = SIX_PIPELINE_CATEGORIES;
 window.DEFAULT_GALLERY_CATEGORIES = SIX_PIPELINE_CATEGORIES;
 
-const PIPELINE_TO_CATEGORY_MAP = {
+var PIPELINE_TO_CATEGORY_MAP = window.PIPELINE_TO_CATEGORY_MAP || {
   'sketch1': 'character',
   'sketch_creature': 'creature',
   'sketch2': 'environment',
@@ -2195,6 +2197,8 @@ if (document.readyState === 'loading') {
   if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
 }
+
+
 // ==============================================================================
 // TAJINKART STUDIO — PORTAL, STORE & COMMISSIONS MODULE (portal.js)
 // Member Portal, Auth Modals, Commission Calculator Wizard, Products Vault
@@ -4263,6 +4267,8 @@ if (document.readyState === 'loading') {
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
 }
 
+
+
 // ==============================================================================
 // موتور آپلود ابری تصاویر CLOUDINARY با تشخیص خودکار پریست و کلود نیم
 // ==============================================================================
@@ -4818,6 +4824,21 @@ function renderAdminArtModalForm(art, isNew) {
             <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Hover Slug (Card Center Title)</label>
             <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="e.g. Red Knight" />
           </div>
+        </div>
+
+        <div>
+          <label style="font-size:11.5px; color:var(--cyan-electric); font-weight:800; display:block; margin-bottom:4px;">🌌 Universe Genre & Worldbuilding Theme (Linked to Top Menu)</label>
+          <select id="editArtGenreSelect" style="width:100%; padding:9px 12px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:8px; color:var(--cyan-electric); font-weight:700; font-size:12px; outline:none;">
+            ${(function() {
+              const currentGenres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0)
+                ? studioGenres
+                : ((window.studioGenres && Array.isArray(window.studioGenres) && window.studioGenres.length > 0)
+                    ? window.studioGenres
+                    : (typeof DEFAULT_STUDIO_GENRES !== 'undefined' ? DEFAULT_STUDIO_GENRES : ['Dark Fantasy', 'Cyberpunk', 'Sci-Fi', 'Mythic & Ancient', 'Post-Apocalyptic', 'Horror & Eldritch', 'High Fantasy', 'Steampunk', 'Mecha & Industrial', 'Anime & Stylized', 'Historical & Military']));
+              const artGenre = art.genre || 'Dark Fantasy';
+              return currentGenres.map(g => `<option value="${g}" ${g === artGenre ? 'selected' : ''}>${g}</option>`).join('');
+            })()}
+          </select>
         </div>
 
         <div>
@@ -7886,6 +7907,8 @@ window.saveStudioModeDirect = function(mode, event) {
   showToast(`Studio status set to ${mode.toUpperCase()} and saved! ✓`, 'success', 3500);
 };
 
+
+
 // ==============================================================================
 // TAJINKART STUDIO — TRANSLATE MODULE (translate.js)
 // Floating Google Translate Controller (Alphabetical, Searchable & Multi-Language)
@@ -7909,8 +7932,7 @@ window.toggleGoogleTranslateMenu = function(e) {
   }
 };
 
-// فیلتر هوشمند و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف واردشده
-// فیلتر هوشمند، دقیق و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف
+// فیلتر هوشمند، دقیق و دینامیک زبان‌ها: جستجوی حروفی با اولویت پیشوند
 window.filterGoogleTranslateLanguages = function(query) {
   const q = (query || '').trim().toLowerCase();
   const container = document.getElementById('googleTranslateLanguagesList');
@@ -7935,29 +7957,31 @@ window.filterGoogleTranslateLanguages = function(query) {
 
     let score = 0;
 
-    // ۱. تطابق دقیق با کد زبان (مثلاً en یا fa یا ar)
+    // ۱. تطابق دقیق با کد زبان (مثلاً en، ar، fa، es)
     if (langCode === q) {
-      score = 100;
+      score = 1000;
     }
-    // ۲. کد زبان با عبارت شروع شود (مثلاً en با e)
+    // ۲. کد زبان با عبارت شروع شود (مثلاً en با e، ar با a)
     else if (langCode.startsWith(q)) {
-      score = 80;
+      score = 800;
     }
-    // ۳. نام انگلیسی زبان با عبارت شروع شود (مثلاً English با e یا en)
+    // ۳. نام انگلیسی زبان با عبارت شروع شود (مثلاً English با e، en، eng)
     else if (engName.startsWith(q)) {
-      score = 70;
+      score = 600;
     }
     // ۴. نام بومی زبان با عبارت شروع شود (مثلاً Español با e یا es، یا فارسی با ف یا فا)
     else if (nativeName.startsWith(q)) {
-      score = 60;
+      score = 500;
     }
-    // ۵. هر کلمه‌ای در داده‌های جستجو با عبارت شروع شود (مثلاً انگلیسی، عربي، فرانسه)
+    // ۵. هر کلمه‌ای از واژگان جستجو با عبارت شروع شود (مثلاً انگلیسی با ان، عربی با عر)
     else if (searchWords.some(w => w.startsWith(q))) {
-      score = 50;
+      score = 400;
     }
-    // ۶. در صورتی که ورودی تک‌حرفی باشد، کلماتی که شامل آن حرف هستند
-    else if (q.length < 2 && searchWords.some(w => w.includes(q))) {
-      score = 10;
+    // ۶. در ورودی‌های ۲ حرفی یا بیشتر: کلماتی که شامل عبارت هستند
+    else if (q.length >= 2) {
+      if (engName.includes(q)) score = 200;
+      else if (nativeName.includes(q)) score = 150;
+      else if (searchWords.some(w => w.includes(q))) score = 100;
     }
 
     if (score > 0) {

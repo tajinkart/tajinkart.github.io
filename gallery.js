@@ -3,7 +3,7 @@
 // Showcase Grid, Categories & Genres Filters, Case Study Lightbox, Zoom
 // ==============================================================================
 
-const DEFAULT_STUDIO_GENRES = [
+var DEFAULT_STUDIO_GENRES = window.DEFAULT_STUDIO_GENRES || [
   'Dark Fantasy',
   'Cyberpunk',
   'Sci-Fi',
@@ -17,7 +17,7 @@ const DEFAULT_STUDIO_GENRES = [
   'Historical & Military'
 ];
 
-let studioGenres = [];
+var studioGenres = window.studioGenres || [];
 try {
   studioGenres = JSON.parse(localStorage.getItem('tajinkart_studio_genres_v1')) || DEFAULT_STUDIO_GENRES;
   if (!Array.isArray(studioGenres) || studioGenres.length === 0) studioGenres = DEFAULT_STUDIO_GENRES;
@@ -26,7 +26,7 @@ try {
 }
 window.studioGenres = studioGenres;
 
-const SIX_PIPELINE_CATEGORIES = [
+var SIX_PIPELINE_CATEGORIES = window.SIX_PIPELINE_CATEGORIES || [
   { id: 'character', title: 'Character Design & Heroes', titleEN: 'Character Design & Heroes', color: '#facc15', pipeKey: 'sketch1' },
   { id: 'creature', title: 'Creatures, Titans & Monsters', titleEN: 'Creatures, Titans & Monsters', color: '#10b981', pipeKey: 'sketch_creature' },
   { id: 'environment', title: 'Environment, Worlds & Architecture', titleEN: 'Environment, Worlds & Architecture', color: '#38bdf8', pipeKey: 'sketch2' },
@@ -35,14 +35,14 @@ const SIX_PIPELINE_CATEGORIES = [
   { id: 'comic', title: 'Comics, Manga & Sequential Art', titleEN: 'Comics, Manga & Sequential Art', color: '#fb923c', pipeKey: 'sketch5' }
 ];
 
-let galleryCategories = SIX_PIPELINE_CATEGORIES;
+var galleryCategories = window.galleryCategories || SIX_PIPELINE_CATEGORIES;
 try {
   localStorage.setItem('tajinkart_gallery_categories_v1', JSON.stringify(SIX_PIPELINE_CATEGORIES));
 } catch(e) {}
 window.galleryCategories = SIX_PIPELINE_CATEGORIES;
 window.DEFAULT_GALLERY_CATEGORIES = SIX_PIPELINE_CATEGORIES;
 
-const PIPELINE_TO_CATEGORY_MAP = {
+var PIPELINE_TO_CATEGORY_MAP = window.PIPELINE_TO_CATEGORY_MAP || {
   'sketch1': 'character',
   'sketch_creature': 'creature',
   'sketch2': 'environment',

@@ -8213,7 +8213,7 @@ body[data-view="showcase"] #topCenterBrandBar.visible {
   pointer-events: none !important;
 }
 
-body[data-view="showcase"] #topCenterBrandBar {
+#topCenterBrandBar.visible {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -8223,7 +8223,7 @@ body[data-view="showcase"] #topCenterBrandBar {
   left: 20px !important;
   z-index: 9990 !important;
   opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
+  transform: translateY(0) !important;
   pointer-events: auto !important;
   visibility: visible !important;
 }
@@ -8321,7 +8321,7 @@ body[data-view="showcase"] #topCenterBrandBar #floatingGalleryCategoryMenu {
   display: none !important;
 }
 
-body[data-view="showcase"] #topCenterBrandBar {
+#topCenterBrandBar.visible {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -8331,7 +8331,7 @@ body[data-view="showcase"] #topCenterBrandBar {
   left: 20px !important;
   z-index: 9990 !important;
   opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
+  transform: translateY(0) !important;
   pointer-events: auto !important;
   visibility: visible !important;
 }
@@ -8345,7 +8345,7 @@ body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
 }
 
 @media (max-width: 768px) {
-  body[data-view="showcase"] #topCenterBrandBar {
+  #topCenterBrandBar.visible {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -8355,7 +8355,7 @@ body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
   left: 20px !important;
   z-index: 9990 !important;
   opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
+  transform: translateY(0) !important;
   pointer-events: auto !important;
   visibility: visible !important;
 }
@@ -8435,7 +8435,7 @@ body[data-view="member-dashboard"] #topCenterBrandBar {
   pointer-events: none !important;
 }
 
-body[data-view="showcase"] #topCenterBrandBar {
+#topCenterBrandBar.visible {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -8445,7 +8445,7 @@ body[data-view="showcase"] #topCenterBrandBar {
   left: 20px !important;
   z-index: 9990 !important;
   opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
+  transform: translateY(0) !important;
   pointer-events: auto !important;
   visibility: visible !important;
 }

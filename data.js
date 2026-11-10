@@ -35,7 +35,7 @@ window.PIPELINE_TO_CATEGORY_MAP = {
 };
 
 
-const DEFAULT_STUDIO_GENRES = [
+var DEFAULT_STUDIO_GENRES = [
   'Dark Fantasy',
   'Cyberpunk',
   'Sci-Fi',

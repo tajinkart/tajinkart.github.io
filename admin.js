@@ -557,6 +557,21 @@ function renderAdminArtModalForm(art, isNew) {
         </div>
 
         <div>
+          <label style="font-size:11.5px; color:var(--cyan-electric); font-weight:800; display:block; margin-bottom:4px;">🌌 Universe Genre & Worldbuilding Theme (Linked to Top Menu)</label>
+          <select id="editArtGenreSelect" style="width:100%; padding:9px 12px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:8px; color:var(--cyan-electric); font-weight:700; font-size:12px; outline:none;">
+            ${(function() {
+              const currentGenres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0)
+                ? studioGenres
+                : ((window.studioGenres && Array.isArray(window.studioGenres) && window.studioGenres.length > 0)
+                    ? window.studioGenres
+                    : (typeof DEFAULT_STUDIO_GENRES !== 'undefined' ? DEFAULT_STUDIO_GENRES : ['Dark Fantasy', 'Cyberpunk', 'Sci-Fi', 'Mythic & Ancient', 'Post-Apocalyptic', 'Horror & Eldritch', 'High Fantasy', 'Steampunk', 'Mecha & Industrial', 'Anime & Stylized', 'Historical & Military']));
+              const artGenre = art.genre || 'Dark Fantasy';
+              return currentGenres.map(g => `<option value="${g}" ${g === artGenre ? 'selected' : ''}>${g}</option>`).join('');
+            })()}
+          </select>
+        </div>
+
+        <div>
           <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 Narrative Lore & Artist Notes:</label>
           <textarea id="editArtDescInput" rows="3" placeholder="Backstory lore, character archetype, visual development notes...">${art.desc || ''}</textarea>
         </div>

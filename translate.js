@@ -21,8 +21,7 @@ window.toggleGoogleTranslateMenu = function(e) {
   }
 };
 
-// فیلتر هوشمند و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف واردشده
-// فیلتر هوشمند، دقیق و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف
+// فیلتر هوشمند، دقیق و دینامیک زبان‌ها: جستجوی حروفی با اولویت پیشوند
 window.filterGoogleTranslateLanguages = function(query) {
   const q = (query || '').trim().toLowerCase();
   const container = document.getElementById('googleTranslateLanguagesList');
@@ -47,29 +46,31 @@ window.filterGoogleTranslateLanguages = function(query) {
 
     let score = 0;
 
-    // ۱. تطابق دقیق با کد زبان (مثلاً en یا fa یا ar)
+    // ۱. تطابق دقیق با کد زبان (مثلاً en، ar، fa، es)
     if (langCode === q) {
-      score = 100;
+      score = 1000;
     }
-    // ۲. کد زبان با عبارت شروع شود (مثلاً en با e)
+    // ۲. کد زبان با عبارت شروع شود (مثلاً en با e، ar با a)
     else if (langCode.startsWith(q)) {
-      score = 80;
+      score = 800;
     }
-    // ۳. نام انگلیسی زبان با عبارت شروع شود (مثلاً English با e یا en)
+    // ۳. نام انگلیسی زبان با عبارت شروع شود (مثلاً English با e، en، eng)
     else if (engName.startsWith(q)) {
-      score = 70;
+      score = 600;
     }
     // ۴. نام بومی زبان با عبارت شروع شود (مثلاً Español با e یا es، یا فارسی با ف یا فا)
     else if (nativeName.startsWith(q)) {
-      score = 60;
+      score = 500;
     }
-    // ۵. هر کلمه‌ای در داده‌های جستجو با عبارت شروع شود (مثلاً انگلیسی، عربي، فرانسه)
+    // ۵. هر کلمه‌ای از واژگان جستجو با عبارت شروع شود (مثلاً انگلیسی با ان، عربی با عر)
     else if (searchWords.some(w => w.startsWith(q))) {
-      score = 50;
+      score = 400;
     }
-    // ۶. در صورتی که ورودی تک‌حرفی باشد، کلماتی که شامل آن حرف هستند
-    else if (q.length < 2 && searchWords.some(w => w.includes(q))) {
-      score = 10;
+    // ۶. در ورودی‌های ۲ حرفی یا بیشتر: کلماتی که شامل عبارت هستند
+    else if (q.length >= 2) {
+      if (engName.includes(q)) score = 200;
+      else if (nativeName.includes(q)) score = 150;
+      else if (searchWords.some(w => w.includes(q))) score = 100;
     }
 
     if (score > 0) {
