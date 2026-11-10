@@ -452,7 +452,7 @@ nav a, nav button,
 
         /* چیدمان گالری صفحه اول با ابعاد دلنشین و ارگونومیک دسکتاپ */
     #showcaseGrid {
-      column-count: 5;
+      column-count: 4;
       column-gap: 10px;
       width: 100%;
       max-width: 1540px;
@@ -6450,5 +6450,37 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     border: none !important;
     border-radius: 50% !important;
     flex-shrink: 0 !important;
+  }
+}
+
+
+
+/* ==============================================================================
+   RELEASE V20.10.0: 4-COLUMN BALANCED DESKTOP SHOWCASE GALLERY
+   ============================================================================== */
+
+/* تثبیت ۴ ستون متوازن، باشکوه و سینمایی برای کل گالری صفحه اصلی دسکتاپ */
+#showcaseGrid {
+  column-count: 4 !important;
+  column-gap: 12px !important;
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  padding: 0 10px !important;
+  display: block !important;
+}
+
+@media (max-width: 1024px) {
+  #showcaseGrid {
+    column-count: 3 !important;
+    column-gap: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #showcaseGrid {
+    column-count: 2 !important;
+    column-gap: 6px !important;
+    padding: 0 4px !important;
   }
 }

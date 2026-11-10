@@ -1722,7 +1722,7 @@ window.renderShowcaseGrid = function() {
     return;
   }
 
-  // ری‌ارنج خودکار و هوشمند چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی
+  // ری‌ارنج خودکار و هوشمند چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی (حالت پایه دسکتاپ: ۴ ستون متوازن)
   const workCount = filteredArtworks.length;
   if (window.innerWidth > 768) {
     if (workCount === 1) {
@@ -1733,13 +1733,11 @@ window.renderShowcaseGrid = function() {
       grid.style.setProperty('max-width', '980px', 'important');
     } else if (workCount === 3) {
       grid.style.setProperty('column-count', '3', 'important');
-      grid.style.setProperty('max-width', '1200px', 'important');
-    } else if (workCount === 4) {
-      grid.style.setProperty('column-count', '4', 'important');
-      grid.style.setProperty('max-width', '1380px', 'important');
+      grid.style.setProperty('max-width', '1240px', 'important');
     } else {
-      grid.style.setProperty('column-count', '5', 'important');
-      grid.style.setProperty('max-width', '1540px', 'important');
+      // حالت اصلی گالری دسکتاپ: ۴ ستون بزرگتر، شارپ‌تر و سینمایی‌تر
+      grid.style.setProperty('column-count', '4', 'important');
+      grid.style.setProperty('max-width', '1480px', 'important');
     }
   } else {
     if (workCount === 1) {
