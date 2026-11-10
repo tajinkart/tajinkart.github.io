@@ -1,30 +1,4 @@
 
-function renderFloatingCategoryDropdown() {
-  if (typeof window.renderFloatingCategoryDropdown === 'function') {
-    return window.renderFloatingCategoryDropdown();
-  }
-}
-function renderAdminGalleryCategories() {
-  if (typeof window.renderAdminGalleryCategories === 'function') {
-    return window.renderAdminGalleryCategories();
-  }
-}
-
-var currentGalleryFilter = (typeof window !== 'undefined' && window.currentGalleryFilter) ? window.currentGalleryFilter : 'all';
-window.currentGalleryFilter = currentGalleryFilter;
-
-const KEYS = (typeof window !== 'undefined' && window.KEYS) ? window.KEYS : ((typeof global !== 'undefined' && global.KEYS) ? global.KEYS : {
-  ORDERS: 'tajinkart_orders_fa_v2',
-  SETTINGS: 'tajinkart_settings_fa_v2',
-  ARTWORKS: 'tajinkart_artworks_fa_v2',
-  PIPELINES: 'tajinkart_pipelines_fa_v2',
-  PRODUCTS: 'tajinkart_products_fa_v2',
-  MEMBERS: 'tajinkart_members_fa_v2',
-  DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2',
-  CATEGORIES: 'tajinkart_gallery_categories_v2'
-});
-
-
 // ==============================================================================
 // موتور داینامیک دسته‌بندی‌های گالری آثار استودیو (Studio Gallery Categories Engine)
 // ==============================================================================
@@ -88,14 +62,14 @@ window.renderAdminGalleryCategories = function() {
     return `
       <div class="admin-cat-pill" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid ${color}44; border-radius:20px; padding:6px 12px; box-shadow:0 0 10px ${color}15;">
         <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
-        <span onclick="adminEditCategoryTitle('${cat.id}')" style="font-size:12px; font-weight:700; color:#fff; cursor:pointer; text-decoration:underline dashed rgba(255,255,255,0.3);" title="Click to edit category title">${cat.titleEN || cat.title} ✏️</span>
+        <span onclick="adminEditCategoryTitle('${cat.id}')" style="font-size:12px; font-weight:700; color:#fff; cursor:pointer; text-decoration:underline dashed rgba(255,255,255,0.3);" title="کلیک برای ویرایش نام این دسته">${cat.title} ✏️</span>
         <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">${cat.id}</span>
         
-        <div style="position:relative; display:inline-flex; align-items:center;" title="Change category neon color">
+        <div style="position:relative; display:inline-flex; align-items:center;" title="تغییر رنگ نئون این دسته">
           <input type="color" value="${color}" onchange="adminUpdateCategoryColor('${cat.id}', this.value)" style="width:18px; height:18px; padding:0; border:none; border-radius:4px; cursor:pointer; background:transparent;" />
         </div>
 
-        <button type="button" onclick="adminDeleteGalleryCategory('${cat.id}')" style="background:none; border:none; color:var(--crimson); font-size:14px; cursor:pointer; padding:0 2px; line-height:1; display:flex; align-items:center;" title="Delete category">✕</button>
+        <button type="button" onclick="adminDeleteGalleryCategory('${cat.id}')" style="background:none; border:none; color:var(--crimson); font-size:14px; cursor:pointer; padding:0 2px; line-height:1; display:flex; align-items:center;" title="حذف این دسته">✕</button>
       </div>
     `;
   }).join('');
@@ -121,14 +95,14 @@ window.adminSubmitNewCategoryInline = function() {
   const color = colorEl ? colorEl.value : '#38bdf8';
 
   if (!title) {
-    showToast('Please enter category title.', 'error');
+    showToast('لطفاً عنوان فارسی دسته را وارد کنید.', 'error');
     return;
   }
   if (!id) {
     id = 'cat_' + Date.now().toString().slice(-4);
   }
   if (galleryCategories.some(c => c.id === id)) {
-    showToast('This category ID already exists.', 'error');
+    showToast('این شناسه انگلیسی قبلاً ثبت شده است.', 'error');
     return;
   }
 
@@ -143,7 +117,7 @@ window.adminSubmitNewCategoryInline = function() {
   try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
-  showToast(`Category "${title}" added successfully! ✓`, 'success', 3500);
+  showToast(`دسته‌بندی «${title}» با موفقیت افزوده شد.`, 'success', 3500);
 };
 
 window.adminUpdateCategoryColor = function(catId, newColor) {
@@ -158,7 +132,7 @@ window.adminUpdateCategoryColor = function(catId, newColor) {
     if (currentGalleryFilter === catId) {
       filterGalleryByCategory(catId, cat.title);
     }
-    showToast(`Color for category "${cat.title}" updated! ✓`, 'success', 2500);
+    showToast(`رنگ دسته‌بندی «${cat.title}» به‌روزرسانی شد.`, 'success', 2500);
   }
 };
 
@@ -173,13 +147,13 @@ window.adminDeleteGalleryCategory = function(catId) {
   try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
-  showToast(`Category "${catName}" removed.`, 'info');
+  showToast(`دسته‌بندی «${catName}» حذف شد.`, 'info');
 };
 
 window.openChatConsultation = function() {
   switchView('store');
   switchStoreTab('commissions', document.querySelector('.store-dual-nav .store-dual-btn'));
-  showToast('Commission consultation opened. Please state your project brief.', 'info');
+  showToast('بخش مشاوره و ثبت سفارش باز شد. درخواست خود را مطرح نمایید.', 'info');
 };
 
 // اجرای لود اولیه در هنگام آماده شدن صفحه
@@ -365,7 +339,7 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
 
   currentMember = {
     id: user.id,
-    name: isDirectorAdmin ? 'Seyed Soroush Taj' : name,
+    name: isDirectorAdmin ? 'سید سروش تاج' : name,
     email: user.email,
     contact: phone || user.email,
     tier: tier,
@@ -376,7 +350,7 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
 
   const labelEl = document.getElementById('rightMemberLabel');
   if (labelEl) {
-    labelEl.textContent = isDirectorAdmin ? '👑 Studio Director' : currentMember.name;
+    labelEl.textContent = isDirectorAdmin ? '👑 مدیر استودیو' : currentMember.name;
   }
 
   // ثبت در لیست اعضا و مشتریان (تنها برای کاربران عادی؛ مدیر ارشد هرگز به عنوان کاربر عادی ثبت نمی‌شود)
@@ -585,14 +559,14 @@ async function syncMembersFromSupabase(showNotification = false) {
 
     if (error) {
       console.warn('[Supabase Members Fetch]', error);
-      if (showNotification) showToast('Failed to retrieve members from cloud database.', 'error');
+      if (showNotification) showToast('خطا در دریافت لیست اعضا از سرور ابری.', 'error');
       return;
     }
 
     if (cloudMembers) {
       siteMembersData = cloudMembers.map(m => ({
         id: m.id,
-        name: m.name || (m.email ? m.email.split('@')[0] : 'Studio Member'),
+        name: m.name || (m.email ? m.email.split('@')[0] : 'عضو استودیو'),
         email: m.email || '',
         contact: m.contact || '',
         tier: m.tier || 'STANDARD',
@@ -608,9 +582,9 @@ async function syncMembersFromSupabase(showNotification = false) {
 
       if (showNotification) {
         if (siteMembersData.length > 0) {
-          showToast(`✓ Members successfully synchronized with cloud database (${siteMembersData.length} Active Members).`, 'success');
+          showToast(`✓ لیست اعضا با موفقیت از دیتابیس ابری همگام شد (${siteMembersData.length} Active Member).`, 'success');
         } else {
-          showToast('✓ Sync complete: Removed members purged from local storage (aligned with cloud DB).', 'info');
+          showToast('✓ همگام‌سازی کامل شد: تمام اعضای حذف‌شده از پنل سایت نیز پاک شدند (لیست همگام با دیتابیس ابری شد).', 'info');
         }
       }
       console.log('[Supabase Members] Synced members from cloud. Active count:', siteMembersData.length);
@@ -674,8 +648,8 @@ async function syncArtworksFromSupabase() {
           desc: row.desc_text || '',
           pipelineKey: pipe,
           image: row.image,
-          colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
-          lore: row.lore || 'Extopia Universe',
+          colorSpace: row.color_space || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+          lore: row.lore || 'جهان اکستوپیا',
           phases: row.phases || []
         };
       }).sort((a, b) => {
@@ -701,8 +675,8 @@ async function syncArtworksFromSupabase() {
         desc_text: a.desc || '',
         pipeline_key: a.pipelineKey || 'sketch1',
         image: a.image,
-        color_space: a.colorSpace || 'Master 4K / 16-Bit ProPhoto RGB',
-        lore: a.lore || 'Extopia Universe',
+        color_space: a.colorSpace || 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
+        lore: a.lore || 'جهان اکستوپیا',
         phases: a.phases || []
       }));
       await window.supabaseClient.from('artworks').upsert(rowsToInsert);
@@ -738,10 +712,10 @@ function compressImageForStorage(file, maxWidth = 1280, maxHeight = 1280, qualit
         const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
         resolve(compressedBase64);
       };
-      img.onerror = () => reject(new Error('Image failed to load'));
+      img.onerror = () => reject(new Error('خطا در لود تصویر'));
       img.src = e.target.result;
     };
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onerror = () => reject(new Error('خطا در خواندن فایل'));
     reader.readAsDataURL(file);
   });
 }
@@ -803,19 +777,19 @@ async function uploadFileToCloudinary(file) {
 
 // سیستم استیجینگ و پیش‌نویس افزودن و ویرایش اثر در ادمین
 const AVAILABLE_PLATFORMS = [
-  { id: 'telegram', name: 'Telegram', icon: '✈️', placeholder: 'Dedicated broadcast caption for Telegram channel...' },
-  { id: 'artstation', name: 'ArtStation', icon: '🎨', placeholder: 'Technical specs, tools, and ArtStation portfolio description...' },
-  { id: 'cara', name: 'Cara', icon: '🛡️', placeholder: 'Anti-AI portfolio caption and creative lore on Cara...' },
-  { id: 'pinterest', name: 'Pinterest', icon: '📌', placeholder: 'Visual tags, pin description, and metadata...' },
-  { id: 'instagram', name: 'Instagram', icon: '📷', placeholder: 'Post caption, worldbuilding story, and hashtags...' },
-  { id: 'reels', name: 'Instagram Reels', icon: '🎬', placeholder: 'Short hook, process breakdown, and soundtrack credits...' },
-  { id: 'threads', name: 'Threads', icon: '🧵', placeholder: 'Conversational lore thread and concept notes...' },
-  { id: 'reddit', name: 'Reddit', icon: '🤖', placeholder: 'Submission title, subreddit, and technical breakdown...' },
-  { id: 'x', name: 'X / Twitter', icon: '🐦', placeholder: 'Short tweet summary (<280 chars) and hashtags...' },
-  { id: 'bluesky', name: 'Bluesky', icon: '🦋', placeholder: 'Decentralized broadcast update on Bluesky...' },
-  { id: 'shorts', name: 'YouTube Shorts', icon: '📹', placeholder: 'Shorts title, description, and production tags...' },
-  { id: 'discord', name: 'Discord', icon: '🎮', placeholder: 'Community showcase announcement and lore ping...' },
-  { id: 'linkedin', name: 'LinkedIn', icon: '💼', placeholder: 'Commercial pipeline application and industry notes...' }
+  { id: 'telegram', name: 'تلگرام', icon: '✈️', placeholder: 'متن و توضیحات اختصاصی برای کانال تلگرام...' },
+  { id: 'artstation', name: 'آرت‌استیشن', icon: '🎨', placeholder: 'توضیحات و مشخصات تکنیکال آرت‌استیشن...' },
+  { id: 'cara', name: 'کارا (Cara)', icon: '🛡️', placeholder: 'متن و کپشن پورتفولیو در پلتفرم ضد هوش‌مصنوعی کارا...' },
+  { id: 'pinterest', name: 'پینترست', icon: '📌', placeholder: 'توضیحات پین، تگ‌های بصری و متادیتای پینترست...' },
+  { id: 'instagram', name: 'اینستاگرام', icon: '📷', placeholder: 'کپشن، داستان شکل‌گیری اثر و هشتگ‌های اصلی اینستاگرام...' },
+  { id: 'reels', name: 'اینستاگرام ریلز', icon: '🎬', placeholder: 'توضیحات و قلاب مخاطب (Hook) برای ویدیوی ریلز...' },
+  { id: 'threads', name: 'تردز (Threads)', icon: '🧵', placeholder: 'متن گفت‌وگومحور و روایت کانسپت در تردز...' },
+  { id: 'reddit', name: 'ردیت (Reddit)', icon: '🤖', placeholder: 'عنوان تاپیک، ساب‌ردیت و توضیحات سابمیشن ردیت...' },
+  { id: 'x', name: 'توییتر (X)', icon: '🐦', placeholder: 'متن خلاصه توییت (زیر ۲۸۰ کاراکتر) و هشتگ‌ها...' },
+  { id: 'bluesky', name: 'بلواسکای', icon: '🦋', placeholder: 'متن پست در شبکه غیرمتمرکز بلواسکای...' },
+  { id: 'shorts', name: 'یوتیوب شورتس', icon: '📹', placeholder: 'عنوان و توضیحات ویدیوی شورتس در چنل یوتیوب...' },
+  { id: 'discord', name: 'دیسکورد', icon: '🎮', placeholder: 'پیام مخابره به روم شوکیس کامیونیتی دیسکورد...' },
+  { id: 'linkedin', name: 'لینکدین', icon: '💼', placeholder: 'متن بیزینس و کاربرد تجاری اثر در لینکدین...' }
 ];
 
 let isCreatingNewArt = false;
@@ -834,14 +808,14 @@ window.openCreateArtworkModal = function() {
     desc: '',
     pipelineKey: 'sketch1',
     image: '',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
+    colorSpace: 'مستر 4K / ۱۶ بیتی ProPhoto RGB',
     phases: [
       {
-        name: 'Main Cover & Master Sheet',
+        name: 'کاور و شیت اصلی اثر',
         img: '',
         image: '',
         pipelineKey: 'sketch1',
-        subcategory: 'Standard Production Standard',
+        subcategory: 'طراحی و اجرای استاندارد',
         desc: '',
         socials: {},
         socialCaptions: {},
@@ -851,7 +825,7 @@ window.openCreateArtworkModal = function() {
   };
 
   const titleEl = document.getElementById('adminArtEditorModalTitle');
-  if (titleEl) titleEl.textContent = '✨ Add New Artwork Project';
+  if (titleEl) titleEl.textContent = '✨ افزودن اثر جدید به گالری';
 
   renderAdminArtModalForm(stagingNewArt, true);
   document.getElementById('adminArtLiveEditorCol').classList.add('active');
@@ -865,7 +839,7 @@ window.selectAdminArt = function(idx) {
   if (!art) return;
 
   const titleEl = document.getElementById('adminArtEditorModalTitle');
-  if (titleEl) titleEl.textContent = `Edit Concept Project: ${art.shortSlug || art.title}`;
+  if (titleEl) titleEl.textContent = `ویرایش آرت‌ورک: ${art.shortSlug || art.title}`;
 
   renderAdminArtModalForm(art, false);
   document.getElementById('adminArtLiveEditorCol').classList.add('active');
@@ -896,7 +870,7 @@ function renderPhaseSocialDrawerContent(p, idx) {
   const isCurrentPlatChecked = Boolean(p.socials[activePlat.id]);
 
   return `
-    <!-- Column 1: Vertical Platform Menu -->
+    <!-- ستون ۱: لیست عمودی شیک و قابل اسکرول پلتفرم‌ها (طرح منوی تاج‌اینک‌آرت) -->
     <div class="phase-social-menu-scroll">
       ${AVAILABLE_PLATFORMS.map(plat => {
         const isSelected = (currentSelectedTab === plat.id);
@@ -907,45 +881,45 @@ function renderPhaseSocialDrawerContent(p, idx) {
               <span style="font-size:14px;">${plat.icon}</span>
               <span style="font-size:11px; font-weight:${isSelected ? '800' : '600'}; color:${isSelected ? 'var(--gold)' : '#e2e8f0'};">${plat.name}</span>
             </div>
-            <input type="checkbox" onclick="event.stopPropagation()" onchange="togglePhaseSocialPlatform(${idx}, '${plat.id}', this.checked)" ${isChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer; width:15px; height:15px;" title="Toggle broadcast to ${plat.name}" />
+            <input type="checkbox" onclick="event.stopPropagation()" onchange="togglePhaseSocialPlatform(${idx}, '${plat.id}', this.checked)" ${isChecked ? 'checked' : ''} style="accent-color:var(--gold); cursor:pointer; width:15px; height:15px;" title="فعال/غیرفعال کردن ارسال به ${plat.name}" />
           </div>
         `;
       }).join('')}
     </div>
 
-    <!-- Column 2: Platform Caption Settings -->
+    <!-- ستون ۲: باکس تنظیمات و متن کاملاً اختصاصی پلتفرم انتخاب شده -->
     <div style="background:#04060c; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:10px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; flex-wrap:wrap; gap:6px;">
         <div style="display:flex; align-items:center; gap:7px;">
           <span style="font-size:18px;">${activePlat.icon}</span>
-          <span style="font-size:12.5px; font-weight:800; color:var(--gold);">Custom Caption & Settings for ${activePlat.name}</span>
+          <span style="font-size:12.5px; font-weight:800; color:var(--gold);">تنظیمات و متن اختصاصی ${activePlat.name}</span>
         </div>
         <div>
           ${isCurrentPlatChecked ? `
             <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.12); padding:3px 10px; border-radius:6px; border:1px solid rgba(250,204,21,0.3);">
-              <span style="font-size:8px;">●</span> Active for Broadcast
+              <span style="font-size:8px;">●</span> فعال برای انتشار
             </span>
           ` : `
             <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:var(--text-muted); background:rgba(255,255,255,0.04); padding:3px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
-              <span style="font-size:8px;">○</span> Inactive (Check box to activate)
+              <span style="font-size:8px;">○</span> غیرفعال (از فهرست منو فعال کنید)
             </span>
           `}
         </div>
       </div>
 
       <div>
-        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Custom Caption & Lore for ${activePlat.name}:</label>
+        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن / کپشن اختصاصی برای ${activePlat.name}:</label>
         <textarea rows="3" placeholder="${activePlat.placeholder}" oninput="setPhaseSocialCaption(${idx}, '${activePlat.id}', this.value)" style="font-size:11.5px; padding:8px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a14; width:100%; box-sizing:border-box;">${(p.socialCaptions && p.socialCaptions[activePlat.id]) || ''}</textarea>
       </div>
 
-      <!-- Telegram Direct Settings -->
+      <!-- تنظیمات انحصاری برای تلگرام -->
       ${activePlat.id === 'telegram' ? `
         <div style="background:rgba(0,240,255,0.04); border:1px dashed rgba(0,240,255,0.25); border-radius:8px; padding:10px 12px; margin-top:2px;">
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11.5px; color:var(--cyan-electric); font-weight:700;">
             <input type="checkbox" onchange="setPhaseTelegramButton(${idx}, this.checked)" ${p.tgIncludeButton ? 'checked' : ''} style="accent-color:var(--cyan-electric); cursor:pointer; width:16px; height:16px;" />
-            <span>Attach direct interactive glass link button to this artwork on live site</span>
+            <span>افزودن دکمه شیشه‌ای لینک مستقیم به همین اثر در سایت (انحصاری همین اثر)</span>
           </label>
-          <p style="font-size:10px; color:var(--text-muted); margin:4px 0 0 24px;">When unchecked, Telegram notification dispatches without an interactive link button.</p>
+          <p style="font-size:10px; color:var(--text-muted); margin:4px 0 0 24px;">در صورت غیرفعال بودن، پیام تلگرام بدون هیچ دکمه‌ای در زیر پست ارسال می‌شود.</p>
         </div>
       ` : ''}
     </div>
@@ -977,7 +951,7 @@ window.togglePhaseSocialPlatform = function(phaseIdx, platId, isChecked) {
     AVAILABLE_PLATFORMS.forEach(item => {
       if (p.socials[item.id]) activeSocials.push(item.name);
     });
-    badgeEl.textContent = activeSocials.length > 0 ? `${activeSocials.length} Active Channels (${activeSocials.join(", ")})` : 'Auto-Broadcast: Off';
+    badgeEl.textContent = activeSocials.length > 0 ? `${activeSocials.length} شبکه فعال (${activeSocials.join('، ')})` : 'توزیع خودکار: خاموش';
     badgeEl.style.color = activeSocials.length > 0 ? 'var(--gold)' : 'var(--text-muted)';
     badgeEl.style.background = activeSocials.length > 0 ? 'rgba(250,204,21,0.12)' : 'rgba(255,255,255,0.05)';
   }
@@ -1010,11 +984,11 @@ function renderAdminArtModalForm(art, isNew) {
     stagingProjectPhases = JSON.parse(JSON.stringify(art.phases));
   } else if (art.image) {
     stagingProjectPhases.push({
-      name: art.title || 'Main Cover Artwork',
+      name: art.title || 'تصویر کاور اصلی',
       img: art.image,
       image: art.image,
       pipelineKey: art.pipelineKey || 'sketch1',
-      subcategory: 'Standard Production Standard',
+      subcategory: 'طراحی و اجرای استاندارد',
       desc: '',
       socials: {},
       socialCaptions: {},
@@ -1022,11 +996,11 @@ function renderAdminArtModalForm(art, isNew) {
     });
   } else {
     stagingProjectPhases.push({
-      name: 'Main Cover & Master Sheet',
+      name: 'کاور و شیت اصلی اثر',
       img: '',
       image: '',
       pipelineKey: 'sketch1',
-      subcategory: 'Standard Production Standard',
+      subcategory: 'طراحی و اجرای استاندارد',
       desc: '',
       socials: {},
       socialCaptions: {},
@@ -1037,75 +1011,75 @@ function renderAdminArtModalForm(art, isNew) {
   box.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:16px;">
       
-      <!-- Step 1: Title & Lore -->
+      <!-- گام ۱: تیتر و داستان کلی کانسپت -->
       <div style="background:#04060a; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
         <div style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📌 Step 1: Concept Project Title & Story Lore</span>
+          <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📌 گام ۱: عنوان و داستان کانسپت</span>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Full Artwork Project Title</label>
-            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="Full concept project title (e.g. Sovereign Vanguard)..." />
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">عنوان کامل اثر</label>
+            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="عنوان کامل اثر..." />
           </div>
           <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Tile Hover Slug (Short Subtitle)</label>
-            <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="e.g. Rook Knight" />
+            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">اسلاگ هاور (عنوان کوتاه وسط تایل)</label>
+            <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="مثال: شوالیه سرخ" />
           </div>
         </div>
 
         <div>
-          <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 Concept Lore & Creative Director Notes:</label>
-          <textarea id="editArtDescInput" rows="3" placeholder="Narrative backstory, worldbuilding lore, key archetype notes, and visual development specs...">${art.desc || ''}</textarea>
+          <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📖 داستان و یادداشت طراح:</label>
+          <textarea id="editArtDescInput" rows="3" placeholder="توضیحات داستانی کاراکتر، جهان، ایده شکل‌گیری و مشخصات بصری...">${art.desc || ''}</textarea>
         </div>
       </div>
 
-      <!-- Step 2: Project Images & Sheets -->
+      <!-- گام ۲: تصاویر و شیت‌های پروژه (مدیریت یکپارچه) -->
       <div style="background:#05070d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:18px;">
         <div style="margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-          <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">📑 Step 2: Project Images & Production Sheets:</span>
-          <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Upload cover artwork and turnaround sheets. Add more sheets via the button below.</p>
+          <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">📑 گام ۲: تصاویر و شیت‌های پروژه:</span>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">تصویر کاور و شیت‌های اثر را بارگذاری کنید. در انتهای شیت‌ها می‌توانید با دکمه زیر شیت جدید اضافه کنید.</p>
         </div>
 
         <div id="adminProjectPhasesList" style="display:flex; flex-direction:column; gap:14px;">
           ${renderStagingPhasesHtml()}
         </div>
 
-        <!-- Add Sheet Button -->
+        <!-- دکمه افزودن شیت در انتهای باندل شیت‌ها -->
         <div style="margin-top:14px;">
           <button type="button" onclick="addStagingPhase()" class="btn-secondary" style="width:100%; padding:12px 16px; font-size:12.5px; font-weight:800; border:1px dashed var(--cyan-electric); color:var(--cyan-electric); background:rgba(0,240,255,0.04); display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px;">
             <span style="font-size:16px;">➕</span>
-            <span>+ Add Complementary Sheet to this Project</span>
+            <span>افزودن Complementary Sheet به این اثر</span>
           </button>
         </div>
       </div>
 
-      <!-- Production Pack Settings -->
+      <!-- تنظیمات نهایی سفارش پکیج کامل -->
       <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.28); border-radius:12px; padding:12px 14px;">
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
           <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--gold); cursor:pointer;" />
-          Enable direct commission as a full Production Pack at end of case study
+          فعال‌سازی سفارش به عنوان پکیج کامل پروداکشن (Production Pack) در انتهای اثر
         </label>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- دکمه‌های عملیاتی -->
       <div style="margin-top:4px; display:flex; flex-direction:column; gap:8px;">
         ${isNew ? `
           <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
-            ✓ Save & Publish to Live Gallery
+            ✓ تایید و افزودن قطعی به گالری
           </button>
           <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
-            Cancel & Close
+            انصراف و لغو
           </button>
         ` : `
           <button type="button" onclick="confirmSaveArtwork()" class="btn-gold" style="width:100%; padding:13px; font-size:12.5px; font-weight:800; cursor:pointer;">
-            ✓ Save Project Changes (No Re-Broadcast)
+            ✓ ذخیره تغییرات پروژه (بدون ارسال تکراری به شبکه‌ها)
           </button>
           <button type="button" onclick="adminDeleteArtwork(${currentSelectedArtIdx})" class="btn-secondary" style="color:var(--crimson); width:100%; padding:10px; border-color:rgba(239,68,68,0.3); cursor:pointer;">
-            Delete Artwork from Gallery
+            حذف این اثر از گالری
           </button>
           <button type="button" onclick="closeAdminArtEditor()" class="btn-secondary" style="width:100%; padding:10px; cursor:pointer;">
-            Close without Changes
+            بستن بدون تغییر
           </button>
         `}
       </div>
@@ -1117,7 +1091,7 @@ function renderAdminArtModalForm(art, isNew) {
 function renderStagingPhasesHtml() {
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
     return `<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#04060a; border-radius:10px; border:1px dashed rgba(255,255,255,0.15);">
-      No production sheets found. Click "+ Add Complementary Sheet to this Project" below.
+      هیچ شیتی وجود ندارد. روی دکمه «+ افزودن Complementary Sheet به این اثر» کلیک کنید.
     </div>`;
   }
 
@@ -1125,7 +1099,7 @@ function renderStagingPhasesHtml() {
 
   return stagingProjectPhases.map((p, idx) => {
     const pipeKey = p.pipelineKey || 'sketch1';
-    const subcats = (pipelines[pipeKey] && pipelines[pipeKey].subcategories) ? pipelines[pipeKey].subcategories : ['Standard Production Standard'];
+    const subcats = (pipelines[pipeKey] && pipelines[pipeKey].subcategories) ? pipelines[pipeKey].subcategories : ['طراحی و اجرای استاندارد'];
     const currentSub = p.subcategory || subcats[0] || '';
     const isCover = (idx === 0);
     const hasImage = Boolean(p.img || p.image);
@@ -1145,59 +1119,59 @@ function renderStagingPhasesHtml() {
     return `
       <div style="display:flex; flex-direction:column; gap:12px; background:#04060a; border:1px solid ${isCover ? 'rgba(250,204,21,0.5)' : 'rgba(0,240,255,0.3)'}; border-radius:14px; padding:16px;">
         
-        <!-- Image Preview or Upload -->
+        <!-- پیش‌نمایش واقعی تصویر یا کادر بارگذاری فایل -->
         ${hasImage ? `
           <div style="background:rgba(0,0,0,0.65); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
               <span class="font-mono" style="font-size:10.5px; padding:3px 10px; border-radius:6px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.18)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'}; border:1px solid ${isCover ? 'rgba(250,204,21,0.35)' : 'rgba(0,240,255,0.3)'};">
-                ${isCover ? '🖼️ Main Cover & Flagship Sheet (Sheet 1)' : `Complementary Sheet #${idx + 1}`}
+                ${isCover ? '🖼️ کاور اصلی و تصویر شاخص پروژه (شیت ۱)' : `Complementary Sheet شماره ${idx + 1}`}
               </span>
               <div style="display:flex; align-items:center; gap:8px;">
                 <button type="button" onclick="document.getElementById('phaseFileInput_${idx}').click()" class="btn-secondary" style="font-size:11px; padding:4px 12px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
-                  🔄 Replace Image
+                  🔄 تغییر تصویر
                 </button>
                 ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:3px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px;" title="Delete Sheet">✕</button>` : ''}
               </div>
               <input type="file" id="phaseFileInput_${idx}" accept="image/*" style="display:none;" onchange="handlePhaseImageUpload(${idx}, this)" />
             </div>
 
-            <!-- Organic Artwork Aspect Display -->
+            <!-- نمایش ابعاد ارگانیک اثر با کادر فاخر -->
             <div style="position:relative; width:100%; max-height:280px; min-height:160px; background:#020306; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; padding:6px;">
-              <img src="${imgSrc}" style="max-width:100%; max-height:268px; width:auto; height:auto; object-fit:contain; display:block; border-radius:8px;" alt="Artwork preview" />
+              <img src="${imgSrc}" style="max-width:100%; max-height:268px; width:auto; height:auto; object-fit:contain; display:block; border-radius:8px;" alt="پیش‌نمایش اثر" />
             </div>
 
             <div>
-              <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">Sheet Title / Phase Name:</label>
-              <input type="text" value="${p.name || ''}" placeholder="Sheet title (e.g. 3-View Turnaround / Orthographic Model Sheet)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:7px 12px; margin:0;" />
+              <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان این شیت:</label>
+              <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این Phases (مثال: مدل‌شیت سه‌نما / طراحی مسکات / اثر نهایی)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:7px 12px; margin:0;" />
             </div>
           </div>
         ` : `
           <div style="display:flex; flex-direction:column; gap:10px; background:rgba(250,204,21,0.03); border:1.5px dashed ${isCover ? 'rgba(250,204,21,0.6)' : 'rgba(0,240,255,0.5)'}; border-radius:12px; padding:16px;">
             <div style="display:flex; align-items:center; justify-content:space-between;">
               <span class="font-mono" style="font-size:10.5px; padding:3px 10px; border-radius:6px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.15)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'};">
-                ${isCover ? '🖼️ Main Cover & Flagship Sheet (Sheet 1)' : `Production Sheet #${idx + 1}`}
+                ${isCover ? '🖼️ کاور اصلی و تصویر شاخص پروژه (شیت ۱)' : `شیت شماره ${idx + 1}`}
               </span>
               ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px;" title="Delete Sheet">✕</button>` : ''}
             </div>
 
             <div onclick="document.getElementById('phaseFileInput_${idx}').click()" style="cursor:pointer; background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:26px 16px; text-align:center; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
               <div style="font-size:32px; margin-bottom:6px;">📁</div>
-              <div style="font-size:13px; font-weight:800; color:var(--gold);">Click to choose and upload ${isCover ? "main cover image" : "this sheet"} from your system</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Supports WEBP, PNG, JPG up to 15MB with lossless quality & artist metadata</div>
+              <div style="font-size:13px; font-weight:800; color:var(--gold);">کلیک کنید تا تصویر ${isCover ? 'کاور اصلی اثر' : 'این شیت'} را از سیستم انتخاب و بارگذاری کنید</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">پشتیبانی از فرمت‌های JPG, PNG, WEBP با حفظ ابعاد واقعی تصویر و بهینه‌سازی خودکار</div>
             </div>
             <input type="file" id="phaseFileInput_${idx}" accept="image/*" style="display:none;" onchange="handlePhaseImageUpload(${idx}, this)" />
 
             <div>
-              <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">Sheet Title / Phase Name:</label>
-              <input type="text" value="${p.name || ''}" placeholder="Sheet title (e.g. Master Keyframe Render / Form Exploration)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:7px 12px; margin:0;" />
+              <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان این شیت:</label>
+              <input type="text" value="${p.name || ''}" placeholder="عنوان شیت (مثال: تصویر نهایی اثر / کانسپت)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:7px 12px; margin:0;" />
             </div>
           </div>
         `}
 
-        <!-- Category, Pipeline & Subcategory Selection -->
+        <!-- انتخاب مستقل دسته‌بندی گالری، پایپلاین و زیرشاخه برای این شیت -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
           <div>
-            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 Gallery Category:</label>
+            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 دسته‌بندی گالری آثار:</label>
             <select onchange="stagingProjectPhases[${idx}].category = this.value; stagingProjectPhases[${idx}].tag = this.value;" style="font-size:11px; padding:5px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
               ${(typeof galleryCategories !== 'undefined' ? galleryCategories : []).map(cat => `
                 <option value="${cat.id}" ${(p.category === cat.id || (!p.category && cat.id === (PIPELINE_TO_CATEGORY_MAP[pipeKey] || 'character'))) ? 'selected' : ''}>
@@ -1207,37 +1181,37 @@ function renderStagingPhasesHtml() {
             </select>
           </div>
           <div>
-            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">Associated Pipeline:</label>
+            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">پایپلاین اختصاصی این عکس:</label>
             <select onchange="handlePhasePipelineChange(${idx}, this.value)" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
-              <option value="sketch1" ${pipeKey === 'sketch1' ? 'selected' : ''}>Character Design & Heroes</option>
-              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>Creatures, Titans & Monsters</option>
-              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>Environment & Worldbuilding</option>
-              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>Keyframes & Cinematic Covers</option>
-              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>Props, Weapons & UI</option>
-              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>Comics & Storyboards</option>
+              <option value="sketch1" ${pipeKey === 'sketch1' ? 'selected' : ''}>کاراکتر و شخصیت</option>
+              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>موجودات و هیولاها</option>
+              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>فضا و معماری دنیا</option>
+              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>کاور و کی‌فریم</option>
+              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>تجهیزات، پراپ و UI</option>
+              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>کمیک و استوری‌بورد</option>
             </select>
           </div>
           <div>
-            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">Commission Subcategory:</label>
+            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">زیرشاخه اختصاصی سفارش:</label>
             <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
               ${subcats.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('')}
             </select>
           </div>
         </div>
 
-        <textarea rows="2" placeholder="Technical notes for this sheet (industry application, variant specs, asset fidelity)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
+        <textarea rows="2" placeholder="توضیحات تخصصی این Phases (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
 
-        <!-- Multi-Channel Broadcast Channels -->
+        <!-- مقاصد انتشار چندکاناله استودیو (دراور شیک و اسکرول‌پذیر با باکس متن کاملاً اختصاصی هر شبکه) -->
         <details id="phaseSocialDetails_${idx}" ontoggle="stagingProjectPhases[${idx}].isSocialOpen = this.open" ${p.isSocialOpen ? 'open' : ''} style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:12px; padding:10px 14px; margin-top:2px;">
           <summary style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; list-style:none; user-select:none; outline:none;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:11.5px; color:var(--gold); font-weight:800;">📡 Multi-Channel Broadcast Channels (Sheet Distribution):</span>
+              <span style="font-size:11.5px; color:var(--gold); font-weight:800;">📡 مقاصد انتشار در شبکه‌ها (توزیع اختصاصی این شیت):</span>
               <span id="phaseSocialBadge_${idx}" class="font-mono" style="font-size:9.5px; color:${activeSocials.length > 0 ? 'var(--gold)' : 'var(--text-muted)'}; background:${activeSocials.length > 0 ? 'rgba(250,204,21,0.12)' : 'rgba(255,255,255,0.05)'}; padding:2px 8px; border-radius:4px;">
-                ${activeSocials.length > 0 ? `${activeSocials.length} Active Channels (${activeSocials.join(", ")})` : 'Auto-Broadcast: Off'}
+                ${activeSocials.length > 0 ? `${activeSocials.length} شبکه فعال (${activeSocials.join('، ')})` : 'توزیع خودکار: خاموش'}
               </span>
             </div>
             <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; display:flex; align-items:center; gap:5px;">
-              <span>Manage Channels</span>
+              <span>مدیریت شبکه‌ها</span>
               <span style="font-size:11px;">▾</span>
             </span>
           </summary>
@@ -1260,7 +1234,7 @@ window.addStagingPhase = function() {
   const nextNum = stagingProjectPhases.length + 1;
   const defPipe = stagingProjectPhases[0]?.pipelineKey || 'sketch1';
   const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
-  const defSub = (pipelines[defPipe] && pipelines[defPipe].subcategories) ? pipelines[defPipe].subcategories[0] : 'Standard Production Standard';
+  const defSub = (pipelines[defPipe] && pipelines[defPipe].subcategories) ? pipelines[defPipe].subcategories[0] : 'طراحی و اجرای استاندارد';
 
   stagingProjectPhases.push({
     name: `Complementary Sheet ${nextNum}`,
@@ -1281,7 +1255,7 @@ window.handlePhasePipelineChange = function(idx, newPipe) {
   if (!stagingProjectPhases || !stagingProjectPhases[idx]) return;
   stagingProjectPhases[idx].pipelineKey = newPipe;
   const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
-  const subcats = (pipelines[newPipe] && pipelines[newPipe].subcategories) ? pipelines[newPipe].subcategories : ['Standard Production Standard'];
+  const subcats = (pipelines[newPipe] && pipelines[newPipe].subcategories) ? pipelines[newPipe].subcategories : ['طراحی و اجرای استاندارد'];
   stagingProjectPhases[idx].subcategory = subcats[0] || '';
   const container = document.getElementById('adminProjectPhasesList');
   if (container) container.innerHTML = renderStagingPhasesHtml();
@@ -1291,7 +1265,7 @@ window.removeStagingPhase = function(idx) {
   if (stagingProjectPhases.length <= 1) {
     stagingProjectPhases[0].img = '';
     stagingProjectPhases[0].image = '';
-    stagingProjectPhases[0].name = 'Main Cover & Master Sheet';
+    stagingProjectPhases[0].name = 'کاور و شیت اصلی اثر';
   } else {
     stagingProjectPhases.splice(idx, 1);
   }
@@ -1302,7 +1276,7 @@ window.removeStagingPhase = function(idx) {
 window.handlePhaseImageUpload = async function(idx, inputEl) {
   if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
-  showToast('Uploading and processing image...', 'info', 2500);
+  showToast('در حال بارگذاری و پردازش تصویر...', 'info', 2500);
 
   try {
     let cloudUrl = await uploadFileToCloudinary(file);
@@ -1313,7 +1287,7 @@ window.handlePhaseImageUpload = async function(idx, inputEl) {
       }
       const container = document.getElementById('adminProjectPhasesList');
       if (container) container.innerHTML = renderStagingPhasesHtml();
-      showToast('Image successfully uploaded to Cloudinary! ✓', 'success');
+      showToast('تصویر با موفقیت در فضای ابری کلودیناری بارگذاری شد!', 'success');
       return;
     }
 
@@ -1324,7 +1298,7 @@ window.handlePhaseImageUpload = async function(idx, inputEl) {
     }
     const container = document.getElementById('adminProjectPhasesList');
     if (container) container.innerHTML = renderStagingPhasesHtml();
-    showToast('High-fidelity image ready and saved! ✓', 'success');
+    showToast('تصویر با کیفیت عالی آماده و ذخیره شد.', 'success');
   } catch (err) {
     console.error('Phase upload error:', err);
     const reader = new FileReader();
@@ -1335,7 +1309,7 @@ window.handlePhaseImageUpload = async function(idx, inputEl) {
       }
       const container = document.getElementById('adminProjectPhasesList');
       if (container) container.innerHTML = renderStagingPhasesHtml();
-      showToast('Image uploaded successfully! ✓', 'success');
+      showToast('تصویر بارگذاری شد.', 'success');
     };
     reader.readAsDataURL(file);
   }
@@ -1348,14 +1322,14 @@ window.confirmSaveArtwork = async function() {
   const isPack = document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true;
 
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
-    showToast('Please add at least one image sheet for this project.', 'error');
+    showToast('لطفاً حداقل یک تصویر برای پروژه اضافه کنید.', 'error');
     return;
   }
 
   // بررسی وجود حداقل یک تصویر معتبر
   const validPhases = stagingProjectPhases.filter(p => Boolean(p.img || p.image));
   if (validPhases.length === 0) {
-    showToast('Please select and upload the main cover image.', 'error', 5000);
+    showToast('لطفاً تصویر کاور اصلی اثر را انتخاب و بارگذاری کنید.', 'error', 5000);
     return;
   }
 
@@ -1363,7 +1337,7 @@ window.confirmSaveArtwork = async function() {
   const img = primaryPhase.img || primaryPhase.image || '';
   const pipe = primaryPhase.pipelineKey || 'sketch1';
   const cat = PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
-  const colorSpace = 'Master 4K / 16-Bit ProPhoto RGB';
+  const colorSpace = 'مستر 4K / ۱۶ بیتی ProPhoto RGB';
 
   try {
     const assembledPhases = JSON.parse(JSON.stringify(validPhases));
@@ -1373,8 +1347,8 @@ window.confirmSaveArtwork = async function() {
         id: (stagingNewArt && stagingNewArt.id) ? stagingNewArt.id : Date.now(),
         tag: cat,
         category: cat,
-        shortSlug: slug || (stagingNewArt && stagingNewArt.shortSlug) || title || 'New Concept',
-        title: title || 'New Studio Concept Project',
+        shortSlug: slug || (stagingNewArt && stagingNewArt.shortSlug) || title || 'کانسپت جدید',
+        title: title || 'کانسپت جدید استودیو',
         desc: desc,
         isProductionPack: isPack,
     isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
@@ -1390,7 +1364,7 @@ window.confirmSaveArtwork = async function() {
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
-      showToast('New concept artwork added to gallery successfully! ✓', 'success');
+      showToast('اثر جدید با موفقیت به گالری اضافه شد!', 'success');
 
       // توزیع چندکاناله: فقط برای کارهای جدید و فقط شیت‌هایی که تیک تلگرام دارند
       const tgPhases = assembledPhases.filter(p => (p.socials?.telegram === true || p.socialTelegram === true));
@@ -1411,7 +1385,7 @@ window.confirmSaveArtwork = async function() {
           phases: newArtRecord.phases
         }]).then(({ error }) => {
           if (error) console.warn('Supabase insert error:', error);
-          else showToast('New concept project registered in cloud database! ✓', 'success');
+          else showToast('اثر جدید در دیتابیس ابری ثبت و همگام شد!', 'success');
         });
       }
     } else if (showcaseArtworks[currentSelectedArtIdx]) {
@@ -1431,7 +1405,7 @@ window.confirmSaveArtwork = async function() {
       closeAdminArtEditor();
       renderShowcaseGrid();
       renderAdminSketch2();
-      showToast('Project changes saved successfully to site and database! ✓', 'success', 5000);
+      showToast('تغییرات پروژه با موفقیت در سایت و دیتابیس ذخیره شد (بدون ارسال تکراری به شبکه‌ها).', 'success', 5000);
 
       // در حالت ویرایش اثر هیچ پیامی به شبکه‌ها مخابره نمی‌شود
       if (window.supabaseClient) {
@@ -1446,22 +1420,22 @@ window.confirmSaveArtwork = async function() {
           phases: art.phases
         }).eq('id', art.id).then(({ error }) => {
           if (error) console.warn('Supabase update error:', error);
-          else showToast('Changes synchronized with cloud database! ✓', 'success');
+          else showToast('تغییرات در دیتابیس ابری ذخیره و همگام شد.', 'success');
         });
       }
     }
   } catch (storageErr) {
     console.error('Storage error:', storageErr);
-    showToast('Error saving data.', 'error');
+    showToast('خطا در ذخیره‌سازی داده‌ها.', 'error');
   }
 };
 
 window.adminDeleteArtwork = function(idx) {
   if (!showcaseArtworks || showcaseArtworks.length <= 0) {
-    showToast('No artwork found to delete.', 'error');
+    showToast('اثری برای حذف وجود ندارد.', 'error');
     return;
   }
-  if (confirm('Are you sure you want to permanently delete this artwork from the gallery?')) {
+  if (confirm('آیا از حذف قطعی این اثر از گالری اطمینان دارید؟')) {
     const deletedItem = showcaseArtworks[idx];
     const deletedId = deletedItem ? Number(deletedItem.id) : null;
 
@@ -1490,7 +1464,7 @@ window.adminDeleteArtwork = function(idx) {
     closeAdminArtEditor();
     renderAdminSketch2();
     renderShowcaseGrid();
-    showToast('Artwork permanently removed from gallery.', 'info');
+    showToast('اثر مورد نظر با موفقیت حذف شد و دیگر برنخواهد گشت.', 'info');
   }
 };
 
@@ -1585,9 +1559,9 @@ function formatPrice(usdPrice) {
       if (matches && matches.length > 0) {
         const tomans = matches.map(m => {
           const val = parseInt(m, 10) * (siteSettings.usdRate || 72000);
-          return '$' + Math.round(val / (siteSettings.usdRate || 70000));
+          return (val / 1000).toLocaleString('fa-IR') + ' هزار TOMAN';
         });
-        return tomans.join(' - ');
+        return tomans.join(' تا ');
       }
     }
     return usdPrice;
@@ -1608,7 +1582,7 @@ window.setCurrencyMode = function(mode) {
   renderProducts();
   selectPipeline(currentSelectedPipeKey, null, false);
   recalcWizardPrice();
-  showToast(`Currency display set to ${mode === 'TOMAN' ? 'TOMAN' : 'USD ($)'}.`, 'info');
+  showToast(`واحد پولی نمایش داده شده به ${mode === 'TOMAN' ? 'TOMAN' : 'دلار ($)'} تغییر یافت.`, 'info');
 };
 
 // سیستم توست نوتیفیکیشن دارک فانتزی
@@ -1720,13 +1694,12 @@ window.renderShowcaseGrid = function() {
             const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
             const pSub = p.subcategory || '';
             if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
-            const pLower = pSub.toLowerCase();
-            if (currentGalleryFilter === 'environment' && (pLower.includes('environment') || pLower.includes('world') || pLower.includes('architecture') || pLower.includes('citadel'))) return true;
-            if (currentGalleryFilter === 'character' && (pLower.includes('character') || pLower.includes('hero') || pLower.includes('vanguard') || pLower.includes('rogue'))) return true;
-            if (currentGalleryFilter === 'creature' && (pLower.includes('creature') || pLower.includes('monster') || pLower.includes('titan') || pLower.includes('leviathan') || pLower.includes('gorgon'))) return true;
-            if (currentGalleryFilter === 'keyframe' && (pLower.includes('keyframe') || pLower.includes('cover') || pLower.includes('cinematic'))) return true;
-            if (currentGalleryFilter === 'props' && (pLower.includes('prop') || pLower.includes('weapon') || pLower.includes('relic') || pLower.includes('ui'))) return true;
-            if (currentGalleryFilter === 'comic' && (pLower.includes('comic') || pLower.includes('manga') || pLower.includes('lore') || pLower.includes('storyboard'))) return true;
+            if (currentGalleryFilter === 'environment' && (pSub.includes('محیط') || pSub.includes('فضا') || pSub.includes('معماری'))) return true;
+            if (currentGalleryFilter === 'character' && (pSub.includes('کاراکتر') || pSub.includes('شخصیت') || pSub.includes('مسکات') || pSub.includes('Mascot'))) return true;
+            if (currentGalleryFilter === 'creature' && (pSub.includes('موجود') || pSub.includes('هیولا') || pSub.includes('باس'))) return true;
+            if (currentGalleryFilter === 'keyframe' && (pSub.includes('کی‌فریم') || pSub.includes('کاور') || pSub.includes('اسپلش'))) return true;
+            if (currentGalleryFilter === 'props' && (pSub.includes('پراپ') || pSub.includes('سلاح') || pSub.includes('UI'))) return true;
+            if (currentGalleryFilter === 'comic' && (pSub.includes('کمیک') || pSub.includes('استوری‌بورد'))) return true;
             return false;
           });
         }
@@ -1737,8 +1710,8 @@ window.renderShowcaseGrid = function() {
   if (filteredArtworks.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); width: 100%;">
-        <p style="font-size: 16px; margin-bottom: 14px; color: #fff; font-family: var(--font-brand); letter-spacing:0.04em;">No concept artworks found in this category.</p>
-        <button onclick="filterGalleryByCategory('all', 'All Artworks')" class="btn-gold" style="font-size: 12px; padding: 9px 20px; font-weight:800;">View All Gallery Artworks</button>
+        <p style="font-size: 15px; margin-bottom: 12px; color: #fff;">اثری در این دسته‌بندی یافت نشد.</p>
+        <button onclick="filterGalleryByCategory('all', 'All Artworks')" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">نمایش تمام آثار گالری</button>
       </div>
     `;
     return;
@@ -1748,30 +1721,30 @@ window.renderShowcaseGrid = function() {
   const workCount = filteredArtworks.length;
   if (window.innerWidth > 768) {
     if (workCount === 1) {
-      try { grid.style.setProperty('column-count', '1', 'important'); } catch(e) { /* safe fallback */ }
-      try { grid.style.setProperty('max-width', '720px', 'important'); } catch(e) { /* safe fallback */ }
+      grid.style.setProperty('column-count', '1', 'important');
+      grid.style.setProperty('max-width', '720px', 'important');
     } else if (workCount === 2) {
-      try { grid.style.setProperty('column-count', '2', 'important'); } catch(e) { /* safe fallback */ }
-      try { grid.style.setProperty('max-width', '980px', 'important'); } catch(e) { /* safe fallback */ }
+      grid.style.setProperty('column-count', '2', 'important');
+      grid.style.setProperty('max-width', '980px', 'important');
     } else if (workCount === 3) {
-      try { grid.style.setProperty('column-count', '3', 'important'); } catch(e) { /* safe fallback */ }
-      try { grid.style.setProperty('max-width', '1240px', 'important'); } catch(e) { /* safe fallback */ }
+      grid.style.setProperty('column-count', '3', 'important');
+      grid.style.setProperty('max-width', '1240px', 'important');
     } else {
       // حالت اصلی گالری دسکتاپ: ۴ ستون بزرگتر، شارپ‌تر و سینمایی‌تر
-      try { grid.style.setProperty('column-count', '4', 'important'); } catch(e) { /* safe fallback */ }
-      try { grid.style.setProperty('max-width', '1480px', 'important'); } catch(e) { /* safe fallback */ }
+      grid.style.setProperty('column-count', '4', 'important');
+      grid.style.setProperty('max-width', '1480px', 'important');
     }
   } else {
     if (workCount === 1) {
-      try { grid.style.setProperty('column-count', '1', 'important'); } catch(e) { /* safe fallback */ }
+      grid.style.setProperty('column-count', '1', 'important');
     } else {
-      try { grid.style.setProperty('column-count', '2', 'important'); } catch(e) { /* safe fallback */ }
+      grid.style.setProperty('column-count', '2', 'important');
     }
   }
 
   grid.innerHTML = filteredArtworks.map((art, i) => {
     const spanClass = getAutoSpanClass(art);
-    const richAlt = `${art.title} — Concept Art & Worldbuilding by TAJINKART Studio`;
+    const richAlt = `${art.title} — کانسپت آرت و طراحی دنیا استودیو TAJINKART`;
     const imgSrc = art.image || art.img || '';
 
     // جلوگیری از تکرار عبارت یکسان در اسلاگ و عنوان
@@ -1793,13 +1766,12 @@ window.renderShowcaseGrid = function() {
         const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
         const pSub = p.subcategory || '';
         if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
-        const pLower2 = (pSub || '').toLowerCase();
-        if (currentGalleryFilter === 'environment' && (pLower2.includes('environment') || pLower2.includes('world') || pLower2.includes('architecture') || pLower2.includes('citadel'))) return true;
-        if (currentGalleryFilter === 'character' && (pLower2.includes('character') || pLower2.includes('hero') || pLower2.includes('vanguard') || pLower2.includes('rogue'))) return true;
-        if (currentGalleryFilter === 'creature' && (pLower2.includes('creature') || pLower2.includes('monster') || pLower2.includes('titan') || pLower2.includes('leviathan') || pLower2.includes('gorgon'))) return true;
-        if (currentGalleryFilter === 'keyframe' && (pLower2.includes('keyframe') || pLower2.includes('cover') || pLower2.includes('cinematic'))) return true;
-        if (currentGalleryFilter === 'props' && (pLower2.includes('prop') || pLower2.includes('weapon') || pLower2.includes('relic') || pLower2.includes('ui'))) return true;
-        if (currentGalleryFilter === 'comic' && (pLower2.includes('comic') || pLower2.includes('manga') || pLower2.includes('lore') || pLower2.includes('storyboard'))) return true;
+        if (currentGalleryFilter === 'environment' && (pSub.includes('محیط') || pSub.includes('فضا') || pSub.includes('معماری'))) return true;
+        if (currentGalleryFilter === 'character' && (pSub.includes('کاراکتر') || pSub.includes('شخصیت') || pSub.includes('مسکات') || pSub.includes('Mascot'))) return true;
+        if (currentGalleryFilter === 'creature' && (pSub.includes('موجود') || pSub.includes('هیولا') || pSub.includes('باس'))) return true;
+        if (currentGalleryFilter === 'keyframe' && (pSub.includes('کی‌فریم') || pSub.includes('کاور') || pSub.includes('اسپلش'))) return true;
+        if (currentGalleryFilter === 'props' && (pSub.includes('پراپ') || pSub.includes('سلاح') || pSub.includes('UI'))) return true;
+        if (currentGalleryFilter === 'comic' && (pSub.includes('کمیک') || pSub.includes('استوری‌بورد'))) return true;
         return false;
       });
 
@@ -2008,12 +1980,12 @@ function renderArtStationProject(art) {
   const stream = document.getElementById('caseStudyImagesStream');
   if (!stream) return;
 
-  const mainTitle = art.title || 'Untitled Concept Project';
-  const mainDesc = art.desc || 'Original concept artwork and visual development by TAJINKART studio.';
+  const mainTitle = art.title || 'کانسپت بدون عنوان';
+  const mainDesc = art.desc || 'کانسپت آرت و طراحی اختصاصی استودیو تاج‌اینک‌آرت.';
   const mainPipe = art.pipelineKey || 'sketch1';
-  const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[mainPipe]) ? PIPELINE_DATA[mainPipe] : { topSub: 'Concept Art Atelier' };
+  const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[mainPipe]) ? PIPELINE_DATA[mainPipe] : { topSub: 'آتلیه کانسپت آرت' };
   const mainPipeName = pipeData.topSub;
-  const artLore = art.lore || 'Extopia Universe';
+  const artLore = art.lore || 'جهان اکستوپیا';
 
   let streamHtml = '';
 
@@ -2033,7 +2005,7 @@ function renderArtStationProject(art) {
     imageList.push({
       src: mainSrc,
       name: mainTitle,
-      phaseNum: '01',
+      phaseNum: '۰۱',
       desc: mainDesc,
       pipe: mainPipe,
       sub: ''
@@ -2044,14 +2016,14 @@ function renderArtStationProject(art) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
-        const phaseName = p.name || `Production Sheet • Phase ${imageList.length + 1}`;
+        const phaseName = p.name || `شیت پروژه • Phases ${imageList.length + 1}`;
         const phaseDesc = p.desc || p.description || p.note || '';
         const phasePipe = p.pipelineKey || mainPipe;
         const phaseSub = p.subcategory || '';
         imageList.push({
           src: pSrc,
           name: phaseName,
-          phaseNum: (imageList.length + 1 < 10 ? `0${imageList.length + 1}` : `${imageList.length + 1}`),
+          phaseNum: (imageList.length + 1 < 10 ? `۰${imageList.length + 1}` : `${imageList.length + 1}`),
           desc: phaseDesc,
           pipe: phasePipe,
           sub: phaseSub
@@ -2062,12 +2034,12 @@ function renderArtStationProject(art) {
 
   // رندر تک‌تک فریم‌های استریم عمودی همراه با یادداشت‌های فنی بین تصاویر
   imageList.forEach((item, idx) => {
-    const pipeInfo = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[item.pipe]) ? PIPELINE_DATA[item.pipe].topSub : 'Design Atelier';
+    const pipeInfo = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[item.pipe]) ? PIPELINE_DATA[item.pipe].topSub : 'آتلیه طراحی';
     streamHtml += `
       <div class="artstation-img-card project-stream-item" 
            data-index="${idx}"
            data-title="${escapeQuotes(item.name)}">
-        <img src="${item.src}" alt="${item.name}" loading="${idx === 0 ? 'eager' : 'lazy'}" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" title="Click to zoom and inspect artwork" />
+        <img src="${item.src}" alt="${item.name}" loading="${idx === 0 ? 'eager' : 'lazy'}" class="elastic-pinch-target" onclick="toggleImageZoom(this, event)" title="کلیک برای بزرگنمایی و زوم اثر" />
         <div class="stream-phase-note" style="padding: 16px 20px; background: rgba(6, 8, 13, 0.75); border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 240px; text-align: right;">
@@ -2231,7 +2203,7 @@ window.setCaseStudyPhase = function(idx) {
 
 function updateCaseStudyPhaseView() {
   if (!activeCaseStudyArt) return;
-  const phases = activeCaseStudyArt.phases || [{ name: 'Master Final Render', img: activeCaseStudyArt.image }];
+  const phases = activeCaseStudyArt.phases || [{ name: 'رندر نهایی اثر', img: activeCaseStudyArt.image }];
   const currentPhase = phases[activeCaseStudyPhaseIdx] || phases[0];
 
   const imgEl = document.getElementById('caseStudyMainImg');
@@ -2343,7 +2315,7 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
       isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
     price: price,
     img: img,
-    timeline: timeline || '5 to 7 business days',
+    timeline: timeline || '۵ تا ۷ روز کاری',
     usdVal: usdVal || 90,
     pipeKey: pipeKey || currentSelectedPipeKey
   };
@@ -2439,7 +2411,7 @@ window.filterStoreAssets = function(type, el) {
   if (el) el.classList.add('active');
 
   const titleEl = document.getElementById('currentAssetCategoryTitle');
-  if (titleEl) titleEl.textContent = type === 'all' ? 'All Studio Digital Assets' : type;
+  if (titleEl) titleEl.textContent = type === 'all' ? 'همه دارایی‌های استودیو' : type;
 
   const noteEl = document.getElementById('assetCategoryDynamicNote');
   if (noteEl) noteEl.textContent = ASSET_CAT_DESCRIPTIONS[type] || ASSET_CAT_DESCRIPTIONS['all'];
@@ -2553,7 +2525,7 @@ function renderAcademy() {
           </div>
           <div style="display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid rgba(168,85,247,0.2);">
             <span class="font-mono" style="font-size:18px; font-weight:800; color:var(--gold);">${displayPrice}</span>
-            <button onclick="enrollAcademyCourse('${c.title}')" class="btn-gold" style="background:var(--violet); color:#fff; font-size:11.5px; padding:8px 14px;">Enroll in Masterclass →</button>
+            <button onclick="enrollAcademyCourse('${c.title}')" class="btn-gold" style="background:var(--violet); color:#fff; font-size:11.5px; padding:8px 14px;">ثبت‌نام در دوره ←</button>
           </div>
         </div>
       </div>
@@ -2562,7 +2534,7 @@ function renderAcademy() {
 }
 
 window.enrollAcademyCourse = function(title) {
-  showToast(`Enrollment in "${title}" completed successfully! ✓`, 'success');
+  showToast(`ثبت‌نام شما در دوره «${title}» با موفقیت انجام شد!`, 'success');
 };
 
 function renderComicPage() {
@@ -2593,9 +2565,9 @@ window.renderAdminTgChannelsList = function() {
 
   container.innerHTML = siteSettings.tgChannels.map((ch, idx) => `
     <div style="display:flex; gap:8px; align-items:center;" id="tgChannelRow_${idx}">
-      <input type="text" value="${escapeQuotes(ch)}" placeholder="e.g. @tajinkart or -100123456789" class="font-mono tg-channel-input" style="flex:1; font-size:11.5px; padding:8px 10px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#fff; box-sizing:border-box;" oninput="updateTgChannelVal(${idx}, this.value)" />
+      <input type="text" value="${escapeQuotes(ch)}" placeholder="مثال: @tajinkart یا -100123456789 یا 12345678" class="font-mono tg-channel-input" style="flex:1; font-size:11.5px; padding:8px 10px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#fff; box-sizing:border-box;" oninput="updateTgChannelVal(${idx}, this.value)" />
       ${siteSettings.tgChannels.length > 1 ? `
-        <button type="button" onclick="removeTgChannel(${idx})" style="color:var(--crimson); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px; font-size:15px; padding:6px 10px; cursor:pointer;" title="Delete Channel">✕</button>
+        <button type="button" onclick="removeTgChannel(${idx})" style="color:var(--crimson); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px; font-size:15px; padding:6px 10px; cursor:pointer;" title="حذف این کانال">✕</button>
       ` : ''}
     </div>
   `).join('');
@@ -2683,7 +2655,7 @@ window.autoDetectTelegramChannelId = async function() {
     const data = await resp.json();
 
     if (!data.ok) {
-      showToast(`Telegram Error: ${data.description || 'Invalid Bot Token'}`, 'error', 5000);
+      showToast(`خطای تلگرام: ${data.description || 'توکن نامعتبر است'}`, 'error', 5000);
       return;
     }
 
@@ -2694,7 +2666,7 @@ window.autoDetectTelegramChannelId = async function() {
       const ch = u.my_chat_member?.chat || u.channel_post?.chat || u.message?.chat;
       if (ch && ch.id && !seen.has(ch.id)) {
         seen.add(ch.id);
-        detected.push({ id: String(ch.id), title: ch.title || ch.username || ch.first_name || 'Channel' });
+        detected.push({ id: String(ch.id), title: ch.title || ch.username || ch.first_name || 'کانال' });
       }
     });
 
@@ -2703,9 +2675,9 @@ window.autoDetectTelegramChannelId = async function() {
       siteSettings.tgChat = detected[0].id;
       renderAdminTgChannelsList();
       saveTelegramSettingsDirect();
-      showToast(`Channel "${detected[0].title}" (${detected[0].id}) detected and registered! 🎉`, 'success', 6000);
+      showToast(`کانال «${detected[0].title}» با شناسه عددی ${detected[0].id} شناسایی و ذخیره شد! 🎉`, 'success', 6000);
     } else {
-      showToast('Channel not found! Please send any message into the channel first, then click again.', 'info', 7000);
+      showToast('کانال یافت نشد! لطفاً یک پیام دلخواه داخل کانال بفرستید، سپس دوباره این دکمه را بزنید.', 'info', 7000);
     }
   } catch(e) {
     showToast('Network error connecting to Telegram API.', 'error', 5000);
@@ -2732,7 +2704,7 @@ window.testTelegramConnection = async function() {
     return;
   }
 
-  showToast(`Broadcasting test dispatch to ${channels.length} Telegram destination(s)...`, 'info', 3000);
+  showToast(`در حال ارسال پیام تست به ${channels.length} کانال/چت تلگرام...`, 'info', 3000);
 
   let successCount = 0;
   let lastError = '';
@@ -2759,10 +2731,10 @@ window.testTelegramConnection = async function() {
       } catch(ignore) {}
     }
     try {
-      const testMsg = `👑 *TAJINKART Atelier Connection Verified*\n\n` +
-                      `Official bot *@tajinkart_bot* successfully connected to the studio command center.\n` +
-                      `System is live and prepared for multi-channel broadcasts and client brief alerts!\n\n` +
-                      `🌐 [Visit Official Studio](https://tajinkart.space)`;
+      const testMsg = `👑 *تست اتصال موفق وب‌سایت TAJINKART*\n\n` +
+                      `ربات رسمی *@tajinkart_bot* با موفقیت به وب‌سایت استودیو متصل گردید.\n` +
+                      `سیستم آماده توزیع خودکار کانسپت‌ها و دریافت هشدارهای سفارش‌های جدید است!\n\n` +
+                      `🌐 [ورود به سایت رسمی استودیو](https://tajinkart.github.io)`;
 
       const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -2773,7 +2745,7 @@ window.testTelegramConnection = async function() {
           parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [[
-              { text: "🎨 Enter Studio Atelier", url: "https://tajinkart.space" }
+              { text: "🎨 ورود به آتلیه رسمی", url: "https://tajinkart.github.io" }
             ]]
           }
         })
@@ -2783,17 +2755,17 @@ window.testTelegramConnection = async function() {
       if (res.ok) {
         successCount++;
       } else {
-        lastError = res.description || 'Unknown';
+        lastError = res.description || 'نامشخص';
       }
     } catch(e) {
-      lastError = e.message || 'Network error';
+      lastError = e.message || 'خطای شبکه';
     }
   }
 
   if (successCount > 0) {
-    showToast(`Test dispatch broadcast successfully to ${successCount} channel(s)! 🎉`, 'success', 5000);
+    showToast(`پیام تست با موفقیت به ${successCount} مقصد تلگرام ارسال شد! 🎉`, 'success', 5000);
   } else {
-    showToast(`Telegram Error: ${lastError}`, 'error', 6000);
+    showToast(`خطای تلگرام: ${lastError}`, 'error', 6000);
   }
 };
 
@@ -2818,7 +2790,7 @@ window.broadcastArtworkPhaseToTelegram = async function(art, phase) {
   }
 
   const photoUrl = phase.img || phase.image || art.image || '';
-  const title = phase.name || art.title || 'New TAJINKART Concept Artwork';
+  const title = phase.name || art.title || 'کانسپت جدید استودیو TAJINKART';
   const desc = phase.desc || art.desc || '';
   
   // استخراج متن اختصاصی تلگرام برای این شیت
@@ -2854,12 +2826,12 @@ window.broadcastArtworkPhaseToTelegram = async function(art, phase) {
   if (phase.tgIncludeButton === true) {
     replyMarkupParam = JSON.stringify({
       inline_keyboard: [[
-        { text: "👁️ View Artwork on TAJINKART Gallery", url: `https://tajinkart.space/?art=${art.id}` }
+        { text: "👁️ مشاهده این اثر در گالری TAJINKART", url: `https://tajinkart.github.io/?art=${art.id}` }
       ]]
     });
   }
 
-  showToast(`Broadcasting sheet "${title}" to Telegram...`, 'info', 2500);
+  showToast(`در حال مخابره شیت «${title}» به تلگرام...`, 'info', 2500);
 
   for (let chat of channels) {
     // حل خودکار در صورتی که کاربر لینک دعوت t.me/+ وارد کرده باشد
@@ -2944,14 +2916,14 @@ window.broadcastArtworkPhaseToTelegram = async function(art, phase) {
 
       const resData = await resp.json();
       if (resData.ok) {
-        showToast(`Sheet "${title}" broadcast to Telegram successfully! ✈️`, 'success', 5000);
+        showToast(`شیت «${title}» با موفقیت به تلگرام ارسال شد! ✈️`, 'success', 5000);
       } else {
         console.warn('[Telegram Error Details]:', resData);
-        showToast(`Telegram Error: ${resData.description || 'No broadcast permissions'}`, 'error', 6500);
+        showToast(`خطای تلگرام: ${resData.description || 'عدم دسترسی به کانال'}`, 'error', 6500);
       }
     } catch(err) {
       console.warn('Telegram broadcast network error:', err);
-      showToast('Network error connecting to Telegram servers.', 'error', 5000);
+      showToast('خطای شبکه در ارتباط با سرور تلگرام (بررسی فیلترشکن).', 'error', 5000);
     }
   }
 };
@@ -3041,7 +3013,6 @@ window.switchView = function(vKey) {
     } else {
       dock.classList.remove('dock-collapsed');
       dock.classList.remove('dock-open');
-      dock.style.display = (vKey === 'admin') ? 'none' : '';
     }
   }
 
@@ -3108,13 +3079,16 @@ function handleOptimizedScroll() {
     return;
   }
 
-  // ۴. دسکتاپ: آیکون‌ها همیشه باز، در دسترس و قابل کلیک باقی می‌مانند
-  if (window.innerWidth > 768) {
-    if (dock) {
-      dock.classList.remove('dock-collapsed');
-      dock.classList.remove('dock-open');
-    }
+  // ۴. دسکتاپ: در بالای صفحه (scrolled <= 100) باز است، با اسکرول به پایین جمع می‌شود به سه خط
+  if (cView !== 'showcase') {
+    dock.classList.add('dock-collapsed');
     return;
+  }
+
+  if (scrolled > 100) {
+    dock.classList.add('dock-collapsed');
+  } else {
+    dock.classList.remove('dock-collapsed');
   }
 }
 
@@ -3142,13 +3116,18 @@ function initDockState() {
     return;
   }
 
-  // دسکتاپ: آیکون‌های ناوبری همیشه در تمام صفحات باز و فعال هستند
-  if (window.innerWidth > 768) {
-    if (dock) {
-      dock.classList.remove('dock-collapsed');
-      dock.classList.remove('dock-open');
-    }
+  // دسکتاپ: در صفحات دیگر بسته است، در صفحه اصلی وابسته به اسکرول
+  if (cView !== 'showcase') {
+    dock.classList.add('dock-collapsed');
+    dock.classList.remove('dock-open');
     return;
+  }
+
+  if (scrolled > 100) {
+    dock.classList.add('dock-collapsed');
+  } else {
+    dock.classList.remove('dock-collapsed');
+    dock.classList.remove('dock-open');
   }
 }
 
@@ -3220,7 +3199,7 @@ window.closeMemberModal = function() {
   const resetView = document.getElementById('authViewResetPassword');
   const isResetActive = resetView && !resetView.classList.contains('hidden');
   if (isResetActive && isRecoveryFlowActive) {
-    showToast('To exit, please set a new password or click Cancel below.', 'info', 4000);
+    showToast('جهت خروج از این بخش، لطفاً رمز جدید تعیین کنید یا دکمه انصراف را در پایین فرم بزنید.', 'info', 4000);
     return;
   }
   const modal = document.getElementById('memberModal');
@@ -3238,14 +3217,14 @@ window.handleMemberModalBackdropClick = function(event) {
       card.style.transition = 'transform 0.15s ease';
       setTimeout(() => { card.style.transform = 'scale(1)'; }, 150);
     }
-    showToast('To complete, please enter your new password or click Cancel.', 'info', 4000);
+    showToast('جهت تکمیل، لطفاً رمز عبور جدید را وارد کنید یا روی دکمه «انصراف» بزنید.', 'info', 4000);
     return;
   }
   closeMemberModal();
 };
 
 window.cancelPasswordReset = async function() {
-  if (confirm('Do you want to cancel password reset?\nYour previous password will remain unchanged.')) {
+  if (confirm('آیا از فرآیند تعیین رمز انصراف می‌دهید؟\nدر این صورت رمز عبور قبلی شما تغییری نخواهد کرد.')) {
     isRecoveryFlowActive = false;
     sessionStorage.removeItem('tajinkart_recovering_password');
     if (window.supabaseClient && window.supabaseClient.auth) {
@@ -3386,7 +3365,7 @@ function renderAdminStagesList() {
   const data = PIPELINE_DATA[currentSelectedPipeKey];
   if (!data) return;
   const titleEl = document.getElementById('adminCurrentPipeTitle');
-  if (titleEl) titleEl.textContent = `Production Pipeline: ${data.topSub}`;
+  if (titleEl) titleEl.textContent = `مراحل: ${data.topSub}`;
 
   const stagesGrid = document.getElementById('adminStagesGridCol');
   if (stagesGrid) {
@@ -3395,11 +3374,11 @@ function renderAdminStagesList() {
         <div>
           <span class="pipeline-step-badge" style="margin-bottom:4px;">${t.badge}</span>
           <div style="font-size:13.5px; font-weight:800; color:#fff;">${t.title}</div>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">⏱ Delivery Timeline: ${t.timeline}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">⏱ زمان تحویل: ${t.timeline}</div>
         </div>
         <div style="text-align:left; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
           <span class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800;">${t.price}</span>
-          <button onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px;">Delete Phase</button>
+          <button onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px;">حذف Phases</button>
         </div>
       </div>
     `).join('');
@@ -3422,33 +3401,33 @@ function renderAdminStageLiveEditor() {
   col.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:11px;">
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Phase Badge Label</label>
+        <label style="font-size:11px; color:var(--text-muted);">عنوان مرحله (بج)</label>
         <input type="text" value="${tile.badge}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'badge', this.value)" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Full Phase Title</label>
+        <label style="font-size:11px; color:var(--text-muted);">عنوان کامل Phases</label>
         <input type="text" value="${tile.title}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'title', this.value)" />
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">Estimated Fee (USD)</label>
+          <label style="font-size:11px; color:var(--text-muted);">تعرفه تخمینی (دلار)</label>
           <input type="text" value="${tile.price}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'price', this.value)" class="font-mono" />
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">Delivery Timeline</label>
+          <label style="font-size:11px; color:var(--text-muted);">زمان تحویل</label>
           <input type="text" value="${tile.timeline}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'timeline', this.value)" />
         </div>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Base Price USD (Interactive Calculator)</label>
+        <label style="font-size:11px; color:var(--text-muted);">قیمت پایه عددی دلار (جهت محاسبه‌گر لحظه‌ای)</label>
         <input type="number" value="${tile.usdVal || 90}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'usdVal', parseInt(this.value, 10))" class="font-mono" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Phase Deliverables & Scope</label>
+        <label style="font-size:11px; color:var(--text-muted);">شرح خروجی مرحله</label>
         <textarea rows="3" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'desc', this.value)">${tile.desc}</textarea>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Phase Background Image URL</label>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر زمینه Phases</label>
         <input type="text" value="${tile.img}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'img', this.value)" class="font-mono" />
       </div>
       <div style="margin-top:6px; height:80px; border-radius:8px; overflow:hidden; border:1px solid var(--border-subtle);">
@@ -3462,7 +3441,7 @@ window.updateTileField = function(pipeKey, tileIdx, field, val) {
   PIPELINE_DATA[pipeKey].tiles[tileIdx][field] = val;
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   selectPipeline(pipeKey, null, false);
-  showToast('Phase changes saved successfully! ✓', 'success');
+  showToast('تغییرات Phases ذخیره شد.', 'success');
 };
 
 window.adminAddNewStage = function() {
@@ -3470,23 +3449,23 @@ window.adminAddNewStage = function() {
   PIPELINE_DATA[currentSelectedPipeKey].tiles.push({
     span: 'col-span-4',
     badge: `Phases ${PIPELINE_DATA[currentSelectedPipeKey].tiles.length + 1}`,
-    title: 'New Concept Development Phase',
-    desc: 'Configure deliverables and specs in the side editor.',
+    title: 'Phases جدید توسعه کانسپت',
+    desc: 'مشخصات خروجی این Phases را در فرم ستون کناری تکمیل فرمایید.',
     price: '$120 - $160',
     usdVal: 130,
-    timeline: '4 to 6 business days',
+    timeline: '۴ تا ۶ روز کاری',
     img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'
   });
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   currentSelectedStageIdx = PIPELINE_DATA[currentSelectedPipeKey].tiles.length - 1;
   renderAdminStagesList();
   selectPipeline(currentSelectedPipeKey, null, false);
-  showToast('New phase added to pipeline! ✓', 'success');
+  showToast('Phases جدید به پایپلاین اضافه شد.', 'success');
 };
 
 window.adminDeleteStage = function(idx) {
   if (PIPELINE_DATA[currentSelectedPipeKey].tiles.length <= 1) {
-    showToast('At least one phase is required per pipeline.', 'error');
+    showToast('حداقل یک مرحله برای هر پایپلاین الزامی است.', 'error');
     return;
   }
   PIPELINE_DATA[currentSelectedPipeKey].tiles.splice(idx, 1);
@@ -3494,26 +3473,26 @@ window.adminDeleteStage = function(idx) {
   currentSelectedStageIdx = Math.max(0, currentSelectedStageIdx - 1);
   renderAdminStagesList();
   selectPipeline(currentSelectedPipeKey, null, false);
-  showToast('Phase removed.', 'info');
+  showToast('Phases مورد نظر حذف شد.', 'info');
 };
 
 window.adminAddNewCategory = function() {
   const newKey = `sketch_cat_${Date.now()}`;
   PIPELINE_DATA[newKey] = {
     id: newKey,
-    topSub: 'New Studio Pipeline',
-    badgeSlug: 'Custom Pipeline',
-    subcategories: ['Concept Ideation', 'Keyframe Production'],
-    note: 'Bespoke atelier pipeline.',
+    topSub: 'سرویس جدید استودیو',
+    badgeSlug: 'سرویس سفارشی',
+    subcategories: ['زیرشاخه ۱', 'زیرشاخه ۲'],
+    note: 'پایپلاین سفارشی استودیو.',
     tiles: [
-      { span: 'col-span-12', badge: 'Phase 1 • Initial Ideation', title: 'Form Ideation & Concept Sketching', desc: 'Initial silhouette exploration sheets with client milestone review.', price: '$80 - $110', usdVal: 90, timeline: '3 to 5 business days', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
+      { span: 'col-span-12', badge: 'Phases ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ مفهومی', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
     ]
   };
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   currentSelectedPipeKey = newKey;
   currentSelectedStageIdx = 0;
   renderAdminSketch1();
-  showToast('New pipeline category added! ✓', 'success');
+  showToast('دسته‌بندی جدید خدمات اضافه شد.', 'success');
 };
 
 // اسکچ ۲: مدیریت گالری آثار (همراه با چیدمان با درگ اند دراپ و پیش‌نمایش کادر)
@@ -3522,10 +3501,10 @@ function renderAdminSketch2() {
   if (!container) return;
 
   let html = `
-    <div class="admin-mosaic-add-tile" onclick="openCreateArtworkModal()" title="Add New Artwork to Gallery">
+    <div class="admin-mosaic-add-tile" onclick="openCreateArtworkModal()" title="افزودن اثر جدید به گالری">
       <span style="font-size:36px; line-height:1; color:var(--gold);">+</span>
-      <span style="font-weight:800; font-size:13px; color:var(--gold);">Upload Concept Project</span>
-      <span style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">Select from system or web URL</span>
+      <span style="font-weight:800; font-size:13px; color:var(--gold);">افزودن اثر از اینجا</span>
+      <span style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">انتخاب از سیستم یا لینک وب</span>
     </div>
   `;
 
@@ -3541,7 +3520,7 @@ function renderAdminSketch2() {
          ondrop="handleAdminArtDrop(event, ${idx})"
          ondragend="setTimeout(() => { isDraggingAdminCard = false; }, 150); handleAdminArtDragEnd(event)"
          onclick="handleAdminCardClick(event, ${idx})" 
-         title="Touch and hold to pick up card, drag to reorder">
+         title="با انگشت شست یا اشاره نگه دارید تا کارت بلند شود، سپس بکشید و رها کنید">
       <img src="${art.image}" draggable="false" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" alt="${art.title}" />
       
       <div style="position:absolute; top:6px; right:6px; padding:3px 7px; border-radius:6px; background:rgba(0,0,0,0.85); color:var(--gold); font-size:11px; font-weight:800; border:1px solid rgba(250,204,21,0.3); pointer-events:none;">
@@ -3570,7 +3549,7 @@ window.handleAdminImageChange = function(idx, newUrl) {
   safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   detectAndApplyArtworkDimensions(showcaseArtworks[idx], (meta) => {
     const badge = document.getElementById('adminArtPreviewRatioText');
-    if (badge) badge.textContent = `${meta.width} × ${meta.height} (Ratio ${meta.ratio})`;
+    if (badge) badge.textContent = `${meta.width} × ${meta.height} (نسبت ${meta.ratio})`;
     renderShowcaseGrid();
   });
 };
@@ -3586,7 +3565,7 @@ window.onAdminPreviewImgLoad = function(imgEl, idx) {
     showcaseArtworks[idx].aspectRatio = r;
     artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
     const badge = document.getElementById('adminArtPreviewRatioText');
-    if (badge) badge.textContent = `${w} × ${h} (Ratio ${r})`;
+    if (badge) badge.textContent = `${w} × ${h} (نسبت ${r})`;
   }
 };
 
@@ -3594,7 +3573,7 @@ window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
   if (showcaseArtworks[artIdx] && showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[phaseIdx]) {
     showcaseArtworks[artIdx].phases[phaseIdx].img = url.trim();
     safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    showToast(`Case study sheet #${phaseIdx + 1} image saved! ✓`, 'success');
+    showToast(`تصویر Phases ${phaseIdx + 1} مطالعه موردی ذخیره شد.`, 'success');
   }
 };
 
@@ -3603,7 +3582,7 @@ window.updateArtField = function(idx, field, value) {
   safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   renderShowcaseGrid();
   renderAdminSketch2();
-  showToast('Artwork project updated successfully! ✓', 'success');
+  showToast('اثر با موفقیت ویرایش شد.', 'success');
 };
 
 
@@ -3645,40 +3624,40 @@ function renderAdminProductLiveEditor() {
         <img src="${p.img}" style="width:100%; height:100%; object-fit:cover;" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Asset Package Title</label>
+        <label style="font-size:11px; color:var(--text-muted);">عنوان دارایی / پکیج</label>
         <input type="text" value="${p.title}" onchange="updateProductField(${currentSelectedProductIdx}, 'title', this.value)" />
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">Asset Category (7 Streams)</label>
+          <label style="font-size:11px; color:var(--text-muted);">شاخه دارایی (۷ شاخه)</label>
           <select onchange="updateProductField(${currentSelectedProductIdx}, 'type', this.value)">
-            <option value="2D Game Asset Packs & Sprites" ${(p.type === '2D Game Asset Packs & Sprites') ? 'selected' : ''}>2D Game Asset Packs & Sprites</option>
-            <option value="Brush Engine, Textures & Concept Art Stamps" ${(p.type === 'Brush Engine, Textures & Concept Art Stamps') ? 'selected' : ''}>Brush Engine, Textures & Stamps</option>
-            <option value="Prop Kits, Icons & Game UI" ${(p.type === 'Prop Kits, Icons & Game UI') ? 'selected' : ''}>Prop Kits, Icons & Game UI</option>
-            <option value="Digital Comics, Lorebooks & Master PSD Sources" ${(p.type === 'Digital Comics, Lorebooks & Master PSD Sources') ? 'selected' : ''}>Digital Comics, Lorebooks & Master PSD Sources</option>
-            <option value="Cinematic Video Loops & Splash Loops" ${(p.type === 'Cinematic Video Loops & Splash Loops') ? 'selected' : ''}>Cinematic Video Loops & Splash Loops</option>
-            <option value="3D Print STL Files & Resin Miniatures" ${(p.type === '3D Print STL Files & Resin Miniatures') ? 'selected' : ''}>3D Print STL Files & Resin Miniatures</option>
-            <option value="Atmospheric Overlays, Dust Particles & VFX" ${(p.type === 'Atmospheric Overlays, Dust Particles & VFX') ? 'selected' : ''}>Atmospheric Overlays, Dust Particles & VFX</option>
+            <option value="بسته‌های اسست بازی و اسپریت ۲D" ${p.type === 'بسته‌های اسست بازی و اسپریت ۲D' ? 'selected' : ''}>بسته‌های اسست بازی و اسپریت ۲D</option>
+            <option value="موتور براش، تکسچر و استمپ‌های کانسپت آرت" ${p.type === 'موتور براش، تکسچر و استمپ‌های کانسپت آرت' ? 'selected' : ''}>موتور براش، تکسچر و استمپ‌ها</option>
+            <option value="کیت‌های پراپ، آیکون و اینترفیس بازی" ${p.type === 'کیت‌های پراپ، آیکون و اینترفیس بازی' ? 'selected' : ''}>کیت‌های پراپ و UI</option>
+            <option value="کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر" ${p.type === 'کمیک دیجیتال، آرت‌بوک و سورس‌فایل‌های مستر' ? 'selected' : ''}>کمیک و سورس‌فایل مستر</option>
+            <option value="فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش" ${p.type === 'فوتیج‌های متحرک، لوپ‌های سینمایی و اسپلش' ? 'selected' : ''}>لوپ‌های سینمایی 4K</option>
+            <option value="فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی" ${p.type === 'فایل‌های پرینت سه‌بعدی STL و مینیاتوری‌های رزینی' ? 'selected' : ''}>فایل‌های پرینت ۳D و STL</option>
+            <option value="اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری" ${p.type === 'اوورلی‌های اتمسفریک، ذرات و افکت‌های بصری' ? 'selected' : ''}>اوورلی ذرات و افکت FX</option>
           </select>
         </div>
         <div>
-          <label style="font-size:11px; color:var(--text-muted);">Base Price (USD)</label>
+          <label style="font-size:11px; color:var(--text-muted);">قیمت پایه (دلار)</label>
           <input type="number" value="${p.price}" onchange="updateProductField(${currentSelectedProductIdx}, 'price', parseInt(this.value, 10))" class="font-mono" />
         </div>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Genesis Lore Access Key</label>
+        <label style="font-size:11px; color:var(--text-muted);">کلید دسترسی لور (Genesis Key)</label>
         <input type="text" value="${p.loreKey || ''}" onchange="updateProductField(${currentSelectedProductIdx}, 'loreKey', this.value)" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Cover Image URL</label>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر کاور</label>
         <input type="text" value="${p.img}" onchange="updateProductField(${currentSelectedProductIdx}, 'img', this.value)" class="font-mono" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Package Contents & Deliverables Description</label>
+        <label style="font-size:11px; color:var(--text-muted);">توضیحات و محتویات بسته</label>
         <textarea rows="3" onchange="updateProductField(${currentSelectedProductIdx}, 'desc', this.value)">${p.desc || ''}</textarea>
       </div>
-      <button onclick="adminDeleteProduct(${currentSelectedProductIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">Delete Asset Package</button>
+      <button onclick="adminDeleteProduct(${currentSelectedProductIdx})" class="btn-secondary" style="color:var(--crimson); margin-top:6px; border-color:rgba(239,68,68,0.3);">حذف این دارایی</button>
     </div>
   `;
 }
@@ -3687,29 +3666,29 @@ window.updateProductField = function(idx, field, val) {
   digitalStoreProducts[idx][field] = val;
   localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
   renderProducts();
-  showToast('Asset specifications saved! ✓', 'success');
+  showToast('مشخصات دارایی ذخیره شد.', 'success');
 };
 
 window.adminAddNewProduct = function() {
   digitalStoreProducts.unshift({
     id: Date.now(),
-    title: 'New Studio Asset Package',
+    title: 'بسته دارایی جدید استودیو',
     price: 29,
-    type: '2D Game Asset Packs & Sprites',
-    loreKey: 'Genesis Universe • Lore Unlock',
+    type: 'بسته‌های اسست بازی و اسپریت ۲D',
+    loreKey: 'جهان جنسیس • آنلاک لور',
     img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80',
-    desc: 'Production source files, PSD layers, and high-res assets.'
+    desc: 'محتویات و سورس‌فایل‌های لایه‌باز این بسته دیجیتال.'
   });
   localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
   currentSelectedProductIdx = 0;
   renderAdminProductsTab();
   renderProducts();
-  showToast('New asset package added! ✓', 'success');
+  showToast('دارایی جدید افزوده شد.', 'success');
 };
 
 window.adminDeleteProduct = function(idx) {
   if (digitalStoreProducts.length <= 1) {
-    showToast('At least one product is required.', 'error');
+    showToast('حداقل یک محصول الزامی است.', 'error');
     return;
   }
   digitalStoreProducts.splice(idx, 1);
@@ -3717,26 +3696,26 @@ window.adminDeleteProduct = function(idx) {
   currentSelectedProductIdx = Math.max(0, currentSelectedProductIdx - 1);
   renderAdminProductsTab();
   renderProducts();
-  showToast('Asset package removed.', 'info');
+  showToast('دارایی حذف شد.', 'info');
 };
 
 // اسکچ ۳: مدیریت اعضا و گزارش‌های مالی
 // شناسه و پرونده رسمی و ابدی خالق، سازنده و معمار جهان استودیو
 const CREATOR_MASTER_RECORD = {
   id: 'creator_seyed_soroush_taj',
-  name: 'Seyed Soroush Taj',
+  name: 'سید سروش تاج',
   email: 'tajinkart@gmail.com',
-  contact: 'Studio Headquarters (Director Direct Channel)',
+  contact: 'دفتر مرکزی استودیو (ارتباط مستقیم مدیریت)',
   tier: 'CREATOR',
-  balance: '$∞ (Studio Director)',
-  withdrawn: 'Studio Command',
-  totalSpent: '100% Studio Ownership 👑',
+  balance: '$∞ (صاحب امتیاز)',
+  withdrawn: 'فرماندهی استودیو',
+  totalSpent: 'مالکیت ۱۰۰٪ 👑',
   isCreator: true,
   assetsBought: [
-    'Full copyright ownership across all 6 concept art pipelines',
-    'Commercial and intellectual property rights for TAJINKART universes',
-    'Visual development and studio original IP catalog',
-    'Master Command access token with Google 2FA verification'
+    'حق امتیاز کامل پایپلاین‌های شش‌گانه کانسپت آرت',
+    'حق مالکیت تجاری و معنوی جهان‌های TAJINKART',
+    'توسعه بصری و دارایی‌های اورجینال استودیو',
+    'کلید دسترسی کامل ادمین با تایید ۲ مرحله‌ای گوگل'
   ]
 };
 
@@ -3780,16 +3759,16 @@ function renderAdminSketch3(filterText = '') {
   // پین کردن حساب سید سروش تاج در پایین‌ترین موقعیت لیست
   membersHtml += `
     <div style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(250,204,21,0.35);">
-      <div style="font-size:10.5px; color:var(--gold); font-weight:800; margin-bottom:6px; padding-right:2px;">Studio Command:</div>
+      <div style="font-size:10.5px; color:var(--gold); font-weight:800; margin-bottom:6px; padding-right:2px;">فرماندهی استودیو:</div>
       <div class="member-list-item ${isCreatorSelected ? 'active' : ''}" onclick="selectAdminCreator()" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, rgba(250,204,21,0.1), #04060a); border:1px solid ${isCreatorSelected ? 'var(--gold)' : 'rgba(250,204,21,0.4)'}; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
         <div style="display:flex; align-items:center; gap:8px;">
           <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, #f59e0b, #d97706); font-size:14px; display:flex; align-items:center; justify-content:center;">👑</div>
           <div>
-            <div style="font-size:12px; font-weight:900; color:#fbbf24;">Seyed Soroush Taj</div>
+            <div style="font-size:12px; font-weight:900; color:#fbbf24;">سید سروش تاج</div>
             <div class="font-mono" style="font-size:10px; color:rgba(255,255,255,0.7);">tajinkart@gmail.com</div>
           </div>
         </div>
-        <span style="font-size:9.5px; font-weight:800; color:#000; background:var(--gold); padding:2px 6px; border-radius:6px;">Studio Creator 👑</span>
+        <span style="font-size:9.5px; font-weight:800; color:#000; background:var(--gold); padding:2px 6px; border-radius:6px;">خالق اثر 👑</span>
       </div>
     </div>
   `;
@@ -3843,7 +3822,7 @@ function renderAdminMemberDetail(m) {
         </div>
       </div>
 
-      <!-- Studio Orders Intake Panel -->
+      <!-- پنل یکپارچه سفارش‌های دریافتی استودیو -->
       <div style="margin-top:20px; border-top:1px solid rgba(250,204,21,0.3); padding-top:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
           <h4 style="font-size:14.5px; font-weight:800; color:var(--gold); margin:0;">
@@ -3906,7 +3885,7 @@ function renderAdminMemberDetail(m) {
       </div>
     </div>
 
-    <!-- Client Orders Dossier -->
+    <!-- پنل ادغام‌شده: سفارش‌های دریافتی این کاربر -->
     <div style="margin-top:20px; border-top:1px solid rgba(0,240,255,0.25); padding-top:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin:0;">
@@ -3916,7 +3895,7 @@ function renderAdminMemberDetail(m) {
 
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${userOrders.length === 0 ? 
-          '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; border:1px dashed rgba(255,255,255,0.1); text-align:center;">No commission briefs submitted by this client yet.</div>' : 
+          '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; border:1px dashed rgba(255,255,255,0.1); text-align:center;">هنوز سفارشی توسط این کاربر Unspecified است.</div>' : 
           userOrders.map(o => renderOrderAdminSnippet(o)).join('')
         }
       </div>
@@ -3933,11 +3912,11 @@ function renderAdminMemberDetail(m) {
 // ساخت کارت سفارش درون پنل کاربر
 function renderOrderAdminSnippet(o) {
   const STAGES = [
-    'Brief Received',
-    '50% Retainer Confirmed',
-    'Ideation & Linework',
-    'Master Final Render',
-    'Settled & PSD Handover'
+    'بریف دریافت شد',
+    'ودیعه ۵۰٪ تایید شد',
+    'اتود و لاین‌آرت',
+    'رندر مستر نهایی',
+    'تسویه و تحویل سورس'
   ];
 
   return `
@@ -3945,7 +3924,7 @@ function renderOrderAdminSnippet(o) {
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
         <div>
           <strong style="font-size:13px; color:#fff;">${o.pkg || 'Concept Art Commission'}</strong>
-          <span class="font-mono" style="font-size:10.5px; color:var(--gold); display:block; margin-top:2px;">#${o.id} • Quote: ${o.price || 'Bespoke Quote'}</span>
+          <span class="font-mono" style="font-size:10.5px; color:var(--gold); display:block; margin-top:2px;">#${o.id} • Quote: ${o.price || 'توافقی'}</span>
         </div>
         <select onchange="updateOrderStatusFromAdmin(${o.id}, this.value)" style="font-size:11px; padding:4px 8px; background:#080c14; border:1px solid rgba(0,240,255,0.35); border-radius:6px; color:var(--cyan-electric); font-weight:700;">
           ${STAGES.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
@@ -3988,16 +3967,16 @@ window.updateOrderStatusFromAdmin = function(orderId, newStatus) {
         console.log('[Supabase Orders] Order status updated in cloud.');
       });
     }
-    showToast(`Order #${orderId} status updated to "${newStatus}". ✓`, 'success', 3000);
+    showToast(`وضعیت سفارش #${orderId} به «${newStatus}» تغییر یافت. ✓`, 'success', 3000);
     // رندر مجدد جزئیات کاربر
-    const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'Seyed Soroush Taj', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
+    const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'سید سروش تاج', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
     renderAdminMemberDetail(currentMemberObj);
   }
 };
 
 // حذف سفارش توسط ادمین
 window.adminDeleteOrderById = function(orderId) {
-  if (!confirm(`Are you sure you want to permanently delete order #${orderId}?`)) return;
+  if (!confirm(`Are you sure you want to delete order #${orderId} اطمینان دارید؟`)) return;
   ordersList = ordersList.filter(x => x.id !== orderId);
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
   if (window.supabaseClient) {
@@ -4006,7 +3985,7 @@ window.adminDeleteOrderById = function(orderId) {
     });
   }
   showToast('Order deleted successfully.', 'info');
-  const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'Seyed Soroush Taj', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
+  const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'سید سروش تاج', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
   renderAdminMemberDetail(currentMemberObj);
 };
 
@@ -4018,7 +3997,7 @@ window.downloadOrderInvoiceById = function(orderId) {
   const dateStr = new Date().toLocaleDateString('fa-IR');
 
   const invoiceText = `================================================================================
-                    TAJINKART Concept Art & Worldbuilding Studio
+                    استودیو کانسپت آرت و دنیاسازی TAJINKART
                     Official Studio Invoice & Commission Agreement #${o.id}
 ================================================================================
 Invoice CID: ${invNumber}
@@ -4026,14 +4005,14 @@ Date: ${dateStr}
 Client / Studio: ${o.client}
 Contact Channel: ${o.contact}
 Package Title: ${o.pkg}
-Production Phase: ${o.phase || "Standard"}
+Phases طراحی: ${o.phase || 'استاندارد'}
 Total Estimate: ${o.price}
-Production Timeline: ${o.timeline || "As Agreed"}
+Production Timeline: ${o.timeline || 'طبق توافق'}
 --------------------------------------------------------------------------------
 Brief Summary & Specifications:
 ${o.brief}
 --------------------------------------------------------------------------------
-Reference Link: ${o.refLink || 'None Provided'}
+Reference Link: ${o.refLink || 'ارائه نشده'}
 Current Status: ${o.status}
 ================================================================================`;
 
@@ -4058,16 +4037,16 @@ function renderAdminLists() {
           <span>${o.client} <span class="font-mono" style="color:var(--text-muted); font-size:11px;">(${o.contact})</span></span>
           <span class="font-mono" style="color:var(--gold);">${o.pkg}</span>
         </div>
-        <div style="font-size:12px; color:var(--cyan-electric); margin:4px 0;">Selected Phase: ${o.phase || 'Standard'}</div>
+        <div style="font-size:12px; color:var(--cyan-electric); margin:4px 0;">Phases انتخابی: ${o.phase || 'استاندارد'}</div>
         <div style="color:var(--text-muted); font-size:12.5px; margin:4px 0; line-height:1.6;">${o.brief}</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:11.5px;">
-          <span style="color:var(--amber);">Project Status: <strong>${o.status}</strong></span>
+          <span style="color:var(--amber);">وضعیت پروژه: <strong>${o.status}</strong></span>
           <select onchange="updateOrderStatus(${idx}, this.value)" style="width:auto; padding:4px 8px; font-size:11.5px;">
-            <option value="Brief Received" ${o.status === 'Brief Received' ? 'selected' : ''}>Brief Received</option>
-            <option value="Phase 1: Initial Ideation" ${(o.status === 'Phase 1: Initial Ideation') ? 'selected' : ''}>Phase 1: Initial Ideation</option>
-            <option value="Phase 2: Linework" ${(o.status === 'Phase 2: Linework') ? 'selected' : ''}>Phase 2: Linework</option>
-            <option value="Phase 3: Render & Lighting" ${(o.status === 'Phase 3: Render & Lighting') ? 'selected' : ''}>Phase 3: Render & Lighting</option>
-            <option value="Final Delivery & Handover" ${(o.status === 'Final Delivery & Handover') ? 'selected' : ''}>Final Delivery & Handover</option>
+            <option value="بریف دریافت شد" ${o.status === 'بریف دریافت شد' ? 'selected' : ''}>بریف دریافت شد</option>
+            <option value="Phases ۱: اتود اولیه" ${o.status === 'Phases ۱: اتود اولیه' ? 'selected' : ''}>Phases ۱: اتود اولیه</option>
+            <option value="Phases ۲: لاین‌آرت" ${o.status === 'Phases ۲: لاین‌آرت' ? 'selected' : ''}>Phases ۲: لاین‌آرت</option>
+            <option value="Phases ۳: رندر و نور" ${o.status === 'Phases ۳: رندر و نور' ? 'selected' : ''}>Phases ۳: رندر و نور</option>
+            <option value="تحویل نهایی و تکمیل" ${o.status === 'تحویل نهایی و تکمیل' ? 'selected' : ''}>تحویل نهایی و تکمیل</option>
           </select>
         </div>
       </div>
@@ -4080,7 +4059,7 @@ window.updateOrderStatus = function(idx, newStatus) {
   localStorage.setItem(KEYS.ORDERS, JSON.stringify(ordersList));
   renderAdminLists();
   renderMemberDashboard();
-  showToast('Project status updated! ✓', 'success');
+  showToast('وضعیت پروژه به‌روزرسانی شد.', 'success');
 };
 
 function renderMemberDashboard() {
@@ -4110,7 +4089,7 @@ function renderMemberDashboard() {
 
   const contactEl = document.getElementById('dashMemberContact');
   if (contactEl) {
-    contactEl.textContent = (currentMember && currentMember.contact) ? currentMember.contact : 'Direct Studio Channel';
+    contactEl.textContent = (currentMember && currentMember.contact) ? currentMember.contact : 'ارتباط مستقیم با استودیو';
   }
 
   // تنظیم هاله و نماد آواتار
@@ -4143,11 +4122,11 @@ function renderMemberDashboard() {
   const passBtn = document.getElementById('dashChangePassBtn');
   if (passBtn) {
     if (currentMember && currentMember.isGoogleUser) {
-      passBtn.innerHTML = '🔑 Set Independent Password (Optional)';
-      passBtn.title = 'You are signed in via Google; you can optionally set an independent password.';
+      passBtn.innerHTML = '🔑 ایجاد رمز عبور مستقل (اختیاری)';
+      passBtn.title = 'شما با حساب امن گوگل وارد شده‌اید؛ در صورت تمایل می‌توانید یک رمز مستقل نیز تعریف فرمایید.';
     } else {
-      passBtn.innerHTML = '🔑 Security Matrix & Password';
-      passBtn.title = 'Change or reset account password';
+      passBtn.innerHTML = '🔑 ماتریس امنیت و رمز عبور';
+      passBtn.title = 'تغییر یا بازنشانی رمز عبور این حساب';
     }
   }
 
@@ -4169,37 +4148,37 @@ function renderMemberDashboard() {
 
   const ordersToRender = userOrders.length > 0 ? userOrders : [{
     id: 701,
-    pkg: 'Cyberpunk Rogue Concept & Turnaround Sheet (Active Brief)',
-    price: '80 (50% Retainer Settled)',
-    status: 'Phase 3: Silhouette approved; 3-view turnaround linework in progress',
-    phase: 'Phase 3 • Linework & 3-View Turnaround',
-    timeline: '5 to 7 business days',
-    brief: 'Full-body rogue cyberpunk character exploration with distressed dark cloak and biomechanical plate armor. Form silhouettes approved; 3-view turnaround linework in active progress.'
+    pkg: 'کانسپت آرت کاراکتر سایبرپانک و شیت اکسپرشن (پروژه فعال)',
+    price: '$180 (ودیعه ۵۰٪ تسویه شده)',
+    status: 'Phases ۳: اتود اولیه و لاین‌آرت ارتوگرافیک در جریان است',
+    phase: 'Phases ۳ • لاین‌آرت و شیت سه‌نما',
+    timeline: '۵ تا ۷ روز کاری',
+    brief: 'طراحی فیگور تمام‌قد کاراکتر سایبرپانک روگ با شنل تیره و قطعات بیومکانیکال زره. در حال حاضر اتودهای سیلوئت تایید شده و لاین‌آرت سه‌نما در حال تکمیل است.'
   }];
 
   if (oBox) {
     oBox.innerHTML = ordersToRender.map(o => {
       let currentStageNum = 1;
       const stLower = (o.status || '').toLowerCase();
-      if (stLower.includes('deposit') || stLower.includes('retainer') || stLower.includes('settled')) currentStageNum = 2;
-      else if (stLower.includes('linework') || stLower.includes('silhouette') || stLower.includes('progress') || stLower.includes('turnaround')) currentStageNum = 3;
-      else if (stLower.includes('render') || stLower.includes('chiaroscuro') || stLower.includes('final') || stLower.includes('lighting')) currentStageNum = 4;
-      else if (stLower.includes('settled') || stLower.includes('handover') || stLower.includes('delivery') || stLower.includes('complete')) currentStageNum = 5;
+      if (stLower.includes('ودیعه') || stLower.includes('پیش‌پرداخت')) currentStageNum = 2;
+      else if (stLower.includes('اتود') || stLower.includes('طراحی') || stLower.includes('تولید')) currentStageNum = 3;
+      else if (stLower.includes('رندر') || stLower.includes('نهایی')) currentStageNum = 4;
+      else if (stLower.includes('تسویه') || stLower.includes('تحویل') || stLower.includes('تکمیل')) currentStageNum = 5;
 
       return `
         <div style="padding:22px; background:#04060b; border-radius:16px; border:1px solid rgba(0,240,255,0.25); font-size:12px; display:flex; flex-direction:column; gap:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); position:relative; overflow:hidden;">
           
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
-              <span style="font-size:15px; font-weight:900; color:#fff; display:block;">${o.pkg || 'Custom Concept Art Commission'}</span>
-              <span class="font-mono" style="font-size:11px; color:var(--gold); margin-top:3px; display:block;">Brief CID: #${o.id} • Quote: ${o.price || 'Bespoke Quote'}</span>
+              <span style="font-size:15px; font-weight:900; color:#fff; display:block;">${o.pkg || 'سفارش اختصاصی کانسپت آرت'}</span>
+              <span class="font-mono" style="font-size:11px; color:var(--gold); margin-top:3px; display:block;">Brief CID: #${o.id} • Quote: ${o.price || 'توافقی'}</span>
             </div>
             <span style="background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.35); padding:4px 14px; border-radius:999px; font-size:11.5px; font-weight:800; letter-spacing:0.3px;">
-              ${o.status || 'Brief Received'}
+              ${o.status || 'بریف دریافت شد'}
             </span>
           </div>
 
-          <!-- 5-Stage Production Conduit Stepper -->
+          <!-- ۵ گام متصل جریان تولید (Conduit Progress Stepper) -->
           <div style="background:#080c16; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px 12px; position:relative;">
             <div style="display:flex; justify-content:space-between; position:relative;">
               ${STAGES.map(s => {
@@ -4224,12 +4203,12 @@ function renderMemberDashboard() {
 
           <div style="color:#cbd5e1; font-size:12px; line-height:1.8; background:rgba(255,255,255,0.02); padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
             <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Brief Summary & Scope Specifications:</strong>
-            ${o.brief || 'Custom concept art and worldbuilding design engineered to highest industry standards at TAJINKART.'}
+            ${o.brief || 'طراحی تخصصی کانسپت آرت و دنیاسازی در استودیو تاجین‌کارت با بالاترین استانداردهای صنعتی.'}
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
-            <span>Current Phase: <strong style="color:#fff;">${o.phase || 'Standard 300DPI'}</strong></span>
-            <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'Per Production Schedule'}</strong></span>
+            <span>Current Phase: <strong style="color:#fff;">${o.phase || 'استاندارد ۳۰۰DPI'}</strong></span>
+            <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'طبق زمان‌بندی پروژه'}</strong></span>
             <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--gold); color:var(--gold);">
               📄 Download Invoice
             </button>
@@ -4246,8 +4225,8 @@ function renderMemberDashboard() {
     const VAULT_ITEMS = [
       {
         id: 1,
-        title: 'Masterclass: Fantasy Character Design & Armor Rendering',
-        desc: '14 advanced masterclass modules covering silhouette ideation, anatomical rhythm, and metal/fabric rendering in Photoshop.',
+        title: 'مسترکلاس جامع طراحی کاراکتر فانتزی و متریال زره',
+        desc: '۱۴ جلسه آموزشی فوق‌پیشرفته از اسکچ اولیه، سیلوئت تا رندر متریال‌های فلز و پارچه با فوتوشاپ.',
         format: 'VIDEO + PSD',
         size: '4.8 GB',
         license: 'Standard Atelier License',
@@ -4255,8 +4234,8 @@ function renderMemberDashboard() {
       },
       {
         id: 2,
-        title: '64-Pack Alpha Brush Engine: Monster Skin & Weathered Rust',
-        desc: 'Proprietary studio alpha brushes for rendering heavy armor chipping, reptilian scales, and seamless dark fantasy textures.',
+        title: 'موتور ۶۴ عددی براش و بافت آلفای زنگ‌زدگی و پوست هیولا',
+        desc: 'براش‌های اختصاصی استودیو برای پینتینگ بافت‌های سخت، فلس، متریال کهنه و الگوهای بدون درز (Seamless).',
         format: '.ABR + PNG',
         size: '340 MB',
         license: 'Commercial Production License',
@@ -4264,8 +4243,8 @@ function renderMemberDashboard() {
       },
       {
         id: 3,
-        title: 'Genesis Lore Archives & Extopia Digital Artbook',
-        desc: 'Historical worldbuilding manuscripts, timelines, and 60 pages of high-resolution print-ready concept art.',
+        title: 'اسناد لور جنسیس و آرت‌بوک دیجیتال اکستوپیا',
+        desc: 'مجموعه دست‌نوشته‌ها، تایم‌لاین‌های تاریخی دنیاسازی و ۶۰ صفحه کانسپت آرت با رزولوشن چاپ کتاب.',
         format: 'PDF 300DPI',
         size: '185 MB',
         license: 'Collector Special Edition',
@@ -4273,8 +4252,8 @@ function renderMemberDashboard() {
       },
       {
         id: 4,
-        title: 'Dark Fantasy UI Elements & Prop Kit (120 Icons)',
-        desc: 'Layered magic skill icons, shields, and runic glyphs optimized for Unity, Unreal Engine 5, and Godot.',
+        title: 'کیت پراپ و المان‌های رابط کاربری دارک‌فانتزی (۱۲۰ آیکون)',
+        desc: 'آیکون‌های مهارت جادو، شیلدها و نشان‌های رونیک با لایه‌های تفکیک‌شده برای موتورهای بازی یونیتی و گودو.',
         format: 'PNG + SVG',
         size: '95 MB',
         license: 'Commercial Game Ready',
@@ -4364,7 +4343,7 @@ window.toggleAtelierPinDropper = function() {
         <span class="pin-beacon"></span>
         <span class="pin-core">${pinCount}</span>
         <div class="pin-hover-card">
-          <strong>Pin #${pinCount}: Client Feedback</strong>
+          <strong>پین ${pinCount}: بازخورد موکل</strong>
           <p>${note.trim()}</p>
         </div>
       `;
@@ -4392,33 +4371,33 @@ window.switchAtelierConsoleTab = function(tabKey) {
 window.downloadOfficialStudioInvoice = function() {
   const invNumber = `TJK-INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   const dateStr = new Date().toLocaleDateString('fa-IR');
-  const clientName = currentMember ? currentMember.name : 'Esteemed Studio Client';
+  const clientName = currentMember ? currentMember.name : 'موکل گرامی استودیو';
 
   const invoiceText = `================================================================================
-                    TAJINKART Concept Art & Worldbuilding Studio
-                    Official Studio Production SLA & Proforma Invoice
+                    استودیو کانسپت آرت و دنیاسازی TAJINKART
+                    پیش‌فاکتور و سند رسمی تعهدات تولید اثر
 ================================================================================
 Invoice CID: ${invNumber}
-Registration Date: ${dateStr}
+تاریخ ثبت: ${dateStr}
 Client / Studio: ${clientName}
-Creative Director & Lead Artist: Seyed Soroush Taj
-Studio Email: tajinkart@gmail.com
-Official Domain: https://tajinkart.space
+مدیر تولید و طراح ارشد: سید سروش تاج (Seyed Soroush Taj)
+ایمیل استودیو: tajinkart@gmail.com
+دامنه رسمی: https://tajinkart.space
 --------------------------------------------------------------------------------
-Scope of Production Services:
-1. Original Concept Artwork Production (Character & Worldbuilding IP)
-2. Exploratory Ideation & 5 Initial Form Silhouettes
-3. 3-View Orthographic Model Sheet for 3D Production Pipelines
-4. Master Final Render at 300DPI (Cinema & Print Standard)
-5. Layered Master PSD Handover in 4K UHD Resolution
+شرح خدمات:
+۱. تولید کانسپت آرت اورجینال (Character & Worldbuilding IP)
+۲. مرحله اکتشاف و ۵ اتود اولیه سیلوئت
+۳. شیت سه‌نمای ارتوگرافیک (Orthographic Model Sheet) جهت مدل‌سازی سه‌بعدی
+۴. رندر نهایی با کیفیت ۳۰۰DPI استاندارد چاپ و سینما
+۵. تحویل سورس لایه‌باز Master PSD با رزولوشن 4K UHD
 --------------------------------------------------------------------------------
-Financial Terms & Settlement:
-- Estimated Fee: Per official studio agreement
-- Mandatory Retainer: 50% advance to lock studio production calendar
-- Final Settlement: 50% upon master render approval prior to layered PSD handover
+شرایط مالی و پرداخت:
+- مبلغ برآورد: طبق قرارداد رسمی آتلیه
+- ودیعه الزامی: ۵۰٪ جهت قفل تقویم کاری طراح
+- تسویه نهایی: ۵۰٪ همزمان با تایید مستر رندر و پیش از تحویل سورس لایه‌باز
 --------------------------------------------------------------------------------
-Official Digital Certification TAJINKART // 2026
-Commercial copyright transferred upon final settlement.
+تاییدیه دیجیتال استودیو TAJINKART // ۲۰۲۶
+حق نشر و مالکیت معنوی پس از تسویه نهایی به موکل واگذار می‌گردد.
 ================================================================================`;
 
   const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8' });
@@ -4430,14 +4409,14 @@ Commercial copyright transferred upon final settlement.
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('Official studio proforma invoice downloaded successfully. 📄', 'success');
+  showToast('پیش‌فاکتور رسمی استودیو با موفقیت downloaded successfully. 📄', 'success');
 };
 
 // دانلود دارایی دیجیتال از خزانه
 window.triggerVaultAssetDownload = function(title, format) {
-  showToast(`Download request for ${title} (${format}) verified. Establishing secure cloud connection...`, 'info', 4000);
+  showToast(`درخواست دانلود ${title} (${format}) ثبت شد. اتصال امن به کلاد آتلیه برقرار گردید...`, 'info', 4000);
   setTimeout(() => {
-    showToast('File delivered successfully. Checksum: SHA256-VERIFIED ✓', 'success');
+    showToast(`فایل با موفقیت ارسال شد. کد اعتبارسنجی: SHA256-VERIFIED ✓`, 'success');
   }, 1200);
 };
 
@@ -4460,7 +4439,7 @@ window.exportSiteDataJSON = function() {
   a.download = `tajinkart_master_backup_${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Complete data backup (JSON) downloaded successfully! ✓', 'success');
+  showToast('بک‌آپ کامل داده‌ها (JSON) دانلود شد.', 'success');
 };
 
 // دانلود سورس کامل به‌روز شده HTML
@@ -4473,7 +4452,7 @@ window.exportFullSelfContainedHTML = function() {
   a.download = 'index.html';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Standalone index.html saved successfully! ✓', 'success');
+  showToast('فایل کامل index.html مستقل ذخیره شد!', 'success');
 };
 
 // راه‌اندازی اولیه در زمان لود صفحه با پایداری ۱۰۰٪ و تفکیک خطا
@@ -4518,7 +4497,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const client = document.getElementById('orderClientName').value.trim();
       const contact = document.getElementById('orderClientContact').value.trim();
-      const refLink = document.getElementById('orderClientRefLink')?.value.trim() || 'None provided (Studio visual research applied)';
+      const refLink = document.getElementById('orderClientRefLink')?.value.trim() || 'ارائه نشده (ریسرچ بصری با استودیو)';
       const phase = document.getElementById('orderPhaseSelect').value;
       const brief = document.getElementById('orderClientBrief').value.trim();
       const priceText = document.getElementById('modalPrice').textContent;
@@ -4533,7 +4512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timeline: activeModalItem.timeline,
         phase: phase,
         brief: brief,
-        status: 'Brief Received'
+        status: 'بریف دریافت شد'
       };
 
       ordersList.unshift(newOrder);
@@ -4620,7 +4599,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (error.message.includes('Email not confirmed')) {
               showToast('Email not confirmed. Please check your verification link.', 'info');
             } else {
-              showToast(error.message || 'Login error occurred.', 'error');
+              showToast(error.message || 'خطا در ورود به حساب.', 'error');
             }
             return;
           }
@@ -4688,7 +4667,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let fullContactNumber = '';
       if (cleanDigits.length > 0) {
         if (cleanDigits.length < 7 || cleanDigits.length > 15) {
-          showToast('Invalid phone number length (must be 7-15 digits).', 'error');
+          showToast('طول شماره تلفن وارد شده نامعتبر است (باید بین ۷ تا ۱۵ رقم باشد).', 'error');
           document.getElementById('signupPhone')?.focus();
           return;
         }
@@ -4743,11 +4722,11 @@ document.addEventListener('DOMContentLoaded', () => {
               const loginEmailEl = document.getElementById('loginEmail');
               if (loginEmailEl) loginEmailEl.value = email;
             } else if (msg.includes('rate limit') || msg.includes('over_email_send_rate_limit')) {
-              showToast('Too many requests. Please wait a few minutes and try again.', 'error', 6000);
+              showToast('تعداد درخواست‌ها بیش از حد مجاز است. لطفاً چند دقیقه دیگر مجدداً تلاش فرمایید.', 'error', 6000);
             } else if (msg.includes('password should be') || msg.includes('weak password')) {
-              showToast('Password is too weak; please enter at least 6 mixed characters.', 'error');
+              showToast('رمز عبور وارد شده بسیار ضعیف است؛ حداقل ۶ کاراکتر ترکیبی وارد فرمایید.', 'error');
             } else {
-              showToast('Registration error: ' + (error.message || 'Failed to create cloud account'), 'error', 6000);
+              showToast('خطا در ثبت‌نام: ' + (error.message || 'ثبت حساب در سرور ابری انجام نشد'), 'error', 6000);
             }
             return;
           }
@@ -4831,11 +4810,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const iden = document.getElementById('forgotIdentifier')?.value.trim().toLowerCase();
 
       if (!iden || !iden.includes('@')) {
-        showToast('Please enter a valid email address.', 'error');
+        showToast('لطفاً یک آدرس ایمیل معتبر وارد فرمایید.', 'error');
         return;
       }
 
-      showToast('Verifying account credentials...', 'info');
+      showToast('در حال بررسی و اعتبارسنجی حساب کاربری...', 'info');
 
       // ۱. بررسی قطعی وجود داشتن ایمیل در استودیو قبل از صدور درخواست
       let emailExists = false;
@@ -4871,7 +4850,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // در صورت عدم وجود ایمیل، بلافاصله ارور شفاف و ممانعت از ارسال پیام کاذب
       if (!emailExists) {
-        showToast('No account found with this email! Please check the address or sign up first.', 'error', 6000);
+        showToast('حساب کاربری با این آدرس ایمیل در سیستم یافت نشد! لطفاً ایمیل را بررسی کرده یا ابتدا ثبت‌نام فرمایید.', 'error', 6000);
         return;
       }
 
@@ -4886,7 +4865,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (error) {
             console.warn('[Supabase Reset Pass Error]', error);
-            showToast(error.message || 'Error sending recovery email.', 'error');
+            showToast(error.message || 'خطا در ارسال ایمیل بازیابی.', 'error');
             return;
           }
 
@@ -4898,7 +4877,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      showToast('Cloud authentication service unavailable.', 'error');
+      showToast('سرویس احراز هویت ابری در دسترس نیست.', 'error');
     });
   }
 
@@ -4926,7 +4905,7 @@ document.addEventListener('DOMContentLoaded', () => {
       safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
       renderProducts();
       selectPipeline(currentSelectedPipeKey, null, false);
-      showToast('Global settings and exchange rate updated! ✓', 'success');
+      showToast('تنظیمات سراسری ذخیره و نرخ دلار به‌روزرسانی شد!', 'success');
     });
   }
 
@@ -4939,11 +4918,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const p2 = document.getElementById('userNewPasswordConfirm')?.value.trim();
 
       if (!p1 || p1.length < 6) {
-        showToast('Password must be at least 6 characters.', 'error');
+        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد.', 'error');
         return;
       }
       if (p1 !== p2) {
-        showToast('Password confirmation does not match!', 'error');
+        showToast('تکرار رمز عبور با رمز واردشده مطابقت ندارد!', 'error');
         return;
       }
 
@@ -4981,7 +4960,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           if (!currentSession) {
-            showToast('Security session expired. Please request a new link via Forgot Password.', 'error', 7000);
+            showToast('نشست امنیتی شما یافت نشد یا منقضی شده است! لطفاً مجدداً از بخش «فراموشی رمز عبور» درخواست لینک جدید فرمایید.', 'error', 7000);
             sessionStorage.removeItem('tajinkart_recovering_password');
             isRecoveryFlowDetected = false;
             return;
@@ -4995,11 +4974,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('[Update Password Error]', error);
             const msg = (error.message || '').toLowerCase();
             if (msg.includes('session missing') || msg.includes('auth session missing')) {
-              showToast('Recovery link expired or invalid. Please request a new recovery link.', 'error', 7000);
+              showToast('لینک بازیابی منقضی شده یا نامعتبر است! لطفاً مجدداً از بخش «فراموشی رمز عبور» لینک جدید دریافت کنید.', 'error', 7000);
             } else if (msg.includes('should be different') || msg.includes('same password')) {
-              showToast('New password cannot match previous password! Please choose a different password.', 'error');
+              showToast('رمز عبور جدید نمی‌تواند با رمز عبور قبلی یکسان باشد! لطفاً رمز متفاوتی انتخاب فرمایید.', 'error');
             } else {
-              showToast('Password update error: ' + (error.message || 'Please try again'), 'error');
+              showToast('خطا در به‌روزرسانی رمز: ' + (error.message || 'لطفاً دوباره امتحان کنید'), 'error');
             }
             return;
           }
@@ -5016,12 +4995,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } catch (updateErr) {
           console.warn('[Supabase Password Update Exception]', updateErr);
-          showToast('Error communicating with authentication server. Please try again.', 'error');
+          showToast('خطا در ارتباط با سرور احراز هویت. لطفاً مجدداً تلاش فرمایید.', 'error');
           return;
         }
       }
 
-      showToast('Cloud authentication service unavailable.', 'error');
+      showToast('سرویس احراز هویت ابری در دسترس نیست.', 'error');
     });
   }
 
@@ -5085,7 +5064,7 @@ window.handleAdminArtDrop = function(e, targetIdx) {
   // رندر مجدد گرید ادمین و گالری صفحه اصلی
   renderAdminSketch2();
   renderShowcaseGrid();
-  showToast('Artwork display sequence updated successfully! ✓', 'success');
+  showToast('ترتیب نمایش آثار با موفقیت تغییر یافت!', 'success');
 
   // همگام‌سازی ابری ترتیب در سوپابیس
   syncArtworkOrderToSupabase();
@@ -5123,10 +5102,10 @@ window.handleGoogleSignIn = async function() {
     if (window.ensureSupabaseClient) window.ensureSupabaseClient();
   }
   if (!window.supabaseClient || !window.supabaseClient.auth) {
-    showToast('Authentication service connecting, please click again.', 'info');
+    showToast('سرویس احراز هویت در حال اتصال است، لطفاً مجدداً کلیک کنید.', 'info');
     return;
   }
-  showToast('Redirecting to Google secure authentication...', 'info');
+  showToast('در حال انتقال به صفحه امن ورود گوگل...', 'info');
   try {
     sessionStorage.setItem('tajinkart_google_signing_in', 'true');
     const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
@@ -5140,11 +5119,11 @@ window.handleGoogleSignIn = async function() {
     });
     if (error) {
       console.warn('Google sign-in error:', error);
-      showToast('Google authentication error: ' + error.message, 'error');
+      showToast('خطا در اتصال به گوگل: ' + error.message, 'error');
     }
   } catch (err) {
     console.error('Google sign-in exception:', err);
-    showToast('Unable to connect to Google account.', 'error');
+    showToast('امکان اتصال به حساب گوگل وجود ندارد.', 'error');
   }
 };
 
@@ -5155,13 +5134,13 @@ window.handleGoogleSignIn = async function() {
 window.adminDeleteMember = function(idx) {
   if (!siteMembersData || !siteMembersData[idx]) return;
   const m = siteMembersData[idx];
-  if (confirm(`Are you sure you want to remove user "${m.name}" (${m.email}) from local panel? (You can restore from cloud anytime)`)) {
+  if (confirm(`آیا از حذف کاربر «${m.name}» (${m.email}) از پنل اطمینان دارید؟ (با دکمه بازیابی ابری همیشه می‌توانید آن را برگردانید)`)) {
     const deletedEmail = m.email;
     siteMembersData.splice(idx, 1);
     safeSetStorage(KEYS.MEMBERS, JSON.stringify(siteMembersData));
     selectedMemberIdx = 0;
     renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
-    showToast(`User "${m.name}" removed from panel list. Use "Sync from Cloud" to restore.`, 'info');
+    showToast(`کاربر «${m.name}» از لیست پنل حذف شد. با دکمه «بازیابی از سرور ابری» می‌توانید بازگردانیدش.`, 'info');
 
     // حذف از جدول عمومی members در سوپابیس
     if (window.supabaseClient && deletedEmail) {
@@ -5186,7 +5165,7 @@ window.exportMembersBackupJSON = function() {
   a.download = `tajinkart_members_backup_${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Members backup (JSON) downloaded successfully! ✓', 'success');
+  showToast('نسخه پشتیبان کامل اطلاعات اعضا (JSON) با موفقیت دانلود شد.', 'success');
 };
 
 
@@ -5199,11 +5178,11 @@ window.togglePasswordVisibility = function(inputId, btnEl) {
   if (input.type === 'password') {
     input.type = 'text';
     btnEl.textContent = '🔒';
-    btnEl.title = 'Hide Password';
+    btnEl.title = 'مخفی‌سازی رمز';
   } else {
     input.type = 'password';
     btnEl.textContent = '👁️';
-    btnEl.title = 'Show Password';
+    btnEl.title = 'نمایش رمز';
   }
 };
 
@@ -5212,53 +5191,46 @@ window.togglePasswordVisibility = function(inputId, btnEl) {
 // سامانه مدیریت پویا و زنده منشور قوانین، لایسنس و شرایط استودیو
 // =========================================================
 
-const DEFAULT_STUDIO_TERMS = `### 1. Accuracy of Information & User Identity Warranty
-By registering or submitting any project brief, the client explicitly warrants that all identity and contact credentials (name, email, telegram handle) are accurate and authentic. TAJINKART assumes no liability for missed communications or delayed deliveries resulting from client clerical errors.
+const DEFAULT_STUDIO_TERMS = `### ۱. اصل صحت اطلاعات و سلب مسئولیت اشتباهات کاربر (Accuracy of Information)
+کاربر با ثبت‌نام در وب‌سایت یا ثبت هرگونه سفارش صراحتاً اقرار و ضمانت می‌نماید که کلیه مشخصات هویتی و ارتباطی ارائه‌شده (شامل نام، لقب، آدرس ایمیل و شماره تماس) واقعی، دقیق و متعلق به خود اوست. استودیو تاج‌اینک‌آرت هیچ‌گونه مسئولیتی در قبال تایپ اشتباه آدرس جیمیل، عدم دریافت ایمیل‌های فعال‌سازی، فراموشی رمز عبور، یا از دست رفتن دسترسی به فایل‌ها ناشی از خطای کاربر ندارد و بار حقوقی هرگونه خسارت انحصاراً بر عهده خود کاربر است.
 
-### 2. General Terms vs. Production Commission SLA
-Platform registration signifies adherence to general community conduct and copyright protection. Binding production conditions, including the non-refundable 50% retainer, project deadlines, revision caps, and NDAs, take legal effect upon formal brief confirmation and invoice settlement.
+### ۲. تفکیک قوانین عمومی ورود از قرارداد خرید (ToS vs Commission SLA)
+تایید قوانین در مرحله ثبت‌نام صرفاً به منزله پذیرش مقررات عمومی پلتفرم، سن مجاز (۱۶+ سال) و حفاظت از کلیت مالکیت فکری استودیو است. شروط مالی سنگین نظیر ودیعه ۵۰٪ غیرقابل‌استرداد، ددلاین‌ها، سقف ادیت‌ها و توافقات محرمانگی، منحصراً در لحظه ثبت قطعی فرم سفارش و پیش از پرداخت فعال شده و به امضای طرفین می‌رسد.
 
-### 3. Regional & Communication Transparency
-TAJINKART is an independent concept art and visual development atelier directed by Seyed Soroush Taj, collaborating globally with international studios. The atelier maintains redundant encrypted backup channels (Telegram & PGP email) to ensure seamless, real-time client communications across international timezones.
+### ۳. شفافیت جغرافیایی، منطقه زمانی و کانال‌های ارتباطی (Regional & Communication Transparency)
+استودیو تاج‌اینک‌آرت با مدیریت سید سروش تاج به‌صورت مستقل در ایران مستقر بوده و به شکل فریلنس و بین‌المللی با کارفرمایان سراسر جهان همکاری می‌نماید. ساعات کاری رسمی استودیو بر پایه منطقه زمانی ایران (UTC+3:30) تنظیم شده است. در صورت وقوع هرگونه اختلال یا کندی موقت در شبکه زیرساخت اینترنت منطقه‌ای، استودیو از کانال‌های امن و پایدار پشتیبان (شامل تلگرام و ایمیل‌های رمزنگاری‌شده) جهت حفظ پیوستگی ارتباطات استفاده می‌نماید.
 
-### 4. Global Payments & Currency Settlement
-International clients may settle retainers and final deliverables via major cryptocurrencies (USDT TRC20/ERC20) or mutually agreed international wire transfers. Remittance transaction and gas fees are the responsibility of the payer.
+### ۴. روش‌های پرداخت بین‌المللی و تسویه ارزی (Global Payments & Cryptocurrency)
+سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل TOMANی نرخ روز صورت می‌پذیرد.
 
-### 5. Client Materials & Reference Indemnity
-The client warrants that all lore, concept sketches, logos, and reference materials supplied for creative direction are legally owned or authorized for commercial development. The client indemnifies TAJINKART against any third-party intellectual property claims.
+### ۵. تضمین اصالت رفرنس‌های ارسالی مشتری (Client Materials Indemnity)
+مشتری متعهد و ضامن است که تمامی تصاویر، کانسپت‌ها، لوگوها و فایل‌های متنی که به عنوان بریف یا رفرنس به استودیو ارسال می‌کند، یا در مالکیت قانونی اوست یا حق بهره‌برداری از آن‌ها را دارد. در صورت بروز هرگونه ادعای نقض کپی‌رایت توسط اشخاص ثالث علیه استودیو ناشی از مواد ارائه‌شده توسط مشتری، مسئولیت حقوقی و جبران کامل خسارت منحصراً متوجه مشتری خواهد بود.
 
-### 6. Inactivity & Project Abandonment Clause
-Following milestone submissions, the client agrees to provide feedback within 14 business days. In the event of 30 consecutive calendar days of client silence, the project is deemed abandoned; the 50% retainer is retained for reserved studio capacity, and the brief is formally closed.
+### ۶. بند بلاتکلیفی و رهاسازی سفارش (Inactivity & Abandonment Clause)
+پس از ارسال اتودها یا Phasesهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.
 
-### 7. Modern AI Transparency & Original IP Direction
-TAJINKART employs cutting-edge AI models strictly as technical copilots (workflow acceleration, coding, and thumbnail ideation). The Genesis universe, lore, characters, and master digital brushwork represent the original intellectual property of Seyed Soroush Taj. Training custom models (e.g., LoRAs) on studio assets is strictly prohibited.
+### ۷. سیاست مدرن هوش مصنوعی و هدایت هنری (Modern AI Transparency)
+استودیو تاج‌اینک‌آرت استفاده از فناوری‌های نوین و مدل‌های هوش مصنوعی را به عنوان کپیلوت (دستیار فنی، کدنویسی و تسریع پایپلاین) به کار می‌بندد؛ با این وجود، جهان‌سازی جنسیس، داستان‌ها، نژادها، کاراکترهای اورجینال و هدایت بصری، دستاورد فکری سید سروش تاج است. هرگونه کپی‌برداری تجاری، آموزش مدل‌های اختصاصی (مانند LoRA) جهت بازتولید عامدانه کاراکترهای استودیو، یا جعل هویت تجاری تاج‌اینک‌آرت ممنوع و دارای پیگرد است.
 
-### 8. Digital Vault Assets EULA & Anti-Piracy License
-Purchasing digital assets (artbooks, brush packs, 3D models, and master PSDs) grants a perpetual single-seat commercial license. Reselling, public sharing on forums, or redistributing via torrents constitutes copyright infringement and results in immediate permanent account termination.
+### ۸. لایسنس دارایی‌های دانلودی و ممنوعیت افشا (EULA & Anti-Leak)
+خرید هرگونه دارایی دیجیتال (آرت‌بوک، براش، مدل سه‌بعدی و تکسچر) دسترسی مادام‌العمر شخصی به فایل‌ها و به‌روزرسانی‌های آینده را به خریدار اعطا می‌کند. هرگونه فروش مجدد، اشتراک‌گذاری در کانال‌های عمومی، وب‌سایت‌های تورنت و دانلود غیرمجاز تخلف قطعی بوده و منجر به مسدودسازی دائمی حساب و پیگرد قانونی خواهد شد.
 
-### 9. Cloud Infrastructure & Force Majeure
-The platform operates on enterprise cloud infrastructure (GitHub Pages, Cloudflare, Supabase, Cloudinary). TAJINKART implements daily distributed backups but assumes no financial liability for global backbone disruptions outside human control.
+### ۹. سلب مسئولیت حوادث قهریه و زیرساخت ابری (Force Majeure)
+سایت بر پایه زیرساخت‌های بین‌المللی GitHub Pages، Supabase و Cloudinary اداره می‌شود. استودیو در قبال اختلالات موقت ناشی از تحریم‌ها، فیلترینگ، قطعی سرورهای بالادستی یا حوادث خارج از کنترل انسانی (فورس ماژور) ضامن خسارت مالی نخواهد بود، هرچند حداکثر تمهیدات جهت حفظ سلامت و بک‌آپ دیتای کاربران اتخاذ شده است.
 
-### 10. Limitation of Liability & Digital Goods Policy
-Due to immediate delivery, digital asset purchases are final and non-refundable. For custom commissions, total studio liability is strictly limited to the actual fee received for that specific commission.
+### ۱۰. سقف مسئولیت مالی و عدم استرداد (Limitation of Liability & No Refund)
+کالاهای دانلودی دیجیتال به دلیل ماهیت دسترسی فوری، پس از خرید غیرقابل‌استرداد هستند. در کلیه دعاوی حقوقی، حداکثر سقف مسئولیت مالی استودیو محدود به همان مبلغ دریافتی از مشتری برای همان سفارش مشخص خواهد بود.
 
-### 11. Moral Rights & Portfolio Attribution
-TAJINKART retains the moral right to display final concept art in its official portfolio and studio publications (with full client IP credit), unless an exclusive confidential non-disclosure agreement (NDA) has been formally executed prior to production.
+### ۱۱. حق امضا و نمایش در پورتفولیو (Moral Rights & Credit)
+استودیو تاج‌اینک‌آرت حق نمایش آثار نهایی را در وب‌سایت، شبکه‌های اجتماعی و پورتفولیوی رسمی خود (با ذکر مالکیت تجاری کارفرما) جهت ارتقای برند برای خود محفوظ می‌دارد، مگر آنکه کارفرما پیش از شروع پروژه قرارداد محرمانگی انحصاری (NDA) با هزینه مشخص منعقد کرده باشد.
 
-### 12. Dispute Resolution & Informal Arbitration
-Both parties agree to pursue informal good-faith negotiations via official studio channels for a minimum period of 30 days prior to initiating formal legal dispute proceedings.`
+### ۱۲. حل و فصل اختلافات و داوری (Dispute Resolution)
+طرفین متعهد می‌شوند پیش از هرگونه اقدام حقوقی، ظرف مدت ۳۰ روز از طریق مکاتبه رسمی با پشتیبانی استودیو و مذاکره دوستانه نسبت به حل اختلاف اقدام نمایند.`;
 
 // واکشی متن ذخیره‌شده یا پیش‌فرض
 window.getStudioTermsContent = function() {
   const saved = localStorage.getItem('tajinkart_studio_terms');
-  if (saved && saved.trim().length > 30) {
-    if (/[\u0600-\u06FF]/.test(saved)) {
-      localStorage.setItem('tajinkart_studio_terms', DEFAULT_STUDIO_TERMS);
-      return DEFAULT_STUDIO_TERMS;
-    }
-    return saved;
-  }
-  return DEFAULT_STUDIO_TERMS;
+  return saved && saved.trim().length > 30 ? saved : DEFAULT_STUDIO_TERMS;
 };
 
 // رندرینگ محتوای قوانین در مودال به صورت بلاک‌های شیک و خوانا
@@ -5324,7 +5296,7 @@ window.saveStudioTerms = async function() {
 
   const newContent = textarea.value.trim();
   if (newContent.length < 20) {
-    showToast('Terms text cannot be empty or under 20 characters.', 'error');
+    showToast('متن قوانین نمی‌تواند خالی یا کمتر از ۲۰ کاراکتر باشد.', 'error');
     return;
   }
 
@@ -5355,7 +5327,7 @@ window.saveStudioTerms = async function() {
 
 // بازنشانی متن به استاندارد رسمی
 window.resetStudioTermsToDefault = function() {
-  if (!confirm('Are you sure you want to reset legal charter to official Master Spec standards?')) return;
+  if (!confirm('آیا از بازنشانی متن منشور قوانین به نسخه رسمی استاندارد (Master Spec) اطمینان دارید؟')) return;
   const textarea = document.getElementById('adminTermsContentInput');
   if (textarea) {
     textarea.value = DEFAULT_STUDIO_TERMS;
@@ -5586,12 +5558,12 @@ window.handleLiveNameCheck = function(nameVal) {
 // تابع ارسال مجدد لینک تایید ایمیل به کاربر در صورت عدم تایید اولیه
 window.resendConfirmationEmail = async function(emailAddress) {
   if (!window.supabaseClient) {
-    showToast('Supabase cloud service unavailable.', 'error');
+    showToast('سامانه ابری سوپابیس در دسترس نیست.', 'error');
     return;
   }
   const email = emailAddress || (window.currentUser && window.currentUser.email);
   if (!email) {
-    showToast('No email address found for resending.', 'error');
+    showToast('آدرس ایمیلی جهت ارسال مجدد یافت نشد.', 'error');
     return;
   }
   try {
@@ -5600,12 +5572,12 @@ window.resendConfirmationEmail = async function(emailAddress) {
       email: email
     });
     if (error) {
-      showToast('Error resending email: ' + error.message, 'error');
+      showToast('خطا در ارسال مجدد Email: ' + error.message, 'error');
     } else {
-      showToast('New verification link sent to ' + email + ' successfully! ✓', 'success', 5000);
+      showToast('لینک تایید جدید با موفقیت به ' + email + ' ارسال گردید.', 'success', 5000);
     }
   } catch(e) {
-    showToast('Network error sending verification email.', 'error');
+    showToast('خطای شبکه در ارسال ایمیل تایید.', 'error');
   }
 };
 
@@ -5625,7 +5597,7 @@ window.moveAdminArtOrder = function(fromIdx, direction) {
   safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
   renderAdminSketch2();
   renderShowcaseGrid();
-  showToast(`Artwork "${movedItem.shortSlug || movedItem.title}" moved to position ${toIdx + 1}! ✓`, 'success');
+  showToast(`اثر «${movedItem.shortSlug || movedItem.title}» به جایگاه ${toIdx + 1} منتقل شد.`, 'success');
   syncArtworkOrderToSupabase();
 };
 
@@ -5716,7 +5688,7 @@ window.initAdminTouchSortable = function() {
           safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
           renderAdminSketch2();
           renderShowcaseGrid();
-          showToast('✓ Artwork sequence updated successfully! ✓', 'success');
+          showToast(`✓ چیدمان اثر با موفقیت جابجا شد.`, 'success');
           syncArtworkOrderToSupabase();
         }
       }
@@ -5892,7 +5864,7 @@ window.openCenteredMagnifier = function(imgSrc, phaseTitle) {
   if (!overlay || !imgEl || !viewport) return;
 
   imgEl.src = imgSrc;
-  if (titleEl) titleEl.textContent = phaseTitle || 'Concept Project Details';
+  if (titleEl) titleEl.textContent = phaseTitle || 'بررسی جزئیات کانسپت';
   overlay.classList.add('active');
 
   // هدایت فوق‌روان ۶۰ فریم بر ثانیه لنز با حرکت موس
@@ -5938,10 +5910,10 @@ window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '', cus
   if (!overlay) return;
 
   const titleEl = document.getElementById('drawerPhaseTitle');
-  if (titleEl) titleEl.textContent = phaseTitle || 'Specialized Production Phase';
+  if (titleEl) titleEl.textContent = phaseTitle || 'Phases تخصصی پروداکشن';
 
   const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[currentDrawerPipelineKey]) ? 
-                   PIPELINE_DATA[currentDrawerPipelineKey] : { topSub: 'Character Design & Concept' };
+                   PIPELINE_DATA[currentDrawerPipelineKey] : { topSub: 'طراحی کاراکتر و کانسپت' };
   
   const pipeEl = document.getElementById('drawerPhasePipeline');
   if (pipeEl) {
@@ -5952,16 +5924,16 @@ window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '', cus
   if (purposeEl) {
     if (customDesc && customDesc.trim().length > 0) {
       purposeEl.textContent = customDesc.trim();
-    } else if (phaseTitle.includes('Turnaround') || phaseTitle.includes('Orthographic') || phaseTitle.includes('Model Sheet')) {
-      purposeEl.textContent = 'Engineered for orthographic alignment (front, side, and rear turnaround views), serving as the foundational blueprint for 3D modeling and rigging teams.';
-    } else if (phaseTitle.includes('Expression') || phaseTitle.includes('Facial') || phaseTitle.includes('Emotion')) {
-      purposeEl.textContent = 'Explores dynamic psychological states, combat expressions, and facial fidelity to preserve narrative consistency across game cinematics.';
-    } else if (phaseTitle.includes('Silhouette') || phaseTitle.includes('Sketch') || phaseTitle.includes('Ideation')) {
-      purposeEl.textContent = 'Primary shape exploration, geometric rhythm, and iconic silhouette definition establishing production direction and creative consensus.';
-    } else if (phaseTitle.includes('Render') || phaseTitle.includes('Master') || phaseTitle.includes('Lighting')) {
-      purposeEl.textContent = 'Material callouts, chiaroscuro lighting, skin/armor texture fidelity, and final 300DPI master polish for cinema marketing and key art.';
+    } else if (phaseTitle.includes('سه‌نما') || phaseTitle.includes('ارتوگرافیک') || phaseTitle.includes('Turnaround')) {
+      purposeEl.textContent = 'این شیت برای تثبیت زوایای تراز ارتوگرافیک (روبرو، نیم‌رخ و پشت) طراحی شده است و به عنوان نقشه فنی اصلی در اختیار تیم مدلسازی سه‌بعدی و انیمیشن قرار می‌گیرد.';
+    } else if (phaseTitle.includes('اکسپرشن') || phaseTitle.includes('چهره') || phaseTitle.includes('حالات')) {
+      purposeEl.textContent = 'این Phases به بررسی حالات روحی، احساسات دینامیک و میمیک چهره کاراکتر در شرایط نبرد، خشم، تمرکز و دیالوگ اختصاص دارد تا روح روایی اثر حفظ گردد.';
+    } else if (phaseTitle.includes('اتود') || phaseTitle.includes('سیلوئت') || phaseTitle.includes('اسکچ')) {
+      purposeEl.textContent = 'کشف فرم اولیه، تناسبات هندسی و هویت سیلوئت کلی اثر در Phases کانسپت پایه؛ این مرحله پایه تصمیم‌گیری‌های پروداکشن و تعیین مسیر نهایی طراحی است.';
+    } else if (phaseTitle.includes('رندر') || phaseTitle.includes('مستر') || phaseTitle.includes('نور')) {
+      purposeEl.textContent = 'تفکیک متریال‌ها، نورپردازی مقداری، پردازش بافت‌های پوستی/فلزی و خروجی باکیفیت پولیش نهایی با قابلیت چاپ و استفاده مستقیم در پروموشن تجاری.';
     } else {
-      purposeEl.textContent = 'Engineered as a cornerstone of the atelier visual development pipeline, guaranteeing AAA industry asset delivery standards.';
+      purposeEl.textContent = 'این ماژول به عنوان بخش مکمل فرآیند توسعه بصری استودیو پیاده‌سازی شده و استانداردهای صنعتی تحویل دارایی را تضمین می‌نماید.';
     }
   }
 
@@ -5983,7 +5955,7 @@ window.goToPipelineFromDrawer = function() {
 
   switchView('store');
   selectPipeline(currentDrawerPipelineKey);
-  showToast('Navigated to atelier commission pipeline. Calculator active.', 'info', 4000);
+  showToast('به پایپلاین سفارش آتلیه منتقل شدید. فرمول محاسبه هزینه فعال است.', 'info', 4000);
 };
 
 // =========================================================
@@ -6021,22 +5993,22 @@ window.updateStudioLiveStatus = function() {
 
   if (mode === 'vacation') {
     badge.className = 'hero-badge studio-status-badge status-vacation';
-    textEl.textContent = customMsg || 'Studio on Sabbatical / Capacity Full • Inquiries Queued';
-    badge.title = 'Studio is temporarily on travel sabbatical.';
+    textEl.textContent = customMsg || 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است';
+    badge.title = 'آتلیه در حالت مرخصی و سفر موقت است.';
     return;
   }
 
   if (mode === 'online') {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = customMsg || 'Studio Active & Online • Briefs & Commissions Open';
-    badge.title = 'Online responses to briefs and messages are active.';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
     return;
   }
 
   if (mode === 'away') {
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = customMsg || 'Brief Intake Active • Review Window 24-48 Hours';
-    badge.title = 'Brief intake active; reviews processed within 24-48 hours.';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت';
+    badge.title = 'پذیرش سفارشات فعال است و بریف‌ها با اندکی تاخیر بررسی خواهند شد.';
     return;
   }
 
@@ -6046,12 +6018,12 @@ window.updateStudioLiveStatus = function() {
 
   if (diffHours <= 24) {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = customMsg || 'Studio Active & Online • Briefs & Commissions Open';
-    badge.title = 'Online responses to briefs and messages are active.';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
   } else {
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = customMsg || 'Brief Intake Active • Response with Latency';
-    badge.title = 'Brief intake active with periodic latency.';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    badge.title = 'پذیرش سفارشات فعال است. بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد.';
   }
 };
 
@@ -6065,7 +6037,7 @@ window.saveStudioAvailabilitySettingsDirect = function() {
   
   updateStudioLiveStatus();
   previewStudioStatusSelection();
-  showToast('Studio presence status and commission availability updated! ✓', 'success', 3500);
+  showToast('وضعیت حضور و پذیرش سفارشات استودیو با موفقیت به‌روزرسانی شد! ✓', 'success', 3500);
 };
 
 window.previewStudioStatusSelection = function() {
@@ -6075,16 +6047,16 @@ window.previewStudioStatusSelection = function() {
   
   if (selectedMode === 'vacation') {
     previewBadge.className = 'hero-badge studio-status-badge status-vacation font-mono';
-    previewBadge.textContent = '🔴 Sabbatical / Full Capacity';
+    previewBadge.textContent = '🔴 حالت سفر و مرخصی (سفارش بسته)';
   } else if (selectedMode === 'online') {
     previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
-    previewBadge.textContent = '🟢 Active & Online';
+    previewBadge.textContent = '🟢 همیشه آنلاین و باز';
   } else if (selectedMode === 'away') {
     previewBadge.className = 'hero-badge studio-status-badge status-pending font-mono';
-    previewBadge.textContent = '🟡 Review with Latency (Away)';
+    previewBadge.textContent = '🟡 بررسی با تاخیر (Away)';
   } else {
     previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
-    previewBadge.textContent = '🔄 Automated 24/7';
+    previewBadge.textContent = '🔄 خودکار ۲۴ ساعته';
   }
 };
 
@@ -6232,13 +6204,13 @@ window.handleAdminLogoUpload = function(inputEl) {
 };
 
 function previewAndStageStudioLogo(file) {
-  showToast('Uploading studio header crest...', 'info', 1500);
+  showToast('در حال بارگذاری نشان استودیو...', 'info', 1500);
   const reader = new FileReader();
   reader.onload = async (e) => {
     const dataUrl = e.target.result;
     siteSettings.studioLogoUrl = dataUrl;
     window.updateStudioLogoDisplay();
-    showToast('Crest preview loaded! Click "Save Header Crest" to commit.', 'success', 4500);
+    showToast('پیش‌نمایش نشان هدر ظاهر شد! برای ثبت دائم دکمه «✓ ثبت و تایید نشان هدر استودیو» را بزنید.', 'success', 4500);
 
     try {
       const compressed = await compressImageForStorage(file, 600, 600, 0.92);
@@ -6253,14 +6225,14 @@ function previewAndStageStudioLogo(file) {
 window.saveStudioLogoSetting = function() {
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Studio header crest saved successfully! ✓', 'success', 4000);
+  showToast('نشان رسمی هدر استودیو با موفقیت ثبت و ذخیره شد! ✓', 'success', 4000);
 };
 
 window.removeStudioLogo = function() {
   siteSettings.studioLogoUrl = '';
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Studio header crest removed.', 'info', 3000);
+  showToast('نشان هدر استودیو با موفقیت حذف شد (ضربدر).', 'info', 3000);
 };
 
 window.handleAdminFaviconUpload = function(inputEl) {
@@ -6269,7 +6241,7 @@ window.handleAdminFaviconUpload = function(inputEl) {
     reader.onload = (e) => {
       siteSettings.faviconUrl = e.target.result;
       window.updateStudioLogoDisplay();
-      showToast('Favicon preview loaded! Click Save to commit permanently.', 'info', 3500);
+      showToast('پیش‌نمایش فاویکون مرورگر ظاهر شد! برای ثبت دائم روی دکمه ثبت کلیک کنید.', 'info', 3500);
     };
     reader.readAsDataURL(inputEl.files[0]);
   }
@@ -6282,14 +6254,14 @@ window.saveStudioFaviconSetting = function() {
   }
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Browser favicon updated successfully! ✓', 'success', 4000);
+  showToast('فاویکون اختصاصی مرورگر با موفقیت ثبت شد! ✓', 'success', 4000);
 };
 
 window.removeStudioFavicon = function() {
   siteSettings.faviconUrl = '';
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Browser favicon reset.', 'info', 3000);
+  showToast('فاویکون تب مرورگر با موفقیت حذف شد (ضربدر).', 'info', 3000);
 };
 
 window.saveStudioBrandingSettings = function() {
@@ -6303,7 +6275,7 @@ window.saveStudioBrandingSettings = function() {
   }
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Studio slogan and director title saved successfully! ✓', 'success', 4000);
+  showToast('شعار و عنوان رسمی مدیر استودیو با موفقیت ذخیره شد! ✓', 'success', 4000);
 };
 
 window.saveStudioCurrencySetting = function() {
@@ -6312,7 +6284,7 @@ window.saveStudioCurrencySetting = function() {
     siteSettings.usdRate = Number(rateInput.value);
     safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
     renderAllPrices();
-    showToast(`Exchange rate updated to ${siteSettings.usdRate.toLocaleString('en-US')} TOMAN. ✓`, 'success', 3500);
+    showToast(`نرخ تسعیر دلار به ${siteSettings.usdRate.toLocaleString('fa-IR')} TOMAN ثبت شد.`, 'success', 3500);
   }
 };
 // =========================================================
@@ -6349,22 +6321,22 @@ window.updateStudioLiveStatus = function() {
 
   if (mode === 'vacation') {
     badge.className = 'hero-badge studio-status-badge status-vacation';
-    textEl.textContent = customMsg || 'Studio on Sabbatical / Capacity Full • Inquiries Queued';
-    badge.title = 'Studio is temporarily on travel sabbatical.';
+    textEl.textContent = customMsg || 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است';
+    badge.title = 'آتلیه در حالت مرخصی و سفر موقت است.';
     return;
   }
 
   if (mode === 'online') {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = customMsg || 'Studio Active & Online • Briefs & Commissions Open';
-    badge.title = 'Online responses to briefs and messages are active.';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
     return;
   }
 
   if (mode === 'away') {
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = customMsg || 'Brief Intake Active • Review Window 24-48 Hours';
-    badge.title = 'Brief intake active; reviews processed within 24-48 hours.';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت';
+    badge.title = 'پذیرش سفارشات فعال است و بریف‌ها با اندکی تاخیر بررسی خواهند شد.';
     return;
   }
 
@@ -6374,12 +6346,12 @@ window.updateStudioLiveStatus = function() {
 
   if (diffHours <= 24) {
     badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = customMsg || 'Studio Active & Online • Briefs & Commissions Open';
-    badge.title = 'Online responses to briefs and messages are active.';
+    textEl.textContent = customMsg || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت باز است';
+    badge.title = 'پاسخگویی آنلاین به بریف‌ها و پیام‌ها در جریان است.';
   } else {
     badge.className = 'hero-badge studio-status-badge status-pending';
-    textEl.textContent = customMsg || 'Brief Intake Active • Response with Latency';
-    badge.title = 'Brief intake active with periodic latency.';
+    textEl.textContent = customMsg || 'دریافت بریف‌ها فعال • پاسخگویی با تاخیر موقت اینترنت';
+    badge.title = 'پذیرش سفارشات فعال است. بررسی بریف‌ها با اندکی تاخیر انجام خواهد شد.';
   }
 };
 
@@ -6393,7 +6365,7 @@ window.saveStudioAvailabilitySettingsDirect = function() {
   
   updateStudioLiveStatus();
   previewStudioStatusSelection();
-  showToast('Studio presence status and commission availability updated! ✓', 'success', 3500);
+  showToast('وضعیت حضور و پذیرش سفارشات استودیو با موفقیت به‌روزرسانی شد! ✓', 'success', 3500);
 };
 
 window.previewStudioStatusSelection = function() {
@@ -6403,16 +6375,16 @@ window.previewStudioStatusSelection = function() {
   
   if (selectedMode === 'vacation') {
     previewBadge.className = 'hero-badge studio-status-badge status-vacation font-mono';
-    previewBadge.textContent = '🔴 Sabbatical / Full Capacity';
+    previewBadge.textContent = '🔴 حالت سفر و مرخصی (سفارش بسته)';
   } else if (selectedMode === 'online') {
     previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
-    previewBadge.textContent = '🟢 Active & Online';
+    previewBadge.textContent = '🟢 همیشه آنلاین و باز';
   } else if (selectedMode === 'away') {
     previewBadge.className = 'hero-badge studio-status-badge status-pending font-mono';
-    previewBadge.textContent = '🟡 Review with Latency (Away)';
+    previewBadge.textContent = '🟡 بررسی با تاخیر (Away)';
   } else {
     previewBadge.className = 'hero-badge studio-status-badge status-online font-mono';
-    previewBadge.textContent = '🔄 Automated 24/7';
+    previewBadge.textContent = '🔄 خودکار ۲۴ ساعته';
   }
 };
 
@@ -6447,12 +6419,12 @@ window.syncOrdersFromSupabase = async function() {
             client: co.client_name,
             contact: co.contact || co.client_email || '',
             refLink: co.ref_link || '',
-            pkg: co.package_name || 'Commission Brief',
+            pkg: co.package_name || 'سفارش کمیسیون',
             price: co.price_text || '',
             timeline: co.timeline || '',
             phase: co.phase || '',
             brief: co.brief_text || '',
-            status: co.status || 'Brief Received'
+            status: co.status || 'بریف دریافت شد'
           });
           updated = true;
         }
@@ -6536,7 +6508,7 @@ window.saveAboutStudioManifestoDirect = function() {
   // اعمال بلادرنگ بر روی المان‌های درباره استودیو در صفحه اصلی
   const aboutHeading = document.querySelector('#showcaseStudioAboutSection h2');
   if (aboutHeading && siteSettings.aboutTitle) {
-    aboutHeading.innerHTML = `About <span style="color:var(--gold);">${(siteSettings.aboutTitle || 'TAJINKART').replace(/About/gi, '').trim() || 'TAJINKART'}</span> Studio`;
+    aboutHeading.innerHTML = `درباره استودیو <span style="color:var(--gold);">${siteSettings.aboutTitle.replace('درباره استودیو', '').trim() || 'TAJINKART'}</span>`;
   }
   const aboutParagraph = document.querySelector('#showcaseStudioAboutSection p[style*="line-height:1.9"]');
   if (aboutParagraph && siteSettings.aboutText) {
@@ -6656,19 +6628,19 @@ window.saveStudioTerms = function() {
   // به‌روزرسانی آنی محتوای پنجره قوانین در سایت
   if (acc) {
     const paneAcc = document.getElementById('termsPane-account');
-    if (paneAcc) paneAcc.innerHTML = `<h4 style="color:var(--gold); font-size:14px; font-weight:800; margin-bottom:10px;">1. General Membership, Account Terms & Anti-AI Protection</h4>` + acc.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+    if (paneAcc) paneAcc.innerHTML = `<h4 style="color:var(--gold); font-size:14px; font-weight:800; margin-bottom:10px;">۱. شرایط عمومی عضویت، حساب کاربری و حریم خصوصی</h4>` + acc.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
   }
   if (comm) {
     const paneComm = document.getElementById('termsPane-commission');
-    if (paneComm) paneComm.innerHTML = `<h4 style="color:var(--cyan-electric); font-size:14px; font-weight:800; margin-bottom:10px;">2. Production Commission SLA, 50% Retainer & Revision Policy</h4>` + comm.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+    if (paneComm) paneComm.innerHTML = `<h4 style="color:var(--cyan-electric); font-size:14px; font-weight:800; margin-bottom:10px;">۲. قرارداد رسمی سفارش پروژه و تعهدات کمیسیون</h4>` + comm.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
   }
   if (ass) {
     const paneAss = document.getElementById('termsPane-assets');
-    if (paneAss) paneAss.innerHTML = `<h4 style="color:var(--emerald); font-size:14px; font-weight:800; margin-bottom:10px;">3. Digital Assets Vault License Agreement (EULA)</h4>` + ass.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+    if (paneAss) paneAss.innerHTML = `<h4 style="color:var(--emerald); font-size:14px; font-weight:800; margin-bottom:10px;">۳. موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA)</h4>` + ass.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
   }
   if (acad) {
     const paneAcad = document.getElementById('termsPane-academy');
-    if (paneAcad) paneAcad.innerHTML = `<h4 style="color:var(--violet); font-size:14px; font-weight:800; margin-bottom:10px;">4. Academy Guidelines, Masterclasses & Community Standards</h4>` + acad.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
+    if (paneAcad) paneAcad.innerHTML = `<h4 style="color:var(--violet); font-size:14px; font-weight:800; margin-bottom:10px;">۴. ضوابط آکادمی تخصصی طراحی و جامعه هنری</h4>` + acad.split('\n').map(p => p.trim() ? `<p style="margin-bottom:12px;">${p}</p>` : '').join('');
   }
 
   const notice = document.getElementById('termsSaveNotice');
@@ -6687,22 +6659,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const assInput = document.getElementById('adminTermsAssetsInput');
     const acadInput = document.getElementById('adminTermsAcademyInput');
 
-    const defaultAcc = `By registering or interacting with the platform, the client explicitly warrants that all identity, communication, and billing credentials provided are accurate and authentic. Account credentials and access tokens are strictly confidential to the authorized user.\n\nAnti-AI Training & IP Protection Clause: Any automated scraping, crawling, or utilization of TAJINKART studio concept artworks, lorebooks, 3D assets, sketches, or visual material for the training, fine-tuning, or distillation of machine learning models, generative AI architectures, or LoRA weights is strictly prohibited and constitutes copyright infringement under international intellectual property law.`;
-    const defaultComm = `The 50% Non-Refundable Retainer Rule: Creative production and studio schedule allocation commence strictly upon verified receipt of a 50% non-refundable advance retainer. The remaining 50% milestone balance must be settled prior to final delivery of high-resolution master source files and layered 4K PSD deliverables.\n\nRevision Milestones & Feedback Policy: Up to 2 iterative revision cycles are included during initial silhouette ideation and orthographic linework phases. Subsequent structural alterations requested after master chiaroscuro rendering has commenced incur supplementary production fees.\n\nProject Abandonment Clause: In the event of 30 consecutive calendar days of client silence or feedback latency following milestone submission, the project is officially deemed abandoned; reserved studio allocation is concluded, and the 50% retainer is retained.`;
-    const defaultAss = `Digital Assets End User License Agreement (EULA): Acquiring digital assets, brush packs, or production models grants a perpetual, non-exclusive single-seat commercial license for integration into finished downstream media (e.g. video games, films, or animations). Resale, sub-licensing, torrent redistribution, or public repository sharing of raw source files is strictly prohibited.\n\nDigital Goods Refund Policy: Due to the immediate delivery of digital goods and cryptographic source packages, all digital asset purchases are final and non-refundable once download credentials have been issued.`;
-    const defaultAcad = `Academy & Masterclass Content Guidelines: All educational masterclasses, recorded workflow tutorials, process breakdowns, and mentorship materials remain the exclusive intellectual property of Seyed Soroush Taj. Re-uploading, public screen-recording, or unauthorized redistribution of private masterclass links is legally actionable.\n\nCommunity Code of Conduct: Participation in studio channels, Discord servers, and Telegram discussion hubs requires mutual professional respect, strict anti-spam adherence, and zero tolerance for harassment or unauthorized solicitation.`;
-
-    // Auto-migrate legacy Persian in siteSettings
-    if (siteSettings.termsAccount && /[\u0600-\u06FF]/.test(siteSettings.termsAccount)) siteSettings.termsAccount = defaultAcc;
-    if (siteSettings.termsCommission && /[\u0600-\u06FF]/.test(siteSettings.termsCommission)) siteSettings.termsCommission = defaultComm;
-    if (siteSettings.termsAssets && /[\u0600-\u06FF]/.test(siteSettings.termsAssets)) siteSettings.termsAssets = defaultAss;
-    if (siteSettings.termsAcademy && /[\u0600-\u06FF]/.test(siteSettings.termsAcademy)) siteSettings.termsAcademy = defaultAcad;
-    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-
-    if (accInput) accInput.value = siteSettings.termsAccount || defaultAcc;
-    if (commInput) commInput.value = siteSettings.termsCommission || defaultComm;
-    if (assInput) assInput.value = siteSettings.termsAssets || defaultAss;
-    if (acadInput) acadInput.value = siteSettings.termsAcademy || defaultAcad;
+    if (accInput) {
+      accInput.value = siteSettings.termsAccount || `کاربر با ثبت‌نام و استفاده از سایت، صحت اطلاعات هویتی و ارتباطی خود را تایید می‌نماید. حفظ محرمانگی رمز عبور بر عهده کاربر است.\n\nبند منع صریح هوش مصنوعی (Anti-AI): هرگونه اسکرپ داده، کپی‌برداری اتوماتیک یا استفاده از کانسپت‌ها و آثار استودیو TAJINKART جهت آموزش مدل‌های هوش مصنوعی مولد اکیداً ممنوع بوده و نقض حقوق مالکیت معنوی بین‌المللی تلقی می‌گردد.`;
+    }
+    if (commInput) {
+      commInput.value = siteSettings.termsCommission || `قانون تغییرناپذیر ودیعه ۵۰٪ (The 50% Deposit Rule): فرآیند طراحی و تخصیص زمان آتلیه منحصراً پس از واریز قطعی ۵۰٪ مبلغ کل سفارش به عنوان پیش‌پرداخت غیرقابل‌استرداد آغاز می‌گردد. تسویه ۵۰٪ باقیمانده پیش از تحویل سورس‌فایل نهایی رزولوشن بالا و فایل لایه‌باز PSD الزامی است.\n\nمراحل فیدبک و بازبینی (Revision Policy): در Phases اتودهای اولیه و سیلوئت تا ۲ مرحله ویرایش آزاد منظور شده است. پس از تایید لاین‌آرت و ورود به Phases رندر مستر نهایی، تغییرات اساسی در تناسبات شامل هزینه مازاد خواهد بود.\n\nبند رهاسازی سفارش (Abandonment Clause): در صورت عدم پاسخگویی یا سکوت کارفرما به مدت بیش از ۳۰ روز تقویمی، پروژه رهاشده تلقی شده و با ضبط ودیعه مختومه می‌گردد.`;
+    }
+    if (assInput) {
+      assInput.value = siteSettings.termsAssets || `موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA): خرید محصولات دیجیتال و فایل‌های آماده از استودیو منحصراً حق استفاده غیرانحصاری در محصول نهایی (مانند بازی یا انیمیشن) را اعطا می‌کند؛ هرگونه بازفروش سورس خام، انتشار عمومی یا توزیع مجدد دارایی‌ها ممنوع است.\n\nاسقاط حق انصراف کالای دیجیتال: دانلود موفق فایل سورس دیجیتال به منزله تحویل قطعی کالا بوده و قابلیت استرداد وجه ندارد.`;
+    }
+    if (acadInput) {
+      acadInput.value = siteSettings.termsAcademy || `ضوابط آکادمی تخصصی طراحی و جامعه هنری: محتوای آموزشی، ویدیوهای مسترکلاس و پکیج‌های آموزشی تحت مالکیت مادی و معنوی سید سروش تاج قرار دارند. هرگونه اشتراک‌گذاری عمومی لینک‌ها یا ضبط تصویر ویدیوها پیگرد قانونی دارد.\n\nفعالیت در گروه‌ها و کانال‌های رسمی استودیو مستلزم رعایت احترام متقابل، عدم ارسال اسپم و حفظ حقوق صنفی آرتیست‌هاست.`;
+    }
   }, 1000);
 });
 
@@ -6749,13 +6717,13 @@ window.pingAllCloudServices = async function() {
   const btn = document.getElementById('btnPingCloudServices');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '⏳ Querying system connections...';
+    btn.innerHTML = '⏳ در حال استعلام اتصالات...';
   }
 
   // ۱. سوپابیس
   const supaBadge = document.getElementById('pingSupabaseBadge');
   if (supaBadge) {
-    supaBadge.textContent = 'Probing...';
+    supaBadge.textContent = 'سنجش...';
     supaBadge.style.color = '#fbbf24';
   }
   const t0 = performance.now();
@@ -6765,22 +6733,22 @@ window.pingAllCloudServices = async function() {
       const lat = Math.round(performance.now() - t0);
       if (supaBadge) {
         if (!error) {
-          supaBadge.textContent = `🟢 Online | ${lat}ms`;
+          supaBadge.textContent = `🟢 برخط | ${lat}ms`;
           supaBadge.style.color = '#10b981';
         } else {
-          supaBadge.textContent = `🟡 Connected | ${lat}ms`;
+          supaBadge.textContent = `🟡 متصل | ${lat}ms`;
           supaBadge.style.color = '#fbbf24';
         }
       }
     } else {
       if (supaBadge) {
-        supaBadge.textContent = '🟢 Client Ready';
+        supaBadge.textContent = '🟢 کلاینت آماده';
         supaBadge.style.color = '#10b981';
       }
     }
   } catch(e) {
     if (supaBadge) {
-      supaBadge.textContent = '🔴 Offline';
+      supaBadge.textContent = '🔴 قطعی ارتباط';
       supaBadge.style.color = '#ef4444';
     }
   }
@@ -6788,7 +6756,7 @@ window.pingAllCloudServices = async function() {
   // ۲. کلودفلر CDN
   const cfBadge = document.getElementById('pingCloudflareBadge');
   if (cfBadge) {
-    cfBadge.textContent = 'Probing...';
+    cfBadge.textContent = 'سنجش...';
     cfBadge.style.color = '#fbbf24';
   }
   const tCf = performance.now();
@@ -6796,12 +6764,12 @@ window.pingAllCloudServices = async function() {
     await fetch(`${window.location.origin}/robots.txt?t=${Date.now()}`, { method: 'HEAD', cache: 'no-store' });
     const latCf = Math.round(performance.now() - tCf);
     if (cfBadge) {
-      cfBadge.textContent = `🟢 Online CDN | ${latCf}ms`;
+      cfBadge.textContent = `🟢 برخط CDN | ${latCf}ms`;
       cfBadge.style.color = '#00f0ff';
     }
   } catch(e) {
     if (cfBadge) {
-      cfBadge.textContent = '🟢 Cloud Edge Active';
+      cfBadge.textContent = '🟢 شبکه ابری فعال';
       cfBadge.style.color = '#00f0ff';
     }
   }
@@ -6809,7 +6777,7 @@ window.pingAllCloudServices = async function() {
   // ۳. گوگل اوث
   const gBadge = document.getElementById('pingGoogleBadge');
   if (gBadge) {
-    gBadge.textContent = '🟢 Director Lock Active';
+    gBadge.textContent = '🟢 قفل فرماندهی فعال';
     gBadge.style.color = '#fbbf24';
   }
 
@@ -6818,10 +6786,10 @@ window.pingAllCloudServices = async function() {
   if (tgBadge) {
     const token = siteSettings.tgToken || (document.getElementById('setTgToken') ? document.getElementById('setTgToken').value.trim() : '');
     if (token) {
-      tgBadge.textContent = '🟢 Bot Active & Dispatch Ready';
+      tgBadge.textContent = '🟢 توکن فعال و آماده مخابره';
       tgBadge.style.color = '#00f0ff';
     } else {
-      tgBadge.textContent = '🟢 Webhook Active';
+      tgBadge.textContent = '🟢 وب‌هوک آماده';
       tgBadge.style.color = '#94a3b8';
     }
   }
@@ -6829,7 +6797,7 @@ window.pingAllCloudServices = async function() {
   // ۵. کلودینری
   const cBadge = document.getElementById('pingCloudinaryBadge');
   if (cBadge) {
-    cBadge.textContent = 'Probing...';
+    cBadge.textContent = 'سنجش...';
     cBadge.style.color = '#fbbf24';
   }
   const tC = performance.now();
@@ -6838,19 +6806,19 @@ window.pingAllCloudServices = async function() {
     await fetch(`https://res.cloudinary.com/${cloud}/image/upload/sample.jpg`, { method: 'HEAD', mode: 'no-cors' });
     const latC = Math.round(performance.now() - tC);
     if (cBadge) {
-      cBadge.textContent = `🟢 Connected | ${latC}ms`;
+      cBadge.textContent = `🟢 متصل | ${latC}ms`;
       cBadge.style.color = '#10b981';
     }
   } catch(e) {
     if (cBadge) {
-      cBadge.textContent = '🟢 CDN Edge Ready';
+      cBadge.textContent = '🟢 سرور آماده پذیرش';
       cBadge.style.color = '#10b981';
     }
   }
 
   if (btn) {
     btn.disabled = false;
-    btn.innerHTML = '⚡ Recheck System Connectivity';
+    btn.innerHTML = '⚡ استعلام مجدد وضعیت اتصالات';
   }
   showToast('Multi-cloud infrastructure health check completed successfully! ✓', 'success', 3000);
 };
@@ -6906,7 +6874,7 @@ window.navigateToStorePane = function(paneKey, e) {
   if (wrapper) wrapper.classList.remove('active');
   const title = document.getElementById('storeSectionMainTitle');
   if (title) {
-    title.textContent = (paneKey === 'products') ? 'Official Digital Assets & Production Vault' : 'Concept Art Atelier & Visual Development';
+    title.textContent = (paneKey === 'products') ? 'مخزن رسمی دارایی‌های دیجیتال و اسست‌های استودیو' : 'آتلیه کانسپت و توسعه بصری استودیو';
   }
 };
 
@@ -6972,7 +6940,7 @@ window.adminEditCategoryTitle = function(catId) {
     try { localStorage.setItem('tajinkart_lang', 'en'); } catch(e) {}
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
-    showToast(`Category title updated to "${cat.title}". ✓`, 'success', 2500);
+    showToast(`نام دسته به «${cat.title}» تغییر یافت. ✓`, 'success', 2500);
   }
 };
 
@@ -7092,7 +7060,7 @@ window.setSiteLanguage = function(lang) {
 window.toggleSiteLanguage = function() {
   const nextLang = (currentSiteLanguage === 'en') ? 'fa' : 'en';
   setSiteLanguage(nextLang);
-  showToast('Language set to English.', 'info', 2500);
+  showToast(nextLang === 'fa' ? 'زبان سایت به فارسی تغییر یافت.' : 'Language switched to English.', 'info', 2500);
 };
 
 
@@ -7202,10 +7170,10 @@ window.renderAdminSloganPairs = function() {
     row.style.cssText = 'display:flex; gap:10px; align-items:center; background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 14px;';
     row.innerHTML = `
       <span class="font-mono" style="font-size:12px; font-weight:800; color:var(--gold); width:26px;">#${idx + 1}</span>
-      <input type="text" class="admin-slogan-title-input font-mono" value="${pair.title || ''}" placeholder="Header Title (e.g. TAJINKART)" style="flex:1; padding:8px 12px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-      <input type="text" class="admin-slogan-sub-input font-mono" value="${pair.sub || ''}" placeholder="Sub-Slogan (e.g. DARK FANTASY • SCI-FI...)" style="flex:1.6; padding:8px 12px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-      <button type="button" onclick="removeAdminSloganPairRow(${idx})" style="color:#fda4af; font-size:12px; font-weight:700; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); border-radius:6px; padding:6px 12px; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Delete Slogan">
-        🗑️ Delete
+      <input type="text" class="admin-slogan-title-input font-mono" value="${pair.title || ''}" placeholder="عنوان هدر (مثلاً TAJINKART)" style="flex:1; padding:8px 12px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+      <input type="text" class="admin-slogan-sub-input font-mono" value="${pair.sub || ''}" placeholder="شعار زیرین (مثلاً DARK FANTASY • SCI-FI...)" style="flex:1.6; padding:8px 12px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+      <button type="button" onclick="removeAdminSloganPairRow(${idx})" style="color:#fda4af; font-size:12px; font-weight:700; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); border-radius:6px; padding:6px 12px; cursor:pointer; display:flex; align-items:center; gap:4px;" title="حذف این شعار">
+        🗑️ حذف
       </button>
     `;
     container.appendChild(row);
@@ -7327,7 +7295,7 @@ window.switchView = function(viewKey) {
 // کنترل وضعیت دوزبانه استودیو
 window.loadStudioStatusBilingual = function() {
   try {
-    const statusFA = safeGetStorage('tajinkart_status_en') || 'Studio Active & Online • Briefs & Commissions Open';
+    const statusFA = safeGetStorage('tajinkart_status_fa') || 'آتلیه فعال و آنلاین • پذیرش بریف و کانسپت';
     const statusEN = safeGetStorage('tajinkart_status_en') || 'Studio Online • Accepting Briefs & Concept Commissions';
     
     const inputFA = document.getElementById('adminStudioStatusFA');
@@ -7355,7 +7323,7 @@ window.saveStudioStatusBilingual = function() {
     if (badgeText) badgeText.textContent = valEN;
   }
 
-  showToast('Studio presence status updated and published! ✓', 'success', 4000);
+  showToast('وضعیت زنده استودیو (فارسی و انگلیسی) با موفقیت ثبت و منتشر شد! ✓', 'success', 4000);
 };
 
 // بارگذاری و ذخیره قوانین دوزبانه
@@ -7381,7 +7349,7 @@ window.saveStudioTermsBilingual = function() {
     if (elFA && elFA.value.trim()) safeSetStorage(`tajinkart_terms_fa_${sec}`, elFA.value.trim());
     if (elEN && elEN.value.trim()) safeSetStorage(`tajinkart_terms_en_${sec}`, elEN.value.trim());
   });
-  showToast('Studio legal charter and terms saved successfully! ✓', 'success', 4000);
+  showToast('هر دو نسخه فارسی و انگلیسی منشور و قوانین استودیو ذخیره شدند! ✓', 'success', 4000);
 };
 window.saveStudioTerms = window.saveStudioTermsBilingual;
 
@@ -7507,7 +7475,7 @@ window.renderAdminGalleryCategories = function() {
   container.innerHTML = galleryCategories.map((cat) => {
     const color = cat.color || '#38bdf8';
     return `
-      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}55; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="Click to edit category">
+      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}55; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="کلیک برای باز شدن کادر ویرایش این دسته">
         <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
         <span style="font-size:12.5px; font-weight:700; color:#fff;">${cat.title}</span>
         <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">(${cat.id})</span>
@@ -7557,7 +7525,7 @@ window.saveAdminCategoryEdit = function() {
   const newColor = colorInput ? colorInput.value.trim() : '#38bdf8';
 
   if (!newTitle || !newId) {
-    showToast('Category title and ID cannot be empty.', 'warning', 3000);
+    showToast('عنوان و شناسه دسته نمی‌تواند خالی باشد.', 'warning', 3000);
     return;
   }
 
@@ -7573,7 +7541,7 @@ window.saveAdminCategoryEdit = function() {
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
-    showToast(`Category "${newTitle}" updated and saved! ✓`, 'success', 3500);
+    showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
   }
 };
 
@@ -7699,7 +7667,7 @@ window.renderAdminGalleryCategories = function() {
   container.innerHTML = galleryCategories.map((cat) => {
     const color = cat.color || '#38bdf8';
     return `
-      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}66; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="Click to edit category">
+      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}66; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="کلیک برای باز شدن کادر ویرایش این دسته">
         <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
         <span style="font-size:12.5px; font-weight:700; color:#fff;">${cat.title}</span>
         <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">(${cat.id})</span>
@@ -7749,7 +7717,7 @@ window.saveAdminCategoryEdit = function() {
   const newColor = colorInput ? colorInput.value.trim() : '#38bdf8';
 
   if (!newTitle || !newId) {
-    showToast('Category title and ID cannot be empty.', 'warning', 3000);
+    showToast('عنوان و شناسه دسته نمی‌تواند خالی باشد.', 'warning', 3000);
     return;
   }
 
@@ -7765,7 +7733,7 @@ window.saveAdminCategoryEdit = function() {
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
-    showToast(`Category "${newTitle}" updated and saved! ✓`, 'success', 3500);
+    showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
   }
 };
 
@@ -7777,13 +7745,13 @@ window.saveAdminCategoryEdit = function() {
 
 // تعریف پیش‌فرض دسته‌بندی‌های دوزبانه (فارسی و انگلیسی)
 const BILINGUAL_GALLERY_CATEGORIES = [
-  { id: 'character', title: 'Character Design & Heroes', titleFA: 'Character Design & Heroes', titleEN: 'Character Design & Heroes', color: '#facc15' },
-  { id: 'environment', title: 'Environment & Worldbuilding', titleFA: 'Environment & Worldbuilding', titleEN: 'Environment & Worldbuilding', color: '#38bdf8' },
-  { id: 'creature', title: 'Creatures, Titans & Monsters', titleFA: 'Creatures, Titans & Monsters', titleEN: 'Creatures, Titans & Monsters', color: '#10b981' },
-  { id: 'keyframe', title: 'Keyframes & Cinematic Covers', titleFA: 'Keyframes & Cinematic Covers', titleEN: 'Keyframes & Cinematic Covers', color: '#f43f5e' },
-  { id: 'props', title: 'Props, Weapons & Relics', titleFA: 'Props, Weapons & Relics', titleEN: 'Props, Weapons & Relics', color: '#a855f7' },
-  { id: 'comic', title: 'Graphic Lore & Comics', titleFA: 'Graphic Lore & Comics', titleEN: 'Graphic Lore & Comics', color: '#fb923c' },
-  { id: 'mascot', title: 'Mascot & Brand Crest', titleFA: 'Mascot & Brand Crest', titleEN: 'Mascot & Brand Crest', color: '#ec4899' }
+  { id: 'character', titleFA: 'طراحی کاراکتر و قهرمانان', titleEN: 'Character Design & Heroes', color: '#facc15' },
+  { id: 'environment', titleFA: 'طراحی محیط، فضا و دنیاسازی', titleEN: 'Environment & Worlds', color: '#38bdf8' },
+  { id: 'creature', titleFA: 'موجودات، تایتان‌ها و هیولاها', titleEN: 'Creatures, Titans & Monsters', color: '#10b981' },
+  { id: 'keyframe', titleFA: 'کی‌فریم‌های سینمایی و کاور', titleEN: 'Cinematic Keyframes & Covers', color: '#f43f5e' },
+  { id: 'props', titleFA: 'پراپ‌ها، سلاح‌ها و تجهیزات', titleEN: 'Props, Weapons & Artifacts', color: '#a855f7' },
+  { id: 'comic', titleFA: 'کمیک، مانگا و استوری‌بورد', titleEN: 'Comics, Manga & Storyboards', color: '#fb923c' },
+  { id: 'mascot', titleFA: 'مسکات استودیو و نشان‌های برند', titleEN: 'Studio Mascot & Brand Crest', color: '#ec4899' }
 ];
 
 // همگام‌سازی دسته‌بندی‌ها با ساختار دوزبانه
@@ -7923,7 +7891,7 @@ window.renderAdminGalleryCategories = function() {
     const faTitle = cat.titleFA || cat.title || '';
     const enTitle = cat.titleEN || cat.id || '';
     return `
-      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}66; border-radius:20px; padding:7px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="Click to edit category">
+      <div class="admin-cat-pill" onclick="openAdminCategoryEdit('${cat.id}')" style="display:inline-flex; align-items:center; gap:9px; background:#080c14; border:1px solid ${color}66; border-radius:20px; padding:7px 14px; box-shadow:0 0 10px ${color}15; cursor:pointer;" title="کلیک برای باز شدن کادر ویرایش این دسته">
         <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color}; flex-shrink:0;"></span>
         <span style="font-size:12.5px; font-weight:700; color:#fff;">${faTitle}</span>
         <span class="font-mono" style="font-size:10px; color:${color}; opacity:0.85;">[${enTitle}]</span>
@@ -7977,7 +7945,7 @@ window.saveAdminCategoryEdit = function() {
   const newColor = colorInput ? colorInput.value.trim() : '#38bdf8';
 
   if (!newTitleFA || !newTitleEN || !newId) {
-    showToast('Category title and ID cannot be empty.', 'warning', 3000);
+    showToast('عنوان فارسی، عنوان انگلیسی و شناسه دسته نمی‌تواند خالی باشد.', 'warning', 3000);
     return;
   }
 
@@ -7998,7 +7966,7 @@ window.saveAdminCategoryEdit = function() {
   renderFloatingCategoryDropdown();
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
-    showToast(`Category "${newTitleEN || newTitleFA}" saved successfully! ✓`, 'success', 3500);
+    showToast(`دسته‌بندی «${newTitleFA}» (${newTitleEN}) با موفقیت ذخیره شد! ✓`, 'success', 3500);
   }
 };
 
@@ -8392,7 +8360,7 @@ window.adminDeleteCurrentEditingCategory = function() {
   if (currentGalleryFilter === origId) {
     filterGalleryByCategory('all', 'All Artworks');
   }
-  showToast(`Category "${catName}" deleted successfully.`, 'info');
+  showToast(`دسته‌بندی «${catName}» با موفقیت حذف شد.`, 'info');
 };
 
 
