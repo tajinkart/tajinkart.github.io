@@ -481,11 +481,8 @@ window.switchView = function(vKey) {
     if (topBar) {
       topBar.style.display = 'flex';
       topBar.style.removeProperty('display');
-      if (window.scrollY > 140) {
-        topBar.classList.add('visible');
-      } else {
-        topBar.classList.remove('visible');
-      }
+      topBar.style.display = 'flex';
+      topBar.classList.add('visible');
     }
     const catMenu = document.getElementById('floatingGalleryCategoryMenu');
     if (catMenu) catMenu.style.display = 'inline-block';
@@ -541,11 +538,8 @@ function handleOptimizedScroll() {
   // ۲. پدیدار شدن نشان برند و دسته‌بندی با اسکرول در گالری
   if (topBar) {
     if (cView === 'showcase') {
-      if (scrolled > 140) {
-        topBar.classList.add('visible');
-      } else {
-        topBar.classList.remove('visible');
-      }
+      topBar.style.display = 'flex';
+      topBar.classList.add('visible');
     } else {
       topBar.classList.remove('visible');
     }
@@ -578,9 +572,11 @@ function initDockState() {
 
   // وضعیت اولیه نشان برند در بالا-چپ (در بالای صفحه بسته، با اسکرول باز)
   if (topBar) {
-    if (cView === 'showcase' && scrolled > 140) {
+    if (cView === 'showcase') {
+      topBar.style.display = 'flex';
       topBar.classList.add('visible');
     } else {
+      topBar.style.display = 'none';
       topBar.classList.remove('visible');
     }
   }

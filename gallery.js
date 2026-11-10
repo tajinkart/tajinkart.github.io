@@ -1216,3 +1216,17 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
 }
+
+
+// اجرای قطعی و فوری رندر شوکیس و فیلترهای بالا-چپ در لود صفحه
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+    if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
+    if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  });
+} else {
+  if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+  if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+}
