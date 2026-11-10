@@ -714,15 +714,14 @@ function renderStagingPhasesHtml() {
         <!-- Unified Category & Pipeline, Specialized Subcategory, and Universe Genre -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
           <div>
-            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 Category & Pipeline:</label>
-            <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
-              <option value="sketch1" ${pipeKey === 'sketch1' ? 'selected' : ''}>Character Design & Heroes</option>
-              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>Creatures, Titans & Monsters</option>
-              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>Environment, Worlds & Architecture</option>
-              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>Cinematic Keyframes & Covers</option>
-              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>Props, Weapons & Artifacts</option>
-              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>Comics, Manga & Sequential Art</option>
-              <option value="sketch_mascot" ${pipeKey === 'sketch_mascot' ? 'selected' : ''}>Brand Mascot & Studio Crest</option>
+            <label style="font-size:11px; color:var(--gold); font-weight:800; display:block; margin-bottom:3px;">📂 Sheet Category & Pipeline:</label>
+            <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11.5px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#080c14; border:1px solid rgba(250,204,21,0.35); border-radius:8px; color:#fff; outline:none;">
+              <option value="sketch1" ${(pipeKey === 'sketch1' || p.category === 'character') ? 'selected' : ''}>🟡 Character Design & Heroes</option>
+              <option value="sketch_creature" ${(pipeKey === 'sketch_creature' || p.category === 'creature') ? 'selected' : ''}>🟢 Creatures, Titans & Monsters</option>
+              <option value="sketch2" ${(pipeKey === 'sketch2' || p.category === 'environment') ? 'selected' : ''}>🔵 Environment, Worlds & Architecture</option>
+              <option value="sketch3" ${(pipeKey === 'sketch3' || p.category === 'keyframe') ? 'selected' : ''}>🔴 Cinematic Keyframes & Covers</option>
+              <option value="sketch4" ${(pipeKey === 'sketch4' || p.category === 'props') ? 'selected' : ''}>🟣 Props, Weapons & Artifacts</option>
+              <option value="sketch5" ${(pipeKey === 'sketch5' || p.category === 'comic') ? 'selected' : ''}>🟠 Comics, Manga & Sequential Art</option>
             </select>
           </div>
           <div>
@@ -793,15 +792,37 @@ window.addStagingPhase = function() {
   if (container) container.innerHTML = renderStagingPhasesHtml();
 };
 
-window.handlePhasePipelineChange = function(idx, newPipe) {
+window.handlePhaseUnifiedCategoryChange = function(idx, newPipe) {
   if (!stagingProjectPhases || !stagingProjectPhases[idx]) return;
   stagingProjectPhases[idx].pipelineKey = newPipe;
+  const pipeMap = {
+    'sketch1': 'character',
+    'sketch_creature': 'creature',
+    'sketch2': 'environment',
+    'sketch3': 'keyframe',
+    'sketch4': 'props',
+    'sketch5': 'comic',
+    'sketch_mascot': 'character'
+  };
+  const cat = pipeMap[newPipe] || 'character';
+  stagingProjectPhases[idx].category = cat;
+
   const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
   const subcats = (pipelines[newPipe] && pipelines[newPipe].subcategories) ? pipelines[newPipe].subcategories : ['Standard Concept Execution'];
   stagingProjectPhases[idx].subcategory = subcats[0] || '';
+
+  if (idx === 0) {
+    if (typeof stagingNewArt !== 'undefined' && stagingNewArt) {
+      stagingNewArt.pipelineKey = newPipe;
+      stagingNewArt.category = cat;
+      stagingNewArt.tag = cat;
+    }
+  }
+
   const container = document.getElementById('adminProjectPhasesList');
   if (container) container.innerHTML = renderStagingPhasesHtml();
 };
+window.handlePhasePipelineChange = window.handlePhaseUnifiedCategoryChange;
 
 window.removeStagingPhase = function(idx) {
   if (stagingProjectPhases.length <= 1) {
@@ -889,6 +910,18 @@ window.confirmSaveArtwork = async function() {
 
   try {
     const assembledPhases = JSON.parse(JSON.stringify(validPhases));
+    const pipeCatMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+      'sketch1': 'character',
+      'sketch_creature': 'creature',
+      'sketch2': 'environment',
+      'sketch3': 'keyframe',
+      'sketch4': 'props',
+      'sketch5': 'comic'
+    };
+    assembledPhases.forEach(p => {
+      if (!p.pipelineKey) p.pipelineKey = pipe;
+      if (!p.category) p.category = pipeCatMap[p.pipelineKey] || 'character';
+    });
 
     if (isCreatingNewArt) {
       const newArtRecord = {

@@ -1261,34 +1261,66 @@ window.renderShowcaseGrid = function() {
   if (!grid) return;
 
   const allArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks) && window.showcaseArtworks.length > 0) ? window.showcaseArtworks : (showcaseArtworks || []);
+  
+  const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+    'sketch1': 'character',
+    'sketch_creature': 'creature',
+    'sketch2': 'environment',
+    'sketch3': 'keyframe',
+    'sketch4': 'props',
+    'sketch5': 'comic'
+  };
+
+  const CATEGORY_COLORS = {
+    'character': '#facc15',
+    'creature': '#10b981',
+    'environment': '#38bdf8',
+    'keyframe': '#f43f5e',
+    'props': '#a855f7',
+    'comic': '#fb923c',
+    'mascot': '#ec4899'
+  };
+
+  const CATEGORY_LABELS = {
+    'character': 'Character',
+    'creature': 'Creature',
+    'environment': 'Environment',
+    'keyframe': 'Keyframe',
+    'props': 'Props',
+    'comic': 'Comic',
+    'mascot': 'Mascot'
+  };
+
   const filteredArtworks = allArts.filter(art => {
-    // 1. Category Filter
+    // 1. Category Filter (بررسی تطابق ریشه اثر و تمام شیت‌های فرعی ۱، ۲، ۳ و ...)
     if (currentGalleryFilter && currentGalleryFilter !== 'all') {
-      const cat = art.category || art.tag || (art.pipelineKey ? (PIPELINE_TO_CATEGORY_MAP[art.pipelineKey] || 'character') : 'character');
-      const pipe = art.pipelineKey;
-      let catMatch = (cat === currentGalleryFilter || 
-                      pipe === currentGalleryFilter || 
-                      (PIPELINE_TO_CATEGORY_MAP[pipe] && PIPELINE_TO_CATEGORY_MAP[pipe] === currentGalleryFilter) ||
-                      art.tag === currentGalleryFilter);
+      const targetCat = currentGalleryFilter.toLowerCase();
+      const artPipe = (art.pipelineKey || '').toLowerCase();
+      const artCat = (art.category || art.tag || (artPipe ? (pipeMap[artPipe] || '') : '')).toLowerCase();
+
+      let catMatch = (artCat === targetCat || artPipe === targetCat || (pipeMap[artPipe] && pipeMap[artPipe].toLowerCase() === targetCat));
+
       if (!catMatch && art.phases && Array.isArray(art.phases)) {
         catMatch = art.phases.some(p => {
-          const pPipe = p.pipelineKey;
-          const pCat = p.category || (pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '');
+          const pPipe = (p.pipelineKey || '').toLowerCase();
+          const pCat = (p.category || (pPipe ? (pipeMap[pPipe] || '') : '')).toLowerCase();
           const pSub = (p.subcategory || '').toLowerCase();
-          if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
-          if (currentGalleryFilter === 'environment' && (pSub.includes('env') || pSub.includes('world') || pSub.includes('arch'))) return true;
-          if (currentGalleryFilter === 'character' && (pSub.includes('char') || pSub.includes('hero') || pSub.includes('mascot'))) return true;
-          if (currentGalleryFilter === 'creature' && (pSub.includes('creature') || pSub.includes('monster') || pSub.includes('titan') || pSub.includes('boss'))) return true;
-          if (currentGalleryFilter === 'keyframe' && (pSub.includes('keyframe') || pSub.includes('cover') || pSub.includes('splash'))) return true;
-          if (currentGalleryFilter === 'props' && (pSub.includes('prop') || pSub.includes('weapon') || pSub.includes('relic') || pSub.includes('ui'))) return true;
-          if (currentGalleryFilter === 'comic' && (pSub.includes('comic') || pSub.includes('manga') || pSub.includes('storyboard'))) return true;
+          const pName = (p.name || '').toLowerCase();
+
+          if (pCat === targetCat || pPipe === targetCat) return true;
+          if (targetCat === 'creature' && (pCat.includes('creature') || pPipe.includes('creature') || pSub.includes('creature') || pSub.includes('monster') || pSub.includes('titan') || pSub.includes('boss') || pSub.includes('موجود') || pName.includes('creature') || pName.includes('titan') || pName.includes('monster'))) return true;
+          if (targetCat === 'environment' && (pCat.includes('env') || pPipe.includes('sketch2') || pSub.includes('env') || pSub.includes('world') || pSub.includes('arch') || pSub.includes('محیط') || pName.includes('env') || pName.includes('world'))) return true;
+          if (targetCat === 'character' && (pCat.includes('char') || pPipe.includes('sketch1') || pSub.includes('char') || pSub.includes('hero') || pSub.includes('mascot') || pSub.includes('کاراکتر') || pName.includes('character') || pName.includes('hero'))) return true;
+          if (targetCat === 'keyframe' && (pCat.includes('keyframe') || pPipe.includes('sketch3') || pSub.includes('keyframe') || pSub.includes('cover') || pSub.includes('splash') || pSub.includes('کی‌فریم'))) return true;
+          if (targetCat === 'props' && (pCat.includes('prop') || pPipe.includes('sketch4') || pSub.includes('prop') || pSub.includes('weapon') || pSub.includes('relic') || pSub.includes('ui') || pSub.includes('پراپ'))) return true;
+          if (targetCat === 'comic' && (pCat.includes('comic') || pPipe.includes('sketch5') || pSub.includes('comic') || pSub.includes('manga') || pSub.includes('storyboard') || pSub.includes('کمیک'))) return true;
           return false;
         });
       }
       if (!catMatch) return false;
     }
 
-    // 2. Genre Filter (با تطابق هوشمند ژانر، فازها و کلمات کلیدی داستانی آثار)
+    // 2. Genre Filter
     if (currentGalleryGenreFilter && currentGalleryGenreFilter !== 'all') {
       const gTarget = currentGalleryGenreFilter.toLowerCase();
       const artG = (art.genre || '').toLowerCase();
@@ -1307,7 +1339,6 @@ window.renderShowcaseGrid = function() {
         });
       }
 
-      // تطابق مضمونی پیش‌فرض برای آثار موجود
       if (!genreMatch) {
         if (gTarget.includes('dark fantasy') || gTarget.includes('fantasy')) {
           if (artTag === 'character' || artTag === 'creature' || artT.includes('knight') || artT.includes('warrior') || artD.includes('fantasy')) genreMatch = true;
@@ -1359,7 +1390,7 @@ window.renderShowcaseGrid = function() {
     return;
   }
 
-  // ری‌ارنج خودکار و هوشمند چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی (حالت پایه دسکتاپ: ۴ ستون متوازن)
+  // چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی
   const workCount = filteredArtworks.length;
   if (window.innerWidth > 768) {
     if (workCount === 1) {
@@ -1372,48 +1403,58 @@ window.renderShowcaseGrid = function() {
       grid.style.setProperty('column-count', '3', 'important');
       grid.style.setProperty('max-width', '1240px', 'important');
     } else {
-      // حالت اصلی گالری دسکتاپ: ۴ ستون بزرگتر، شارپ‌تر و سینمایی‌تر
       grid.style.setProperty('column-count', '4', 'important');
       grid.style.setProperty('max-width', '1480px', 'important');
     }
   } else {
-    if (workCount === 1) {
-      grid.style.setProperty('column-count', '1', 'important');
-    } else {
-      grid.style.setProperty('column-count', '2', 'important');
-    }
+    grid.style.setProperty('column-count', workCount === 1 ? '1' : '2', 'important');
   }
 
-  grid.innerHTML = filteredArtworks.map((art, i) => {
+  function hexToRgbaStr(hex, alpha) {
+    if (!hex) return `rgba(250, 204, 21, ${alpha})`;
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const r = parseInt(hex.substring(0, 2), 16) || 250;
+    const g = parseInt(hex.substring(2, 4), 16) || 204;
+    const b = parseInt(hex.substring(4, 6), 16) || 21;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  grid.innerHTML = filteredArtworks.map((art) => {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — Concept Art & Worldbuilding by TAJINKART Studio`;
-    const imgSrc = art.image || art.img || '';
+    const defaultImg = art.image || art.img || '';
 
-    // جلوگیری از تکرار عبارت یکسان در اسلاگ و عنوان
     let slug = art.shortSlug || '';
     if (!slug || slug === art.title) {
       slug = art.tag ? art.tag.toUpperCase() : 'CONCEPT';
     }
 
-    let tileImg = imgSrc;
+    let tileImg = defaultImg;
     let targetPhaseIdx = 0;
     let displayTitle = art.title || "Untitled Concept";
     let displaySlug = slug;
-    let activeKey = art.tag || art.category || art.pipelineKey || 'character';
+    
+    // شناسایی دسته اصلی اثر
+    let artRootCat = art.category || art.tag || (art.pipelineKey ? (pipeMap[art.pipelineKey] || 'character') : 'character');
+    let activeKey = artRootCat;
 
-    // تایل داینامیک: اگر دسته‌بندی خاصی فیلتر شده و شیت دوم یا سوم به آن تعلق دارد، تایل همان شیت، عنوان و رنگ نئون آن را می‌گیرد
+    // تایل داینامیک انحصاری: اگر دسته‌ای فیلتر شده، شیت منطبق (اول، دوم، سوم و ...) انتخاب می‌شود
     if (currentGalleryFilter && currentGalleryFilter !== 'all' && art.phases && Array.isArray(art.phases)) {
-      const matchIdx = art.phases.findIndex((p, pIdx) => {
-        const pPipe = p.pipelineKey;
-        const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
-        const pSub = p.subcategory || '';
-        if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
-        if (currentGalleryFilter === 'environment' && (pSub.toLowerCase().includes('env') || pSub.toLowerCase().includes('world') || pSub.toLowerCase().includes('arch') || pSub.includes('محیط'))) return true;
-        if (currentGalleryFilter === 'character' && (pSub.toLowerCase().includes('char') || pSub.toLowerCase().includes('hero') || pSub.toLowerCase().includes('mascot') || pSub.includes('کاراکتر'))) return true;
-        if (currentGalleryFilter === 'creature' && (pSub.toLowerCase().includes('creature') || pSub.toLowerCase().includes('monster') || pSub.toLowerCase().includes('titan') || pSub.toLowerCase().includes('boss') || pSub.includes('موجود'))) return true;
-        if (currentGalleryFilter === 'keyframe' && (pSub.toLowerCase().includes('keyframe') || pSub.toLowerCase().includes('cover') || pSub.toLowerCase().includes('splash') || pSub.includes('کی‌فریم'))) return true;
-        if (currentGalleryFilter === 'props' && (pSub.toLowerCase().includes('prop') || pSub.toLowerCase().includes('weapon') || pSub.toLowerCase().includes('relic') || pSub.toLowerCase().includes('ui') || pSub.includes('پراپ'))) return true;
-        if (currentGalleryFilter === 'comic' && (pSub.toLowerCase().includes('comic') || pSub.toLowerCase().includes('manga') || pSub.toLowerCase().includes('storyboard') || pSub.includes('کمیک'))) return true;
+      const targetCat = currentGalleryFilter.toLowerCase();
+      const matchIdx = art.phases.findIndex((p) => {
+        const pPipe = (p.pipelineKey || '').toLowerCase();
+        const pCat = (p.category || (pPipe ? (pipeMap[pPipe] || '') : '')).toLowerCase();
+        const pSub = (p.subcategory || '').toLowerCase();
+        const pName = (p.name || '').toLowerCase();
+
+        if (pCat === targetCat || pPipe === targetCat) return true;
+        if (targetCat === 'creature' && (pCat.includes('creature') || pPipe.includes('creature') || pSub.includes('creature') || pSub.includes('monster') || pSub.includes('titan') || pSub.includes('boss') || pSub.includes('موجود') || pName.includes('creature') || pName.includes('titan') || pName.includes('monster'))) return true;
+        if (targetCat === 'environment' && (pCat.includes('env') || pPipe.includes('sketch2') || pSub.includes('env') || pSub.includes('world') || pSub.includes('arch') || pSub.includes('محیط') || pName.includes('env') || pName.includes('world'))) return true;
+        if (targetCat === 'character' && (pCat.includes('char') || pPipe.includes('sketch1') || pSub.includes('char') || pSub.includes('hero') || pSub.includes('mascot') || pSub.includes('کاراکتر') || pName.includes('character') || pName.includes('hero'))) return true;
+        if (targetCat === 'keyframe' && (pCat.includes('keyframe') || pPipe.includes('sketch3') || pSub.includes('keyframe') || pSub.includes('cover') || pSub.includes('splash') || pSub.includes('کی‌فریم'))) return true;
+        if (targetCat === 'props' && (pCat.includes('prop') || pPipe.includes('sketch4') || pSub.includes('prop') || pSub.includes('weapon') || pSub.includes('relic') || pSub.includes('ui') || pSub.includes('پراپ'))) return true;
+        if (targetCat === 'comic' && (pCat.includes('comic') || pPipe.includes('sketch5') || pSub.includes('comic') || pSub.includes('manga') || pSub.includes('storyboard') || pSub.includes('کمیک'))) return true;
         return false;
       });
 
@@ -1421,64 +1462,46 @@ window.renderShowcaseGrid = function() {
         const matchedPhase = art.phases[matchIdx];
         if (matchedPhase.img || matchedPhase.image) {
           tileImg = matchedPhase.img || matchedPhase.image;
-          targetPhaseIdx = matchIdx + 1; // Matching index in stream
+          targetPhaseIdx = matchIdx + 1;
           displayTitle = matchedPhase.name || art.title;
-          displaySlug = matchedPhase.subcategory || PIPELINE_TO_CATEGORY_MAP[matchedPhase.pipelineKey] || slug;
-          activeKey = matchedPhase.pipelineKey || activeKey;
+          displaySlug = matchedPhase.subcategory || (CATEGORY_LABELS[targetCat] ? `${CATEGORY_LABELS[targetCat]} Concept` : slug);
+          activeKey = targetCat;
         }
       }
     }
 
-    // محاسبه پالت نئونی اختصاصی بر اساس شیت نمایش‌داده‌شده
-    // تبدیل کد رنگ هگز به آر‌جی‌بی با آلفا برای هاله نوری هالوژنی پشت تایل
-    function hexToRgbaStr(hex, alpha) {
-      if (!hex) return `rgba(250, 204, 21, ${alpha})`;
-      hex = hex.replace('#', '');
-      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-      const r = parseInt(hex.substring(0, 2), 16) || 250;
-      const g = parseInt(hex.substring(2, 4), 16) || 204;
-      const b = parseInt(hex.substring(4, 6), 16) || 21;
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
-    // استخراج رنگ نئون کاملاً پویا از پالت رنگ دسته‌بندی‌های استودیو
-    let catHex = '#facc15';
+    // استخراج دقیق رنگ نئون دسته‌بندی انتخاب‌شده / اصلی
+    let catHex = CATEGORY_COLORS[activeKey] || CATEGORY_COLORS[pipeMap[activeKey]] || '#facc15';
     if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
-      if (currentGalleryFilter && currentGalleryFilter !== 'all') {
-        const activeFilterCat = galleryCategories.find(c => c.id === currentGalleryFilter);
-        if (activeFilterCat && activeFilterCat.color) {
-          catHex = activeFilterCat.color;
-        }
-      } else {
-        const directCat = galleryCategories.find(c => c.id === activeKey || c.id === (PIPELINE_TO_CATEGORY_MAP[activeKey] || ''));
-        if (directCat && directCat.color) {
-          catHex = directCat.color;
-        }
-      }
+      const found = galleryCategories.find(c => c.id === activeKey || c.id === (pipeMap[activeKey] || '') || c.pipeKey === activeKey);
+      if (found && found.color) catHex = found.color;
     }
 
     const neon = {
       border: catHex,
-      glow: hexToRgbaStr(catHex, 0.8),
-      soft: hexToRgbaStr(catHex, 0.35)
+      glow: hexToRgbaStr(catHex, 0.85),
+      soft: hexToRgbaStr(catHex, 0.3)
     };
 
-    // برچسب زیرین هویت اثر: نمایش پکیج پروداکشن در آثار چندفازی یا شاخه کانسپت
+    const catBadgeName = CATEGORY_LABELS[activeKey] || activeKey.toUpperCase();
+
     let subLabel = '';
     if (art.phases && Array.isArray(art.phases) && art.phases.length > 1) {
       subLabel = `Production Case Study • ${art.phases.length} Sheets`;
     } else {
-      const catObj = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories))
-        ? galleryCategories.find(c => c.id === activeKey || c.id === (PIPELINE_TO_CATEGORY_MAP[activeKey] || ''))
-        : null;
-      const catName = catObj ? (catObj.title || catObj.name) : activeKey.toUpperCase();
-      subLabel = `${catName} Concept`;
+      subLabel = `${catBadgeName} Concept`;
     }
 
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
-           style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
+           style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft}; border-color:${neon.border} !important;" 
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
+        
+        <!-- بج شیک شاخه هنری در گوشه بالا-راست تایل با رنگ نئون منطبق -->
+        <span class="tile-category-badge font-mono" style="position:absolute; top:8px; right:8px; z-index:3; font-size:9.5px; font-weight:800; padding:3px 8px; border-radius:5px; background:rgba(4,6,10,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:${neon.border}; border:1px solid ${neon.border}; box-shadow:0 0 10px ${neon.soft}; text-transform:uppercase; letter-spacing:0.04em; pointer-events:none;">
+          ${catBadgeName}
+        </span>
+
         <div class="tile-center-title">
           <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 14px ${neon.glow}; font-size:13px; font-weight:800;"># ${displayTitle} #</span>
           <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:36px;"></span>
@@ -1488,7 +1511,7 @@ window.renderShowcaseGrid = function() {
       </div>
     `;
   }).join('');
-}
+};
 
 window.handleImageAutoDetect = function(imgEl, artId) {
   if (!imgEl || !imgEl.naturalWidth || !imgEl.naturalHeight) return;
@@ -4984,15 +5007,14 @@ function renderStagingPhasesHtml() {
         <!-- Unified Category & Pipeline, Specialized Subcategory, and Universe Genre -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
           <div>
-            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 Category & Pipeline:</label>
-            <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
-              <option value="sketch1" ${pipeKey === 'sketch1' ? 'selected' : ''}>Character Design & Heroes</option>
-              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>Creatures, Titans & Monsters</option>
-              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>Environment, Worlds & Architecture</option>
-              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>Cinematic Keyframes & Covers</option>
-              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>Props, Weapons & Artifacts</option>
-              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>Comics, Manga & Sequential Art</option>
-              <option value="sketch_mascot" ${pipeKey === 'sketch_mascot' ? 'selected' : ''}>Brand Mascot & Studio Crest</option>
+            <label style="font-size:11px; color:var(--gold); font-weight:800; display:block; margin-bottom:3px;">📂 Sheet Category & Pipeline:</label>
+            <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11.5px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#080c14; border:1px solid rgba(250,204,21,0.35); border-radius:8px; color:#fff; outline:none;">
+              <option value="sketch1" ${(pipeKey === 'sketch1' || p.category === 'character') ? 'selected' : ''}>🟡 Character Design & Heroes</option>
+              <option value="sketch_creature" ${(pipeKey === 'sketch_creature' || p.category === 'creature') ? 'selected' : ''}>🟢 Creatures, Titans & Monsters</option>
+              <option value="sketch2" ${(pipeKey === 'sketch2' || p.category === 'environment') ? 'selected' : ''}>🔵 Environment, Worlds & Architecture</option>
+              <option value="sketch3" ${(pipeKey === 'sketch3' || p.category === 'keyframe') ? 'selected' : ''}>🔴 Cinematic Keyframes & Covers</option>
+              <option value="sketch4" ${(pipeKey === 'sketch4' || p.category === 'props') ? 'selected' : ''}>🟣 Props, Weapons & Artifacts</option>
+              <option value="sketch5" ${(pipeKey === 'sketch5' || p.category === 'comic') ? 'selected' : ''}>🟠 Comics, Manga & Sequential Art</option>
             </select>
           </div>
           <div>
@@ -5063,15 +5085,37 @@ window.addStagingPhase = function() {
   if (container) container.innerHTML = renderStagingPhasesHtml();
 };
 
-window.handlePhasePipelineChange = function(idx, newPipe) {
+window.handlePhaseUnifiedCategoryChange = function(idx, newPipe) {
   if (!stagingProjectPhases || !stagingProjectPhases[idx]) return;
   stagingProjectPhases[idx].pipelineKey = newPipe;
+  const pipeMap = {
+    'sketch1': 'character',
+    'sketch_creature': 'creature',
+    'sketch2': 'environment',
+    'sketch3': 'keyframe',
+    'sketch4': 'props',
+    'sketch5': 'comic',
+    'sketch_mascot': 'character'
+  };
+  const cat = pipeMap[newPipe] || 'character';
+  stagingProjectPhases[idx].category = cat;
+
   const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
   const subcats = (pipelines[newPipe] && pipelines[newPipe].subcategories) ? pipelines[newPipe].subcategories : ['Standard Concept Execution'];
   stagingProjectPhases[idx].subcategory = subcats[0] || '';
+
+  if (idx === 0) {
+    if (typeof stagingNewArt !== 'undefined' && stagingNewArt) {
+      stagingNewArt.pipelineKey = newPipe;
+      stagingNewArt.category = cat;
+      stagingNewArt.tag = cat;
+    }
+  }
+
   const container = document.getElementById('adminProjectPhasesList');
   if (container) container.innerHTML = renderStagingPhasesHtml();
 };
+window.handlePhasePipelineChange = window.handlePhaseUnifiedCategoryChange;
 
 window.removeStagingPhase = function(idx) {
   if (stagingProjectPhases.length <= 1) {
@@ -5159,6 +5203,18 @@ window.confirmSaveArtwork = async function() {
 
   try {
     const assembledPhases = JSON.parse(JSON.stringify(validPhases));
+    const pipeCatMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+      'sketch1': 'character',
+      'sketch_creature': 'creature',
+      'sketch2': 'environment',
+      'sketch3': 'keyframe',
+      'sketch4': 'props',
+      'sketch5': 'comic'
+    };
+    assembledPhases.forEach(p => {
+      if (!p.pipelineKey) p.pipelineKey = pipe;
+      if (!p.category) p.category = pipeCatMap[p.pipelineKey] || 'character';
+    });
 
     if (isCreatingNewArt) {
       const newArtRecord = {
