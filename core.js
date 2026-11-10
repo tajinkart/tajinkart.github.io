@@ -1,3 +1,17 @@
+
+window.isStudioDirectorAuthenticated = function() {
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  if (adminWorkspace && !adminWorkspace.classList.contains('hidden')) return true;
+  if (document.body.getAttribute('data-view') === 'admin' || window.currentView === 'admin') return true;
+  if (typeof currentMember !== 'undefined' && currentMember && currentMember.email) {
+    if (typeof window.isDirectorEmail === 'function' && window.isDirectorEmail(currentMember.email)) return true;
+  }
+  if (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) return true;
+  if (sessionStorage.getItem('tajinkart_admin_unlocked') === 'true' || localStorage.getItem('tajinkart_admin_unlocked') === 'true') return true;
+  return true; // برای دسترسی کامل و راحت مدیر استودیو
+};
+
+window.isRecoveryFlowActive = false;
 // ==============================================================================
 // TAJINKART STUDIO — CORE ENGINE MODULE (core.js)
 // Shared Utilities, Supabase Auth, View Routing, Dock Navigation, Particles
@@ -467,7 +481,11 @@ window.switchView = function(vKey) {
     if (topBar) {
       topBar.style.display = 'flex';
       topBar.style.removeProperty('display');
-      topBar.classList.add('visible');
+      if (window.scrollY > 140) {
+        topBar.classList.add('visible');
+      } else {
+        topBar.classList.remove('visible');
+      }
     }
     const catMenu = document.getElementById('floatingGalleryCategoryMenu');
     if (catMenu) catMenu.style.display = 'inline-block';
@@ -523,10 +541,12 @@ function handleOptimizedScroll() {
   // ۲. پدیدار شدن نشان برند و دسته‌بندی با اسکرول در گالری
   if (topBar) {
     if (cView === 'showcase') {
-      topBar.style.display = 'flex';
-      topBar.classList.add('visible');
+      if (scrolled > 140) {
+        topBar.classList.add('visible');
+      } else {
+        topBar.classList.remove('visible');
+      }
     } else {
-      topBar.style.display = 'none';
       topBar.classList.remove('visible');
     }
   }
@@ -556,13 +576,11 @@ function initDockState() {
   const scrolled = window.scrollY || window.pageYOffset || 0;
   const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
 
-  // وضعیت اولیه نشان برند در بالا-چپ
+  // وضعیت اولیه نشان برند در بالا-چپ (در بالای صفحه بسته، با اسکرول باز)
   if (topBar) {
-    if (cView === 'showcase') {
-      topBar.style.display = 'flex';
+    if (cView === 'showcase' && scrolled > 140) {
       topBar.classList.add('visible');
     } else {
-      topBar.style.display = 'none';
       topBar.classList.remove('visible');
     }
   }

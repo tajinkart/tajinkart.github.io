@@ -1,4 +1,24 @@
 // ==============================================================================
+// پلتفرم‌های انتشار اثر در استودیو
+// ==============================================================================
+const AVAILABLE_PLATFORMS = [
+  { id: 'telegram', name: 'Telegram', icon: '✈️', placeholder: 'Custom caption for Telegram channel...' },
+  { id: 'artstation', name: 'ArtStation', icon: '🎨', placeholder: 'Technical breakdown for ArtStation...' },
+  { id: 'cara', name: 'Cara', icon: '🛡️', placeholder: 'Anti-AI portfolio post for Cara...' },
+  { id: 'pinterest', name: 'Pinterest', icon: '📌', placeholder: 'Pin description and metadata...' },
+  { id: 'instagram', name: 'Instagram', icon: '📷', placeholder: 'Instagram caption, lore & hashtags...' },
+  { id: 'reels', name: 'Reels', icon: '🎬', placeholder: 'Hook & audio caption for Reels video...' },
+  { id: 'threads', name: 'Threads', icon: '🧵', placeholder: 'Narrative post for Threads...' },
+  { id: 'reddit', name: 'Reddit', icon: '🤖', placeholder: 'Title and sub-reddit body...' },
+  { id: 'x', name: 'X / Twitter', icon: '🐦', placeholder: 'Short tweet (<280 chars) and hashtags...' },
+  { id: 'bluesky', name: 'Bluesky', icon: '🦋', placeholder: 'Post copy for Bluesky...' },
+  { id: 'shorts', name: 'YouTube Shorts', icon: '📹', placeholder: 'Title and description for Shorts...' },
+  { id: 'discord', name: 'Discord', icon: '🎮', placeholder: 'Showcase announcement for Discord...' },
+  { id: 'linkedin', name: 'LinkedIn', icon: '💼', placeholder: 'Professional entertainment design copy...' }
+];
+window.AVAILABLE_PLATFORMS = AVAILABLE_PLATFORMS;
+
+// ==============================================================================
 // TAJINKART STUDIO — ADMIN MANAGEMENT MODULE (admin.js)
 // Showcase Curation, Genres & Categories, Pipelines, Products, Members, Settings
 // ==============================================================================
@@ -108,6 +128,7 @@ window.adminSubmitNewCategoryInline = function() {
   }
   if (!Array.isArray(galleryCategories)) galleryCategories = [];
   galleryCategories.push({ id, title, titleEN: title, titleFA: title, color });
+  window.galleryCategories = galleryCategories;
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   if (titleInp) titleInp.value = '';
   if (idInp) idInp.value = '';
@@ -119,16 +140,23 @@ window.adminSubmitNewCategoryInline = function() {
 };
 
 window.openAdminCategoryEdit = function(catId) {
-  const cat = (galleryCategories || []).find(c => c.id === catId);
+  const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0) ? galleryCategories : (window.galleryCategories || window.SIX_PIPELINE_CATEGORIES || []);
+  const cat = cats.find(c => c.id === catId);
   if (!cat) return;
   const row = document.getElementById('adminInlineEditCategoryRow');
   if (!row) return;
-  document.getElementById('adminEditCatOriginalId').value = cat.id;
-  document.getElementById('adminEditCatTitleFA').value = cat.titleFA || cat.title || '';
-  document.getElementById('adminEditCatTitleEN').value = cat.titleEN || cat.title || '';
-  document.getElementById('adminEditCatId').value = cat.id;
-  document.getElementById('adminEditCatColor').value = cat.color || '#38bdf8';
-  document.getElementById('adminEditCatColorPicker').value = cat.color || '#38bdf8';
+  const origIdEl = document.getElementById('adminEditCatOriginalId');
+  if (origIdEl) origIdEl.value = cat.id;
+  const titleFAEl = document.getElementById('adminEditCatTitleFA');
+  if (titleFAEl) titleFAEl.value = cat.titleFA || cat.title || '';
+  const titleENEl = document.getElementById('adminEditCatTitleEN');
+  if (titleENEl) titleENEl.value = cat.titleEN || cat.title || '';
+  const idEl = document.getElementById('adminEditCatId');
+  if (idEl) idEl.value = cat.id;
+  const colorEl = document.getElementById('adminEditCatColor');
+  if (colorEl) colorEl.value = cat.color || '#38bdf8';
+  const pickerEl = document.getElementById('adminEditCatColorPicker');
+  if (pickerEl) pickerEl.value = cat.color || '#38bdf8';
   row.style.display = 'block';
 };
 
@@ -139,12 +167,17 @@ window.closeAdminCategoryEditForm = function() {
 
 window.saveAdminCategoryEdit = function() {
   const origId = document.getElementById('adminEditCatOriginalId')?.value;
-  const cat = (galleryCategories || []).find(c => c.id === origId);
+  if (!Array.isArray(galleryCategories)) galleryCategories = (window.galleryCategories || window.SIX_PIPELINE_CATEGORIES || []).slice();
+  const cat = galleryCategories.find(c => c.id === origId);
   if (!cat) return;
-  cat.titleFA = document.getElementById('adminEditCatTitleFA').value.trim() || cat.title;
-  cat.titleEN = document.getElementById('adminEditCatTitleEN').value.trim() || cat.title;
-  cat.title = cat.titleEN;
-  cat.color = document.getElementById('adminEditCatColor').value || cat.color;
+  const titleFAEl = document.getElementById('adminEditCatTitleFA');
+  if (titleFAEl) cat.titleFA = titleFAEl.value.trim() || cat.title;
+  const titleENEl = document.getElementById('adminEditCatTitleEN');
+  if (titleENEl) cat.titleEN = titleENEl.value.trim() || cat.title;
+  cat.title = cat.titleEN || cat.titleFA || cat.title;
+  const colorEl = document.getElementById('adminEditCatColor');
+  if (colorEl && colorEl.value) cat.color = colorEl.value;
+  window.galleryCategories = galleryCategories;
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   window.closeAdminCategoryEditForm();
   window.renderAdminGalleryCategories();
@@ -157,6 +190,7 @@ window.adminDeleteCurrentEditingCategory = function() {
   const origId = document.getElementById('adminEditCatOriginalId')?.value;
   if (!origId) return;
   galleryCategories = (galleryCategories || []).filter(c => c.id !== origId);
+  window.galleryCategories = galleryCategories;
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   window.closeAdminCategoryEditForm();
   window.renderAdminGalleryCategories();
@@ -1178,7 +1212,8 @@ function renderAdminSketch2() {
     </div>
   `;
 
-  html += showcaseArtworks.map((art, idx) => `
+  const arts = (typeof showcaseArtworks !== "undefined" && Array.isArray(showcaseArtworks)) ? showcaseArtworks : (window.showcaseArtworks || []);
+  html += arts.map((art, idx) => `
     <div class="admin-mosaic-card ${idx === currentSelectedArtIdx ? 'active' : ''}" 
          id="adminArtCard_${idx}"
          data-admin-idx="${idx}"

@@ -79,6 +79,7 @@ window.safeSetStorage = safeSetStorage;
 
 
 const KEYS = {
+
   ORDERS: 'tajinkart_orders_fa_v2',
   SETTINGS: 'tajinkart_settings_fa_v2',
   ARTWORKS: 'tajinkart_artworks_fa_v2',
@@ -87,6 +88,7 @@ const KEYS = {
   MEMBERS: 'tajinkart_members_fa_v2',
   DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2'
 };
+window.KEYS = KEYS;
 
 var currentView = 'showcase';
 var currentMember = null;
