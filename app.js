@@ -116,6 +116,7 @@ window.adminSubmitNewCategoryInline = function() {
 
   renderAdminGalleryCategories();
   renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast(`دسته‌بندی «${title}» با موفقیت افزوده شد.`, 'success', 3500);
 };
 
@@ -126,6 +127,7 @@ window.adminUpdateCategoryColor = function(catId, newColor) {
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
     renderAdminGalleryCategories();
     renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     if (currentGalleryFilter === catId) {
       filterGalleryByCategory(catId, cat.title);
     }
@@ -142,6 +144,7 @@ window.adminDeleteGalleryCategory = function(catId) {
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
   renderAdminGalleryCategories();
   renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast(`دسته‌بندی «${catName}» حذف شد.`, 'info');
 };
 
@@ -154,8 +157,10 @@ window.openChatConsultation = function() {
 // اجرای لود اولیه در هنگام آماده شدن صفحه
 document.addEventListener('DOMContentLoaded', () => {
   renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   renderAdminGalleryCategories();
   if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
+  if (typeof renderAdminSloganPairs === 'function') renderAdminSloganPairs();
   if (typeof loadStudioPricingMatrixToForm === 'function') loadStudioPricingMatrixToForm();
 });
 
@@ -2247,7 +2252,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
                 <span class="font-mono" style="color:var(--gold); font-size:13.5px; font-weight:800;">${displayPrice}</span>
                 <span style="color:var(--cyan-electric); font-size:11px; margin-right:8px;">(${tile.timeline})</span>
               </div>
-              <span style="font-size:11.5px; color:var(--iris); font-weight:700;">محاسبه فاکتور و ثبت بریف ←</span>
+              <span style="font-size:11.5px; color:var(--iris); font-weight:700;">Quote & Submit Brief →</span>
             </div>
           </div>
         </div>
@@ -2897,17 +2902,26 @@ window.broadcastArtworkToTelegram = async function(art) {
 async function dispatchTelegramNotification(order) {
   if (!siteSettings.tgToken || !siteSettings.tgChat) return;
   const text = encodeURIComponent(
-    `🚨 *ثبت بریف کانسپت آرت جدید TAJINKART*\n` +
-    `• *کارفرما:* ${order.client}\n` +
-    `• *تماس:* ${order.contact}\n` +
-    `• *پکیج:* ${order.pkg}\n` +
-    `• *فاز:* ${order.phase}\n` +
-    `• *لینک رفرنس:* ${order.refLink || 'ندارد'}\n` +
-    `• *توضیحات بریف:* ${order.brief}\n` +
-    `• *تعرفه محاسبه‌شده:* ${order.price}`
+    `🚨 *NEW TAJINKART COMMISSION INQUIRY // PROJECT BRIEF*
+` +
+    `• *Client / Studio:* ${order.client}
+` +
+    `• *Contact:* ${order.contact}
+` +
+    `• *Package:* ${order.pkg}
+` +
+    `• *Scope / Phase:* ${order.phase}
+` +
+    `• *Reference Link:* ${order.refLink || 'None provided'}
+` +
+    `• *Project Brief:* ${order.brief}
+` +
+    `• *Estimated Quote:* ${order.price}
+` +
+    `• *Timestamp:* ${new Date().toISOString()}`
   );
   try {
-    await fetch(`https://api.telegram.org/bot${siteSettings.tgToken}/sendMessage?chat_id=${siteSettings.tgChat}&text=${text}&parse_mode=Markdown`);
+    fetch(`https://api.telegram.org/bot${siteSettings.tgToken}/sendMessage?chat_id=${siteSettings.tgChat}&text=${text}&parse_mode=Markdown`);
   } catch (err) {
     console.warn('Telegram sync failed:', err);
   }
@@ -2915,11 +2929,11 @@ async function dispatchTelegramNotification(order) {
 
 // سوییچ ویوها و هماهنگی ناوبری
 window.switchView = function(vKey) {
-  // ۱. قفل امنیتی جنسیس و آکادمی: فقط مدیر استودیو از پنل ادمین می‌تواند وارد شود
+  // قفل دسترسی به جنسیس لور و آکادمی (منحصراً برای مدیر استودیو بدون متن به زودی)
   if (vKey === 'genesis' || vKey === 'academy') {
     if (!window.isStudioDirectorAuthenticated()) {
       const secName = vKey === 'genesis' ? 'Genesis Lore' : 'Academy';
-      showToast(`${secName} is currently in active production and will launch soon (Coming Soon)`, 'info', 4000);
+      showToast(`${secName} is currently in active production and reserved for Studio Director access.`, 'info', 4000);
       return;
     }
   }
@@ -3286,7 +3300,7 @@ window.switchAdminTab = function(tabKey, btn) {
   if (tabKey === 'pipelines') renderAdminSketch1();
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') renderAdminSketch3();
-  if (tabKey === 'orders') renderAdminLists();
+  if (tabKey === 'orders') { tabKey = 'members'; switchAdminTab('members'); return; }
   if (tabKey === 'settings') renderAdminSettingsTab();
   if (tabKey === 'terms') renderAdminTerms();
 };
@@ -3744,12 +3758,15 @@ function renderAdminMemberDetail(m) {
 
   // پرونده رسمی و اختصاصی خالق استودیو
   if (m.isCreator) {
+    // برای مدیر استودیو، کلیه سفارش‌های استودیو در پنل زیرین نمایش داده می‌شوند
+    const allStudioOrders = ordersList || [];
+
     col.innerHTML = `
       <div style="padding:18px; background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(15,23,42,0.95)); border-radius:14px; border:1px solid #fbbf24; margin-bottom:14px; box-shadow:0 6px 25px rgba(245,158,11,0.2);">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:20px;">👑</span>
-            <h3 style="font-size:17px; font-weight:900; color:#fbbf24;">${m.name}</h3>
+            <h3 style="font-size:17px; font-weight:900; color:#fbbf24; margin:0;">${m.name}</h3>
           </div>
           <span class="tier-tag tier-creator" style="font-size:11px;">خالق و معمار جهان 👑</span>
         </div>
@@ -3768,22 +3785,22 @@ function renderAdminMemberDetail(m) {
         </div>
       </div>
 
-      <div>
-        <h5 style="font-size:12.5px; font-weight:800; margin-bottom:8px; color:#fff;">اختیارات و مجوزهای انحصاری خالق:</h5>
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          ${(m.assetsBought || []).map(a => `
-            <div style="padding:8px 10px; background:#070a10; border-radius:8px; border:1px solid rgba(245,158,11,0.25); font-size:12px; display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#fef3c7;">${a}</span>
-              <span style="color:var(--gold); font-size:11px; font-weight:800;">✓ انحصاری مالک</span>
-            </div>
-          `).join('')}
+      <!-- پنل یکپارچه سفارش‌های دریافتی استودیو -->
+      <div style="margin-top:20px; border-top:1px solid rgba(250,204,21,0.3); padding-top:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <h4 style="font-size:14.5px; font-weight:800; color:var(--gold); margin:0;">
+            📦 تمامی سفارش‌ها و بریف‌های دریافتی استودیو (${allStudioOrders.length})
+          </h4>
+          <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:10.5px; padding:4px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+            🔄 واکشی از کلود
+          </button>
         </div>
-      </div>
 
-      <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle); text-align:center;">
-        <span style="font-size:11px; color:var(--text-muted); padding:6px 14px; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); display:inline-block;">
-          🔒 حساب رسمی و غیرقابل تغییر مدیر استودیو
-        </span>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${allStudioOrders.length === 0 ? '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; text-align:center;">هنوز سفارشی در سامانه ثبت نشده است.</div>' : 
+            allStudioOrders.map(o => renderOrderAdminSnippet(o)).join('')
+          }
+        </div>
       </div>
     `;
     return;
@@ -3792,40 +3809,62 @@ function renderAdminMemberDetail(m) {
   // پرونده اعضای عادی
   const tierColor = m.tier === 'VIP' ? 'var(--gold)' : (m.tier === 'PRO' ? 'var(--cyan-electric)' : '#cbd5e1');
 
+  // فیلتر کردن سفارش‌های متعلق به این کاربر
+  const userOrders = ordersList.filter(o => 
+    (o.client && m.name && o.client.toLowerCase() === m.name.toLowerCase()) ||
+    (o.contact && m.email && (o.contact.toLowerCase() === m.email.toLowerCase() || o.contact === m.contact))
+  );
+
   col.innerHTML = `
     <div style="padding:14px; background:#040609; border-radius:12px; border:1px solid ${tierColor}; margin-bottom:14px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="font-size:16px; font-weight:900; color:${tierColor};">${m.name}</h3>
-        <span class="tier-tag tier-${m.tier.toLowerCase()}">${m.tier}</span>
+        <h3 style="font-size:16px; font-weight:900; color:${tierColor}; margin:0;">${m.name}</h3>
+        <span class="tier-tag tier-${(m.tier || 'member').toLowerCase()}">${m.tier || 'MEMBER'}</span>
       </div>
-      <div class="font-mono" style="font-size:12px; color:var(--text-muted); margin-top:4px;">ایمیل: ${m.email}</div>
-      <div class="font-mono" style="font-size:12px; color:var(--text-muted);">تماس: ${m.contact}</div>
+      <div class="font-mono" style="font-size:12px; color:var(--text-muted); margin-top:4px;">ایمیل: ${m.email || 'ثبت نشده'}</div>
+      <div class="font-mono" style="font-size:12px; color:var(--text-muted);">تماس: ${m.contact || 'ثبت نشده'}</div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
       <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid var(--border-subtle);">
         <div style="font-size:11px; color:var(--text-muted);">موجودی قابل برداشت:</div>
-        <div class="font-mono" style="font-size:17px; font-weight:800; color:var(--cyan-electric); margin-top:3px;">${m.balance}</div>
+        <div class="font-mono" style="font-size:17px; font-weight:800; color:var(--cyan-electric); margin-top:3px;">${m.balance || '0 $'}</div>
       </div>
       <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid var(--border-subtle);">
         <div style="font-size:11px; color:var(--text-muted);">مجموع خریدهای ثبت‌شده:</div>
-        <div class="font-mono" style="font-size:17px; font-weight:800; color:var(--gold); margin-top:3px;">${m.totalSpent}</div>
+        <div class="font-mono" style="font-size:17px; font-weight:800; color:var(--gold); margin-top:3px;">${m.totalSpent || '0 $'}</div>
       </div>
     </div>
 
     <div>
       <h5 style="font-size:12.5px; font-weight:800; margin-bottom:8px; color:#fff;">دارایی‌های دیجیتال و لایسنس‌های فعال:</h5>
       <div style="display:flex; flex-direction:column; gap:6px;">
-        ${(m.assetsBought || []).map(a => `
+        ${(m.assetsBought && m.assetsBought.length > 0) ? m.assetsBought.map(a => `
           <div style="padding:8px 10px; background:#070a10; border-radius:8px; border:1px solid var(--border-subtle); font-size:12px; display:flex; justify-content:space-between; align-items:center;">
             <span>${a}</span>
             <span style="color:var(--emerald); font-size:11px; font-weight:700;">✓ دسترسی فعال</span>
           </div>
-        `).join('')}
+        `).join('') : '<div style="font-size:11px; color:var(--text-muted); padding:8px 10px; background:#070a10; border-radius:8px;">لایسنس دانلودی فعالی ندارد.</div>'}
       </div>
     </div>
 
-    <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+    <!-- پنل ادغام‌شده: سفارش‌های دریافتی این کاربر -->
+    <div style="margin-top:20px; border-top:1px solid rgba(0,240,255,0.25); padding-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin:0;">
+          📦 سفارش‌ها و پروژه‌های دریافتی این موکل (${userOrders.length})
+        </h4>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${userOrders.length === 0 ? 
+          '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; border:1px dashed rgba(255,255,255,0.1); text-align:center;">هنوز سفارشی توسط این کاربر ثبت نشده است.</div>' : 
+          userOrders.map(o => renderOrderAdminSnippet(o)).join('')
+        }
+      </div>
+    </div>
+
+    <div style="margin-top:20px; padding-top:14px; border-top:1px solid var(--border-subtle);">
       <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="width:100%; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
         🗑️ حذف این کاربر
       </button>
@@ -3833,15 +3872,123 @@ function renderAdminMemberDetail(m) {
   `;
 }
 
-window.filterAdminMembers = function(val) {
-  renderAdminSketch3(val, currentMemberTierFilter);
+// ساخت کارت سفارش درون پنل کاربر
+function renderOrderAdminSnippet(o) {
+  const STAGES = [
+    'بریف دریافت شد',
+    'ودیعه ۵۰٪ تایید شد',
+    'اتود و لاین‌آرت',
+    'رندر مستر نهایی',
+    'تسویه و تحویل سورس'
+  ];
+
+  return `
+    <div style="padding:14px; background:#04060b; border:1px solid rgba(255,255,255,0.08); border-radius:10px; display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+        <div>
+          <strong style="font-size:13px; color:#fff;">${o.pkg || 'سفارش کانسپت آرت'}</strong>
+          <span class="font-mono" style="font-size:10.5px; color:var(--gold); display:block; margin-top:2px;">#${o.id} • هزینه: ${o.price || 'توافقی'}</span>
+        </div>
+        <select onchange="updateOrderStatusFromAdmin(${o.id}, this.value)" style="font-size:11px; padding:4px 8px; background:#080c14; border:1px solid rgba(0,240,255,0.35); border-radius:6px; color:var(--cyan-electric); font-weight:700;">
+          ${STAGES.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </div>
+
+      <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:6px;">
+        <span style="color:var(--text-muted); font-size:10.5px; display:block; margin-bottom:2px;">متن بریف و توافق:</span>
+        ${o.brief || 'توضیحات اختصاصی کانسپت آرت'}
+      </div>
+
+      ${o.refLink && o.refLink.startsWith('http') ? `
+        <div style="font-size:11px;">
+          <a href="${o.refLink}" target="_blank" rel="noopener" style="color:var(--cyan-electric); text-decoration:underline;">
+            🔗 مشاهده لینک رفرنس و مودبورد ارسالی
+          </a>
+        </div>
+      ` : ''}
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05); font-size:11px;">
+        <button type="button" onclick="downloadOrderInvoiceById(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-color:var(--gold); color:var(--gold);">
+          📄 پیش‌فاکتور
+        </button>
+        <button type="button" onclick="adminDeleteOrderById(${o.id})" style="background:none; border:none; color:var(--crimson); font-size:11px; cursor:pointer;">
+          🗑️ حذف سفارش
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// تغییر وضعیت سفارش از درون پنل کاربر
+window.updateOrderStatusFromAdmin = function(orderId, newStatus) {
+  const o = ordersList.find(x => x.id === orderId);
+  if (o) {
+    o.status = newStatus;
+    safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+    if (window.supabaseClient) {
+      window.supabaseClient.from('orders').update({ status: newStatus }).eq('id', orderId).then(() => {
+        console.log('[Supabase Orders] Order status updated in cloud.');
+      });
+    }
+    showToast(`وضعیت سفارش #${orderId} به «${newStatus}» تغییر یافت. ✓`, 'success', 3000);
+    // رندر مجدد جزئیات کاربر
+    const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'سید سروش تاج', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
+    renderAdminMemberDetail(currentMemberObj);
+  }
 };
 
-window.filterMembersByTier = function(tier) {
-  currentMemberTierFilter = tier;
-  document.querySelectorAll('#adminTabMembers .gallery-filter-btn').forEach(b => b.classList.remove('active'));
-  if (window.event && window.event.target) window.event.target.classList.add('active');
-  renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', tier);
+// حذف سفارش توسط ادمین
+window.adminDeleteOrderById = function(orderId) {
+  if (!confirm(`آیا از حذف سفارش شماره #${orderId} اطمینان دارید؟`)) return;
+  ordersList = ordersList.filter(x => x.id !== orderId);
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (window.supabaseClient) {
+    window.supabaseClient.from('orders').delete().eq('id', orderId).then(() => {
+      console.log('[Supabase Orders] Order deleted from cloud.');
+    });
+  }
+  showToast('سفارش با موفقیت حذف گردید.', 'info');
+  const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'سید سروش تاج', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
+  renderAdminMemberDetail(currentMemberObj);
+};
+
+// دانلود پیش‌فاکتور اختصاصی برای یک سفارش
+window.downloadOrderInvoiceById = function(orderId) {
+  const o = ordersList.find(x => x.id === orderId);
+  if (!o) return;
+  const invNumber = `TJK-INV-ORDER-${o.id}`;
+  const dateStr = new Date().toLocaleDateString('fa-IR');
+
+  const invoiceText = `================================================================================
+                    استودیو کانسپت آرت و دنیاسازی TAJINKART
+                    پیش‌فاکتور و سند رسمی تعهدات سفارش #${o.id}
+================================================================================
+شماره فاکتور: ${invNumber}
+تاریخ: ${dateStr}
+طرف قرارداد / موکل: ${o.client}
+پل ارتباطی: ${o.contact}
+عنوان پکیج: ${o.pkg}
+فاز طراحی: ${o.phase || 'استاندارد'}
+مبلغ کل برآورد: ${o.price}
+زمان‌بندی تقریبی: ${o.timeline || 'طبق توافق'}
+--------------------------------------------------------------------------------
+خلاصه بریف و نیازمندی:
+${o.brief}
+--------------------------------------------------------------------------------
+لینک رفرنس: ${o.refLink || 'ارائه نشده'}
+وضعیت کنونی پروژه: ${o.status}
+================================================================================`;
+
+  const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `TAJINKART_Invoice_${o.id}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`پیش‌فاکتور سفارش #${o.id} دانلود شد. 📄`, 'success');
 };
 
 function renderAdminLists() {
@@ -4385,7 +4532,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModalDirect();
       renderAdminLists();
       renderMemberDashboard();
-      showToast('بریف کمیسیون با موفقیت ثبت شد و در پایگاه ابری و تلگرام استودیو بایگانی گردید. ✓', 'success', 5000);
+      showToast('Commission brief inquiry submitted successfully! Archived in Studio Cloud & Telegram. ✓', 'success', 5000);
     });
   }
 
@@ -6495,7 +6642,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // پویایی بصری عنوان استودیو و شعار رسمی در بالای صفحه (Brand Signature Morphing)
 // ==============================================================================
 let brandMorphInterval = null;
-const BRAND_SIGNATURE_PAIRS = [
+var BRAND_SIGNATURE_PAIRS = [
   { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' },
   { title: 'TAJINKART', sub: 'CONCEPT ART & VISUAL DEVELOPMENT ATELIER' },
   { title: 'FROM INK TO UNIVERSE', sub: 'ORIGINAL DARK FANTASY & SCI-FI WORLDS' }
@@ -6754,6 +6901,7 @@ window.adminEditCategoryTitle = function(catId) {
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
     renderAdminGalleryCategories();
     renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     showToast(`نام دسته به «${cat.title}» تغییر یافت. ✓`, 'success', 2500);
   }
 };
@@ -6941,6 +7089,7 @@ window.loadBrandSlogansFromStorage = function() {
       const parsed = JSON.parse(customPairs);
       if (Array.isArray(parsed) && parsed.length > 0) {
         BRAND_SIGNATURE_PAIRS = parsed;
+        window.BRAND_SIGNATURE_PAIRS = parsed;
       }
     }
     const customTitle = safeGetStorage('tajinkart_brand_title');
@@ -6967,15 +7116,26 @@ window.renderAdminSloganPairs = function() {
   const genreInput = document.getElementById('adminGenreSubtitleInput');
   if (genreInput) genreInput.value = safeGetStorage('tajinkart_brand_genre') || 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN';
 
+  // در صورت خالی بودن آرایه، ۳ شعار پیش‌فرض بارگذاری شوند
+  if (!Array.isArray(BRAND_SIGNATURE_PAIRS) || BRAND_SIGNATURE_PAIRS.length === 0) {
+    BRAND_SIGNATURE_PAIRS = [
+      { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' },
+      { title: 'TAJINKART', sub: 'CONCEPT ART & VISUAL DEVELOPMENT ATELIER' },
+      { title: 'FROM INK TO UNIVERSE', sub: 'ORIGINAL DARK FANTASY & SCI-FI WORLDS' }
+    ];
+  }
+
   container.innerHTML = '';
   BRAND_SIGNATURE_PAIRS.forEach((pair, idx) => {
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex; gap:10px; align-items:center; background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 12px;';
+    row.style.cssText = 'display:flex; gap:10px; align-items:center; background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 14px;';
     row.innerHTML = `
-      <span class="font-mono" style="font-size:11px; color:var(--gold); width:20px;">#${idx + 1}</span>
-      <input type="text" class="admin-slogan-title-input font-mono" value="${pair.title || ''}" placeholder="عنوان هدر (مثلاً TAJINKART)" style="flex:1; padding:7px 10px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-      <input type="text" class="admin-slogan-sub-input font-mono" value="${pair.sub || ''}" placeholder="شعار زیرین (مثلاً FROM INK TO UNIVERSE)" style="flex:1.4; padding:7px 10px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-      <button type="button" onclick="removeAdminSloganPairRow(${idx})" style="color:var(--crimson); font-size:16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px; padding:4px 10px; cursor:pointer;" title="حذف این شعار">✕</button>
+      <span class="font-mono" style="font-size:12px; font-weight:800; color:var(--gold); width:26px;">#${idx + 1}</span>
+      <input type="text" class="admin-slogan-title-input font-mono" value="${pair.title || ''}" placeholder="عنوان هدر (مثلاً TAJINKART)" style="flex:1; padding:8px 12px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+      <input type="text" class="admin-slogan-sub-input font-mono" value="${pair.sub || ''}" placeholder="شعار زیرین (مثلاً DARK FANTASY • SCI-FI...)" style="flex:1.6; padding:8px 12px; font-size:12px; background:#080c14; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+      <button type="button" onclick="removeAdminSloganPairRow(${idx})" style="color:#fda4af; font-size:12px; font-weight:700; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); border-radius:6px; padding:6px 12px; cursor:pointer; display:flex; align-items:center; gap:4px;" title="حذف این شعار">
+        🗑️ حذف
+      </button>
     `;
     container.appendChild(row);
   });
@@ -6983,7 +7143,11 @@ window.renderAdminSloganPairs = function() {
 
 window.addAdminSloganPairRow = function() {
   BRAND_SIGNATURE_PAIRS.push({ title: 'TAJINKART', sub: 'CONCEPT ART & WORLDBUILDING' });
+  window.BRAND_SIGNATURE_PAIRS = BRAND_SIGNATURE_PAIRS;
+  safeSetStorage('tajinkart_brand_pairs', JSON.stringify(BRAND_SIGNATURE_PAIRS));
   renderAdminSloganPairs();
+  if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
+  showToast('ردیف شعار جدید اضافه شد. برای ذخیره دائمی دکمه ثبت را بزنید.', 'info');
 };
 
 window.removeAdminSloganPairRow = function(idx) {
@@ -6992,7 +7156,11 @@ window.removeAdminSloganPairRow = function(idx) {
     return;
   }
   BRAND_SIGNATURE_PAIRS.splice(idx, 1);
+  window.BRAND_SIGNATURE_PAIRS = BRAND_SIGNATURE_PAIRS;
+  safeSetStorage('tajinkart_brand_pairs', JSON.stringify(BRAND_SIGNATURE_PAIRS));
   renderAdminSloganPairs();
+  if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
+  showToast('شعار مورد نظر حذف و تغییرات ذخیره شد. ✓', 'success', 3000);
 };
 
 window.saveAdminSlogansSettings = function() {
@@ -7026,6 +7194,7 @@ window.saveAdminSlogansSettings = function() {
 
   if (updatedPairs.length > 0) {
     BRAND_SIGNATURE_PAIRS = updatedPairs;
+    window.BRAND_SIGNATURE_PAIRS = updatedPairs;
     safeSetStorage('tajinkart_brand_pairs', JSON.stringify(updatedPairs));
   }
 
@@ -7327,6 +7496,7 @@ window.saveAdminCategoryEdit = function() {
     safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
     window.renderAdminGalleryCategories();
     window.renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
   }
@@ -7514,6 +7684,7 @@ window.saveAdminCategoryEdit = function() {
     safeSetStorage(KEYS.CATEGORIES, JSON.stringify(galleryCategories));
     window.renderAdminGalleryCategories();
     window.renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`دسته‌بندی «${newTitle}» با موفقیت ویرایش و ذخیره شد! ✓`, 'success', 3500);
   }
@@ -7746,6 +7917,7 @@ window.saveAdminCategoryEdit = function() {
     
     window.renderAdminGalleryCategories();
     window.renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
     window.closeAdminCategoryEditForm();
     showToast(`دسته‌بندی «${newTitleFA}» (${newTitleEN}) با موفقیت ذخیره شد! ✓`, 'success', 3500);
   }
@@ -8136,8 +8308,87 @@ window.adminDeleteCurrentEditingCategory = function() {
   closeAdminCategoryEditForm();
   if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
   if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   if (currentGalleryFilter === origId) {
     filterGalleryByCategory('all', 'All Artworks');
   }
   showToast(`دسته‌بندی «${catName}» با موفقیت حذف شد.`, 'info');
+};
+
+
+// اتصال زنده رنگ‌های دسته‌بندی گالری به کارت‌های پایپلاین استودیو (v21.2.0)
+window.applyCategoryColorsToServiceCards = function() {
+  const cards = document.querySelectorAll('.service-nav-card');
+  if (!cards || cards.length === 0) return;
+
+  cards.forEach(card => {
+    const pipeKey = card.getAttribute('data-pipeline');
+    if (!pipeKey) return;
+
+    // نگاشت پایپلاین به دسته‌بندی گالری
+    const catId = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? (PIPELINE_TO_CATEGORY_MAP[pipeKey] || 'character') : 'character';
+    
+    // دریافت رنگ زنده این دسته‌بندی از آرایه گالری ادمین
+    let catColor = '#facc15';
+    if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+      const foundCat = galleryCategories.find(c => c.id === catId);
+      if (foundCat && foundCat.color) {
+        catColor = foundCat.color;
+      }
+    }
+
+    // اعمال متغیرهای CSS روی هر کارت
+    card.style.setProperty('--cat-color', catColor);
+    card.style.setProperty('--cat-color-glow', `${catColor}55`); // 33% opacity hex
+    card.style.borderBottomColor = catColor;
+
+    // تنظیم رنگ شماره سرفصل (01., 02., ...)
+    const numSpan = card.querySelector('.service-nav-title .font-mono');
+    if (numSpan) {
+      numSpan.style.color = catColor;
+    }
+
+    // اگر کارت در حال حاضر فعال است
+    if (card.classList.contains('active')) {
+      card.style.borderColor = catColor;
+      card.style.boxShadow = `0 0 0 1px ${catColor}, 0 12px 30px ${catColor}44`;
+    }
+  });
+};
+
+
+// انتخاب و پیش‌نمایش کارت وضعیت آتلیه
+window.selectStudioStatusCard = function(mode, event) {
+  const radio = document.getElementById(`studioMode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+  if (radio) radio.checked = true;
+
+  document.querySelectorAll('.studio-status-option-card').forEach(c => c.classList.remove('active'));
+  const activeCard = document.getElementById(`cardMode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+  if (activeCard) activeCard.classList.add('active');
+
+  previewStudioStatusSelection();
+};
+
+// ذخیره مستقیم وضعیت با دکمه مربعی زرد
+window.saveStudioModeDirect = function(mode, event) {
+  if (event) event.stopPropagation();
+
+  const radio = document.getElementById(`studioMode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+  if (radio) radio.checked = true;
+
+  const input = document.getElementById(`statusMsg_${mode}`);
+  const msg = input ? input.value.trim() : '';
+
+  siteSettings.studioAvailabilityMode = mode;
+  siteSettings.studioCustomStatusMessage = msg;
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+
+  updateStudioLiveStatus();
+  previewStudioStatusSelection();
+
+  document.querySelectorAll('.studio-status-option-card').forEach(c => c.classList.remove('active'));
+  const activeCard = document.getElementById(`cardMode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+  if (activeCard) activeCard.classList.add('active');
+
+  showToast(`وضعیت استودیو با موفقیت بر روی «${mode.toUpperCase()}» تنظیم و ذخیره شد! ✓`, 'success', 3500);
 };

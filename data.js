@@ -439,27 +439,27 @@ window.digitalStoreProducts = digitalStoreProducts;
 var academyCourses = [
   {
     id: 1,
-    title: 'مسترکلاس: طراحی کاراکتر فانتزی و متریال زره',
+    title: 'Masterclass: Fantasy Character Design & Armor Rendering',
     price: 59,
-    duration: '۱۴ ساعت ویدیو HD + فایل‌های PSD',
+    duration: '14 Hours HD Video + Layered PSD Master Files',
     img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
-    desc: 'از اتودزنی سیلوئت تا مدل‌شیت سه‌نما و تکنیک‌های پیشرفته رندر فلز و چرم طبق پایپلاین استودیو.'
+    desc: 'From thumbnail silhouette exploration to 3-view turnaround model sheets and advanced metal, leather, and fabric rendering according to studio pipeline.'
   },
   {
     id: 2,
-    title: 'جهان‌سازی و کانسپت آرت محیط‌های سینمایی',
+    title: 'Cinematic Environment Concept Art & Worldbuilding',
     price: 65,
-    duration: '۱۲ ساعت ویدیو HD + براش اختصاصی',
+    duration: '12 Hours HD Video + Custom Atelier Brush Set',
     img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
-    desc: 'پرسپکتیو کاربردی، نورپردازی حجمی، تعادل تیرگی و روشن و مدیریت نقاط کانونی در شات‌های عریض.'
+    desc: 'Practical perspective, volumetric atmosphere, value structures, and focal point orchestration for wide cinematic establishing shots.'
   },
   {
     id: 3,
-    title: 'نقشه راه فریلنسری کانسپت آرتیست‌ها در بازار جهانی',
+    title: 'Freelance Concept Artist Career Roadmap & Global Contracts',
     price: 49,
-    duration: '۸ ساعت ویدیو + قالب قراردادها',
+    duration: '8 Hours Video + Legal Contract Templates',
     img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-    desc: 'تنظیم پورتفولیو استاندارد، ارتباط با کارفرمای خارجی، تعریف مایل‌استون‌ها و عقد قرارداد بین‌المللی.'
+    desc: 'Industry standard portfolio curation, international client communications, milestone pricing models, and IP agreements.'
   }
 ];
 

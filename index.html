@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=21.0.0">
+  <link rel="stylesheet" href="style.css?v=21.2.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -543,7 +543,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <div style="display:inline-flex; align-items:center; gap:8px; padding:5px 14px; border-radius:999px; background:rgba(244,63,94,0.14); border:1px solid rgba(244,63,94,0.4); color:#fda4af; font-size:12px; font-weight:700; margin-bottom:10px;">⏳ در حال توسعه و بارگذاری محتوا • به زودی (Coming Soon)</div>
+          <div class="genesis-status-badge font-mono" style="display:inline-flex; align-items:center; gap:8px; padding:5px 14px; border-radius:999px; background:rgba(0,240,255,0.12); border:1px solid rgba(0,240,255,0.35); color:var(--cyan-electric); font-size:12px; font-weight:700; margin-bottom:10px;">⚡ Original IP Universe • Active Production & Chapter Releases</div>
           <h2 class="view-hero-title">Genesis Universe & Graphic Lore</h2>
           <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">Original dark fantasy universe, narrative chapters, and world progression roadmap.</p>
         </div>
@@ -555,25 +555,25 @@
         </p>
 
         <div style="margin-top:20px;">
-          <div style="display:flex; justify-content:space-between; font-size:12px;">
-            <span>هدف اولیه پروژه: <strong style="color:var(--gold); direction:ltr; display:inline-block;">$10,000 USD</strong></span>
-            <span style="color:var(--crimson); font-weight:700;">تأمین شده: ۴,۲۰۰ دلار (۴۲٪)</span>
+          <div style="display:flex; justify-content:space-between; font-size:12px; flex-wrap:wrap; gap:8px;">
+            <span>Project Funding Goal: <strong style="color:var(--gold); direction:ltr; display:inline-block;">$10,000 USD</strong></span>
+            <span style="color:var(--cyan-electric); font-weight:700;">Funded: $4,200 USD (42%)</span>
           </div>
           <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
         </div>
 
         <div class="milestone-stepper">
           <div class="milestone-box unlocked">
-            <div style="color:var(--gold); font-weight:700;">مرحله ۱ • ۱۰,۰۰۰ دلار (شماره اول باز شد)</div>
-            <div style="color:#cbd5e1; margin-top:3px;">انتشار دیجیتال ۲۴ صفحه پیش‌درآمد همراه با اتودهای خام PSD.</div>
+            <div style="color:var(--gold); font-weight:700;">Milestone 1 • $10,000 (Issue #1 Unlocked)</div>
+            <div style="color:#cbd5e1; margin-top:3px;">Digital release of 24 prologue pages with layered PSD master files.</div>
           </div>
           <div class="milestone-box">
-            <div style="color:var(--text-muted); font-weight:700;">مرحله ۲ • ۱۵,۰۰۰ دلار (کاراکترهای جدید)</div>
-            <div style="color:var(--text-muted); margin-top:3px;">آنلاک دو شخصیت جدید همراه با شیت‌های حالات چهره و موسیقی متن اختصاصی.</div>
+            <div style="color:var(--text-muted); font-weight:700;">Milestone 2 • $15,000 (New Character Roster)</div>
+            <div style="color:var(--text-muted); margin-top:3px;">Unlock 2 new characters with expression sheets and original score.</div>
           </div>
           <div class="milestone-box">
-            <div style="color:var(--text-muted); font-weight:700;">مرحله ۳ • ۲۰,۰۰۰ دلار (پروتوتایپ بازی)</div>
-            <div style="color:var(--text-muted); margin-top:3px;">دموی بازی پیکسلی دوبعدی و فایل STL سه بعدی برای پرینت رزینی.</div>
+            <div style="color:var(--text-muted); font-weight:700;">Milestone 3 • $20,000 (Game Prototype)</div>
+            <div style="color:var(--text-muted); margin-top:3px;">2D pixel playable demo and resin 3D printable STL files.</div>
           </div>
         </div>
       </div>
@@ -581,14 +581,14 @@
       <div class="comic-reader-box">
         <div style="display:flex; align-items:center; justify-content:space-between; max-width:720px; margin:0 auto; flex-wrap:wrap; gap:10px;">
           <span class="font-mono" style="font-size:12px; color:var(--gold);" id="comicPageIndicator">PAGE 1 / 4</span>
-          <h3 style="font-size:15px; font-weight:800; color:#fff;">پیش‌درآمد داستان: مبدأ بازمانده</h3>
+          <h3 style="font-size:15px; font-weight:800; color:#fff;">Prologue Chapter: The Ashborn Vanguard</h3>
           <div style="display:flex; gap:6px;">
-            <button onclick="navigateComic(-1)" class="btn-secondary" style="padding:6px 14px; font-size:11px;">← صفحه قبلی</button>
-            <button onclick="navigateComic(1)" class="btn-secondary" style="padding:6px 14px; font-size:11px;">صفحه بعدی ←</button>
+            <button onclick="navigateComic(-1)" class="btn-secondary" style="padding:6px 14px; font-size:11px;">← Previous Page</button>
+            <button onclick="navigateComic(1)" class="btn-secondary" style="padding:6px 14px; font-size:11px;">Next Page →</button>
           </div>
         </div>
         <div class="comic-page-stage">
-          <img id="comicPageImg" src="" alt="صفحه کمیک" />
+          <img id="comicPageImg" src="" alt="Genesis Comic Page" />
         </div>
       </div>
     </div>
@@ -599,9 +599,9 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <div style="display:inline-flex; align-items:center; gap:8px; padding:5px 14px; border-radius:999px; background:rgba(168,85,247,0.14); border:1px solid rgba(168,85,247,0.4); color:#d8b4fe; font-size:12px; font-weight:700; margin-bottom:10px;">⏳ در حال تدوین مسترکلاس‌ها • به زودی (Coming Soon)</div>
-          <h2 class="view-hero-title">آکادمی کانسپت آرت و توسعه بصری</h2>
-          <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">مسترکلاس‌های تخصصی طراحی شده برای ورود به بازار کار بین‌المللی و تسلط بر تصویرسازی دیجیتال.</p>
+          <div class="academy-status-badge font-mono" style="display:inline-flex; align-items:center; gap:8px; padding:5px 14px; border-radius:999px; background:rgba(168,85,247,0.14); border:1px solid rgba(168,85,247,0.4); color:#d8b4fe; font-size:12px; font-weight:700; margin-bottom:10px;">🎓 Professional Concept Art & Visual Development Masterclasses</div>
+          <h2 class="view-hero-title">Visual Development & Concept Art Academy</h2>
+          <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">Masterclasses designed for international industry standards, portfolio development, and digital illustration mastery.</p>
         </div>
       </div>
       <div id="academyCoursesGrid" class="cards-grid-3"></div>
@@ -915,12 +915,12 @@
                 </div>
               </button>
 
-              <!-- ۳. سفارش‌های دریافتی -->
-              <button type="button" onclick="switchAdminTab('orders', this)" class="admin-nav-item" data-tab="orders">
-                <span class="admin-nav-icon">📋</span>
+              <!-- ۳. اعضا، کاربران و سفارش‌های دریافتی (ادغام شده) -->
+              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
+                <span class="admin-nav-icon">👥</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۳. سفارش‌های دریافتی</span>
-                  <span class="admin-nav-sub">بریف‌ها، فاکتورها و وضعیت</span>
+                  <span class="admin-nav-title">۳. اعضا و سفارش‌های دریافتی</span>
+                  <span class="admin-nav-sub">پرونده کاربران و پایش بریف‌ها</span>
                 </div>
               </button>
 
@@ -930,15 +930,6 @@
                 <div class="admin-nav-text">
                   <span class="admin-nav-title">۴. فروشگاه دارایی‌ها</span>
                   <span class="admin-nav-sub">اسست‌ها، براش‌ها و کمیک</span>
-                </div>
-              </button>
-
-              <!-- ۵. اعضا و گزارش‌های مالی -->
-              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
-                <span class="admin-nav-icon">👥</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">۵. اعضا و کاربران</span>
-                  <span class="admin-nav-sub">سطوح کاربری و تراکنش‌ها</span>
                 </div>
               </button>
 
@@ -1492,33 +1483,7 @@
                     </button>
                   </div>
 
-                                                      <!-- کارت ۱-ج: مدیریت وضعیت استودیو و ظرفیت پذیرش سفارش (دو نسخه فارسی و انگلیسی) -->
-                  <div style="background:#06080d; border:1px solid rgba(16,185,129,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px; grid-column:1 / -1;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <div>
-                        <span style="font-size:14px; font-weight:800; color:var(--emerald);">🟢 کنترل وضعیت ارتباطی و پذیرش آتلیه (Studio Availability Status)</span>
-                        <span style="display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px;">تنظیم متن نشانگر وضعیت زنده در هدر سایت برای مراجعین بین‌المللی و داخلی.</span>
-                      </div>
-                      <span class="font-mono" style="font-size:10px; color:var(--emerald); padding:3px 8px; border-radius:4px; background:rgba(16,185,129,0.1);">LIVE BADGE</span>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-                      <div>
-                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">🇮🇷 متن وضعیت به زبان فارسی (نسخه داخلی):</label>
-                        <input type="text" id="adminStudioStatusFA" class="font-mono" placeholder="آتلیه فعال و آنلاین • پذیرش بریف و کانسپت" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff; direction:rtl;" />
-                      </div>
-                      <div>
-                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">🌐 Studio Status Text (English - Public Site):</label>
-                        <input type="text" id="adminStudioStatusEN" class="font-mono" placeholder="Studio Online • Accepting Briefs & Concept Commissions" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff; direction:ltr;" />
-                      </div>
-                    </div>
-
-                    <button type="button" onclick="saveStudioStatusBilingual()" class="btn-gold" style="width:100%; padding:11px; font-size:12.5px; font-weight:800; cursor:pointer;">
-                      ✓ ثبت و به‌روزرسانی وضعیت زنده آتلیه
-                    </button>
-                  </div>
-
-                  <!-- کارت ۱-د: مدیریت شعارهای متحرک و عناوین برند هدر استودیو (کاملاً داینامیک) -->
+                                                      <!-- کارت ۱-د: مدیریت شعارهای متحرک و عناوین برند هدر استودیو (کاملاً داینامیک) -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px; grid-column:1 / -1;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                       <div>
@@ -1574,67 +1539,98 @@
                       ✓ ذخیره و به‌روزرسانی متن درباره استودیو
                     </button>
                   </div>
-                  <!-- کارت تنظیم دستی وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه (حالت سفر/مرخصی) -->
-                  <div style="background:#06080d; border:1.5px solid rgba(250,204,21,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                  <!-- کارت یکپارچه: کنترل وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
                       <div>
                         <div style="display:flex; align-items:center; gap:8px;">
-                          <span style="font-size:18px;">🎛️</span>
-                          <span style="font-size:14.5px; font-weight:900; color:var(--gold);">کنترل وضعیت حضور، پاسخ‌گویی و پذیرش سفارشات آتلیه</span>
+                          <span style="font-size:16px;">🟢</span>
+                          <span style="font-size:15px; font-weight:900; color:var(--gold);">کنترل یکپارچه وضعیت حضور، پاسخ‌گویی و پذیرش سفارشات آتلیه</span>
                         </div>
-                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">تعیین مستقیم نشانگر آنلاین، زمان پاسخ‌دهی یا بستن موقت سفارشات در زمان سفر و مرخصی استودیو.</span>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">تعیین نشانگر آنلاین و پذیرش با امکان ویرایش مستقیم متن و فعال‌سازی فوری هر حالت با دکمه مربعی زرد.</span>
                       </div>
                       <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 پیش‌نمایش زنده</span>
                     </div>
 
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                    <!-- شبکه گزینه‌های وضعیت استودیو همراه با فیلد متنی اختصاصی و دکمه مربعی ذخیره در پایین سمت چپ -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+                      
                       <!-- گزینه ۱: خودکار هوشمند -->
-                      <label style="background:#04060a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
-                        <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin-top:3px;" checked />
-                        <div>
-                          <strong style="color:#fff; font-size:12px; display:block;">🔄 خودکار (هوشمند ۲۴ ساعته)</strong>
-                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">تعیین وضعیت بر اساس آخرین ورود شما (کمتر از ۲۴ ساعت آنلاین، بیش از آن پاسخ‌دهی ۲۴ ساعته).</span>
+                      <div class="studio-status-option-card" id="cardModeAuto" onclick="selectStudioStatusCard('auto', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin:0;" checked />
+                            <strong style="color:#fff; font-size:12.5px;">🔄 خودکار (هوشمند ۲۴ ساعته)</strong>
+                          </label>
                         </div>
-                      </label>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت خودکار:</label>
+                          <input type="text" id="statusMsg_auto" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="متن پیام وضعیت خودکار..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('auto', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت خودکار">
+                            💾
+                          </button>
+                        </div>
+                      </div>
 
-                      <!-- گزینه ۲: آنلاین و فعال دائم -->
-                      <label style="background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
-                        <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
-                        <div>
-                          <strong style="color:#10b981; font-size:12px; display:block;">🟢 همیشه آنلاین و باز</strong>
-                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">Studio Online • Accepting Briefs & Concept Commissions.</span>
+                      <!-- گزینه ۲: آنلاین و پذیرش فعال -->
+                      <div class="studio-status-option-card" id="cardModeOnline" onclick="selectStudioStatusCard('online', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin:0;" />
+                            <strong style="color:#10b981; font-size:12.5px;">🟢 همیشه آنلاین و باز</strong>
+                          </label>
                         </div>
-                      </label>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت آنلاین:</label>
+                          <input type="text" id="statusMsg_online" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="متن پیام وضعیت آنلاین..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('online', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت آنلاین">
+                            💾
+                          </button>
+                        </div>
+                      </div>
 
-                      <!-- گزینه ۳: در حال بررسی با تاخیر -->
-                      <label style="background:#04060a; border:1px solid rgba(251,191,36,0.3); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
-                        <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
-                        <div>
-                          <strong style="color:#fbbf24; font-size:12px; display:block;">🟡 بررسی با تاخیر (Away)</strong>
-                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">دریافت بریف‌ها فعال • زمان بررسی ۲۴ تا ۴۸ ساعت.</span>
+                      <!-- گزینه ۳: در حال بررسی با تاخیر (Away) -->
+                      <div class="studio-status-option-card" id="cardModeAway" onclick="selectStudioStatusCard('away', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin:0;" />
+                            <strong style="color:#fbbf24; font-size:12.5px;">🟡 بررسی با تاخیر (Away / Queued)</strong>
+                          </label>
                         </div>
-                      </label>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت بررسی:</label>
+                          <input type="text" id="statusMsg_away" class="font-mono status-mode-input" value="High Demand • Reviewing Inquiries (24-48h)" placeholder="متن پیام بررسی با تاخیر..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('away', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت با تاخیر">
+                            💾
+                          </button>
+                        </div>
+                      </div>
 
                       <!-- گزینه ۴: حالت مرخصی و سفر استودیو -->
-                      <label style="background:#04060a; border:1px solid rgba(239,68,68,0.35); border-radius:10px; padding:12px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px;">
-                        <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin-top:3px;" />
-                        <div>
-                          <strong style="color:#ef4444; font-size:12px; display:block;">🔴 مرخصی و سفر استودیو (بسته)</strong>
-                          <span style="font-size:11px; color:var(--text-muted); line-height:1.6; display:block; margin-top:2px;">آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارشات موقتاً متوقف است.</span>
+                      <div class="studio-status-option-card" id="cardModeVacation" onclick="selectStudioStatusCard('vacation', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin:0;" />
+                            <strong style="color:#ef4444; font-size:12.5px;">🔴 مرخصی و سفر استودیو (بسته)</strong>
+                          </label>
                         </div>
-                      </label>
-                    </div>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت سفر و تعطیلی:</label>
+                          <input type="text" id="statusMsg_vacation" class="font-mono status-mode-input" value="Studio on Worldbuilding Expedition • Inquiries Paused" placeholder="متن پیام مرخصی و سفر..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('vacation', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت مرخصی">
+                            💾
+                          </button>
+                        </div>
+                      </div>
 
-                    <!-- کادر متن پیام سفارشی وضعیت -->
-                    <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن پیام سفارشی نشانگر وضعیت (اختیاری):</label>
-                      <input type="text" id="setStudioCustomStatusMessage" placeholder="مثلاً: استودیو تا دوشنبه آینده در سفر تحقیقاتی دنیاسازی است و پس از بازگشت پاسخگوی سفارشات خواهد بود." style="font-size:11.5px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:10px 12px; width:100%; box-sizing:border-box; color:#fff;" />
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end;">
-                      <button type="button" onclick="saveStudioAvailabilitySettingsDirect()" class="btn-gold" style="font-size:12px; padding:10px 22px; font-weight:800; border-radius:8px; cursor:pointer;">
-                        ✓ ذخیره و فعال‌سازی فوری وضعیت استودیو
-                      </button>
                     </div>
                   </div>
 
@@ -1928,15 +1924,15 @@
         <!-- فاکتور داینامیک لحظه‌ای محاسبه‌شده -->
         <div style="padding:16px; border-radius:14px; background:#06080e; border:1px solid rgba(250,204,21,0.3); display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-            <span style="font-size:11.5px; color:var(--text-muted);">مبلغ تخمینی کل سفارش:</span>
+            <span style="font-size:11.5px; color:var(--text-muted);">Estimated Project Quote:</span>
             <span id="modalPrice" class="font-mono" style="font-size:22px; font-weight:900; color:var(--gold);">80</span>
           </div>
           <div style="display:flex; justify-content:space-between; font-size:11.5px;">
-            <span style="color:var(--text-muted);">زمان‌بندی تحویل:</span>
+            <span style="color:var(--text-muted);">Production Timeline:</span>
             <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">۵ تا ۷ روز کاری</span>
           </div>
           <div style="font-size:10.5px; color:var(--emerald); display:flex; align-items:center; gap:4px; margin-top:4px;">
-            <span>✓</span> <span>فیگور مقایسه ابعاد انسانی به صورت رایگان در شیت نهایی ارائه می‌شود.</span>
+            <span>✓</span> <span>Standard human scale reference figure included free on final model sheet.</span>
           </div>
         </div>
       </div>
@@ -1945,125 +1941,125 @@
       <form id="commissionOrderForm" style="display:flex; flex-direction:column; justify-content:space-between;">
         <div style="max-height:68vh; overflow-y:auto; padding-left:4px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h4 style="font-size:14.5px; font-weight:900; color:#fff;">محاسبه‌گر مشخصات و اسکوپ پروژه</h4>
+            <h4 style="font-size:14.5px; font-weight:900; color:#fff;">Project Specifications & Cost Calculator</h4>
             <button type="button" onclick="closeModalDirect()" style="color:var(--text-muted); font-size:19px;">✕</button>
           </div>
 
-          <!-- گام ۱: مشخصات پایه و کادربندی -->
+          <!-- Step 1: Scope, Archetype & Framing -->
           <div class="wizard-step-card active" id="wizardStep1">
             <div class="wizard-step-header" onclick="toggleWizardStep(1)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">۱.</span> کادربندی و ضریب پیچیدگی</span>
+              <span class="wizard-step-title"><span style="color:var(--gold);">1.</span> Scope, Archetype & Framing</span>
               <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
             <div class="wizard-step-body">
               <div>
-                <label style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">تیپ و سناریوی پروژه (Scope & Archetype):</label>
+                <label style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">Scope & Archetype:</label>
                 <select id="wizCharacterScope" onchange="recalcWizardPrice()" style="width:100%; font-size:12px; margin-bottom:10px;">
-                  <option value="single" data-usd="0" selected>👤 تک‌کاراکتر مستقل (Hero / Single Character Concept)</option>
-                  <option value="timeline" data-usd="60">⏳ خط زمانی سن و سال کاراکتر (کودکی ➔ جوانی ➔ کهنسالی) (+۶۰$)</option>
-                  <option value="party" data-usd="85">👥 پکیج تیمی / فکشن / خانوادگی (کاراکتر اصلی + همراهان) (+۸۵$)</option>
-                  <option value="redesign" data-usd="15">🔄 بازطراحی و ارتقای کاراکتر قدیمی (Redesign & Evolution) (+۱۵$)</option>
+                  <option value="single" data-usd="0" selected>👤 Single Hero / Character Concept (Base)</option>
+                  <option value="timeline" data-usd="60">⏳ Age Progression Timeline (Youth ➔ Prime ➔ Elder) (+$60)</option>
+                  <option value="party" data-usd="85">👥 Ensemble / Faction Bundle (Hero + Companions) (+$85)</option>
+                  <option value="redesign" data-usd="15">🔄 Character Redesign & Evolution (+$15)</option>
                 </select>
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">کادربندی و نما</label>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Framing & View</label>
                   <select id="wizFraming" onchange="recalcWizardPrice()">
-                    <option value="bust" data-usd="0">پرتره / نیم‌تنه (پایه)</option>
-                    <option value="full" data-usd="40" selected>تمام‌قد پویا (+۴۰$)</option>
-                    <option value="turnaround" data-usd="75">مدل‌شیت ۳۶۰ درجه ارتوگرافیک (+۷۵$)</option>
+                    <option value="bust" data-usd="0">Portrait / Bust (Base)</option>
+                    <option value="full" data-usd="40" selected>Full Body Dynamic Action (+$40)</option>
+                    <option value="turnaround" data-usd="75">360° Orthographic Turnaround (+$75)</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ضریب پیچیدگی دیزاین</label>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Design Complexity</label>
                   <select id="wizComplexity" onchange="recalcWizardPrice()">
-                    <option value="simple" data-usd="0">ساده (سیلوئت و المان‌های مینیمال)</option>
-                    <option value="medium" data-usd="30" selected>استاندارد پروداکشن (زره و بافت)</option>
-                    <option value="hard" data-usd="60">پیچیده سینمایی (زره سنگین / ارگانیک)</option>
+                    <option value="simple" data-usd="0">Minimal (Graphic Silhouettes)</option>
+                    <option value="medium" data-usd="30" selected>Production Standard (Armor & Props)</option>
+                    <option value="hard" data-usd="60">Cinematic AAA (Ornate / Biomechanical)</option>
                   </select>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- گام ۲: سطح فیدلیتی و رندرینگ نهایی -->
+          <!-- Step 2: Rendering Fidelity & Add-ons -->
           <div class="wizard-step-card active" id="wizardStep2">
             <div class="wizard-step-header" onclick="toggleWizardStep(2)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">۲.</span> سطح رندرینگ و فازهای اتود</span>
+              <span class="wizard-step-title"><span style="color:var(--gold);">2.</span> Rendering Fidelity & Add-ons</span>
               <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
             <div class="wizard-step-body">
               <div>
-                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">فیدلیتی پرداخت و رندرینگ</label>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Rendering Fidelity</label>
                 <select id="orderPhaseSelect" onchange="recalcWizardPrice()">
-                  <option value="فاز ۱: اتود اولیه، کشف فرم و سیلوئت" data-usd="-40">فاز ۱: اتود اولیه و کشف سیلوئت</option>
-                  <option value="فاز ۲: لاین‌آرت دقیق فنی و مدل‌شیت" data-usd="-20">فاز ۲: لاین‌آرت فنی و ترن‌اراند</option>
-                  <option value="فاز ۳: سایه‌زنی مقداری و نورپردازی" data-usd="0">فاز ۳: مطالعه مقداری و نورپردازی</option>
-                  <option value="فاز ۴: رندر کامل سینمایی + فایل لایه‌باز PSD" data-usd="50" selected>فاز ۴: رندر مستر سینمایی + لایه‌باز PSD</option>
+                  <option value="Phase 1: Initial Silhouette & Form Exploration" data-usd="-40">Phase 1: Initial Silhouette & Form Exploration</option>
+                  <option value="Phase 2: Technical Linework & Model Sheet" data-usd="-20">Phase 2: Technical Linework & Model Sheet</option>
+                  <option value="Phase 3: Value Study & Lighting" data-usd="0">Phase 3: Value Study & Lighting</option>
+                  <option value="Phase 4: Master 300DPI Keyframe Render + Layered PSD" data-usd="50" selected>Phase 4: Master 300DPI Keyframe Render + Layered PSD</option>
                 </select>
               </div>
               <div style="margin-top:6px; margin-bottom:8px;">
-                <span style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 افزونه‌های پیوسته به همین پرونده (Character Add-ons):</span>
+                <span style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 Character Add-ons:</span>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
                     <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>طراحی سلاح اختصاصی (+۳۵$)</span>
+                    <span>Hero Weapon Design (+$35)</span>
                   </label>
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
                     <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>شیت حالات چهره (+۳۰$)</span>
+                    <span>Facial Expressions Sheet (+$30)</span>
                   </label>
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
                     <input type="checkbox" id="wizColorPalette" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>واریاسیون رنگ لباس (+۲۰$)</span>
+                    <span>Color Variations (+$20)</span>
                   </label>
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
                     <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>لایسنس تجاری AAA (+۴۵$)</span>
+                    <span>Commercial AAA License (+$45)</span>
                   </label>
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
                     <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
-                    <span style="color:#10b981; font-weight:700;">✓ فایل مستر لایه‌باز PSD چاپ ۳۰۰DPI تجاری (رایگان و تضمین‌شده)</span>
+                    <span style="color:#10b981; font-weight:700;">✓ Master Layered 300DPI PSD (Included & Guaranteed)</span>
                   </label>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- گام ۳: مشخصات کارفرما و بریف متنی -->
+          <!-- Step 3: Client Credentials & Project Brief -->
           <div class="wizard-step-card active" id="wizardStep3">
             <div class="wizard-step-header" onclick="toggleWizardStep(3)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">۳.</span> مشخصات کارفرما و متن بریف</span>
+              <span class="wizard-step-title"><span style="color:var(--gold);">3.</span> Client Credentials & Project Brief</span>
               <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
             <div class="wizard-step-body">
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">نام کارفرما / استودیو</label>
-                  <input type="text" id="orderClientName" required placeholder="سید سروش تاج / استودیو نوا" />
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Client / Studio Name</label>
+                  <input type="text" id="orderClientName" required placeholder="Studio Nova / John Doe" />
                 </div>
                 <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">ایمیل یا آیدی تلگرام / شماره</label>
-                  <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com یا ۰۹۱۲..." />
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Email or Telegram Handle</label>
+                  <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com or @handle" />
                 </div>
               </div>
               <div>
-                <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px;">لینک رفرنس یا مودبورد (اختیاری - Pinterest / Drive / ArtStation)</label>
-                <input type="url" id="orderClientRefLink" class="font-mono" placeholder="https://pinterest.com/... یا لینک گوگل درایو" style="font-size:11.5px;" />
+                <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px;">Reference Link (Optional - Pinterest / Drive / ArtStation)</label>
+                <input type="url" id="orderClientRefLink" class="font-mono" placeholder="https://pinterest.com/... or Google Drive link" style="font-size:11.5px;" />
                 <span style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:3px;">
-                  💡 ارسال رفرنس اختیاری است؛ در صورت عدم ارسال، استودیو فرآیند تخصصی تحقیق بصری و استخراج استایل را متناسب با دیدگاه شما انجام خواهد داد.
+                  💡 Providing references is optional. The atelier handles full visual exploration and style extraction tailored to your vision.
                 </span>
               </div>
               <div>
-                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">توضیحات تکمیلی، جزئیات لور و نکات کلیدی (Lore & Details)</label>
-                <textarea id="orderClientBrief" rows="3" required placeholder="نژاد، سلاح‌ها، زوایا، ویژگی‌های ظاهری و حس کلی اثر..."></textarea>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Project Brief, Lore & Character Details</label>
+                <textarea id="orderClientBrief" rows="3" required placeholder="Archetype, armor details, weaponry, backstory lore, key mood requirements..."></textarea>
               </div>
             </div>
           </div>
         </div>
 
         <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:14px; width:100%;">
-          ثبت رسمی بریف و ارسال مستقیم به تلگرام مدیر استودیو ←
+          Submit Project Brief & Send Direct Inquiry to Studio Director →
         </button>
       </form>
     </div>
@@ -2476,8 +2472,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=21.0.0"></script>
-  <script src="app.js?v=21.0.0"></script>
+  <script src="data.js?v=21.2.0"></script>
+  <script src="app.js?v=21.2.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
