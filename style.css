@@ -6028,183 +6028,97 @@ body.in-admin-view #rightVerticalNav,
 
 
 /* ==============================================================================
-   RELEASE V20.9.0: DEEP SATURATED CINEMATIC COLORS, MOBILE DOCK LABELS & DYNAMIC GRID
+   RELEASE V20.11.0: TRANSLUCENT OBSIDIAN ICONS, DESKTOP 3-LINE COLLAPSE & CLEAN MOBILE CIRCLES
    ============================================================================== */
 
-/* ۱. پالت رنگ‌های اصیل، پررنگ، غنی و غیرپاستیلی استودیو (Deep Saturated Neon) */
-:root {
-  --coral-flame: #ff4500 !important;
-  --cyan-electric: #00f0ff !important;
-  --gold: #f59e0b !important;
-  --crimson: #e11d48 !important;
-  --violet: #9333ea !important;
-  --emerald: #059669 !important;
+/* ۱. استایل کلی دکمه‌های داک: پس‌زمینه شیشه‌ای نیمه‌شفاف تیره تا ذرات کیهانی از پشت آن مشخص باشند */
+.right-exp-btn {
+  background: rgba(6, 8, 14, 0.72) !important;
+  backdrop-filter: blur(10px) !important;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s ease, 
+              background 0.25s ease,
+              border-color 0.25s ease !important;
 }
 
-/* ۲. نشان شناور برند و پیل دسته‌بندی آثار با ابعاد جادار و رنگ هماهنگ با شاخه انتخابی */
-#topCenterBrandBar {
-  position: fixed !important;
-  top: 16px !important;
-  left: 16px !important;
-  z-index: 9990 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 8px !important;
-  opacity: 0 !important;
-  transform: translateY(-24px) !important;
-  pointer-events: none !important;
-  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+/* آیکون در حالت عادی: پس‌زمینه رنگی ندارد تا ذرات گرد و غبار از پشت آن عبور کنند */
+.right-exp-icon {
+  background: transparent !important;
+  border: none !important;
+  transition: background 0.25s ease, color 0.25s ease !important;
 }
 
-#topCenterBrandBar.visible {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  pointer-events: auto !important;
-  visibility: visible !important;
-}
-
-.top-center-pill {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 8px 18px !important;
-  border-radius: 999px !important;
-  background: #080b12 !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1.5px solid var(--gold) !important;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4), inset 0 0 6px rgba(245, 158, 11, 0.18) !important;
-  color: #fff !important;
-  font-weight: 800 !important;
-  cursor: pointer !important;
-  width: auto !important;
-  min-width: fit-content !important;
-  max-width: max-content !important;
-  white-space: nowrap !important;
-}
-
-#floatingGalleryCategoryMenu,
-.floating-cat-menu-wrapper {
-  position: relative !important;
-  display: block !important;
-  margin: 0 !important;
-  width: auto !important;
-  min-width: fit-content !important;
-  max-width: max-content !important;
-}
-
-body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
-  display: none !important;
-}
-
-/* پیل دسته‌بندی آثار: ابعاد کاملاً آزاد، رنگ هماهنگ با شاخه انتخابی */
-#currentCategoryPillBtn,
-.floating-cat-pill {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 8px 20px !important;
-  border-radius: 999px !important;
-  background: #080b12 !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1.5px solid var(--pill-accent-color, var(--gold)) !important;
-  box-shadow: 0 0 14px var(--pill-glow-color, rgba(245, 158, 11, 0.35)), inset 0 0 6px var(--pill-glow-color, rgba(245, 158, 11, 0.15)) !important;
-  color: #fff !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  width: auto !important;
-  min-width: fit-content !important;
-  max-width: max-content !important;
-  white-space: nowrap !important;
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-#currentCategoryPillLabel {
-  color: var(--pill-accent-color, #fff) !important;
-  font-weight: 800 !important;
-}
-
-/* ۳. خط محیطی شارپ و مشخص ۱.۵px با رنگ‌های غنی و عمیق (بدون پاستیلی شدن) */
+/* ۲. خط محیطی شارپ و مشخص ۱.۵ پیکسلی با رنگ غنی اختصاصی هر بخش */
 .right-exp-btn.home-theme,
 #rightDockHomeBtn {
   border: 1.5px solid #ff4500 !important;
-  box-shadow: 0 0 12px rgba(255, 69, 0, 0.38), inset 0 0 6px rgba(255, 69, 0, 0.2) !important;
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.32), inset 0 0 5px rgba(255, 69, 0, 0.15) !important;
 }
+.right-exp-btn.home-theme .right-exp-icon { color: #ff4500 !important; }
+.right-exp-btn.home-theme:hover .right-exp-icon { background: rgba(255, 69, 0, 0.22) !important; }
 .right-exp-btn.home-theme:hover {
-  box-shadow: 0 0 20px rgba(255, 69, 0, 0.7), 0 0 35px rgba(255, 69, 0, 0.35), inset 0 0 8px rgba(255, 69, 0, 0.25) !important;
-}
-.right-exp-btn.home-theme .right-exp-icon {
-  background: rgba(255, 69, 0, 0.18) !important;
-  color: #ff4500 !important;
+  box-shadow: 0 0 20px rgba(255, 69, 0, 0.65), 0 0 35px rgba(255, 69, 0, 0.3), inset 0 0 8px rgba(255, 69, 0, 0.22) !important;
 }
 
 .right-exp-btn.cyan-theme {
   border: 1.5px solid #00f0ff !important;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.38), inset 0 0 6px rgba(0, 240, 255, 0.2) !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.32), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
 }
+.right-exp-btn.cyan-theme .right-exp-icon { color: #00f0ff !important; }
+.right-exp-btn.cyan-theme:hover .right-exp-icon { background: rgba(0, 240, 255, 0.22) !important; }
 .right-exp-btn.cyan-theme:hover {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.7), 0 0 35px rgba(0, 240, 255, 0.35), inset 0 0 8px rgba(0, 240, 255, 0.25) !important;
-}
-.right-exp-btn.cyan-theme .right-exp-icon {
-  background: rgba(0, 240, 255, 0.18) !important;
-  color: #00f0ff !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.65), 0 0 35px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(0, 240, 255, 0.22) !important;
 }
 
 .right-exp-btn.gold-theme,
 #dockStoreMainBtn {
   border: 1.5px solid #f59e0b !important;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.38), inset 0 0 6px rgba(245, 158, 11, 0.2) !important;
-}
-.right-exp-btn.gold-theme:hover,
-#dockStoreMainBtn:hover {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.7), 0 0 35px rgba(245, 158, 11, 0.35), inset 0 0 8px rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.32), inset 0 0 5px rgba(245, 158, 11, 0.15) !important;
 }
 .right-exp-btn.gold-theme .right-exp-icon,
-#dockStoreMainBtn .right-exp-icon {
-  background: rgba(245, 158, 11, 0.18) !important;
-  color: #f59e0b !important;
+#dockStoreMainBtn .right-exp-icon { color: #f59e0b !important; }
+.right-exp-btn.gold-theme:hover .right-exp-icon,
+#dockStoreMainBtn:hover .right-exp-icon { background: rgba(245, 158, 11, 0.22) !important; }
+.right-exp-btn.gold-theme:hover,
+#dockStoreMainBtn:hover {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.65), 0 0 35px rgba(245, 158, 11, 0.3), inset 0 0 8px rgba(245, 158, 11, 0.22) !important;
 }
 
 .right-exp-btn.crimson-theme {
   border: 1.5px solid #e11d48 !important;
-  box-shadow: 0 0 12px rgba(225, 29, 72, 0.38), inset 0 0 6px rgba(225, 29, 72, 0.2) !important;
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.32), inset 0 0 5px rgba(225, 29, 72, 0.15) !important;
 }
+.right-exp-btn.crimson-theme .right-exp-icon { color: #e11d48 !important; }
+.right-exp-btn.crimson-theme:hover .right-exp-icon { background: rgba(225, 29, 72, 0.22) !important; }
 .right-exp-btn.crimson-theme:hover {
-  box-shadow: 0 0 20px rgba(225, 29, 72, 0.7), 0 0 35px rgba(225, 29, 72, 0.35), inset 0 0 8px rgba(225, 29, 72, 0.25) !important;
-}
-.right-exp-btn.crimson-theme .right-exp-icon {
-  background: rgba(225, 29, 72, 0.18) !important;
-  color: #e11d48 !important;
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.65), 0 0 35px rgba(225, 29, 72, 0.3), inset 0 0 8px rgba(225, 29, 72, 0.22) !important;
 }
 
 .right-exp-btn.purple-theme {
   border: 1.5px solid #9333ea !important;
-  box-shadow: 0 0 12px rgba(147, 51, 234, 0.38), inset 0 0 6px rgba(147, 51, 234, 0.2) !important;
+  box-shadow: 0 0 12px rgba(147, 51, 234, 0.32), inset 0 0 5px rgba(147, 51, 234, 0.15) !important;
 }
+.right-exp-btn.purple-theme .right-exp-icon { color: #9333ea !important; }
+.right-exp-btn.purple-theme:hover .right-exp-icon { background: rgba(147, 51, 234, 0.22) !important; }
 .right-exp-btn.purple-theme:hover {
-  box-shadow: 0 0 20px rgba(147, 51, 234, 0.7), 0 0 35px rgba(147, 51, 234, 0.35), inset 0 0 8px rgba(147, 51, 234, 0.25) !important;
-}
-.right-exp-btn.purple-theme .right-exp-icon {
-  background: rgba(147, 51, 234, 0.18) !important;
-  color: #9333ea !important;
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.65), 0 0 35px rgba(147, 51, 234, 0.3), inset 0 0 8px rgba(147, 51, 234, 0.22) !important;
 }
 
 .right-exp-btn.emerald-theme {
   border: 1.5px solid #059669 !important;
-  box-shadow: 0 0 12px rgba(5, 150, 105, 0.38), inset 0 0 6px rgba(5, 150, 105, 0.2) !important;
+  box-shadow: 0 0 12px rgba(5, 150, 105, 0.32), inset 0 0 5px rgba(5, 150, 105, 0.15) !important;
 }
+.right-exp-btn.emerald-theme .right-exp-icon { color: #059669 !important; }
+.right-exp-btn.emerald-theme:hover .right-exp-icon { background: rgba(5, 150, 105, 0.22) !important; }
 .right-exp-btn.emerald-theme:hover {
-  box-shadow: 0 0 20px rgba(5, 150, 105, 0.7), 0 0 35px rgba(5, 150, 105, 0.35), inset 0 0 8px rgba(5, 150, 105, 0.25) !important;
-}
-.right-exp-btn.emerald-theme .right-exp-icon {
-  background: rgba(5, 150, 105, 0.18) !important;
-  color: #059669 !important;
+  box-shadow: 0 0 20px rgba(5, 150, 105, 0.65), 0 0 35px rgba(5, 150, 105, 0.3), inset 0 0 8px rgba(5, 150, 105, 0.22) !important;
 }
 
-/* ۴. معماری دسکتاپ (صفحات بالای 768px):
-   - داک کلاً باز می‌ماند (بدون سه خط)
-   - هاور موس روی هر دکمه، کپسول متن و عنوان را به سمت چپ باز می‌کند */
+/* ۳. معماری دسکتاپ (صفحات بالای 768px):
+   - بالای صفحه: ۶ آیکون باز، سه خط مخفی
+   - با اسکرول به پایین (>100px): دکمه‌ها جمع می‌شوند به سه خط
+   - کلیک روی سه خط: باز شدن مجدد دکمه‌ها
+   - هاور روی هر دکمه: باز شدن کپسول متن به سمت چپ */
 @media (min-width: 769px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6217,12 +6131,13 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     gap: 10px !important;
   }
 
-  #dockMasterTrigger {
+  /* کلید سه خط در بالای صفحه دسکتاپ مخفی است */
+  #rightVerticalNav:not(.dock-collapsed) #dockMasterTrigger {
     display: none !important;
   }
 
-  #rightVerticalNav .dock-buttons-container,
-  .dock-buttons-container {
+  /* در بالای صفحه، ۶ آیکون باز و در دسترس هستند */
+  #rightVerticalNav:not(.dock-collapsed) .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-end !important;
@@ -6230,6 +6145,37 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+  }
+
+  /* با اسکرول به پایین (dock-collapsed)، سه خط ظاهر شده و دکمه‌ها جمع می‌شوند */
+  #rightVerticalNav.dock-collapsed #dockMasterTrigger {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    background: rgba(6, 8, 14, 0.72) !important;
+    border: 1.5px solid #00f0ff !important;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
+    color: #00f0ff !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+
+  #rightVerticalNav.dock-collapsed:not(.dock-open) .dock-buttons-container {
+    display: none !important;
+  }
+
+  #rightVerticalNav.dock-collapsed.dock-open .dock-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    margin-top: 8px !important;
   }
 
   #rightVerticalNav .right-exp-btn,
@@ -6244,14 +6190,9 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 999px !important;
-    background: #080b12 !important;
-    backdrop-filter: blur(14px) !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
     cursor: pointer !important;
-    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 0.25s ease, 
-                border-color 0.25s ease !important;
   }
 
   #rightVerticalNav .right-exp-btn:hover,
@@ -6270,7 +6211,6 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border: none !important;
     border-radius: 50% !important;
     flex-shrink: 0 !important;
   }
@@ -6315,7 +6255,10 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   }
 }
 
-/* ۵. معماری موبایل با اولویت قطعی بالا (Specificity 1-2-0) جهت غلبه بر هرگونه کات شدن */
+/* ۴. معماری موبایل (صفحات تا 768px):
+   - داک در حالت بسته: فقط سه خط با پس‌زمینه نیمه‌شفاف
+   - کلیک روی سه خط: باز شدن ۶ آیکون دایره‌ای تمیز و شیک بدون متن اضافی
+   - کلیک دوباره روی سه خط: بسته شدن داک و خاموش شدن کامل نور آبی کلید سه خط */
 @media (max-width: 768px) {
   #rightVerticalNav {
     position: fixed !important;
@@ -6326,8 +6269,8 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     flex-direction: column !important;
     align-items: flex-end !important;
     gap: 10px !important;
-    width: auto !important;
-    max-width: 290px !important;
+    width: 44px !important;
+    max-width: 44px !important;
   }
 
   #dockMasterTrigger {
@@ -6338,18 +6281,26 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     min-height: 44px !important;
     border-radius: 50% !important;
     aspect-ratio: 1 / 1 !important;
-    background: #080b12 !important;
+    background: rgba(6, 8, 14, 0.72) !important;
+    backdrop-filter: blur(8px) !important;
     border: 1.5px solid #00f0ff !important;
     box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 5px rgba(0, 240, 255, 0.15) !important;
     color: #00f0ff !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
+    outline: none !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, box-shadow 0.25s ease !important;
   }
 
-  #dockMasterTrigger:active {
-    transform: scale(0.92) !important;
+  #dockMasterTrigger:focus {
+    outline: none !important;
+  }
+
+  /* هنگام باز بودن داک، سه خط می‌چرخد و پس‌زمینه ملایم می‌گیرد */
+  #rightVerticalNav.dock-open #dockMasterTrigger {
+    background: rgba(0, 240, 255, 0.18) !important;
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.45) !important;
   }
 
   #rightVerticalNav.dock-open #dockMasterTrigger svg {
@@ -6362,78 +6313,42 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     display: none !important;
   }
 
-  /* در حالت باز روی موبایل: کانتینر بدون محدودیت ۴۴px باز می‌شود */
-  #rightVerticalNav.dock-open .dock-buttons-container,
-  #rightVerticalNav.dock-open #dockButtonsContainer {
+  #rightVerticalNav.dock-open .dock-buttons-container {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-end !important;
     gap: 9px !important;
-    width: auto !important;
-    max-width: 280px !important;
+    width: 44px !important;
     padding: 0 !important;
     margin-top: 8px !important;
-    overflow: visible !important;
   }
 
-  /* هر دکمه در حالت باز موبایل: کپسول خودکار با نمایش کامل عنوان و آیکون */
+  /* روی گوشی دکمه‌ها دایره‌های خالص و بی‌نقص ۴۴ پیکسلی هستند (متن حذف شد طبق دستور کاربر) */
   #rightVerticalNav.dock-open .right-exp-btn,
-  #rightVerticalNav.dock-open #dockButtonsContainer .right-exp-btn {
-    width: auto !important;
+  .dock-open .right-exp-btn,
+  #rightVerticalNav .right-exp-btn {
+    width: 44px !important;
     min-width: 44px !important;
-    max-width: 260px !important;
+    max-width: 44px !important;
     height: 44px !important;
-    border-radius: 999px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
     display: flex !important;
-    flex-direction: row-reverse !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    padding: 0 0 0 14px !important;
-    margin: 0 !important;
-    background: #080b12 !important;
-    backdrop-filter: blur(16px) !important;
-    overflow: visible !important;
-    box-sizing: border-box !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-  }
-
-  /* دکمه استور در موبایل */
-  #rightVerticalNav.dock-open .dock-store-wrapper {
-    width: auto !important;
-    max-width: 260px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    overflow: visible !important;
-  }
-
-  /* متون اختصاصی هر بخش روی موبایل با باز شدن داک کاملاً مرئی و خوانا */
-  #rightVerticalNav.dock-open .right-exp-text,
-  #rightVerticalNav.dock-open #dockButtonsContainer .right-exp-text {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
     justify-content: center !important;
-    text-align: left !important;
-    direction: ltr !important;
-    padding-left: 10px !important;
-    padding-right: 4px !important;
-    white-space: nowrap !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    width: auto !important;
-    max-width: 190px !important;
-    pointer-events: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
 
-  #rightVerticalNav.dock-open .right-exp-text * {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  #rightVerticalNav:not(.dock-open) .right-exp-text {
+  /* حذف کامل نوشته‌ها روی موبایل برای خلوت ماندن صفحه */
+  #rightVerticalNav .right-exp-text,
+  .right-exp-text {
     display: none !important;
+    width: 0 !important;
     max-width: 0 !important;
     opacity: 0 !important;
   }
@@ -6447,40 +6362,11 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border: none !important;
     border-radius: 50% !important;
-    flex-shrink: 0 !important;
   }
-}
 
-
-
-/* ==============================================================================
-   RELEASE V20.10.0: 4-COLUMN BALANCED DESKTOP SHOWCASE GALLERY
-   ============================================================================== */
-
-/* تثبیت ۴ ستون متوازن، باشکوه و سینمایی برای کل گالری صفحه اصلی دسکتاپ */
-#showcaseGrid {
-  column-count: 4 !important;
-  column-gap: 12px !important;
-  width: 100% !important;
-  max-width: 1480px !important;
-  margin: 0 auto !important;
-  padding: 0 10px !important;
-  display: block !important;
-}
-
-@media (max-width: 1024px) {
-  #showcaseGrid {
-    column-count: 3 !important;
-    column-gap: 10px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  #showcaseGrid {
-    column-count: 2 !important;
-    column-gap: 6px !important;
-    padding: 0 4px !important;
+  .dock-store-wrapper {
+    width: 44px !important;
+    max-width: 44px !important;
   }
 }

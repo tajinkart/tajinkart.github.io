@@ -1535,20 +1535,7 @@ function pushModalState(modalName) {
   } catch(e) {}
 }
 
-window.toggleDockExpand = function(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
-  const dock = document.getElementById('rightVerticalNav');
-  if (dock) {
-    const isOpen = dock.classList.contains('dock-open');
-    if (isOpen) {
-      dock.classList.remove('dock-open');
-      dock.classList.add('dock-collapsed');
-    } else {
-      dock.classList.add('dock-open');
-      dock.classList.remove('dock-collapsed');
-    }
-  }
-};
+
 
 
 /**
@@ -3015,7 +3002,7 @@ function handleOptimizedScroll() {
   const topBar = document.getElementById('topCenterBrandBar');
   const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
 
-  // ۱. کنترل پدیدار شدن نشان تاژین کارت و دسته‌بندی آثار با اسکرول به پایین (روی موبایل و دسکتاپ در صفحه اول)
+  // ۱. کنترل پدیدار شدن نشان تاژین کارت و دسته‌بندی آثار با اسکرول به پایین در گالری
   if (topBar) {
     if (cView === 'showcase') {
       if (scrolled > 80) {
@@ -3035,8 +3022,18 @@ function handleOptimizedScroll() {
     return;
   }
 
-  // ۳. روی دسکتاپ: کلاً داک همیشه باز می‌ماند
-  dock.classList.remove('dock-collapsed');
+  // ۳. بازگشت رسمی سه خط به دسکتاپ: در بالای صفحه باز است، با اسکرول به پایین (>100px) جمع می‌شود به سه خط
+  if (cView !== 'showcase') {
+    dock.classList.add('dock-collapsed');
+    return;
+  }
+
+  if (scrolled > 100) {
+    dock.classList.add('dock-collapsed');
+  } else {
+    dock.classList.remove('dock-collapsed');
+    dock.classList.remove('dock-open');
+  }
 }
 
 function initDockState() {
@@ -3063,9 +3060,19 @@ function initDockState() {
     return;
   }
 
-  // دسکتاپ: کلاً باز می‌ماند
-  dock.classList.remove('dock-collapsed');
-  dock.classList.remove('dock-open');
+  // دسکتاپ: در صفحات دیگر بسته است، در صفحه اصلی وابسته به اسکرول
+  if (cView !== 'showcase') {
+    dock.classList.add('dock-collapsed');
+    dock.classList.remove('dock-open');
+    return;
+  }
+
+  if (scrolled > 100) {
+    dock.classList.add('dock-collapsed');
+  } else {
+    dock.classList.remove('dock-collapsed');
+    dock.classList.remove('dock-open');
+  }
 }
 
 window.addEventListener('scroll', () => {
@@ -3078,10 +3085,7 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 
-window.toggleDockExpand = function() {
-  const dock = document.getElementById('rightVerticalNav');
-  if (dock) dock.classList.toggle('dock-open');
-};
+
 
 document.addEventListener('click', (e) => {
   const dock = document.getElementById('rightVerticalNav');
@@ -6686,20 +6690,7 @@ window.toggleSiteLanguage = function() {
 // ==============================================================================
 
 // ۱. مدیریت بی‌نقص داک و بستن خودکار زیرمنوها
-window.toggleDockExpand = function(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
-  const dock = document.getElementById('rightVerticalNav');
-  if (dock) {
-    const isCurrentlyOpen = dock.classList.contains('dock-open');
-    if (isCurrentlyOpen) {
-      dock.classList.remove('dock-open');
-      dock.classList.add('dock-collapsed');
-    } else {
-      dock.classList.add('dock-open');
-      dock.classList.remove('dock-collapsed');
-    }
-  }
-};
+
 
 window.closeDockMobile = function(e) {
   if (e && e.stopPropagation) e.stopPropagation();
@@ -7858,13 +7849,7 @@ if (document.readyState === 'loading') {
 
 
 
-window.toggleDockExpand = function(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
-  const dock = document.getElementById('rightVerticalNav');
-  if (dock) {
-    dock.classList.toggle('dock-open');
-  }
-};
+
 
 
 
@@ -7915,5 +7900,22 @@ window.handleAcademyClick = function(e) {
     showToast('دسترسی مدیر استودیو به بخش آکادمی تایید شد.', 'success');
   } else {
     showToast('🔒 آکادمی استودیو در حال آماده‌سازی است و به زودی آغاز به کار خواهد کرد (Academy — Coming Soon)', 'info', 3500);
+  }
+};
+
+window.toggleDockExpand = function(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const trigger = document.getElementById('dockMasterTrigger');
+  if (trigger) trigger.blur();
+  const dock = document.getElementById('rightVerticalNav');
+  if (!dock) return;
+
+  const isOpen = dock.classList.contains('dock-open');
+  if (isOpen) {
+    dock.classList.remove('dock-open');
+    dock.classList.add('dock-collapsed');
+  } else {
+    dock.classList.add('dock-open');
+    dock.classList.remove('dock-collapsed');
   }
 };
