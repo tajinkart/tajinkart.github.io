@@ -1716,10 +1716,37 @@ window.renderShowcaseGrid = function() {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); width: 100%;">
         <p style="font-size: 15px; margin-bottom: 12px; color: #fff;">اثری در این دسته‌بندی یافت نشد.</p>
-        <button onclick="filterGalleryByCategory('all', 'همه آثار')" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">نمایش تمام آثار گالری</button>
+        <button onclick="filterGalleryByCategory('all', 'All Artworks')" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">نمایش تمام آثار گالری</button>
       </div>
     `;
     return;
+  }
+
+  // ری‌ارنج خودکار و هوشمند چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی
+  const workCount = filteredArtworks.length;
+  if (window.innerWidth > 768) {
+    if (workCount === 1) {
+      grid.style.setProperty('column-count', '1', 'important');
+      grid.style.setProperty('max-width', '720px', 'important');
+    } else if (workCount === 2) {
+      grid.style.setProperty('column-count', '2', 'important');
+      grid.style.setProperty('max-width', '980px', 'important');
+    } else if (workCount === 3) {
+      grid.style.setProperty('column-count', '3', 'important');
+      grid.style.setProperty('max-width', '1200px', 'important');
+    } else if (workCount === 4) {
+      grid.style.setProperty('column-count', '4', 'important');
+      grid.style.setProperty('max-width', '1380px', 'important');
+    } else {
+      grid.style.setProperty('column-count', '5', 'important');
+      grid.style.setProperty('max-width', '1540px', 'important');
+    }
+  } else {
+    if (workCount === 1) {
+      grid.style.setProperty('column-count', '1', 'important');
+    } else {
+      grid.style.setProperty('column-count', '2', 'important');
+    }
   }
 
   grid.innerHTML = filteredArtworks.map((art, i) => {
@@ -2903,6 +2930,17 @@ async function dispatchTelegramNotification(order) {
 
 // سوییچ ویوها و هماهنگی ناوبری
 window.switchView = function(vKey) {
+  // ۱. قفل امنیتی جنسیس و آکادمی: فقط مدیر استودیو از پنل ادمین می‌تواند وارد شود
+  if (vKey === 'genesis' || vKey === 'academy') {
+    const isDirectorOrAdmin = (typeof currentAdminRole !== 'undefined' && (currentAdminRole === 'director' || currentAdminRole === 'admin')) || 
+                              (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) ||
+                              (typeof isCurrentUserDirector !== 'undefined' && isCurrentUserDirector());
+    if (!isDirectorOrAdmin) {
+      const secName = vKey === 'genesis' ? 'جنسیس (Genesis Lore)' : 'آکادمی (Academy)';
+      showToast(`🔒 بخش ${secName} در حال آماده‌سازی و بارگذاری است و به زودی رونمایی می‌شود (Coming Soon)`, 'info', 3500);
+      return;
+    }
+  }
   document.body.setAttribute('data-view', vKey);
   if (typeof unlockBodyScroll === 'function') unlockBodyScroll();
   const openArtModal = document.getElementById('artDetailModal');
@@ -5364,6 +5402,8 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
   if (dropdown) dropdown.classList.add('hidden');
 
   renderShowcaseGrid();
+  const gEl = document.getElementById('showcaseGrid');
+  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
 };
 
 
@@ -7853,15 +7893,29 @@ window.switchView = function(viewKey) {
 
 
 window.handleGenesisClick = function(e) {
-  if (e) e.preventDefault();
+  if (e) { e.preventDefault(); e.stopPropagation(); }
   closeDockMobile();
-  showToast('بخش جنسیس در حال توسعه است و به زودی رونمایی می‌شود (Genesis Lore — Coming Soon)', 'info');
-  switchView('genesis');
+  const isDirectorOrAdmin = (typeof currentAdminRole !== 'undefined' && (currentAdminRole === 'director' || currentAdminRole === 'admin')) || 
+                            (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) ||
+                            (typeof isCurrentUserDirector !== 'undefined' && isCurrentUserDirector());
+  if (isDirectorOrAdmin) {
+    switchView('genesis');
+    showToast('دسترسی مدیر استودیو به بخش داستان و جنسیس تایید شد.', 'success');
+  } else {
+    showToast('🔒 بخش داستان و جهان جنسیس در حال توسعه است و به زودی رونمایی می‌شود (Genesis Lore — Coming Soon)', 'info', 3500);
+  }
 };
 
 window.handleAcademyClick = function(e) {
-  if (e) e.preventDefault();
+  if (e) { e.preventDefault(); e.stopPropagation(); }
   closeDockMobile();
-  showToast('آکادمی در حال آماده‌سازی است و به زودی آغاز به کار خواهد کرد (Academy — Coming Soon)', 'info');
-  switchView('academy');
+  const isDirectorOrAdmin = (typeof currentAdminRole !== 'undefined' && (currentAdminRole === 'director' || currentAdminRole === 'admin')) || 
+                            (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) ||
+                            (typeof isCurrentUserDirector !== 'undefined' && isCurrentUserDirector());
+  if (isDirectorOrAdmin) {
+    switchView('academy');
+    showToast('دسترسی مدیر استودیو به بخش آکادمی تایید شد.', 'success');
+  } else {
+    showToast('🔒 آکادمی استودیو در حال آماده‌سازی است و به زودی آغاز به کار خواهد کرد (Academy — Coming Soon)', 'info', 3500);
+  }
 };
