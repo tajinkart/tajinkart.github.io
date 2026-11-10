@@ -42,6 +42,8 @@ if (typeof window !== "undefined") window.KEYS = KEYS;
 if (typeof global !== "undefined") global.KEYS = KEYS;
 
 var currentView = 'showcase';
+var currentGalleryFilter = 'all';
+window.currentGalleryFilter = 'all';
 var currentMember = null;
 var comicCurrentPage = 1;
 var activeModalItem = {};

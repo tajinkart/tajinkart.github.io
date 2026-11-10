@@ -1,3 +1,18 @@
+
+function renderFloatingCategoryDropdown() {
+  if (typeof window.renderFloatingCategoryDropdown === 'function') {
+    return window.renderFloatingCategoryDropdown();
+  }
+}
+function renderAdminGalleryCategories() {
+  if (typeof window.renderAdminGalleryCategories === 'function') {
+    return window.renderAdminGalleryCategories();
+  }
+}
+
+var currentGalleryFilter = (typeof window !== 'undefined' && window.currentGalleryFilter) ? window.currentGalleryFilter : 'all';
+window.currentGalleryFilter = currentGalleryFilter;
+
 const KEYS = (typeof window !== 'undefined' && window.KEYS) ? window.KEYS : ((typeof global !== 'undefined' && global.KEYS) ? global.KEYS : {
   ORDERS: 'tajinkart_orders_fa_v2',
   SETTINGS: 'tajinkart_settings_fa_v2',
@@ -3026,6 +3041,7 @@ window.switchView = function(vKey) {
     } else {
       dock.classList.remove('dock-collapsed');
       dock.classList.remove('dock-open');
+      dock.style.display = (vKey === 'admin') ? 'none' : '';
     }
   }
 
@@ -3092,16 +3108,13 @@ function handleOptimizedScroll() {
     return;
   }
 
-  // ۴. دسکتاپ: در بالای صفحه (scrolled <= 100) باز است، با اسکرول به پایین جمع می‌شود به سه خط
-  if (cView !== 'showcase') {
-    dock.classList.add('dock-collapsed');
+  // ۴. دسکتاپ: آیکون‌ها همیشه باز، در دسترس و قابل کلیک باقی می‌مانند
+  if (window.innerWidth > 768) {
+    if (dock) {
+      dock.classList.remove('dock-collapsed');
+      dock.classList.remove('dock-open');
+    }
     return;
-  }
-
-  if (scrolled > 100) {
-    dock.classList.add('dock-collapsed');
-  } else {
-    dock.classList.remove('dock-collapsed');
   }
 }
 
@@ -3129,18 +3142,13 @@ function initDockState() {
     return;
   }
 
-  // دسکتاپ: در صفحات دیگر بسته است، در صفحه اصلی وابسته به اسکرول
-  if (cView !== 'showcase') {
-    dock.classList.add('dock-collapsed');
-    dock.classList.remove('dock-open');
+  // دسکتاپ: آیکون‌های ناوبری همیشه در تمام صفحات باز و فعال هستند
+  if (window.innerWidth > 768) {
+    if (dock) {
+      dock.classList.remove('dock-collapsed');
+      dock.classList.remove('dock-open');
+    }
     return;
-  }
-
-  if (scrolled > 100) {
-    dock.classList.add('dock-collapsed');
-  } else {
-    dock.classList.remove('dock-collapsed');
-    dock.classList.remove('dock-open');
   }
 }
 
