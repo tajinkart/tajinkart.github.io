@@ -35,26 +35,38 @@
   <!-- بوم پارتیکل‌های معلق کیهانی و جوهر استودیو (Ambient Cosmic & Ink Particles) -->
   <canvas id="ambientParticleCanvas"></canvas>
 
-      <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | ژانرها (وسط) | دسته‌بندی‌ها -->
+        <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
   <div id="topCenterBrandBar">
-    <div class="top-brand-controls-row">
-      <!-- ۱. دکمه خانه / برند -->
-      <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
-        <span class="top-dot"></span>
-        <span>TAJINKART</span>
+    <!-- دکمه برند / خانه -->
+    <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
+      <span class="top-dot"></span>
+      <span>TAJINKART</span>
+    </button>
+
+    <!-- فهرست شناور ژانرهای استودیو (All Genres) زیر نشان برند -->
+    <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
+        <span id="currentGenrePillLabel">All Genres</span>
+        <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
       </button>
 
-      <!-- ۲. فهرست شناور ژانرهای استودیو (وسط - All Genres) -->
-      <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
-        <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
-          <span id="currentGenrePillLabel">All Genres</span>
-          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-        </button>
-
-        <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
-          <!-- داینامیک توسط renderFloatingGenreDropdown لود می‌شود -->
-        </div>
+      <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک توسط renderFloatingGenreDropdown لود می‌شود -->
       </div>
+    </div>
+
+    <!-- فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
+    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
+        <span id="currentCategoryPillLabel">All Artworks</span>
+        <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
+      </button>
+
+      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      </div>
+    </div>
+  </div>
 
       <!-- ۳. فهرست شناور دسته‌بندی آثار (All Artworks) -->
       <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
@@ -887,7 +899,7 @@
       </div>
 
       <div id="adminWorkspace" class="hidden">
-        <div class="section-head" style="margin-bottom:16px;">
+        <div class="section-head" style="margin-bottom:20px;">
           <div>
             <h2 class="view-hero-title" style="margin:0;">Studio Command Console & Control Center</h2>
           </div>
@@ -896,37 +908,69 @@
           </div>
         </div>
 
-        <!-- نوار افقی شیک و منظم تب‌های مدیریت در بالای صفحه -->
-        <nav class="admin-top-tabs-bar">
-          <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-top-tab-btn active" data-tab="artworks">
-            <span class="admin-tab-icon">🖼️</span>
-            <span>1. Gallery Curation</span>
-          </button>
-          <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-top-tab-btn" data-tab="pipelines">
-            <span class="admin-tab-icon">⚡</span>
-            <span>2. Atelier & Pipelines</span>
-          </button>
-          <button type="button" onclick="switchAdminTab('members', this)" class="admin-top-tab-btn" data-tab="members">
-            <span class="admin-tab-icon">👥</span>
-            <span>3. Members & Dossiers</span>
-          </button>
-          <button type="button" onclick="switchAdminTab('products', this)" class="admin-top-tab-btn" data-tab="products">
-            <span class="admin-tab-icon">💎</span>
-            <span>4. Digital Vault Assets</span>
-          </button>
-          <button type="button" onclick="switchAdminTab('terms', this)" class="admin-top-tab-btn" data-tab="terms">
-            <span class="admin-tab-icon">⚖️</span>
-            <span>5. Studio Legal Charter</span>
-          </button>
-          <button type="button" onclick="switchAdminTab('settings', this)" class="admin-top-tab-btn" data-tab="settings">
-            <span class="admin-tab-icon">⚙️</span>
-            <span>6. Settings & Cloud</span>
-          </button>
-        </nav>
+        <!-- چیدمان داشبورد ادمین: سایدبار در سمت چپ و تب‌ها در سمت راست -->
+        <div class="admin-dashboard-layout">
+          
+          <!-- سایدبار منوی ادمین در سمت چپ (بدون نوشته‌های زرد تکراری) -->
+          <aside class="admin-vertical-sidebar">
+            <nav class="admin-sidebar-menu">
+              <!-- 1. Gallery & Portfolio -->
+              <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
+                <span class="admin-nav-icon">🖼️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">1. Gallery & Portfolio</span>
+                  <span class="admin-nav-sub">Curate Artworks & Showcase Layout</span>
+                </div>
+              </button>
 
-        <div class="admin-dashboard-layout full-width-layout">
+              <!-- 2. Atelier & Pricing -->
+              <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
+                <span class="admin-nav-icon">⚡</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">2. Atelier & Pricing</span>
+                  <span class="admin-nav-sub">Pipelines & Rate Matrix</span>
+                </div>
+              </button>
 
-          <!-- کانتینر اصلی تب‌های ادمین (همه ۶ تب مستقل و خواهر-برادر) -->
+              <!-- 3. Members & Client Dossiers -->
+              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
+                <span class="admin-nav-icon">👥</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">3. Members & Client Dossiers</span>
+                  <span class="admin-nav-sub">Client Inquiries & Briefs</span>
+                </div>
+              </button>
+
+              <!-- 4. Digital Vault Assets -->
+              <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
+                <span class="admin-nav-icon">💎</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">4. Digital Vault Assets</span>
+                  <span class="admin-nav-sub">Packs, Brush Engines & Comics</span>
+                </div>
+              </button>
+
+              <!-- 5. Studio Legal Charter -->
+              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
+                <span class="admin-nav-icon">⚖️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">5. Studio Legal Charter</span>
+                  <span class="admin-nav-sub">Terms of Service & EULA</span>
+                </div>
+              </button>
+
+              <!-- 6. Settings & Infrastructure -->
+              <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
+                <span class="admin-nav-icon">⚙️</span>
+                <div class="admin-nav-text">
+                  <span class="admin-nav-title">6. Settings & Infrastructure</span>
+                  <span class="admin-nav-sub">Branding, Availability & Cloud Health</span>
+                </div>
+              </button>
+            </nav>
+          </aside>
+
+          <!-- کانتینر اصلی تب‌های ادمین -->
           <main class="admin-main-panes-holder">
             <div id="adminTabArtworks">
           <div class="admin-artworks-fullwidth">
@@ -1019,34 +1063,7 @@
               </div>
             </div>
 
-            <!-- مدیریت ژانرهای آثار استودیو (Studio Genres & Worldbuilding Themes) -->
-            <div style="margin-top:16px; background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">🌌 Universe Genres & Themes</h4>
-                  <span id="adminGenreCountBadge" class="font-mono" style="font-size:10.5px; color:var(--gold); background:rgba(250,204,21,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(250,204,21,0.25);">Active Genres</span>
-                </div>
-                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px;">
-                  + Add New Genre
-                </button>
-              </div>
-
-              <!-- ردیف اینلاین ایجاد ژانر جدید -->
-              <div id="adminInlineAddGenreRow" style="display:none; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
-                <input type="text" id="adminNewGenreTitle" placeholder="Genre Name (e.g. Grimdark, Solar-Punk, Gothic Horror)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:180px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
-                <button type="button" onclick="adminSubmitNewGenreInline()" class="btn-gold" style="font-size:11px; padding:6px 14px;">
-                  ✓ Save Genre
-                </button>
-                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
-                  Cancel
-                </button>
-              </div>
-
-              <!-- لیست افقی ژانرها به شکل بج‌های باوقار -->
-              <div id="adminStudioGenresList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-                <!-- داینامیک توسط renderAdminStudioGenres پر می‌شود -->
-              </div>
-            </div>
+            
 
             <!-- مدال شناور ادیتور اثر (در حالت عادی باز نیست) -->
             <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">

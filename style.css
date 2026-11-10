@@ -8382,3 +8382,67 @@ body[data-view="member-dashboard"] #topCenterBrandBar {
   box-shadow: 0 0 28px rgba(250, 204, 21, 0.7), inset 0 0 12px rgba(250, 204, 21, 0.3), 0 10px 30px rgba(0, 0, 0, 0.95) !important;
   transform: translateY(-2px) scale(1.03) !important;
 }
+
+
+
+/* ==============================================================================
+   TOP-LEFT BRAND BAR (STRICTLY AND EXCLUSIVELY ON SHOWCASE / GALLERY)
+   ============================================================================== */
+#topCenterBrandBar {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body[data-view="showcase"] #topCenterBrandBar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  position: fixed !important;
+  top: 16px !important;
+  left: 20px !important;
+  z-index: 9990 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+body[data-view="showcase"] #topCenterBrandBar #floatingGalleryGenreMenu,
+body[data-view="showcase"] #topCenterBrandBar #floatingGalleryCategoryMenu {
+  display: block !important;
+  position: relative !important;
+  margin: 0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Hard hide topCenterBrandBar on EVERY other view (Admin, Store, Society, Genesis, Academy, Portal) */
+body:not([data-view="showcase"]) #topCenterBrandBar,
+body[data-view="admin"] #topCenterBrandBar,
+body[data-view="store"] #topCenterBrandBar,
+body[data-view="genesis"] #topCenterBrandBar,
+body[data-view="academy"] #topCenterBrandBar,
+body[data-view="society"] #topCenterBrandBar,
+body[data-view="member-dashboard"] #topCenterBrandBar {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Restore Left Sidebar Admin Dashboard Layout */
+.admin-dashboard-layout {
+  display: grid !important;
+  grid-template-columns: 290px 1fr !important;
+  gap: 22px !important;
+  align-items: start !important;
+  width: 100% !important;
+}
+
+@media (max-width: 900px) {
+  .admin-dashboard-layout {
+    grid-template-columns: 1fr !important;
+  }
+}

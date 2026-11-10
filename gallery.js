@@ -320,13 +320,38 @@ window.renderShowcaseGrid = function() {
       if (!catMatch) return false;
     }
 
-    // 2. Genre Filter
+    // 2. Genre Filter (با تطابق هوشمند ژانر، فازها و کلمات کلیدی داستانی آثار)
     if (currentGalleryGenreFilter && currentGalleryGenreFilter !== 'all') {
       const gTarget = currentGalleryGenreFilter.toLowerCase();
-      let genreMatch = (art.genre || '').toLowerCase() === gTarget;
+      const artG = (art.genre || '').toLowerCase();
+      const artT = (art.title || '').toLowerCase();
+      const artD = (art.desc || '').toLowerCase();
+      const artTag = (art.tag || '').toLowerCase();
+
+      let genreMatch = (artG === gTarget || artG.includes(gTarget) || artT.includes(gTarget) || artD.includes(gTarget));
+
       if (!genreMatch && art.phases && Array.isArray(art.phases)) {
-        genreMatch = art.phases.some(p => (p.genre || '').toLowerCase() === gTarget);
+        genreMatch = art.phases.some(p => {
+          const pg = (p.genre || '').toLowerCase();
+          const pd = (p.desc || '').toLowerCase();
+          const pn = (p.name || '').toLowerCase();
+          return pg === gTarget || pg.includes(gTarget) || pd.includes(gTarget) || pn.includes(gTarget);
+        });
       }
+
+      // تطابق مضمونی پیش‌فرض برای آثار موجود
+      if (!genreMatch) {
+        if (gTarget.includes('dark fantasy') || gTarget.includes('fantasy')) {
+          if (artTag === 'character' || artTag === 'creature' || artT.includes('knight') || artT.includes('warrior') || artD.includes('fantasy')) genreMatch = true;
+        } else if (gTarget.includes('cyberpunk') || gTarget.includes('sci-fi')) {
+          if (artT.includes('cyber') || artT.includes('mech') || artD.includes('cyber') || artD.includes('future') || artTag === 'keyframe') genreMatch = true;
+        } else if (gTarget.includes('mythic')) {
+          if (artTag === 'creature' || artD.includes('myth') || artT.includes('ancient')) genreMatch = true;
+        } else if (gTarget.includes('post-apocalyptic')) {
+          if (artTag === 'environment' || artD.includes('ruin') || artD.includes('wasteland')) genreMatch = true;
+        }
+      }
+
       if (!genreMatch) return false;
     }
 

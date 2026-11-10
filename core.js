@@ -517,13 +517,11 @@ function handleOptimizedScroll() {
   // ۲. پدیدار شدن نشان برند و دسته‌بندی با اسکرول در گالری
   if (topBar) {
     if (cView === 'showcase') {
-      if (scrolled > 80) {
-        topBar.classList.add('visible');
-      } else {
-        topBar.classList.remove('visible');
-      }
-    } else {
+      topBar.style.display = 'flex';
       topBar.classList.add('visible');
+    } else {
+      topBar.style.display = 'none';
+      topBar.classList.remove('visible');
     }
   }
 
@@ -554,10 +552,12 @@ function initDockState() {
 
   // وضعیت اولیه نشان برند در بالا-چپ
   if (topBar) {
-    if (cView === 'showcase' && scrolled <= 80) {
-      topBar.classList.remove('visible');
-    } else {
+    if (cView === 'showcase') {
+      topBar.style.display = 'flex';
       topBar.classList.add('visible');
+    } else {
+      topBar.style.display = 'none';
+      topBar.classList.remove('visible');
     }
   }
 
