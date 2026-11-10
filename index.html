@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=21.6.0">
+  <link rel="stylesheet" href="style.css?v=22.6.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -35,93 +35,6 @@
   <!-- بوم پارتیکل‌های معلق کیهانی و جوهر استودیو (Ambient Cosmic & Ink Particles) -->
   <canvas id="ambientParticleCanvas"></canvas>
 
-          <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
-  <div id="topCenterBrandBar">
-    <!-- دکمه برند / خانه -->
-    <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
-      <span class="top-dot"></span>
-      <span>TAJINKART</span>
-    </button>
-
-    <!-- ۲. فهرست شناور ژانرهای استودیو (All Genres) زیر نشان برند -->
-    <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
-        <span id="currentGenrePillLabel">All Genres</span>
-        <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-      </button>
-
-      <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
-        <div class="cat-dropdown-item active" onclick="filterGalleryByGenre('all')">
-          <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
-          <span class="cat-item-text">All Genres</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Dark Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Dark Fantasy</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Cyberpunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Cyberpunk</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Sci-Fi')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Sci-Fi</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mythic & Ancient')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mythic & Ancient</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Post-Apocalyptic')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Post-Apocalyptic</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Horror & Eldritch')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Horror & Eldritch</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('High Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">High Fantasy</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Steampunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Steampunk</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mecha & Industrial')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mecha & Industrial</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Anime & Stylized')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Anime & Stylized</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Historical & Military')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Historical & Military</span></div>
-      </div>
-    </div>
-
-    <!-- ۳. فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
-    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
-        <span id="currentCategoryPillLabel">All Artworks</span>
-        <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-      </button>
-
-      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-        <div class="cat-dropdown-item active" onclick="filterGalleryByCategory('all', 'All Artworks')">
-          <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
-          <span class="cat-item-text">All Artworks</span>
-        </div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('character', 'Character Design & Heroes')"><span class="cat-item-dot" style="background:#facc15; box-shadow:0 0 8px #facc15;"></span><span class="cat-item-text">Character Design & Heroes</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('creature', 'Creatures, Titans & Monsters')"><span class="cat-item-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span><span class="cat-item-text">Creatures, Titans & Monsters</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('environment', 'Environment, Worlds & Architecture')"><span class="cat-item-dot" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span><span class="cat-item-text">Environment, Worlds & Architecture</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('keyframe', 'Cinematic Keyframes & Covers')"><span class="cat-item-dot" style="background:#f43f5e; box-shadow:0 0 8px #f43f5e;"></span><span class="cat-item-text">Cinematic Keyframes & Covers</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('props', 'Props, Weapons & Artifacts')"><span class="cat-item-dot" style="background:#a855f7; box-shadow:0 0 8px #a855f7;"></span><span class="cat-item-text">Props, Weapons & Artifacts</span></div>
-        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('comic', 'Comics, Manga & Sequential Art')"><span class="cat-item-dot" style="background:#fb923c; box-shadow:0 0 8px #fb923c;"></span><span class="cat-item-text">Comics, Manga & Sequential Art</span></div>
-      </div>
-    </div>
-  </div>
-
-    <!-- فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
-    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
-        <span id="currentCategoryPillLabel">All Artworks</span>
-        <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-      </button>
-
-      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
-      </div>
-    </div>
-  </div>
-
-      <!-- ۳. فهرست شناور دسته‌بندی آثار (All Artworks) -->
-      <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-        <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
-          <span id="currentCategoryPillLabel">All Artworks</span>
-          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-        </button>
-
-        <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-          <!-- داینامیک از جاوااسکریپت لود می‌شود -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-    <!-- ۲. داک عمودی ناوبری راست -->
-    <!-- ۲. داک عمودی ناوبری راست -->
-    <!-- ۲. داک عمودی ناوبری راست (شامل تمام ۶ آیکون اصلی + تریگر هوشمند) -->
-    <!-- ۲. داک عمودی ناوبری راست (در موبایل بسته به سه خط، در دسکتاپ حین اسکرول به پایین سه خط) -->
   <nav id="rightVerticalNav" class="dock-collapsed">
     <!-- سه خط آبی معروف استودیو (Trigger) -->
     <div id="dockMasterTrigger" title="Menu Navigation" onclick="toggleDockExpand(event)">
@@ -239,6 +152,62 @@
 
   <!-- بخش ۰: صفحه اول با ترنزیشن نرم سبک ZEN -->
   <section id="view-showcase" class="view-section">
+    <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
+    <div id="topCenterBrandBar">
+      <!-- دکمه برند / خانه -->
+      <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
+        <span class="top-dot"></span>
+        <span>TAJINKART</span>
+      </button>
+
+      <!-- ۲. فهرست شناور ژانرهای استودیو (All Genres) زیر نشان برند -->
+      <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
+        <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
+          <span id="currentGenrePillLabel">All Genres</span>
+          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
+        </button>
+
+        <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
+          <div class="cat-dropdown-item active" onclick="filterGalleryByGenre('all')">
+            <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+            <span class="cat-item-text">All Genres</span>
+          </div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Dark Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Dark Fantasy</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Cyberpunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Cyberpunk</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Sci-Fi')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Sci-Fi</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mythic & Ancient')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mythic & Ancient</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Post-Apocalyptic')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Post-Apocalyptic</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Horror & Eldritch')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Horror & Eldritch</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('High Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">High Fantasy</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Steampunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Steampunk</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mecha & Industrial')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mecha & Industrial</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Anime & Stylized')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Anime & Stylized</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Historical & Military')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Historical & Military</span></div>
+        </div>
+      </div>
+
+      <!-- ۳. فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
+      <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+        <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
+          <span id="currentCategoryPillLabel">All Artworks</span>
+          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
+        </button>
+
+        <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+          <div class="cat-dropdown-item active" onclick="filterGalleryByCategory('all', 'All Artworks')">
+            <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
+            <span class="cat-item-text">All Artworks</span>
+          </div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('character', 'Character Design & Heroes')"><span class="cat-item-dot" style="background:#facc15; box-shadow:0 0 8px #facc15;"></span><span class="cat-item-text">Character Design & Heroes</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('creature', 'Creatures, Titans & Monsters')"><span class="cat-item-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span><span class="cat-item-text">Creatures, Titans & Monsters</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('environment', 'Environment, Worlds & Architecture')"><span class="cat-item-dot" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span><span class="cat-item-text">Environment, Worlds & Architecture</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('keyframe', 'Cinematic Keyframes & Covers')"><span class="cat-item-dot" style="background:#f43f5e; box-shadow:0 0 8px #f43f5e;"></span><span class="cat-item-text">Cinematic Keyframes & Covers</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('props', 'Props, Weapons & Artifacts')"><span class="cat-item-dot" style="background:#a855f7; box-shadow:0 0 8px #a855f7;"></span><span class="cat-item-text">Props, Weapons & Artifacts</span></div>
+          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('comic', 'Comics, Manga & Sequential Art')"><span class="cat-item-dot" style="background:#fb923c; box-shadow:0 0 8px #fb923c;"></span><span class="cat-item-text">Comics, Manga & Sequential Art</span></div>
+        </div>
+      </div>
+    </div>
+
 
 
         <div id="stickyBrandHero">
@@ -2557,12 +2526,12 @@
       </div>
     </footer>
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
-  <script src="data.js?v=22.0.0"></script>
-  <script src="core.js?v=22.0.0"></script>
-  <script src="gallery.js?v=22.0.0"></script>
-  <script src="portal.js?v=22.0.0"></script>
-  <script src="admin.js?v=22.0.0"></script>
-  <script src="translate.js?v=22.0.0"></script>
+  <script src="data.js?v=22.6.0"></script>
+  <script src="core.js?v=22.6.0"></script>
+  <script src="gallery.js?v=22.6.0"></script>
+  <script src="portal.js?v=22.6.0"></script>
+  <script src="admin.js?v=22.6.0"></script>
+  <script src="translate.js?v=22.6.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">

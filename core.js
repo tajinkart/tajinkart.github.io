@@ -419,6 +419,12 @@ window.switchView = function(vKey) {
   const target = document.getElementById(`view-${vKey}`);
   if (target) target.classList.remove('hidden');
 
+  if (vKey === 'store') {
+    if (typeof applyCategoryColorsToServiceCards === 'function') {
+      applyCategoryColorsToServiceCards();
+    }
+  }
+
   // آدرس‌دهی تمیز، بین‌المللی و حرفه‌ای در نوار آدرس مرورگر بدون هشتگ زائد
   try {
     if (vKey === 'showcase') {
@@ -919,3 +925,31 @@ window.initAmbientParticles = function() {
 document.addEventListener('DOMContentLoaded', () => {
   window.initAmbientParticles();
 });
+
+// ==============================================================================
+// پشتیبانی از مسیریابی زنده با هش مرورگر (#commissions, #admin, #portal, ...)
+// ==============================================================================
+function checkInitialHashRoute() {
+  const hash = window.location.hash || '';
+  if (hash.includes('type=recovery') || hash.includes('access_token=')) return;
+  if (hash === '#commissions' || hash === '#store') {
+    if (typeof switchView === 'function') switchView('store');
+  } else if (hash === '#admin') {
+    if (typeof switchView === 'function') switchView('admin');
+  } else if (hash === '#portal' || hash === '#member-dashboard') {
+    if (typeof switchView === 'function') switchView('member-dashboard');
+  } else if (hash === '#genesis') {
+    if (typeof switchView === 'function') switchView('genesis');
+  } else if (hash === '#academy') {
+    if (typeof switchView === 'function') switchView('academy');
+  } else if (hash === '#society') {
+    if (typeof switchView === 'function') switchView('society');
+  }
+}
+
+window.addEventListener('hashchange', checkInitialHashRoute);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', checkInitialHashRoute);
+} else {
+  setTimeout(checkInitialHashRoute, 40);
+}

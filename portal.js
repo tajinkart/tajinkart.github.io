@@ -21,6 +21,72 @@ window.handleAcademyClick = function() {
 
 
 // پایپلاین‌های ۶گانه آتلیه - اتصال زنده به رنگ دسته‌بندی گالری و زیرشاخه‌ها (v21.3.0)
+
+// ==============================================================================
+// اعمال یکدست و زنده رنگ‌ها و پالت‌های نئون دسته‌بندی گالری بر کارت‌های پایپلاین کمیسیون
+// ==============================================================================
+window.applyCategoryColorsToServiceCards = function() {
+  const cards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
+  if (!cards || cards.length === 0) return;
+
+  const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+    ? galleryCategories
+    : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+
+  const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+    'sketch1': 'character',
+    'sketch_creature': 'creature',
+    'sketch2': 'environment',
+    'sketch3': 'keyframe',
+    'sketch4': 'props',
+    'sketch5': 'comic',
+    'sketch_mascot': 'character'
+  };
+
+  cards.forEach(card => {
+    const pipe = card.getAttribute('data-pipeline');
+    const catId = pipeMap[pipe] || 'character';
+    const foundCat = cats.find(c => c.id === catId);
+    let color = '#facc15';
+    if (foundCat && foundCat.color) {
+      color = foundCat.color;
+    } else if (pipe === 'sketch1') {
+      color = '#facc15';
+    } else if (pipe === 'sketch_creature') {
+      color = '#10b981';
+    } else if (pipe === 'sketch2') {
+      color = '#38bdf8';
+    } else if (pipe === 'sketch3') {
+      color = '#f43f5e';
+    } else if (pipe === 'sketch4') {
+      color = '#a855f7';
+    } else if (pipe === 'sketch5') {
+      color = '#fb923c';
+    } else if (pipe === 'sketch_mascot') {
+      color = '#eab308';
+    }
+
+    card.style.setProperty('--cat-color', color);
+    card.style.setProperty('--cat-color-glow', color + '55');
+
+    const numSpan = card.querySelector('.service-nav-title span:first-child');
+    if (numSpan) {
+      numSpan.style.color = color;
+      numSpan.style.textShadow = "0 0 10px " + color + "66";
+    }
+
+    if (card.classList.contains('active')) {
+      card.style.borderColor = color;
+      card.style.borderBottomColor = color;
+      card.style.boxShadow = "0 0 0 1.5px " + color + ", 0 14px 35px " + color + "55";
+    } else {
+      card.style.borderBottomColor = color;
+      card.style.removeProperty('border-color');
+      card.style.removeProperty('box-shadow');
+    }
+  });
+};
+
 window.selectPipeline = function(key, cardEl, userClicked) {
   currentSelectedPipeKey = key;
   
@@ -1942,3 +2008,11 @@ window.openProductDetailModal = function(idx) {
 window.downloadOfficialStudioInvoice = function(orderId) {
   showToast(`Generating official PDF invoice for order #${orderId}...`, 'info');
 };
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
+  });
+} else {
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
+}

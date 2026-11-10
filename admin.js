@@ -114,6 +114,7 @@ window.adminSubmitNewCategoryInline = function() {
   window.adminToggleAddCategoryForm();
   window.renderAdminGalleryCategories();
   if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast('Category created successfully!', 'success');
 };
 
@@ -148,6 +149,7 @@ window.saveAdminCategoryEdit = function() {
   window.closeAdminCategoryEditForm();
   window.renderAdminGalleryCategories();
   if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast('Category updated successfully!', 'success');
 };
 
@@ -159,6 +161,7 @@ window.adminDeleteCurrentEditingCategory = function() {
   window.closeAdminCategoryEditForm();
   window.renderAdminGalleryCategories();
   if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
   showToast('Category deleted.', 'info');
 };
 
