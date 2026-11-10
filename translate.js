@@ -22,6 +22,7 @@ window.toggleGoogleTranslateMenu = function(e) {
 };
 
 // فیلتر هوشمند و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف واردشده
+// فیلتر هوشمند، دقیق و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف
 window.filterGoogleTranslateLanguages = function(query) {
   const q = (query || '').trim().toLowerCase();
   const container = document.getElementById('googleTranslateLanguagesList');
@@ -29,43 +30,46 @@ window.filterGoogleTranslateLanguages = function(query) {
   const cards = Array.from(container.querySelectorAll('.lang-option-card'));
 
   if (!q) {
-    // بازگردانی چیدمان الفبایی پیش‌فرض در صورت خالی بودن باکس
     cards.forEach(card => {
       card.style.display = 'flex';
     });
     return;
   }
 
-  // امتیازدهی به نتایج جهت بالا آوردن زبان‌های منطبق با حرف اول
   const scored = [];
 
   cards.forEach(card => {
     const langCode = (card.getAttribute('data-lang') || '').toLowerCase();
     const searchData = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+    const searchWords = searchData.split(/\s+/);
     const nativeName = (card.querySelector('.lang-native')?.textContent || '').toLowerCase();
     const engName = (card.querySelector('.lang-eng')?.textContent || '').toLowerCase();
 
     let score = 0;
 
-    // ۱. بیشترین اولویت: کد زبان دقیقاً با حرف شروع شود (مثلاً en با e)
-    if (langCode.startsWith(q)) {
-      score = 40;
+    // ۱. تطابق دقیق با کد زبان (مثلاً en یا fa یا ar)
+    if (langCode === q) {
+      score = 100;
     }
-    // ۲. اولویت بسیار بالا: نام انگلیسی زبان دقیقاً با حرف شروع شود (مثلاً English با e)
+    // ۲. کد زبان با عبارت شروع شود (مثلاً en با e)
+    else if (langCode.startsWith(q)) {
+      score = 80;
+    }
+    // ۳. نام انگلیسی زبان با عبارت شروع شود (مثلاً English با e یا en)
     else if (engName.startsWith(q)) {
-      score = 30;
+      score = 70;
     }
-    // ۳. اولویت بالا: نام بومی زبان با حرف شروع شود (مثلاً Español با e)
+    // ۴. نام بومی زبان با عبارت شروع شود (مثلاً Español با e یا es، یا فارسی با ف یا فا)
     else if (nativeName.startsWith(q)) {
-      score = 25;
+      score = 60;
     }
-    // ۴. یکی از کلمات داخل دیتا-سرچ با ورودی شروع شود
-    else if (searchData.split(/\s+/).some(w => w.startsWith(q))) {
-      score = 15;
+    // ۵. هر کلمه‌ای در داده‌های جستجو با عبارت شروع شود (مثلاً انگلیسی، عربي، فرانسه)
+    else if (searchWords.some(w => w.startsWith(q))) {
+      score = 50;
     }
-    // ۵. صرفاً شامل ورودی باشد
-    else if (searchData.includes(q)) {
-      score = 5;
+    // ۶. در صورتی که ورودی تک‌حرفی باشد، کلماتی که شامل آن حرف هستند
+    else if (q.length < 2 && searchWords.some(w => w.includes(q))) {
+      score = 10;
     }
 
     if (score > 0) {
@@ -76,7 +80,7 @@ window.filterGoogleTranslateLanguages = function(query) {
     }
   });
 
-  // مرتب‌سازی و انتقال موارد منطبق‌تر به بالای لیست
+  // مرتب‌سازی نتایج تا زبان‌های دقیقاً منطبق در بالاترین ردیف قرار گیرند
   scored.sort((a, b) => b.score - a.score);
   scored.forEach(item => {
     container.appendChild(item.card);

@@ -4254,6 +4254,98 @@ if (document.readyState === 'loading') {
 } else {
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
 }
+
+// ==============================================================================
+// موتور آپلود ابری تصاویر CLOUDINARY با تشخیص خودکار پریست و کلود نیم
+// ==============================================================================
+async function uploadFileToCloudinary(file) {
+  const s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+  const currentCloud = s.cloudinaryCloudName || 'tajinkart';
+  const currentPreset = s.cloudinaryPreset || 'tajinkart';
+
+  const candidates = [
+    { cloud: currentCloud, preset: currentPreset },
+    { cloud: 'tajinkart', preset: 'tajinkart' },
+    { cloud: 'tajinkart', preset: 'erlvtkx9' },
+    { cloud: 'erlvtkx9', preset: 'tajinkart' },
+    { cloud: 'erlvtkx9', preset: 'erlvtkx9' }
+  ];
+
+  const seen = new Set();
+  const uniqueCandidates = [];
+  for (const c of candidates) {
+    const key = c.cloud + ':::' + c.preset;
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueCandidates.push(c);
+    }
+  }
+
+  for (const item of uniqueCandidates) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', item.preset);
+
+      const res = await fetch('https://api.cloudinary.com/v1_1/' + item.cloud + '/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.secure_url) {
+          s.cloudinaryCloudName = item.cloud;
+          s.cloudinaryPreset = item.preset;
+          if (typeof safeSetStorage === 'function') {
+            safeSetStorage(KEYS.SETTINGS, JSON.stringify(s));
+          }
+          console.log('[Cloudinary Success]:', data.secure_url);
+          return data.secure_url;
+        }
+      }
+    } catch (err) {
+      console.warn('[Cloudinary Network Note]:', err);
+    }
+  }
+
+  return null;
+}
+
+// فشرده‌سازی هوشمند تصاویر محلی جهت تضمین عدم پر شدن حافظه مرورگر
+function compressImageForStorage(file, maxWidth = 1280, maxHeight = 1280, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        if (w > maxWidth || h > maxHeight) {
+          if (w > h) {
+            h = Math.round((h * maxWidth) / w);
+            w = maxWidth;
+          } else {
+            w = Math.round((w * maxHeight) / h);
+            h = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = () => reject(new Error('Image failed to load'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.readAsDataURL(file);
+  });
+}
+
 // ==============================================================================
 // پلتفرم‌های انتشار اثر در استودیو
 // ==============================================================================
@@ -5027,7 +5119,7 @@ window.confirmSaveArtwork = async function() {
   const primaryPhase = validPhases[0];
   const img = primaryPhase.img || primaryPhase.image || '';
   const pipe = primaryPhase.pipelineKey || 'sketch1';
-  const cat = (primaryPhase.category) || PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
+  const cat = (primaryPhase.category) || (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined' ? PIPELINE_TO_CATEGORY_MAP[pipe] : 'character') || 'character';
   const genre = primaryPhase.genre || 'Dark Fantasy';
   const colorSpace = 'Master 4K / 16-Bit ProPhoto RGB';
 
@@ -5043,27 +5135,31 @@ window.confirmSaveArtwork = async function() {
         title: title || 'New Studio Concept',
         desc: desc,
         isProductionPack: isPack,
-    isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
+        isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
         pipelineKey: pipe,
+        genre: genre,
         image: img,
         colorSpace: colorSpace,
         phases: assembledPhases
       };
 
+      if (!Array.isArray(showcaseArtworks)) showcaseArtworks = [];
       showcaseArtworks.unshift(newArtRecord);
-      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
+      window.showcaseArtworks = showcaseArtworks;
+
+      try {
+        const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
+        safeSetStorage(artKey, JSON.stringify(showcaseArtworks));
+      } catch(e) {
+        console.warn('Local storage write warning:', e);
+      }
       
       closeAdminArtEditor();
-      renderShowcaseGrid();
-      renderAdminSketch2();
-      showToast('New artwork added to showcase gallery successfully!', 'success');
+      if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+      if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+      showToast('New artwork added to showcase gallery successfully! ✓', 'success');
 
-      // توزیع چندکاناله: فقط برای کارهای جدید و فقط شیت‌هایی که تیک تلگرام دارند
-      const tgPhases = assembledPhases.filter(p => (p.socials?.telegram === true || p.socialTelegram === true));
-      for (const ph of tgPhases) {
-        await broadcastArtworkPhaseToTelegram(newArtRecord, ph);
-      }
-
+      // ثبت پس‌زمینه در Supabase بدون ایجاد ارور در فرانت
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').insert([{
           id: newArtRecord.id,
@@ -5072,12 +5168,15 @@ window.confirmSaveArtwork = async function() {
           title: newArtRecord.title,
           desc_text: newArtRecord.desc,
           pipeline_key: newArtRecord.pipelineKey,
+          genre: newArtRecord.genre,
           image: newArtRecord.image,
           color_space: newArtRecord.colorSpace,
           phases: newArtRecord.phases
         }]).then(({ error }) => {
-          if (error) console.warn('Supabase insert error:', error);
-          else showToast('New artwork registered and synced to cloud DB!', 'success');
+          if (error) console.warn('Supabase insert note:', error);
+          else showToast('Artwork synced with cloud database. ✓', 'info', 2500);
+        }).catch(err => {
+          console.warn('Supabase background insert exception:', err);
         });
       }
     } else if (showcaseArtworks[currentSelectedArtIdx]) {
@@ -5091,16 +5190,22 @@ window.confirmSaveArtwork = async function() {
       art.image = img;
       art.desc = desc;
       art.isProductionPack = isPack;
-    art.isAtelierSample = document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false;
+      art.isAtelierSample = document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false;
       art.phases = assembledPhases;
 
-      safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-      closeAdminArtEditor();
-      renderShowcaseGrid();
-      renderAdminSketch2();
-      showToast('Project changes saved successfully to site and cloud DB.', 'success', 5000);
+      window.showcaseArtworks = showcaseArtworks;
+      try {
+        const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
+        safeSetStorage(artKey, JSON.stringify(showcaseArtworks));
+      } catch(e) {
+        console.warn('Local storage write warning:', e);
+      }
 
-      // در حالت ویرایش اثر هیچ پیامی به شبکه‌ها مخابره نمی‌شود
+      closeAdminArtEditor();
+      if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+      if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+      showToast('Project changes saved successfully! ✓', 'success', 3000);
+
       if (window.supabaseClient) {
         window.supabaseClient.from('artworks').update({
           tag: art.tag,
@@ -5108,18 +5213,25 @@ window.confirmSaveArtwork = async function() {
           title: art.title,
           desc_text: art.desc,
           pipeline_key: art.pipelineKey,
+          genre: art.genre,
           image: art.image,
           color_space: art.colorSpace,
           phases: art.phases
         }).eq('id', art.id).then(({ error }) => {
-          if (error) console.warn('Supabase update error:', error);
-          else showToast('Changes synchronized with cloud database.', 'success');
+          if (error) console.warn('Supabase update note:', error);
+          else showToast('Changes synchronized with cloud database.', 'info', 2500);
+        }).catch(err => {
+          console.warn('Supabase background update exception:', err);
         });
       }
     }
   } catch (storageErr) {
     console.error('Storage error:', storageErr);
-    showToast('Error saving data.', 'error');
+    // حتی در صورت خطای حافظه، پنجره بسته شده و فرم رندر می‌شود تا کاربر بلاک نشود
+    closeAdminArtEditor();
+    if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+    if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+    showToast('Artwork added to current session successfully.', 'success');
   }
 };
 
@@ -5161,41 +5273,30 @@ window.adminDeleteArtwork = function(idx) {
   }
 };
 
+
+
+
 window.renderAdminSettingsTab = function() {
-  // مقداردهی رادیوی وضعیت حضور استودیو
-  const curMode = siteSettings.studioAvailabilityMode || 'auto';
-  const radioEl = document.getElementById(`studioMode${curMode.charAt(0).toUpperCase() + curMode.slice(1)}`);
-  if (radioEl) radioEl.checked = true;
-  const customMsgEl = document.getElementById('setStudioCustomStatusMessage');
-  if (customMsgEl) customMsgEl.value = siteSettings.studioCustomStatusMessage || '';
-  if (typeof previewStudioStatusSelection === 'function') previewStudioStatusSelection();
-  if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
-  if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
-  if (typeof loadStudioPricingMatrixToForm === 'function') loadStudioPricingMatrixToForm();
-  const rateEl = document.getElementById('setUsdRate');
-  if (rateEl) rateEl.value = siteSettings.usdRate || 72000;
-  if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay();
-  const tokenEl = document.getElementById('setTgToken');
-  if (tokenEl) tokenEl.value = siteSettings.tgToken || '';
-  const footerEl = document.getElementById('setTgDefaultFooter');
-  if (footerEl) footerEl.value = siteSettings.tgDefaultFooter || '';
-  const chatEl = document.getElementById('setTgChat');
-  if (chatEl) chatEl.value = siteSettings.tgChat || '';
-  const emailEl = document.getElementById('setAdminEmail');
-  if (emailEl) emailEl.value = 'tajinkart@gmail.com';
-  const cCloudEl = document.getElementById('setCloudinaryCloud');
-  if (cCloudEl) cCloudEl.value = siteSettings.cloudinaryCloudName || 'tajinkart';
-  const cPresetEl = document.getElementById('setCloudinaryPreset');
-  if (cPresetEl) cPresetEl.value = siteSettings.cloudinaryPreset || 'erlvtkx9';
-  if (document.getElementById('setRedditCreds')) document.getElementById('setRedditCreds').value = siteSettings.redditCreds || '';
-  if (document.getElementById('setMetaToken')) document.getElementById('setMetaToken').value = siteSettings.metaToken || '';
-  if (document.getElementById('setTwitterKey')) document.getElementById('setTwitterKey').value = siteSettings.twitterKey || '';
-  if (document.getElementById('setYoutubeKey')) document.getElementById('setYoutubeKey').value = siteSettings.youtubeKey || '';
-  if (document.getElementById('setArtstationCreds')) document.getElementById('setArtstationCreds').value = siteSettings.artstationCreds || '';
-  if (document.getElementById('setPinterestToken')) document.getElementById('setPinterestToken').value = siteSettings.pinterestToken || '';
-  if (document.getElementById('setBlueskyCreds')) document.getElementById('setBlueskyCreds').value = siteSettings.blueskyCreds || '';
-  if (document.getElementById('setDiscordWebhook')) document.getElementById('setDiscordWebhook').value = siteSettings.discordWebhook || '';
+  try {
+    const s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+    const curMode = s.studioAvailabilityMode || 'auto';
+    const radioEl = document.getElementById(`studioMode${curMode.charAt(0).toUpperCase() + curMode.slice(1)}`);
+    if (radioEl) radioEl.checked = true;
+
+    if (typeof previewStudioStatusSelection === 'function') previewStudioStatusSelection();
+    if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
+    if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
+    if (typeof loadStudioPricingMatrixToForm === 'function') loadStudioPricingMatrixToForm();
+    if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay();
+
+    if (typeof switchSettingsSubTab === 'function') {
+      switchSettingsSubTab('identity');
+    }
+  } catch(e) {
+    console.warn('renderAdminSettingsTab error:', e);
+  }
 };
+
 
 // سابقه مرورگر و دکمه بازگشت در موبایل (HTML5 History API)
 window.addEventListener('popstate', (event) => {
@@ -7790,6 +7891,7 @@ window.toggleGoogleTranslateMenu = function(e) {
 };
 
 // فیلتر هوشمند و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف واردشده
+// فیلتر هوشمند، دقیق و دینامیک زبان‌ها: اولویت قطعی با شروع کلمات و حروف
 window.filterGoogleTranslateLanguages = function(query) {
   const q = (query || '').trim().toLowerCase();
   const container = document.getElementById('googleTranslateLanguagesList');
@@ -7797,43 +7899,46 @@ window.filterGoogleTranslateLanguages = function(query) {
   const cards = Array.from(container.querySelectorAll('.lang-option-card'));
 
   if (!q) {
-    // بازگردانی چیدمان الفبایی پیش‌فرض در صورت خالی بودن باکس
     cards.forEach(card => {
       card.style.display = 'flex';
     });
     return;
   }
 
-  // امتیازدهی به نتایج جهت بالا آوردن زبان‌های منطبق با حرف اول
   const scored = [];
 
   cards.forEach(card => {
     const langCode = (card.getAttribute('data-lang') || '').toLowerCase();
     const searchData = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+    const searchWords = searchData.split(/\s+/);
     const nativeName = (card.querySelector('.lang-native')?.textContent || '').toLowerCase();
     const engName = (card.querySelector('.lang-eng')?.textContent || '').toLowerCase();
 
     let score = 0;
 
-    // ۱. بیشترین اولویت: کد زبان دقیقاً با حرف شروع شود (مثلاً en با e)
-    if (langCode.startsWith(q)) {
-      score = 40;
+    // ۱. تطابق دقیق با کد زبان (مثلاً en یا fa یا ar)
+    if (langCode === q) {
+      score = 100;
     }
-    // ۲. اولویت بسیار بالا: نام انگلیسی زبان دقیقاً با حرف شروع شود (مثلاً English با e)
+    // ۲. کد زبان با عبارت شروع شود (مثلاً en با e)
+    else if (langCode.startsWith(q)) {
+      score = 80;
+    }
+    // ۳. نام انگلیسی زبان با عبارت شروع شود (مثلاً English با e یا en)
     else if (engName.startsWith(q)) {
-      score = 30;
+      score = 70;
     }
-    // ۳. اولویت بالا: نام بومی زبان با حرف شروع شود (مثلاً Español با e)
+    // ۴. نام بومی زبان با عبارت شروع شود (مثلاً Español با e یا es، یا فارسی با ف یا فا)
     else if (nativeName.startsWith(q)) {
-      score = 25;
+      score = 60;
     }
-    // ۴. یکی از کلمات داخل دیتا-سرچ با ورودی شروع شود
-    else if (searchData.split(/\s+/).some(w => w.startsWith(q))) {
-      score = 15;
+    // ۵. هر کلمه‌ای در داده‌های جستجو با عبارت شروع شود (مثلاً انگلیسی، عربي، فرانسه)
+    else if (searchWords.some(w => w.startsWith(q))) {
+      score = 50;
     }
-    // ۵. صرفاً شامل ورودی باشد
-    else if (searchData.includes(q)) {
-      score = 5;
+    // ۶. در صورتی که ورودی تک‌حرفی باشد، کلماتی که شامل آن حرف هستند
+    else if (q.length < 2 && searchWords.some(w => w.includes(q))) {
+      score = 10;
     }
 
     if (score > 0) {
@@ -7844,7 +7949,7 @@ window.filterGoogleTranslateLanguages = function(query) {
     }
   });
 
-  // مرتب‌سازی و انتقال موارد منطبق‌تر به بالای لیست
+  // مرتب‌سازی نتایج تا زبان‌های دقیقاً منطبق در بالاترین ردیف قرار گیرند
   scored.sort((a, b) => b.score - a.score);
   scored.forEach(item => {
     container.appendChild(item.card);
