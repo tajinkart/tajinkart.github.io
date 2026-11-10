@@ -257,7 +257,7 @@ window.ensureSupabaseClient = function() {
         if (event === 'SIGNED_OUT') {
           currentMember = null;
           const labelEl = document.getElementById('rightMemberLabel');
-          if (labelEl) labelEl.textContent = 'حساب اعضا';
+          if (labelEl) labelEl.textContent = 'Member Portal';
           const adminGate = document.getElementById('adminLoginGate');
           const adminWorkspace = document.getElementById('adminWorkspace');
           if (adminWorkspace) adminWorkspace.classList.add('hidden');
@@ -2917,12 +2917,9 @@ async function dispatchTelegramNotification(order) {
 window.switchView = function(vKey) {
   // ۱. قفل امنیتی جنسیس و آکادمی: فقط مدیر استودیو از پنل ادمین می‌تواند وارد شود
   if (vKey === 'genesis' || vKey === 'academy') {
-    const isDirectorOrAdmin = (typeof currentAdminRole !== 'undefined' && (currentAdminRole === 'director' || currentAdminRole === 'admin')) || 
-                              (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) ||
-                              (typeof isCurrentUserDirector !== 'undefined' && isCurrentUserDirector());
-    if (!isDirectorOrAdmin) {
-      const secName = vKey === 'genesis' ? 'جنسیس (Genesis Lore)' : 'آکادمی (Academy)';
-      showToast(`🔒 بخش ${secName} در حال آماده‌سازی و بارگذاری است و به زودی رونمایی می‌شود (Coming Soon)`, 'info', 3500);
+    if (!window.isStudioDirectorAuthenticated()) {
+      const secName = vKey === 'genesis' ? 'Genesis Lore' : 'Academy';
+      showToast(`${secName} is currently in active production and will launch soon (Coming Soon)`, 'info', 4000);
       return;
     }
   }
@@ -3176,7 +3173,7 @@ window.cancelPasswordReset = async function() {
     }
     currentMember = null;
     const labelEl = document.getElementById('rightMemberLabel');
-    if (labelEl) labelEl.textContent = 'حساب اعضا';
+    if (labelEl) labelEl.textContent = 'Member Portal';
 
     const adminGate = document.getElementById('adminLoginGate');
     const adminWorkspace = document.getElementById('adminWorkspace');
@@ -3212,7 +3209,7 @@ window.logoutMemberAccount = async function() {
   }
   currentMember = null;
   const labelEl = document.getElementById('rightMemberLabel');
-  if (labelEl) labelEl.textContent = 'پورتال اعضا';
+  if (labelEl) labelEl.textContent = 'Portal';
   showToast('از حساب کاربری خارج شدید.', 'info');
   switchView('showcase');
 };
@@ -3254,7 +3251,7 @@ window.logoutAdmin = async function() {
 
   currentMember = null;
   const labelEl = document.getElementById('rightMemberLabel');
-  if (labelEl) labelEl.textContent = 'حساب اعضا';
+  if (labelEl) labelEl.textContent = 'Member Portal';
 
   const adminWorkspace = document.getElementById('adminWorkspace');
   const adminGate = document.getElementById('adminLoginGate');
@@ -5355,21 +5352,20 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
 
   const pillBtn = document.getElementById('currentCategoryPillBtn');
   if (pillBtn) {
-    let color = '#facc15';
-    let glow = 'rgba(250, 204, 21, 0.45)';
+    let color = '#f59e0b';
+    let glow = 'rgba(245, 158, 11, 0.55)';
 
-    // پالت دقیق رنگ‌های هر شاخه و آتلیه
     const categoryColorMap = {
-      'all': '#facc15',
-      'character': '#ff5722',
-      'characters': '#ff5722',
+      'all': '#f59e0b',
+      'character': '#ff4500',
+      'characters': '#ff4500',
       'environment': '#00f0ff',
       'environments': '#00f0ff',
-      'creature': '#10b981',
-      'creatures': '#10b981',
-      'keyframe': '#f43f5e',
-      'keyframes': '#f43f5e',
-      'props': '#a855f7',
+      'creature': '#059669',
+      'creatures': '#059669',
+      'keyframe': '#e11d48',
+      'keyframes': '#e11d48',
+      'props': '#9333ea',
       'comic': '#fb923c',
       'comics': '#fb923c',
       'mascot': '#ec4899'
@@ -5383,14 +5379,13 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
           ? galleryCategories.find(c => c.id === categoryKey) : null;
         if (cat && cat.color) color = cat.color;
       }
-      glow = color.startsWith('#') ? `${color}66` : color;
+      glow = color.startsWith('#') ? `${color}88` : color;
     }
 
-    // اعمال مقتدرانه رنگ با important روی کادر و هاله هالوژن پیل
     pillBtn.style.setProperty('--pill-accent-color', color, 'important');
     pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
     pillBtn.style.setProperty('border-color', color, 'important');
-    pillBtn.style.setProperty('box-shadow', `0 0 16px ${glow}, inset 0 0 6px ${glow}`, 'important');
+    pillBtn.style.setProperty('box-shadow', `0 0 18px ${glow}, inset 0 0 8px ${glow}`, 'important');
     if (labelEl) {
       labelEl.style.setProperty('color', color, 'important');
     }
@@ -6619,7 +6614,7 @@ const I18N_STRINGS = {
     status_vacation: 'آتلیه موقتاً در سفر / ظرفیت پر • پذیرش سفارش تا تاریخ مشخص بسته است',
     dock_home_title: 'صفحه اصلی',
     dock_home_sub: 'آرشیو آثار و گالری',
-    dock_members_title: 'پورتال اعضا',
+    dock_members_title: 'Member Portal',
     dock_members_sub: 'ورود / عضویت',
     dock_store_title: 'آتلیه و فروشگاه',
     dock_store_sub: 'کانسپت و اسست‌ها',
@@ -7875,33 +7870,42 @@ window.switchView = function(viewKey) {
 
 
 
+
+// تابع دقیق و جامع احراز هویت مدیر استودیو جهت دسترسی به بخش‌های در حال توسعه
+window.isStudioDirectorAuthenticated = function() {
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  if (adminWorkspace && !adminWorkspace.classList.contains('hidden')) return true;
+  if (document.body.getAttribute('data-view') === 'admin' || window.currentView === 'admin') return true;
+  if (typeof currentMember !== 'undefined' && currentMember && currentMember.email) {
+    if (typeof window.isDirectorEmail === 'function' && window.isDirectorEmail(currentMember.email)) return true;
+  }
+  if (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) return true;
+  if (sessionStorage.getItem('tajinkart_admin_unlocked') === 'true' || localStorage.getItem('tajinkart_admin_unlocked') === 'true') return true;
+  return false;
+};
+
 window.handleGenesisClick = function(e) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
   closeDockMobile();
-  const isDirectorOrAdmin = (typeof currentAdminRole !== 'undefined' && (currentAdminRole === 'director' || currentAdminRole === 'admin')) || 
-                            (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) ||
-                            (typeof isCurrentUserDirector !== 'undefined' && isCurrentUserDirector());
-  if (isDirectorOrAdmin) {
+  if (window.isStudioDirectorAuthenticated()) {
     switchView('genesis');
-    showToast('دسترسی مدیر استودیو به بخش داستان و جنسیس تایید شد.', 'success');
+    showToast('Director clearance verified. Entering Genesis Lore.', 'success', 3000);
   } else {
-    showToast('🔒 بخش داستان و جهان جنسیس در حال توسعه است و به زودی رونمایی می‌شود (Genesis Lore — Coming Soon)', 'info', 3500);
+    showToast('Genesis Lore is currently in active worldbuilding and will launch soon (Coming Soon)', 'info', 4000);
   }
 };
 
 window.handleAcademyClick = function(e) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
   closeDockMobile();
-  const isDirectorOrAdmin = (typeof currentAdminRole !== 'undefined' && (currentAdminRole === 'director' || currentAdminRole === 'admin')) || 
-                            (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) ||
-                            (typeof isCurrentUserDirector !== 'undefined' && isCurrentUserDirector());
-  if (isDirectorOrAdmin) {
+  if (window.isStudioDirectorAuthenticated()) {
     switchView('academy');
-    showToast('دسترسی مدیر استودیو به بخش آکادمی تایید شد.', 'success');
+    showToast('Director clearance verified. Entering Academy Studio.', 'success', 3000);
   } else {
-    showToast('🔒 آکادمی استودیو در حال آماده‌سازی است و به زودی آغاز به کار خواهد کرد (Academy — Coming Soon)', 'info', 3500);
+    showToast('Academy Masterclasses are currently in production and will launch soon (Coming Soon)', 'info', 4000);
   }
 };
+
 
 window.toggleDockExpand = function(e) {
   if (e && e.stopPropagation) e.stopPropagation();
