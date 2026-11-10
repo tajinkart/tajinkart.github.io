@@ -35,7 +35,7 @@
   <!-- بوم پارتیکل‌های معلق کیهانی و جوهر استودیو (Ambient Cosmic & Ink Particles) -->
   <canvas id="ambientParticleCanvas"></canvas>
 
-        <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
+          <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
   <div id="topCenterBrandBar">
     <!-- دکمه برند / خانه -->
     <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
@@ -43,7 +43,7 @@
       <span>TAJINKART</span>
     </button>
 
-    <!-- فهرست شناور ژانرهای استودیو (All Genres) زیر نشان برند -->
+    <!-- ۲. فهرست شناور ژانرهای استودیو (All Genres) زیر نشان برند -->
     <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
       <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
         <span id="currentGenrePillLabel">All Genres</span>
@@ -51,9 +51,45 @@
       </button>
 
       <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
-        <!-- داینامیک توسط renderFloatingGenreDropdown لود می‌شود -->
+        <div class="cat-dropdown-item active" onclick="filterGalleryByGenre('all')">
+          <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+          <span class="cat-item-text">All Genres</span>
+        </div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Dark Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Dark Fantasy</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Cyberpunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Cyberpunk</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Sci-Fi')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Sci-Fi</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mythic & Ancient')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mythic & Ancient</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Post-Apocalyptic')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Post-Apocalyptic</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Horror & Eldritch')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Horror & Eldritch</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('High Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">High Fantasy</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Steampunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Steampunk</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mecha & Industrial')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mecha & Industrial</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Anime & Stylized')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Anime & Stylized</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Historical & Military')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Historical & Military</span></div>
       </div>
     </div>
+
+    <!-- ۳. فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
+    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
+        <span id="currentCategoryPillLabel">All Artworks</span>
+        <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
+      </button>
+
+      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+        <div class="cat-dropdown-item active" onclick="filterGalleryByCategory('all', 'All Artworks')">
+          <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
+          <span class="cat-item-text">All Artworks</span>
+        </div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('character', 'Character Design & Heroes')"><span class="cat-item-dot" style="background:#facc15; box-shadow:0 0 8px #facc15;"></span><span class="cat-item-text">Character Design & Heroes</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('creature', 'Creatures, Titans & Monsters')"><span class="cat-item-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span><span class="cat-item-text">Creatures, Titans & Monsters</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('environment', 'Environment, Worlds & Architecture')"><span class="cat-item-dot" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span><span class="cat-item-text">Environment, Worlds & Architecture</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('keyframe', 'Cinematic Keyframes & Covers')"><span class="cat-item-dot" style="background:#f43f5e; box-shadow:0 0 8px #f43f5e;"></span><span class="cat-item-text">Cinematic Keyframes & Covers</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('props', 'Props, Weapons & Artifacts')"><span class="cat-item-dot" style="background:#a855f7; box-shadow:0 0 8px #a855f7;"></span><span class="cat-item-text">Props, Weapons & Artifacts</span></div>
+        <div class="cat-dropdown-item" onclick="filterGalleryByCategory('comic', 'Comics, Manga & Sequential Art')"><span class="cat-item-dot" style="background:#fb923c; box-shadow:0 0 8px #fb923c;"></span><span class="cat-item-text">Comics, Manga & Sequential Art</span></div>
+      </div>
+    </div>
+  </div>
 
     <!-- فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
     <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
@@ -982,14 +1018,14 @@
               <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
             </div>
 
-            <!-- مدیریت فشرده، ارگونومیک و مدرن دسته‌بندی‌های گالری با پالت رنگی نئون -->
+                        <!-- مدیریت فشرده، ارگونومیک و مدرن دسته‌بندی‌های گالری با پالت رنگی نئون -->
             <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
                 <div style="display:flex; align-items:center; gap:10px;">
                   <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0;">🏷️ Gallery Categories & Neon Palette</h4>
-                  <span id="adminCategoryCountBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,240,255,0.2);">7 Active Categories</span>
+                  <span id="adminCategoryCountBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,240,255,0.2);">6 Active Categories</span>
                 </div>
-                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px;">
+                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px; cursor:pointer;">
                   + Add New Category
                 </button>
               </div>
@@ -1002,15 +1038,15 @@
                   <span style="font-size:10.5px; color:var(--text-muted);">Neon Color:</span>
                   <input type="color" id="adminNewCatColor" value="#38bdf8" style="width:22px; height:22px; border:none; padding:0; background:transparent; cursor:pointer;" />
                 </div>
-                <button type="button" onclick="adminSubmitNewCategoryInline()" class="btn-gold" style="font-size:11px; padding:6px 14px;">
+                <button type="button" onclick="adminSubmitNewCategoryInline()" class="btn-gold" style="font-size:11px; padding:6px 14px; cursor:pointer;">
                   ✓ Save Category
                 </button>
-                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
+                <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px; cursor:pointer;">
                   Cancel
                 </button>
               </div>
 
-                                                        <!-- فرم ویرایش دوزبانه مشخصات دسته‌بندی گالری (اولی فارسی، دومی انگلیسی) -->
+              <!-- فرم ویرایش دسته‌بندی گالری -->
               <div id="adminInlineEditCategoryRow" style="display:none; margin-bottom:16px; background:#06080d; border:1.5px solid var(--cyan-electric); border-radius:14px; padding:18px 20px; box-shadow:0 0 30px rgba(0,240,255,0.2);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                   <span style="font-size:14px; font-weight:800; color:var(--cyan-electric);">✏️ Edit Gallery Category Specifications</span>
@@ -1019,53 +1055,78 @@
                 <input type="hidden" id="adminEditCatOriginalId" />
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
                   <div>
-                    <label style="display:block; font-size:12px; font-weight:800; color:var(--gold); margin-bottom:6px;">
-                      1. Category Display Title:
-                    </label>
-                    <input type="text" id="adminEditCatTitleFA" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:rtl;" />
+                    <label style="display:block; font-size:12px; font-weight:800; color:var(--gold); margin-bottom:6px;">Category Title:</label>
+                    <input type="text" id="adminEditCatTitleEN" class="font-mono" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;" />
                   </div>
                   <div>
-                    <label style="display:block; font-size:12px; font-weight:800; color:var(--cyan-electric); margin-bottom:6px;">
-                      2. Public Site English Title:
-                    </label>
-                    <input type="text" id="adminEditCatTitleEN" class="font-mono" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:ltr;" />
-                  </div>
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:14px; align-items:flex-end;">
-                  <div>
-                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">3. Category Slug / ID:</label>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">Category Slug / ID:</label>
                     <input type="text" id="adminEditCatId" class="font-mono" placeholder="character" style="width:100%; box-sizing:border-box; font-size:13px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;" />
                   </div>
-                  <div>
-                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">4. Neon Accent Color:</label>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                      <input type="color" id="adminEditCatColorPicker" onchange="document.getElementById('adminEditCatColor').value = this.value" style="width:42px; height:42px; border:none; padding:0; background:transparent; cursor:pointer;" />
-                      <input type="text" id="adminEditCatColor" class="font-mono" style="flex:1; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; font-size:13px;" />
-                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:11.5px; color:#94a3b8;">Neon Color:</span>
+                    <input type="color" id="adminEditCatColorPicker" onchange="document.getElementById('adminEditCatColor').value = this.value" style="width:36px; height:36px; border:none; padding:0; background:transparent; cursor:pointer;" />
+                    <input type="text" id="adminEditCatColor" class="font-mono" style="width:110px; padding:8px 12px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; font-size:12px;" />
                   </div>
-                  <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button type="button" onclick="adminDeleteCurrentEditingCategory()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; font-weight:700; color:#fda4af; border:1px solid rgba(244,63,94,0.45); background:rgba(244,63,94,0.12); cursor:pointer;" title="Delete this category from studio">
-                      🗑️ Delete Category
-                    </button>
-                    <button type="button" onclick="closeAdminCategoryEditForm()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; cursor:pointer;">
-                      Cancel
-                    </button>
-                    <button type="button" onclick="saveAdminCategoryEdit()" class="btn-gold" style="padding:10px 24px; font-size:12.5px; font-weight:800; cursor:pointer;">
-                      💾 Save Category Changes
-                    </button>
+                  <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeAdminCategoryEditForm()" class="btn-secondary" style="padding:8px 16px; font-size:12px; cursor:pointer;">Cancel</button>
+                    <button type="button" onclick="saveAdminCategoryEdit()" class="btn-gold" style="padding:8px 20px; font-size:12px; font-weight:800; cursor:pointer;">💾 Save</button>
                   </div>
                 </div>
               </div>
-              <!-- لیست افقی و فشرده دسته‌بندی‌ها به شکل پیل‌های شیک -->
+
+              <!-- لیست افقی و پیش‌رندر شده دسته‌بندی‌ها -->
               <div id="adminGalleryCategoriesList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-                <!-- داینامیک توسط renderAdminGalleryCategories پر می‌شود -->
+                <div class="admin-cat-pill" onclick="openAdminCategoryEdit('character')" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid #facc1588; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px #facc1520; cursor:pointer; font-size:12px; color:#fff;"><span style="width:8px; height:8px; border-radius:50%; background:#facc15; box-shadow:0 0 6px #facc15;"></span><span style="font-weight:700;">Character Design & Heroes</span><span style="font-size:11px; opacity:0.7;">✏️</span></div>
+                <div class="admin-cat-pill" onclick="openAdminCategoryEdit('creature')" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid #10b98188; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px #10b98120; cursor:pointer; font-size:12px; color:#fff;"><span style="width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;"></span><span style="font-weight:700;">Creatures, Titans & Monsters</span><span style="font-size:11px; opacity:0.7;">✏️</span></div>
+                <div class="admin-cat-pill" onclick="openAdminCategoryEdit('environment')" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid #38bdf888; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px #38bdf820; cursor:pointer; font-size:12px; color:#fff;"><span style="width:8px; height:8px; border-radius:50%; background:#38bdf8; box-shadow:0 0 6px #38bdf8;"></span><span style="font-weight:700;">Environment, Worlds & Architecture</span><span style="font-size:11px; opacity:0.7;">✏️</span></div>
+                <div class="admin-cat-pill" onclick="openAdminCategoryEdit('keyframe')" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid #f43f5e88; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px #f43f5e20; cursor:pointer; font-size:12px; color:#fff;"><span style="width:8px; height:8px; border-radius:50%; background:#f43f5e; box-shadow:0 0 6px #f43f5e;"></span><span style="font-weight:700;">Cinematic Keyframes & Covers</span><span style="font-size:11px; opacity:0.7;">✏️</span></div>
+                <div class="admin-cat-pill" onclick="openAdminCategoryEdit('props')" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid #a855f788; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px #a855f720; cursor:pointer; font-size:12px; color:#fff;"><span style="width:8px; height:8px; border-radius:50%; background:#a855f7; box-shadow:0 0 6px #a855f7;"></span><span style="font-weight:700;">Props, Weapons & Artifacts</span><span style="font-size:11px; opacity:0.7;">✏️</span></div>
+                <div class="admin-cat-pill" onclick="openAdminCategoryEdit('comic')" style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid #fb923c88; border-radius:20px; padding:6px 14px; box-shadow:0 0 10px #fb923c20; cursor:pointer; font-size:12px; color:#fff;"><span style="width:8px; height:8px; border-radius:50%; background:#fb923c; box-shadow:0 0 6px #fb923c;"></span><span style="font-weight:700;">Comics, Manga & Sequential Art</span><span style="font-size:11px; opacity:0.7;">✏️</span></div>
               </div>
             </div>
 
-            
+            <!-- مدیریت ژانرهای آثار استودیو (Studio Genres & Worldbuilding Themes) -->
+            <div style="margin-top:16px; background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">🌌 Universe Genres & Themes</h4>
+                  <span id="adminGenreCountBadge" class="font-mono" style="font-size:10.5px; color:var(--gold); background:rgba(250,204,21,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(250,204,21,0.25);">11 Active Genres</span>
+                </div>
+                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px; cursor:pointer;">
+                  + Add New Genre
+                </button>
+              </div>
 
-            <!-- مدال شناور ادیتور اثر (در حالت عادی باز نیست) -->
+              <!-- ردیف اینلاین ایجاد ژانر جدید -->
+              <div id="adminInlineAddGenreRow" style="display:none; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
+                <input type="text" id="adminNewGenreTitle" placeholder="Genre Name (e.g. Grimdark, Solar-Punk, Gothic Horror)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:180px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" onkeydown="if(event.key==='Enter') adminSubmitNewGenreInline()" />
+                <button type="button" onclick="adminSubmitNewGenreInline()" class="btn-gold" style="font-size:11px; padding:6px 14px; cursor:pointer;">
+                  ✓ Save Genre
+                </button>
+                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px; cursor:pointer;">
+                  Cancel
+                </button>
+              </div>
+
+              <!-- لیست افقی و پیش‌رندر شده ژانرها -->
+              <div id="adminStudioGenresList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Dark Fantasy</span><button type="button" onclick="adminDeleteStudioGenre('Dark Fantasy')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Cyberpunk</span><button type="button" onclick="adminDeleteStudioGenre('Cyberpunk')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Sci-Fi</span><button type="button" onclick="adminDeleteStudioGenre('Sci-Fi')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Mythic & Ancient</span><button type="button" onclick="adminDeleteStudioGenre('Mythic & Ancient')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Post-Apocalyptic</span><button type="button" onclick="adminDeleteStudioGenre('Post-Apocalyptic')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Horror & Eldritch</span><button type="button" onclick="adminDeleteStudioGenre('Horror & Eldritch')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">High Fantasy</span><button type="button" onclick="adminDeleteStudioGenre('High Fantasy')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Steampunk</span><button type="button" onclick="adminDeleteStudioGenre('Steampunk')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Mecha & Industrial</span><button type="button" onclick="adminDeleteStudioGenre('Mecha & Industrial')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Anime & Stylized</span><button type="button" onclick="adminDeleteStudioGenre('Anime & Stylized')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;"><span style="color:var(--cyan-electric); font-size:11px;">🌌</span><span style="font-weight:700;">Historical & Military</span><button type="button" onclick="adminDeleteStudioGenre('Historical & Military')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px;">✕</button></div>
+              </div>
+            </div>
+
+<!-- مدال شناور ادیتور اثر (در حالت عادی باز نیست) -->
             <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
               <div class="admin-art-modal-box" onclick="event.stopPropagation()">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">

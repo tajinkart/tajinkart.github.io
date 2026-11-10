@@ -1,4 +1,40 @@
 
+window.SIX_PIPELINE_CATEGORIES = [
+  { id: 'character', title: 'Character Design & Heroes', titleEN: 'Character Design & Heroes', color: '#facc15', pipeKey: 'sketch1' },
+  { id: 'creature', title: 'Creatures, Titans & Monsters', titleEN: 'Creatures, Titans & Monsters', color: '#10b981', pipeKey: 'sketch_creature' },
+  { id: 'environment', title: 'Environment, Worlds & Architecture', titleEN: 'Environment, Worlds & Architecture', color: '#38bdf8', pipeKey: 'sketch2' },
+  { id: 'keyframe', title: 'Cinematic Keyframes & Covers', titleEN: 'Cinematic Keyframes & Covers', color: '#f43f5e', pipeKey: 'sketch3' },
+  { id: 'props', title: 'Props, Weapons & Artifacts', titleEN: 'Props, Weapons & Artifacts', color: '#a855f7', pipeKey: 'sketch4' },
+  { id: 'comic', title: 'Comics, Manga & Sequential Art', titleEN: 'Comics, Manga & Sequential Art', color: '#fb923c', pipeKey: 'sketch5' }
+];
+window.DEFAULT_GALLERY_CATEGORIES = window.SIX_PIPELINE_CATEGORIES;
+window.galleryCategories = window.SIX_PIPELINE_CATEGORIES;
+
+window.DEFAULT_STUDIO_GENRES = [
+  'Dark Fantasy',
+  'Cyberpunk',
+  'Sci-Fi',
+  'Mythic & Ancient',
+  'Post-Apocalyptic',
+  'Horror & Eldritch',
+  'High Fantasy',
+  'Steampunk',
+  'Mecha & Industrial',
+  'Anime & Stylized',
+  'Historical & Military'
+];
+window.studioGenres = window.DEFAULT_STUDIO_GENRES;
+
+window.PIPELINE_TO_CATEGORY_MAP = {
+  'sketch1': 'character',
+  'sketch_creature': 'creature',
+  'sketch2': 'environment',
+  'sketch3': 'keyframe',
+  'sketch4': 'props',
+  'sketch5': 'comic'
+};
+
+
 const DEFAULT_STUDIO_GENRES = [
   'Dark Fantasy',
   'Cyberpunk',

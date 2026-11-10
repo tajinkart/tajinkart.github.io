@@ -919,7 +919,6 @@ window.initAmbientParticles = function() {
 document.addEventListener('DOMContentLoaded', () => {
   window.initAmbientParticles();
 });
-
 // ==============================================================================
 // TAJINKART STUDIO — GALLERY & SHOWCASE MODULE (gallery.js)
 // Showcase Grid, Categories & Genres Filters, Case Study Lightbox, Zoom
@@ -2025,7 +2024,6 @@ document.addEventListener('touchend', (e) => {
     pinchPanY = 0;
   }
 }, { passive: true });
-
 // ==============================================================================
 // TAJINKART STUDIO — PORTAL, STORE & COMMISSIONS MODULE (portal.js)
 // Member Portal, Auth Modals, Commission Calculator Wizard, Products Vault
@@ -3970,7 +3968,6 @@ window.openProductDetailModal = function(idx) {
 window.downloadOfficialStudioInvoice = function(orderId) {
   showToast(`Generating official PDF invoice for order #${orderId}...`, 'info');
 };
-
 // ==============================================================================
 // TAJINKART STUDIO — ADMIN MANAGEMENT MODULE (admin.js)
 // Showcase Curation, Genres & Categories, Pipelines, Products, Members, Settings
@@ -7425,7 +7422,6 @@ window.saveStudioModeDirect = function(mode, event) {
 
   showToast(`Studio status set to ${mode.toUpperCase()} and saved! ✓`, 'success', 3500);
 };
-
 
 // ==============================================================================
 // TAJINKART STUDIO — TRANSLATE MODULE (translate.js)
