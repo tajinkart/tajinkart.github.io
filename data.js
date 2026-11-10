@@ -1,9 +1,9 @@
 /**
  * TAJINKART Master Spec v2.1 Data Store
- * مدیر استودیو و طراح دنیا: سید سروش تاج
+ * Studio Director & Lead Worldbuilder: Seyed Soroush Taj
  */
 
-// حافظه پشتیبان موقت در صورت مسدود بودن یا پرایوت بودن حافظه مرورگر
+// In-memory fallback storage if browser localStorage is blocked or restricted
 window._tajinMemoryStorage = window._tajinMemoryStorage || {};
 
 function safeGetStorage(key) {
@@ -58,7 +58,7 @@ var siteSettings = {
   tgToken: '',
   tgChat: '',
   adminPass: 'tajinkart',
-  commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
+  commissionCapacity: '2 of 3 Atelier Slots Reserved'
 };
 try {
   const _s = safeGetStorage(KEYS.SETTINGS);
@@ -71,9 +71,9 @@ try {
 } catch(e) {}
 window.siteSettings = siteSettings;
 
-// گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
-// بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
-// کانسپت‌های پیش‌فرض و غنی استودیو (Fallback جهت تضمین عدم خالی شدن گالری)
+// Showcase Gallery with multi-phase case study lightbox and atelier deep-linking
+// Load artist artworks (filtered and cleaned from legacy mockups)
+// Studio fallback concepts
 const DEFAULT_STUDIO_ARTWORKS = [];
 
 var storedArtworks = [];
@@ -90,7 +90,7 @@ if (showcaseArtworks.length === 0) {
 }
 window.showcaseArtworks = showcaseArtworks;
 
-// ۶ پایپلاین تخصصی آتلیه طبق سند مستر با زیرشاخه‌ها و مراحل شفاف
+// Studio bespoke production pipelines
 var PIPELINE_DATA = {
   sketch1: {
     id: 'sketch1',
@@ -357,7 +357,7 @@ var PIPELINE_DATA = {
   }
 };
 
-// مخزن دارایی‌های دیجیتال مبتنی بر ۷ شاخه استاندارد سند مستر TAJINKART
+// Digital Assets Vault - 7 Core Production Branches
 var digitalStoreProducts = [];
 let _initialProds = [
   {
@@ -466,7 +466,7 @@ var ordersList = [];
 try {
   const _storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS));
   if (Array.isArray(_storedOrders)) {
-    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'استودیو نوا' && !String(o.client).includes('نوا'));
+    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'Studio Nova' && !String(o.client).includes('Nova'));
   }
 } catch(e) {
   ordersList = [];
@@ -486,42 +486,42 @@ var siteMembersData = [];
 let _defaultMembers = [
   {
     id: 101,
-    name: 'سید سروش تاج',
+    name: 'Seyed Soroush Taj',
     email: 'soroush@tajinkart.com',
     contact: '09120000000',
     tier: 'VIP',
     balance: ',450',
     withdrawn: ',200',
     assetsBought: [
-      'کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD',
-      'موتور براش، بافت و آلفای زنگ‌زدگی (۶۴ عددی)',
-      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ'
+      'Genesis Graphic Lore Chapters 1-3 + Master PSD',
+      '64-Piece Rust Texture & Alpha Brush Engine',
+      'Raven Knight 2D Game Sprite Animation Pack'
     ],
     totalSpent: '20'
   },
   {
     id: 102,
-    name: 'استودیو پایا گیمز',
+    name: 'Paya Games Studio',
     email: 'director@payagames.ir',
     contact: '09350000000',
     tier: 'PRO',
     balance: '50',
     withdrawn: '50',
     assetsBought: [
-      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ',
-      'لوپ‌های ویدیویی منوی بازی و اسپلش سینمایی 4K'
+      'Raven Knight 2D Game Sprite Animation Pack',
+      '4K Cinematic Game Menu Video Loops'
     ],
     totalSpent: '90'
   },
   {
     id: 103,
-    name: 'آریا کیان',
+    name: 'Arya Kian',
     email: 'aria@gmail.com',
     contact: '09190000000',
     tier: 'STANDARD',
     balance: '/usr/bin/bash',
     withdrawn: '/usr/bin/bash',
-    assetsBought: ['موتور براش، بافت و آلفای زنگ‌زدگی و پوست هیولا'],
+    assetsBought: ['64-Piece Master Brush Engine & Monster Alphas'],
     totalSpent: '9'
   }
 ];

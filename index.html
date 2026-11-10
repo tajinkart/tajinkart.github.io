@@ -859,17 +859,17 @@
   </section>
 
   <!-- بخش ۶: پنل مدیریت ادمین کامل فارسی -->
-  <section id="view-admin" class="view-section hidden" dir="rtl" lang="fa">
+  <section id="view-admin" class="view-section hidden" dir="ltr" lang="en">
     <div class="container">
       <div id="adminLoginGate" style="max-width:440px; margin:50px auto; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.35); border-radius:20px; padding:30px 24px; text-align:center; box-shadow:0 15px 45px rgba(0,0,0,0.75);">
         <div style="width:48px; height:48px; border-radius:14px; background:rgba(250,204,21,0.12); border:1px solid rgba(250,204,21,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">👑</div>
-        <h2 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:8px;">ورود اختصاصی مدیر ارشد استودیو</h2>
+        <h2 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:8px;">Studio Director Secure Access</h2>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px; line-height:1.7;">
-          دسترسی به مرکز کنترل استودیو منحصراً از طریق تایید هویت دو مرحله‌ای حساب گوگل مدیریت (<span class="font-mono" style="color:var(--cyan-electric); font-weight:700;">tajinkart@gmail.com</span>) انجام می‌پذیرد.
+          Access to the studio command console is restricted exclusively to the Studio Director Google account (<span class="font-mono" style="color:var(--cyan-electric); font-weight:700;">tajinkart@gmail.com</span>) via 2-Factor Authentication.
         </p>
         <button type="button" onclick="handleGoogleSignIn()" class="btn-google-auth" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; border-radius:10px; background:#0b0f19; border:1px solid rgba(250,204,21,0.4); color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; transition:all 0.25s;">
           <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <span>ورود مستقیم مدیر با حساب Google</span>
+          <span>Sign in with Director Google Account</span>
         </button>
       </div>
 
@@ -877,10 +877,10 @@
         <div class="section-head">
           <div>
             <span class="font-mono" style="font-size:11px; color:var(--gold);">STUDIO_DIRECTOR: SEYED_SOROUSH_TAJ</span>
-            <h2 class="view-hero-title">مرکز کنترل و پنل مدیریت استودیو</h2>
+            <h2 class="view-hero-title">Studio Command Console & Control Center</h2>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="خروج کامل از حساب و قفل پنل">قفل پنل</button>
+            <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="Lock Console & Sign Out">Lock Console</button>
           </div>
         </div>
 
@@ -891,16 +891,16 @@
           <aside class="admin-vertical-sidebar">
             <div class="admin-sidebar-header">
               <span class="font-mono" style="font-size:10.5px; color:var(--gold);">STUDIO DIRECTOR</span>
-              <h3 style="font-size:14.5px; font-weight:800; color:#fff; margin-top:2px;">منوی مدیریت استودیو</h3>
+              <h3 style="font-size:14.5px; font-weight:800; color:#fff; margin-top:2px;">Studio Director Menu</h3>
             </div>
             
                         <nav class="admin-sidebar-menu">
-              <!-- ۱. گالری و آثار استودیو -->
+              <!-- 1. Gallery & Portfolio -->
               <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
                 <span class="admin-nav-icon">🖼️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۱. گالری و آثار استودیو</span>
-                  <span class="admin-nav-sub">پورتفولیو، چیدمان و نمونه‌های زنده</span>
+                  <span class="admin-nav-title">1. Gallery & Portfolio</span>
+                  <span class="admin-nav-sub">Curate Artworks & Showcase Layout</span>
                 </div>
               </button>
 
@@ -908,8 +908,8 @@
               <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
                 <span class="admin-nav-icon">⚡</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۲. آتلیه و قیمت‌گذاری</span>
-                  <span class="admin-nav-sub">پایپلاین‌ها و ماتریس تعرفه‌ها</span>
+                  <span class="admin-nav-title">2. Atelier & Pricing</span>
+                  <span class="admin-nav-sub">Pipelines & Rate Matrix</span>
                 </div>
               </button>
 
@@ -917,26 +917,26 @@
               <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
                 <span class="admin-nav-icon">👥</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۳. اعضا و سفارش‌های دریافتی</span>
-                  <span class="admin-nav-sub">پرونده کاربران و پایش بریف‌ها</span>
+                  <span class="admin-nav-title">3. Members & Client Dossiers</span>
+                  <span class="admin-nav-sub">Client Inquiries & Briefs</span>
                 </div>
               </button>
 
-              <!-- ۴. فروشگاه دارایی‌های دیجیتال -->
+              <!-- 4. Digital Vault Assetsی دیجیتال -->
               <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
                 <span class="admin-nav-icon">💎</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۴. فروشگاه دارایی‌ها</span>
-                  <span class="admin-nav-sub">اسست‌ها، براش‌ها و کمیک</span>
+                  <span class="admin-nav-title">4. Digital Vault Assets</span>
+                  <span class="admin-nav-sub">Packs, Brush Engines & Comics</span>
                 </div>
               </button>
 
-              <!-- ۶. منشور و قوانین استودیو -->
+              <!-- 5. Studio Legal Charter -->
               <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
                 <span class="admin-nav-icon">⚖️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۶. منشور و قوانین استودیو</span>
-                  <span class="admin-nav-sub">۴ تب مستقل لایسنس و شرایط</span>
+                  <span class="admin-nav-title">5. Studio Legal Charter</span>
+                  <span class="admin-nav-sub">Terms of Service & EULA</span>
                 </div>
               </button>
 
@@ -944,8 +944,8 @@
               <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
                 <span class="admin-nav-icon">⚙️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">۷. تنظیمات و زیرساخت</span>
-                  <span class="admin-nav-sub">حضور استودیو، برند، تلگرام و مانیتورینگ</span>
+                  <span class="admin-nav-title">6. Settings & Infrastructure</span>
+                  <span class="admin-nav-sub">Branding, Availability & Cloud Health</span>
                 </div>
               </button>
             </nav>
@@ -957,8 +957,8 @@
           <div class="admin-artworks-fullwidth">
             <div style="background:var(--bg-panel); padding:20px; border-radius:18px; border:1px solid var(--border-subtle); width:100%;">
               <div style="margin-bottom:16px;">
-                <h4 style="font-size:16px; font-weight:800; color:#fff;">مدیریت چیدمان گالری صفحه اصلی</h4>
-                <span style="font-size:12px; color:var(--text-muted);">برای افزودن اثر جدید روی کادر + در گرید کلیک کنید یا برای ادیت هر اثر روی کارت آن ضربه بزنید. (همگام‌سازی ابری به صورت ۱۰۰٪ خودکار انجام می‌شود)</span>
+                <h4 style="font-size:16px; font-weight:800; color:#fff;">Home Showcase Gallery Curation</h4>
+                <span style="font-size:12px; color:var(--text-muted);">Click the + card to upload a new artwork, or click any card to edit. (Automatic 2-way cloud synchronization active)</span>
               </div>
               <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
             </div>
@@ -967,47 +967,47 @@
             <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
                 <div style="display:flex; align-items:center; gap:10px;">
-                  <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0;">🏷️ دسته‌بندی‌های گالری و پالت رنگی نئون</h4>
-                  <span id="adminCategoryCountBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,240,255,0.2);">۷ دسته فعال</span>
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0;">🏷️ Gallery Categories & Neon Palette</h4>
+                  <span id="adminCategoryCountBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,240,255,0.2);">7 Active Categories</span>
                 </div>
                 <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px;">
-                  + افزودن دسته‌بندی جدید
+                  + Add New Category
                 </button>
               </div>
 
               <!-- ردیف اینلاین و سریع ایجاد دسته جدید با انتخاب رنگ -->
               <div id="adminInlineAddCategoryRow" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
-                <input type="text" id="adminNewCatTitle" placeholder="عنوان فارسی (مثال: تصویرسازی سه‌بعدی)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:160px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
-                <input type="text" id="adminNewCatId" placeholder="شناسه انگلیسی (مثال: 3d)" class="font-mono" style="font-size:11px; padding:6px 10px; width:130px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:var(--cyan-electric); direction:ltr;" />
+                <input type="text" id="adminNewCatTitle" placeholder="Category Title (e.g. 3D Illustration)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:160px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
+                <input type="text" id="adminNewCatId" placeholder="Category ID / Slug (e.g. 3d)" class="font-mono" style="font-size:11px; padding:6px 10px; width:130px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:var(--cyan-electric); direction:ltr;" />
                 <div style="display:flex; align-items:center; gap:6px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; padding:4px 8px;">
-                  <span style="font-size:10.5px; color:var(--text-muted);">رنگ نئون:</span>
+                  <span style="font-size:10.5px; color:var(--text-muted);">Neon Color:</span>
                   <input type="color" id="adminNewCatColor" value="#38bdf8" style="width:22px; height:22px; border:none; padding:0; background:transparent; cursor:pointer;" />
                 </div>
                 <button type="button" onclick="adminSubmitNewCategoryInline()" class="btn-gold" style="font-size:11px; padding:6px 14px;">
-                  ✓ ثبت دسته
+                  ✓ Save Category
                 </button>
                 <button type="button" onclick="adminToggleAddCategoryForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
-                  انصراف
+                  Cancel
                 </button>
               </div>
 
                                                         <!-- فرم ویرایش دوزبانه مشخصات دسته‌بندی گالری (اولی فارسی، دومی انگلیسی) -->
               <div id="adminInlineEditCategoryRow" style="display:none; margin-bottom:16px; background:#06080d; border:1.5px solid var(--cyan-electric); border-radius:14px; padding:18px 20px; box-shadow:0 0 30px rgba(0,240,255,0.2);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-                  <span style="font-size:14px; font-weight:800; color:var(--cyan-electric);">✏️ ویرایش مشخصات دوزبانه دسته‌بندی آثار گالری</span>
+                  <span style="font-size:14px; font-weight:800; color:var(--cyan-electric);">✏️ Edit Gallery Category Specifications</span>
                   <button type="button" onclick="closeAdminCategoryEditForm()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;" title="Close">✕</button>
                 </div>
                 <input type="hidden" id="adminEditCatOriginalId" />
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
                   <div>
                     <label style="display:block; font-size:12px; font-weight:800; color:var(--gold); margin-bottom:6px;">
-                      🇮🇷 ۱. عنوان دسته‌بندی به زبان فارسی (نسخه داخلی استودیو):
+                      1. Category Display Title:
                     </label>
-                    <input type="text" id="adminEditCatTitleFA" placeholder="مثال: طراحی کاراکتر و قهرمانان" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:rtl;" />
+                    <input type="text" id="adminEditCatTitleFA" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:rtl;" />
                   </div>
                   <div>
                     <label style="display:block; font-size:12px; font-weight:800; color:var(--cyan-electric); margin-bottom:6px;">
-                      🌐 ۲. English Category Title (Public Site):
+                      2. Public Site English Title:
                     </label>
                     <input type="text" id="adminEditCatTitleEN" class="font-mono" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:ltr;" />
                   </div>
@@ -1015,25 +1015,25 @@
 
                 <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:14px; align-items:flex-end;">
                   <div>
-                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">۳. شناسه لاتین دسته (Slug):</label>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">3. Category Slug / ID:</label>
                     <input type="text" id="adminEditCatId" class="font-mono" placeholder="character" style="width:100%; box-sizing:border-box; font-size:13px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;" />
                   </div>
                   <div>
-                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">۴. رنگ نئون دسته:</label>
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#94a3b8; margin-bottom:6px;">4. Neon Accent Color:</label>
                     <div style="display:flex; align-items:center; gap:10px;">
                       <input type="color" id="adminEditCatColorPicker" onchange="document.getElementById('adminEditCatColor').value = this.value" style="width:42px; height:42px; border:none; padding:0; background:transparent; cursor:pointer;" />
                       <input type="text" id="adminEditCatColor" class="font-mono" style="flex:1; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; font-size:13px;" />
                     </div>
                   </div>
                   <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button type="button" onclick="adminDeleteCurrentEditingCategory()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; font-weight:700; color:#fda4af; border:1px solid rgba(244,63,94,0.45); background:rgba(244,63,94,0.12); cursor:pointer;" title="حذف این دسته‌بندی از استودیو">
-                      🗑️ حذف دسته‌بندی
+                    <button type="button" onclick="adminDeleteCurrentEditingCategory()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; font-weight:700; color:#fda4af; border:1px solid rgba(244,63,94,0.45); background:rgba(244,63,94,0.12); cursor:pointer;" title="Delete this category from studio">
+                      🗑️ Delete Category
                     </button>
                     <button type="button" onclick="closeAdminCategoryEditForm()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; cursor:pointer;">
-                      انصراف
+                      Cancel
                     </button>
                     <button type="button" onclick="saveAdminCategoryEdit()" class="btn-gold" style="padding:10px 24px; font-size:12.5px; font-weight:800; cursor:pointer;">
-                      💾 ذخیره تغییرات دسته‌بندی
+                      💾 Save Category Changes
                     </button>
                   </div>
                 </div>
@@ -1048,11 +1048,11 @@
             <div id="adminArtLiveEditorCol" onclick="closeAdminArtEditorDirect(event)">
               <div class="admin-art-modal-box" onclick="event.stopPropagation()">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
-                  <h4 style="font-size:15px; font-weight:800; color:var(--iris);" id="adminArtEditorModalTitle">ویرایش آرت‌ورک</h4>
+                  <h4 style="font-size:15px; font-weight:800; color:var(--iris);" id="adminArtEditorModalTitle">Edit Artwork Case Study</h4>
                   <button type="button" onclick="closeAdminArtEditor()" style="font-size:18px; color:var(--text-muted); cursor:pointer;">✕</button>
                 </div>
                 <div id="adminArtFormFields">
-                  <p style="font-size:12px; color:var(--text-muted);">در حال بارگذاری فرم...</p>
+                  <p style="font-size:12px; color:var(--text-muted);">Loading editor form...</p>
                 </div>
               </div>
             </div>
@@ -1063,25 +1063,25 @@
           <div class="admin-sketch1-layout">
             <!-- ستون اول: کارت‌های دسته‌بندی + دکمه افزودن دسته جدید -->
             <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
-              <h4 style="font-size:13px; font-weight:800; margin-bottom:12px; color:var(--gold);">دسته‌های خدمات</h4>
+              <h4 style="font-size:13px; font-weight:800; margin-bottom:12px; color:var(--gold);">Service Pipelines</h4>
                           <div id="adminCategoryListCol"></div>
-              <button onclick="adminAddNewCategory()" class="btn-secondary" style="width:100%; margin-top:10px; border-style:dashed; color:var(--gold); font-size:12px; padding:10px;">+ افزودن دسته جدید</button>
+              <button onclick="adminAddNewCategory()" class="btn-secondary" style="width:100%; margin-top:10px; border-style:dashed; color:var(--gold); font-size:12px; padding:10px;">+ Add New Pipeline</button>
             </div>
 
             <!-- ستون دوم: باکس‌های مراحل ایجاد شده برای آن دسته + دکمه افزودن مرحله -->
             <div style="background:var(--bg-panel); padding:16px; border-radius:16px; border:1px solid var(--border-subtle);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h4 style="font-size:14px; font-weight:800;" id="adminCurrentPipeTitle">مراحل پایپلاین</h4>
-                <button onclick="adminAddNewStage()" class="btn-gold" style="font-size:11px; padding:6px 12px;">+ افزودن مرحله جدید</button>
+                <h4 style="font-size:14px; font-weight:800;" id="adminCurrentPipeTitle">Pipeline Stages</h4>
+                <button onclick="adminAddNewStage()" class="btn-gold" style="font-size:11px; padding:6px 12px;">+ Add New Stage</button>
               </div>
               <div id="adminStagesGridCol" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
 
             <!-- ستون سوم: ادیتور زنده قیمت و جزئیات مرحله انتخاب شده -->
             <div class="admin-live-editor-col" style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle); position:sticky; top:90px;" id="adminLiveEditorCol">
-              <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin-bottom:14px;">ویرایشگر پایپلاین و مراحل قیمت‌گذاری</h4>
+              <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin-bottom:14px;">Pipeline Stage Specifications Editor</h4>
               <div id="adminStageEditFormContainer">
-                <p style="font-size:12px; color:var(--text-muted);">یک مرحله را از ستون وسط انتخاب کنید تا مشخصات آن در این بخش ویرایش شود.</p>
+                <p style="font-size:12px; color:var(--text-muted);">Select a stage from the middle column to edit its specifications here.</p>
               </div>
             </div>
           </div>
@@ -1089,11 +1089,11 @@
             <div style="margin-top:20px; background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.6);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
                 <div>
-                  <h4 style="font-size:14.5px; font-weight:900; color:var(--gold); margin:0 0 4px;">📊 جدول ماتریس قیمت‌گذاری و ضرایب آتلیه (Studio Pricing Matrix)</h4>
-                  <span style="font-size:11.5px; color:var(--text-muted);">مدیریت یکپارچه قیمت پایه، ضرایب کادربندی، افزونه‌ها و درصد تخفیف پکیج‌ها بدون نیاز به اکسل خارجی.</span>
+                  <h4 style="font-size:14.5px; font-weight:900; color:var(--gold); margin:0 0 4px;">📊 Studio Pricing Matrix & Scope Multipliers</h4>
+                  <span style="font-size:11.5px; color:var(--text-muted);">Direct management of baseline rates, framing add-ons, scope multipliers, and package discounts.</span>
                 </div>
                 <button type="button" onclick="saveStudioPricingMatrixDirect()" class="btn-gold" style="font-size:11.5px; padding:7px 16px; font-weight:800; border-radius:8px; cursor:pointer;">
-                  ✓ ذخیره ماتریس قیمت‌ها
+                  ✓ Save Pricing Matrix
                 </button>
               </div>
 
@@ -1101,69 +1101,69 @@
                 <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:right;">
                   <thead>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.12); color:var(--text-muted); font-size:11px;">
-                      <th style="padding:10px 8px;">شاخه و پایپلاین</th>
-                      <th style="padding:10px 8px;">قیمت پایه ($)</th>
-                      <th style="padding:10px 8px;">ضریب تمام‌قد ($)</th>
-                      <th style="padding:10px 8px;">مدل‌شیت ارتوگرافیک ($)</th>
-                      <th style="padding:10px 8px;">افزونه سلاح ($)</th>
-                      <th style="padding:10px 8px;">تخفیف پکیج (%)</th>
-                      <th style="padding:10px 8px;">زمان تحویل</th>
+                      <th style="padding:10px 8px;">Pipeline Category</th>
+                      <th style="padding:10px 8px;">Base Rate ($)</th>
+                      <th style="padding:10px 8px;">Full Body (+$)</th>
+                      <th style="padding:10px 8px;">Turnaround Model Sheet (+$)</th>
+                      <th style="padding:10px 8px;">Hero Weapon (+$)</th>
+                      <th style="padding:10px 8px;">Bundle Discount (%)</th>
+                      <th style="padding:10px 8px;">Delivery Timeline</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👤 طراحی کاراکتر و قهرمانان</td>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👤 Character Design & Heroes</td>
                       <td style="padding:10px 8px;"><input type="number" id="matBase_sketch1" value="95" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matFull_sketch1" value="40" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch1" value="75" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch1" value="35" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch1" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
-                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">4-6 days</td>
                     </tr>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🐉 موجودات، تایتان‌ها و هیولاها</td>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🐉 Creatures, Titans & Monsters</td>
                       <td style="padding:10px 8px;"><input type="number" id="matBase_sketch_creature" value="100" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matFull_sketch_creature" value="45" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch_creature" value="80" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch_creature" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch_creature" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
-                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۵ تا ۷ روز</td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">5-7 days</td>
                     </tr>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🏰 طراحی فضا، معماری و دنیا</td>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🏰 Environment, Worlds & Architecture</td>
                       <td style="padding:10px 8px;"><input type="number" id="matBase_sketch2" value="105" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matFull_sketch2" value="35" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch2" value="65" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch2" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch2" value="15" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
-                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">4-6 days</td>
                     </tr>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🎬 کاور و کی‌فریم سینمایی</td>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">🎬 Cinematic Keyframes & Splash Art</td>
                       <td style="padding:10px 8px;"><input type="number" id="matBase_sketch3" value="130" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matFull_sketch3" value="50" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch3" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch3" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch3" value="20" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
-                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۵ تا ۸ روز</td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">5-8 days</td>
                     </tr>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                      <td style="padding:10px 8px; font-weight:800; color:#fff;">⚔️ تجهیزات و پراپ</td>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">⚔️ Props, Weapons & Relics</td>
                       <td style="padding:10px 8px;"><input type="number" id="matBase_sketch4" value="70" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matFull_sketch4" value="25" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch4" value="45" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch4" value="20" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch4" value="10" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
-                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۳ تا ۵ روز</td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">3-5 days</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👑 مسکات و نشان برند</td>
+                      <td style="padding:10px 8px; font-weight:800; color:#fff;">👑 Brand Mascot & Studio Crest</td>
                       <td style="padding:10px 8px;"><input type="number" id="matBase_sketch_mascot" value="100" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:var(--gold);" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matFull_sketch_mascot" value="40" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matTurn_sketch_mascot" value="60" class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matWeapon_sketch_mascot" value="0" disabled class="font-mono" style="width:70px; padding:4px 6px; font-size:11.5px; background:#020306; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#64748b;" /></td>
                       <td style="padding:10px 8px;"><input type="number" id="matDiscount_sketch_mascot" value="10" class="font-mono" style="width:65px; padding:4px 6px; font-size:11.5px; background:#030408; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#10b981;" /></td>
-                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">۴ تا ۶ روز</td>
+                      <td style="padding:10px 8px; color:var(--cyan-electric); font-size:11px;">4-6 days</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1176,19 +1176,19 @@
             <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
                 <div>
-                  <h4 style="font-size:15px; font-weight:800; color:var(--cyan-electric);">مدیریت محصولات و دارایی‌های دیجیتال</h4>
-                  <span style="font-size:11.5px; color:var(--text-muted);">محصولات فروشگاه را مدیریت، قیمت‌گذاری و ویرایش کنید یا دارایی جدید بسازید.</span>
+                  <h4 style="font-size:15px; font-weight:800; color:var(--cyan-electric);">Digital Vault Assets Management</h4>
+                  <span style="font-size:11.5px; color:var(--text-muted);">Manage, price, and curate digital goods, brush engines, and 3D print assets.</span>
                 </div>
-                <button onclick="adminAddNewProduct()" class="btn-gold" style="font-size:11.5px; padding:7px 14px;">+ افزودن دارایی دیجیتال جدید</button>
+                <button onclick="adminAddNewProduct()" class="btn-gold" style="font-size:11.5px; padding:7px 14px;">+ Add New Digital Asset</button>
               </div>
               <div id="adminProductsListContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:12px;"></div>
             </div>
 
             <!-- فرم ویرایش زنده دارایی انتخاب شده -->
             <div style="background:var(--bg-panel); padding:18px; border-radius:16px; border:1px solid var(--border-subtle); position:sticky; top:90px;" id="adminProductEditCol">
-              <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin-bottom:12px;">ویرایشگر مشخصات دارایی دیجیتال</h4>
+              <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin-bottom:12px;">Digital Asset Specifications Editor</h4>
               <div id="adminProductFormFields">
-                <p style="font-size:12px; color:var(--text-muted);">یک دارایی را انتخاب کنید تا مشخصات آن در این فرم بارگذاری گردد.</p>
+                <p style="font-size:12px; color:var(--text-muted);">Select an asset to load and edit its specifications here.</p>
               </div>
             </div>
           </div>
@@ -1199,11 +1199,11 @@
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
               <div>
-                <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric); margin:0 0 4px;">👥 مدیریت کاربران، اعضا و تعاملات</h3>
-                <span style="font-size:12px; color:var(--text-muted);">مشاهده مشخصات کاربران ثبت‌نام‌شده، سوابق ورود و ارتباط مستقیم کارفرمایان.</span>
+                <h3 style="font-size:17px; font-weight:900; color:var(--cyan-electric); margin:0 0 4px;">👥 Client Dossiers & Member Profiles</h3>
+                <span style="font-size:12px; color:var(--text-muted);">Review verified client records, brief histories, and direct studio communications.</span>
               </div>
-              <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800;" title="واکشی زنده و همگام‌سازی کاربران ثبت‌شده از دیتابیس ابری Supabase">
-                🔄 همگام‌سازی اعضا از دیتابیس ابری
+              <button type="button" onclick="syncMembersFromSupabase(true)" class="btn-gold" style="font-size:11.5px; padding:7px 16px; background:var(--cyan-electric); color:#000; font-weight:800;" title="Live fetch and synchronize registered users from Supabase Cloud DB">
+                🔄 Sync Members from Cloud DB
               </button>
             </div>
 
@@ -1212,7 +1212,7 @@
               <!-- ستون اول (سمت راست در RTL): لیست باریک و جمع‌وجور کاربران -->
               <div style="background:#06080d; border:1px solid var(--border-subtle); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
                 <div>
-                  <input type="text" id="adminMemberSearchInput" placeholder="🔍 جستجوی کاربر (نام، ایمیل)..." style="font-size:11.5px; padding:8px 12px; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" oninput="filterAdminMembers(this.value)" />
+                  <input type="text" id="adminMemberSearchInput" placeholder="🔍 Search member (name, email)..." style="font-size:11.5px; padding:8px 12px; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" oninput="filterAdminMembers(this.value)" />
                 </div>
                 <div id="adminMembersListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:650px; overflow-y:auto; padding-left:4px;"></div>
               </div>
@@ -1220,7 +1220,7 @@
               <!-- ستون دوم (سمت چپ): پرونده کامل تعاملات، لاگ و مشخصات کاربر انتخابی -->
               <div id="adminMemberDetailCol" style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:20px; position:sticky; top:90px;">
                 <div id="adminMemberDetailContent">
-                  <p style="font-size:12.5px; color:var(--text-muted);">یک کاربر را از فهرست سمت راست انتخاب کنید تا پرونده، فعالیت‌ها و بریف‌های وی نمایش داده شود.</p>
+                  <p style="font-size:12.5px; color:var(--text-muted);">Select a client from the list to inspect their dossier, projects, and active briefs.</p>
                 </div>
               </div>
 
@@ -1233,12 +1233,12 @@
           <div style="padding:22px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
               <div>
-                <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">📦 سفارش‌ها و گزارش مالی جامع استودیو</h3>
-                <span style="font-size:12px; color:var(--text-muted);">پایش زنده وضعیت سفارش‌های کمیسیون، تسویه‌حساب‌ها و حجم مالی پروژه‌ها.</span>
+                <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">📦 Studio Inquiries & Financial Telemetry</h3>
+                <span style="font-size:12px; color:var(--text-muted);">Real-time monitoring of commission briefs, project milestones, and gross volume.</span>
               </div>
               <div style="display:flex; gap:8px;">
-                <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:11px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="همگام‌سازی زنده با جدول orders در دیتابیس Supabase">
-                  🔄 واکشی زنده سفارش‌ها از کلود
+                <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:11px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="Live synchronization with orders table in Supabase DB">
+                  🔄 Fetch Inquiries from Cloud DB
                 </button>
               </div>
             </div>
@@ -1246,29 +1246,29 @@
             <!-- کارت‌های شاخص‌های کلیدی مالی و سفارش‌ها (Financial & Order KPIs) -->
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:22px;">
               <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:var(--gold); font-weight:700; display:block;">💵 مجموع حجم مالی پروژه‌ها:</span>
-                <span id="kpiGrossVolume" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">$۰</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">برآورد ارزی کل سفارش‌های ثبت‌شده</span>
+                <span style="font-size:11px; color:var(--gold); font-weight:700; display:block;">💵 Gross Project Volume:</span>
+                <span id="kpiGrossVolume" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">/usr/bin/bash</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Estimated total value of registered inquiries</span>
               </div>
               <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block;">⚡ پروژه‌های در حال تولید آتلیه:</span>
-                <span id="kpiActiveProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:var(--cyan-electric); display:block; margin-top:4px;">۰ پروژه</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">در مراحل اتود، مدل‌شیت و رندر</span>
+                <span style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block;">⚡ Active Atelier Projects:</span>
+                <span id="kpiActiveProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:var(--cyan-electric); display:block; margin-top:4px;">0 Active</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">In thumbnail, linework & master render stages</span>
               </div>
               <div style="background:#06080d; border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:#10b981; font-weight:700; display:block;">✓ پروژه‌های تسویه‌شده و تحویل:</span>
-                <span id="kpiCompletedProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:#10b981; display:block; margin-top:4px;">۰ تحویل</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">ارسال سورس نهایی PSD و لایسنس</span>
+                <span style="font-size:11px; color:#10b981; font-weight:700; display:block;">✓ Completed Deliveries:</span>
+                <span id="kpiCompletedProjectsCount" class="font-mono" style="font-size:18px; font-weight:900; color:#10b981; display:block; margin-top:4px;">0 Delivered</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Final master PSD source & license handed over</span>
               </div>
               <div style="background:#06080d; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px 16px;">
-                <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block;">📝 کل بریف‌های ثبت‌شده:</span>
-                <span id="kpiTotalOrdersCount" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">۰ بریف</span>
-                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">پایگاه داده ابری و محلی</span>
+                <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block;">📝 Total Registered Briefs:</span>
+                <span id="kpiTotalOrdersCount" class="font-mono" style="font-size:18px; font-weight:900; color:#fff; display:block; margin-top:4px;">0 Inquiries</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:2px; display:block;">Cloud database & client records</span>
               </div>
             </div>
 
             <!-- فهرست سفارش‌های استودیو -->
-            <h4 style="font-size:14px; font-weight:800; color:#fff; margin-bottom:12px;">فهرست سفارش‌ها و بریف‌های کارفرمایان:</h4>
+            <h4 style="font-size:14px; font-weight:800; color:#fff; margin-bottom:12px;">Client Inquiries & Briefs Stream:</h4>
             <div id="adminOrdersList" style="display:flex; flex-direction:column; gap:12px;"></div>
           </div>
         </div>
@@ -1277,15 +1277,15 @@
         <div id="adminTabTerms" class="hidden">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
             <div>
-              <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">ویرایشگر زنده منشور قوانین، لایسنس و شرایط استودیو</h3>
-              <p style="font-size:12px; color:var(--text-muted); margin:0;">ویرایش تفکیک‌شده سرفصل‌های حقوقی استودیو؛ بدون نیاز به دستکاری کدهای سایت.</p>
+              <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">Live Studio Legal Charter & EULA Editor</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:0;">Modular editing of legal articles, commission SLA, and digital licenses without touching code.</p>
             </div>
             <div style="display:flex; gap:10px;">
               <button type="button" onclick="openTermsModal(event)" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
-                👁️ پیش‌نمایش در سایت
+                👁️ Preview on Site
               </button>
               <button type="button" onclick="saveStudioTerms()" class="btn-gold" style="padding:8px 18px; font-size:12px;">
-                💾 ذخیره و انتشار سراسری تمام بخش‌ها
+                💾 Save & Publish All Articles
               </button>
             </div>
           </div>
@@ -1293,16 +1293,16 @@
           <!-- ساب‌تب‌های ویرایشگر منشور قوانین استودیو -->
           <div style="display:flex; gap:8px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
             <button type="button" onclick="switchAdminTermsEditorTab('account', this)" class="terms-tab-btn active">
-              🛡️ شرایط عمومی و عضویت
+              🛡️ General Terms & Anti-AI Policy
             </button>
             <button type="button" onclick="switchAdminTermsEditorTab('commission', this)" class="terms-tab-btn">
-              📜 قرارداد سفارش و کمیسیون (ودیعه ۵۰٪)
+              📜 Commission SLA & 50% Retainer
             </button>
             <button type="button" onclick="switchAdminTermsEditorTab('assets', this)" class="terms-tab-btn">
-              💎 لایسنس دارایی‌ها و مارکت‌پلیس
+              💎 Digital Assets EULA
             </button>
             <button type="button" onclick="switchAdminTermsEditorTab('academy', this)" class="terms-tab-btn">
-              🎓 ضوابط آکادمی و جامعه هنری
+              🎓 Academy & Community Guidelines
             </button>
           </div>
 
@@ -1310,7 +1310,7 @@
             <!-- بخش ۱: شرایط عمومی -->
             <div id="adminTermsPane-account" class="admin-terms-editor-pane">
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gold);">
-                متن ۱: شرایط عمومی عضویت، حساب کاربری و منع صریح آموزش هوش مصنوعی (Anti-AI):
+                Article 1: General Membership, Account Security & Anti-AI Training Ban:
               </label>
               <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
             </div>
@@ -1318,7 +1318,7 @@
             <!-- بخش ۲: قرارداد کمیسیون -->
             <div id="adminTermsPane-commission" class="admin-terms-editor-pane" style="display:none;">
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--cyan-electric);">
-                متن ۲: قرارداد رسمی سفارش، قانون ودیعه ۵۰٪، مراحل ادیت و بند رهاسازی سفارش:
+                Article 2: Commission SLA, 50% Retainer Rule, Revision Caps & Abandonment Clause:
               </label>
               <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
             </div>
@@ -1326,7 +1326,7 @@
             <!-- بخش ۳: لایسنس دارایی‌ها -->
             <div id="adminTermsPane-assets" class="admin-terms-editor-pane" style="display:none;">
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--emerald);">
-                متن ۳: موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA) و شرایط اسقاط انصراف:
+                Article 3: Digital Goods License (EULA) & Cancellation Policy:
               </label>
               <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
             </div>
@@ -1334,14 +1334,14 @@
             <!-- بخش ۴: آکادمی و کامیونیتی -->
             <div id="adminTermsPane-academy" class="admin-terms-editor-pane" style="display:none;">
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--violet);">
-                متن ۴: ضوابط آکادمی تخصصی طراحی، حقوق معنوی ویدیوها و جامعه هنری:
+                Article 4: Academy Code of Conduct & Copyright Protections:
               </label>
               <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
             </div>
 
             <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <span style="font-size:11.5px; color:var(--text-muted);">💡 هر بخش به صورت جداگانه در پورتال و پنجره قوانین نمایش داده می‌شود.</span>
-              <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ با موفقیت ذخیره شد</span>
+              <span style="font-size:11.5px; color:var(--text-muted);">💡 Each article is displayed modularly in the client portal and legal modal.</span>
+              <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ Saved successfully</span>
             </div>
           </div>
         </div>
@@ -1352,18 +1352,18 @@
               <!-- هدر مرکز کنترل استودیو -->
               <div style="margin-bottom:18px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div>
-                  <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">🏛️ مرکز کنترل هویت، برندینگ و پیکربندی استودیو TAJINKART</h3>
-                  <span style="font-size:12px; color:var(--text-muted);">مدیریت مستقل نشان استودیو، فاویکون مرورگر، شعار رسمی، شبکه‌های اجتماعی و ربات تلگرام.</span>
+                  <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">🏛️ Studio Identity, Branding & Infrastructure Console</h3>
+                  <span style="font-size:12px; color:var(--text-muted);">Independent management of master crest, browser favicon, official slogans, Telegram bot, and cloud health.</span>
                 </div>
               </div>
 
               <!-- زیربرگه‌ها (۲ ساب‌تب مجزا) -->
               <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
                 <button type="button" id="adminSettingsSubTabBtn-identity" onclick="switchSettingsSubTab('identity')" class="settings-subtab-btn active" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                  <span>🏛️ هویت، محتوای استودیو و دیتابیس‌های ابری</span>
+                  <span>🏛️ Studio Identity, Content & Cloud Databases</span>
                 </button>
                 <button type="button" id="adminSettingsSubTabBtn-social" onclick="switchSettingsSubTab('social')" class="settings-subtab-btn" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                  <span>📡 ربات تلگرام و شبکه‌های اجتماعی</span>
+                  <span>📡 Telegram Bot & Omnichannel Dispatches</span>
                 </button>
               </div>
 
@@ -1375,10 +1375,10 @@
                   <!-- کارت ۱-الف: نشان و آیکون رسمی هدر استودیو (کاملاً مستقل) -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 نشان هدر استودیو (Header Master Crest)</span>
+                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">🦅 Header Master Crest</span>
                       <span class=font-mono style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">HEADER CREST</span>
                     </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">این نشان مستقیماً در بالای نام TAJINKART در صفحه اصلی سایت نمایش داده می‌شود.</p>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">Displayed prominently above the TAJINKART title on the homepage.</p>
 
                     <!-- بخش کارت موزاییک نشان استودیو همراه با ضربدر حذف و پیش‌نمایش -->
                     <div id="adminLogoCardContainer">
@@ -1386,20 +1386,20 @@
                       <div id="adminLogoActiveCard" style="display:none; background:#04060a; border:1px solid rgba(250,204,21,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                           <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--gold); background:rgba(250,204,21,0.15); padding:2px 8px; border-radius:4px;">
-                            🦅 نشان فعال استودیو
+                            🦅 Active Studio Crest
                           </span>
                           <div style="display:flex; align-items:center; gap:8px;">
                             <button type="button" onclick="document.getElementById('adminLogoFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
-                              🔄 تغییر فایل
+                              🔄 Change File
                             </button>
-                            <button type="button" onclick="removeStudioLogo()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف نشان (ضربدر)">
+                            <button type="button" onclick="removeStudioLogo()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="Remove Crest">
                               ✕
                             </button>
                           </div>
                         </div>
 
                         <div style="position:relative; width:100%; max-height:200px; min-height:130px; background:#020306; border-radius:8px; border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; padding:10px;">
-                          <img id="adminLogoPreviewImg" src="" alt="نشان استودیو" style="max-width:100%; max-height:180px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 0 20px rgba(250,204,21,0.35));" />
+                          <img id="adminLogoPreviewImg" src="" alt="Studio Crest" style="max-width:100%; max-height:180px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 0 20px rgba(250,204,21,0.35));" />
                         </div>
                       </div>
 
@@ -1411,25 +1411,25 @@
                            ondrop="handleLogoDrop(event)"
                            style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(250,204,21,0.5); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
                         <div style="font-size:32px; margin-bottom:6px;">🦅</div>
-                        <div style="font-size:12.5px; font-weight:800; color:var(--gold);">کلیک یا درگ اند دراپ برای انداختن نشان استودیو</div>
-                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">پشتیبانی از PNG ترنسپرنت، JPG و WEBP (پیش‌نمایش آنی)</div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--gold);">Click or drag & drop studio crest image</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">Supports transparent PNG, JPG & WEBP (Instant preview)</div>
                       </div>
                     </div>
                     <input type="file" id="adminLogoFileInput" accept="image/*" style="display:none;" onchange="handleAdminLogoUpload(this)" />
 
                     <!-- دکمه تایید و ثبت نشان استودیو -->
                     <button type="button" onclick="saveStudioLogoSetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
-                      ✓ ثبت و تایید نشان هدر استودیو
+                      ✓ Save & Confirm Header Crest
                     </button>
                   </div>
 
                   <!-- کارت ۱-ب: فاویکون اختصاصی تب مرورگر (کاملاً جدا و مستقل) -->
                   <div style="background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:800; color:var(--cyan-electric);">🌐 فاویکون تب مرورگر (Browser Tab Favicon)</span>
+                      <span style="font-size:13.5px; font-weight:800; color:var(--cyan-electric);">🌐 Browser Tab Favicon</span>
                       <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">TAB ICON</span>
                     </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">آیکون کوچک تب مرورگر که در کنار عنوان صفحه نمایش داده می‌شود (مستقل از لوگوی هدر).</p>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">Small browser tab icon displayed in the title bar (independent from header crest).</p>
 
                     <!-- کادر پیش‌نمایش و آپلود فاویکون -->
                     <div id="adminFaviconCardContainer">
@@ -1437,13 +1437,13 @@
                       <div id="adminFaviconActiveCard" style="display:none; background:#04060a; border:1px solid rgba(0,240,255,0.45); border-radius:12px; padding:14px; flex-direction:column; gap:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                           <span class="font-mono" style="font-size:10.5px; font-weight:800; color:var(--cyan-electric); background:rgba(0,240,255,0.15); padding:2px 8px; border-radius:4px;">
-                            🌐 فاویکون فعال مرورگر
+                            🌐 Active Browser Favicon
                           </span>
                           <div style="display:flex; align-items:center; gap:8px;">
                             <button type="button" onclick="document.getElementById('adminFaviconFileInput').click()" class="btn-secondary" style="font-size:11px; padding:3px 10px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
-                              🔄 تغییر فایل
+                              🔄 Change File
                             </button>
-                            <button type="button" onclick="removeStudioFavicon()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="حذف فاویکون (ضربدر)">
+                            <button type="button" onclick="removeStudioFavicon()" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;" title="Remove Favicon">
                               ✕
                             </button>
                           </div>
@@ -1452,11 +1452,11 @@
                         <!-- شبیه‌ساز تب مرورگر -->
                         <div style="background:#020306; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
                           <div id="adminFaviconPreviewBox" style="width:32px; height:32px; border-radius:6px; background:#0b0f19; border:1px solid rgba(0,240,255,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <img id="adminFaviconPreviewImg" src="" style="width:22px; height:22px; object-fit:contain; display:none;" alt="فاویکون" />
+                            <img id="adminFaviconPreviewImg" src="" style="width:22px; height:22px; object-fit:contain; display:none;" alt="Favicon" />
                             <span id="adminFaviconEmptyIcon" style="font-size:16px;">🌐</span>
                           </div>
                           <div>
-                            <span style="font-size:11px; color:#fff; font-weight:700; display:block;">TAJINKART | استودیو کانسپت آرت</span>
+                            <span style="font-size:11px; color:#fff; font-weight:700; display:block;">TAJINKART | Concept Art Atelier</span>
                             <span class="font-mono" style="font-size:10px; color:var(--text-muted);">tajinkart.github.io</span>
                           </div>
                         </div>
@@ -1467,17 +1467,17 @@
                            onclick="document.getElementById('adminFaviconFileInput').click()"
                            style="cursor:pointer; background:rgba(0,0,0,0.55); border:1.5px dashed rgba(0,240,255,0.4); border-radius:12px; padding:26px 16px; text-align:center; transition:all 0.2s;">
                         <div style="font-size:32px; margin-bottom:6px;">🌐</div>
-                        <div style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">انتخاب یا انداختن آیکون فاویکون مرورگر</div>
-                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">ابعاد پیشنهادی: 32x32 یا 64x64 پیکسل (PNG یا ICO)</div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">Select or drop browser tab favicon</div>
+                        <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">Recommended: 32x32 or 64x64 px (PNG or ICO)</div>
                       </div>
                     </div>
                     
-                    <input type="text" id="adminFaviconInput" placeholder="یا وارد کردن آدرس مستقیم فاویکون..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
+                    <input type="text" id="adminFaviconInput" placeholder="Or enter direct favicon image URL..." style="font-size:11px; padding:6px 10px; margin:0; width:100%; box-sizing:border-box; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff;" onchange="siteSettings.faviconUrl = this.value.trim(); updateStudioLogoDisplay();" />
                     <input type="file" id="adminFaviconFileInput" accept="image/*" style="display:none;" onchange="handleAdminFaviconUpload(this)" />
 
                     <!-- دکمه تایید و ثبت فاویکون -->
                     <button type="button" onclick="saveStudioFaviconSetting()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
-                      ✓ ثبت و تایید فاویکون تب مرورگر
+                      ✓ Save Browser Tab Favicon
                     </button>
                   </div>
 
@@ -1485,19 +1485,19 @@
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.35); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px; grid-column:1 / -1;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                       <div>
-                        <span style="font-size:14px; font-weight:800; color:var(--gold);">⚡ مدیریت عناوین و شعارهای متحرک هدر (Brand Slogans & Taglines)</span>
-                        <span style="display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px;">تغییر متن لوگو، زیرعنوان سبک‌ها (Dark Fantasy / Sci-Fi) و شعارهای چرخشی که در بالای سایت جابجا می‌شوند.</span>
+                        <span style="font-size:14px; font-weight:800; color:var(--gold);">⚡ Header Brand Slogans & Rotating Taglines</span>
+                        <span style="display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px;">Configure master title, genre subtitles (Dark Fantasy / Sci-Fi), and rotating hero slogans.</span>
                       </div>
                       <span class="font-mono" style="font-size:10px; color:var(--gold); padding:3px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">LIVE HERO TYPOGRAPHY</span>
                     </div>
 
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
                       <div>
-                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">۱. نام اصلی استودیو (Main Brand Title)</label>
+                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">1. Main Brand Title</label>
                         <input type="text" id="adminMainBrandTitleInput" class="font-mono" placeholder="TAJINKART" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff;" />
                       </div>
                       <div>
-                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">۲. زیرعنوان سبک‌ها و ژانرها (Genre Subtitle)</label>
+                        <label style="font-size:12px; font-weight:700; color:#e2e8f0; display:block; margin-bottom:5px;">2. Genre Subtitle</label>
                         <input type="text" id="adminGenreSubtitleInput" class="font-mono" placeholder="DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN" style="width:100%; box-sizing:border-box; font-size:13px; padding:9px 12px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff;" />
                       </div>
                     </div>
@@ -1505,8 +1505,8 @@
                     <!-- ویرایشگر جفت‌های چرخشی شعار -->
                     <div>
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <label style="font-size:12px; font-weight:700; color:var(--gold);">۳. لیست شعارهای متحرک و چرخشی هدر (Rotating Tagline Pairs):</label>
-                        <button type="button" onclick="addAdminSloganPairRow()" class="btn-secondary" style="font-size:11px; padding:3px 10px; cursor:pointer;">➕ افزودن جفت شعار جدید</button>
+                        <label style="font-size:12px; font-weight:700; color:var(--gold);">3. Rotating Hero Taglines:</label>
+                        <button type="button" onclick="addAdminSloganPairRow()" class="btn-secondary" style="font-size:11px; padding:3px 10px; cursor:pointer;">➕ Add Tagline Pair</button>
                       </div>
                       <div id="adminSloganPairsListContainer" style="display:flex; flex-direction:column; gap:8px;">
                         <!-- ردیف‌های شعار داینامیک از جاوااسکریپت لود می‌شوند -->
@@ -1515,26 +1515,26 @@
 
                     <!-- دکمه تایید و ثبت شعارها -->
                     <button type="button" onclick="saveAdminSlogansSettings()" class="btn-gold" style="width:100%; padding:11px; font-size:12.5px; font-weight:800; cursor:pointer;">
-                      ✓ ثبت و ذخیره دائمی عناوین و شعارهای متحرک هدر
+                      ✓ Save Brand Titles & Rotating Slogans
                     </button>
                   </div>
 
                   <!-- کارت ۱-ج: ویرایشگر متن و مانیفست «درباره استودیو» در صفحه اول -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; grid-column:1 / -1;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">📜 ویرایشگر مانیفست و متن «درباره استودیو» (صفحه اصلی)</span>
+                      <span style="font-size:13.5px; font-weight:800; color:var(--gold);">📜 About Studio Manifesto Editor (Homepage Section)</span>
                       <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.1);">ABOUT MANIFESTO</span>
                     </div>
                     <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">تیتر مانیفست:</label>
-                      <input type="text" id="setAboutManifestoTitle" value="درباره استودیو TAJINKART" style="font-size:12px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Manifesto Title:</label>
+                      <input type="text" id="setAboutManifestoTitle" value="About TAJINKART Studio" style="font-size:12px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
                     </div>
                     <div>
-                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">متن بیانیه و فلسفه دنیاسازی استودیو:</label>
+                      <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Studio Philosophy & Worldbuilding Statement:</label>
                       <textarea id="setAboutManifestoText" rows="4" style="font-size:11.5px; line-height:1.8; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;">TAJINKART Studio was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: «From Ink to Universe».</textarea>
                     </div>
                     <button type="button" onclick="saveAboutStudioManifestoDirect()" class="btn-gold" style="width:100%; padding:10px 14px; font-size:12px; font-weight:800; cursor:pointer;">
-                      ✓ ذخیره و به‌روزرسانی متن درباره استودیو
+                      ✓ Save & Update About Studio Section
                     </button>
                   </div>
                   <!-- کارت یکپارچه: کنترل وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه -->
@@ -1543,11 +1543,11 @@
                       <div>
                         <div style="display:flex; align-items:center; gap:8px;">
                           <span style="font-size:16px;">🟢</span>
-                          <span style="font-size:15px; font-weight:900; color:var(--gold);">کنترل یکپارچه وضعیت حضور، پاسخ‌گویی و پذیرش سفارشات آتلیه</span>
+                          <span style="font-size:15px; font-weight:900; color:var(--gold);">Unified Studio Availability & Brief Acceptance Controls</span>
                         </div>
-                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">تعیین نشانگر آنلاین و پذیرش با امکان ویرایش مستقیم متن و فعال‌سازی فوری هر حالت با دکمه مربعی زرد.</span>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Set live status indicator with customizable messages and one-click activation.</span>
                       </div>
-                      <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 پیش‌نمایش زنده</span>
+                      <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 Live Preview</span>
                     </div>
 
                     <!-- شبکه گزینه‌های وضعیت استودیو همراه با فیلد متنی اختصاصی و دکمه مربعی ذخیره در پایین سمت چپ -->
@@ -1558,15 +1558,15 @@
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
                             <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin:0;" checked />
-                            <strong style="color:#fff; font-size:12.5px;">🔄 خودکار (هوشمند ۲۴ ساعته)</strong>
+                            <strong style="color:#fff; font-size:12.5px;">🔄 Smart Auto (24h Activity)</strong>
                           </label>
                         </div>
                         <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت خودکار:</label>
-                          <input type="text" id="statusMsg_auto" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="متن پیام وضعیت خودکار..." onclick="event.stopPropagation()" />
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Auto Status Message:</label>
+                          <input type="text" id="statusMsg_auto" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="Auto status message..." onclick="event.stopPropagation()" />
                         </div>
                         <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('auto', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت خودکار">
+                          <button type="button" onclick="saveStudioModeDirect('auto', event)" class="btn-save-square-gold" title="Save & Activate Auto Status">
                             💾
                           </button>
                         </div>
@@ -1577,15 +1577,15 @@
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
                             <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin:0;" />
-                            <strong style="color:#10b981; font-size:12.5px;">🟢 همیشه آنلاین و باز</strong>
+                            <strong style="color:#10b981; font-size:12.5px;">🟢 Online & Accepting Briefs</strong>
                           </label>
                         </div>
                         <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت آنلاین:</label>
-                          <input type="text" id="statusMsg_online" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="متن پیام وضعیت آنلاین..." onclick="event.stopPropagation()" />
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Online Status Message:</label>
+                          <input type="text" id="statusMsg_online" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="Online status message..." onclick="event.stopPropagation()" />
                         </div>
                         <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('online', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت آنلاین">
+                          <button type="button" onclick="saveStudioModeDirect('online', event)" class="btn-save-square-gold" title="Save & Activate Online Status">
                             💾
                           </button>
                         </div>
@@ -1596,15 +1596,15 @@
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
                             <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin:0;" />
-                            <strong style="color:#fbbf24; font-size:12.5px;">🟡 بررسی با تاخیر (Away / Queued)</strong>
+                            <strong style="color:#fbbf24; font-size:12.5px;">🟡 Away / High Demand (Queued)</strong>
                           </label>
                         </div>
                         <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت بررسی:</label>
-                          <input type="text" id="statusMsg_away" class="font-mono status-mode-input" value="High Demand • Reviewing Inquiries (24-48h)" placeholder="متن پیام بررسی با تاخیر..." onclick="event.stopPropagation()" />
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Away Status Message:</label>
+                          <input type="text" id="statusMsg_away" class="font-mono status-mode-input" value="High Demand • Reviewing Inquiries (24-48h)" placeholder="Queued status message..." onclick="event.stopPropagation()" />
                         </div>
                         <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('away', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت با تاخیر">
+                          <button type="button" onclick="saveStudioModeDirect('away', event)" class="btn-save-square-gold" title="Save & Activate Away Status">
                             💾
                           </button>
                         </div>
@@ -1615,15 +1615,15 @@
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                           <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
                             <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin:0;" />
-                            <strong style="color:#ef4444; font-size:12.5px;">🔴 مرخصی و سفر استودیو (بسته)</strong>
+                            <strong style="color:#ef4444; font-size:12.5px;">🔴 Studio Expedition (Briefs Paused)</strong>
                           </label>
                         </div>
                         <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">متن نمایش وضعیت سفر و تعطیلی:</label>
-                          <input type="text" id="statusMsg_vacation" class="font-mono status-mode-input" value="Studio on Worldbuilding Expedition • Inquiries Paused" placeholder="متن پیام مرخصی و سفر..." onclick="event.stopPropagation()" />
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Expedition Status Message:</label>
+                          <input type="text" id="statusMsg_vacation" class="font-mono status-mode-input" value="Studio on Worldbuilding Expedition • Inquiries Paused" placeholder="Expedition status message..." onclick="event.stopPropagation()" />
                         </div>
                         <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('vacation', event)" class="btn-save-square-gold" title="ذخیره و فعال‌سازی فوری وضعیت مرخصی">
+                          <button type="button" onclick="saveStudioModeDirect('vacation', event)" class="btn-save-square-gold" title="Save & Activate Expedition Status">
                             💾
                           </button>
                         </div>
@@ -1638,12 +1638,12 @@
                       <div>
                         <div style="display:flex; align-items:center; gap:8px;">
                           <span style="font-size:18px;">🌐</span>
-                          <span style="font-size:14.5px; font-weight:900; color:#fff;">مرکز مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو</span>
+                          <span style="font-size:14.5px; font-weight:900; color:#fff;">Live Cloud Infrastructure & Telemetry Health Center</span>
                         </div>
-                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">پایش بلادرنگ اتصالات دیتابیس، شبکه توزیع محتوا (CDN)، هاست ابری تصاویر و بات تلگرام با امکان سنجش پینگ.</span>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Real-time health monitoring of database, CDN, image host, and Telegram bot with latency pinging.</span>
                       </div>
                       <button type="button" id="btnPingCloudServices" onclick="pingAllCloudServices()" class="btn-cyan" style="font-size:11.5px; padding:8px 16px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                        ⚡ استعلام زنده و پینگ اتصالات
+                        ⚡ Ping All Cloud Services
                       </button>
                     </div>
 
@@ -1651,51 +1651,51 @@
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
                       <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                          <strong style="color:#fff; font-size:12px;">🗄️ پایگاه داده ابری Supabase</strong>
-                          <span id="pingSupabaseBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 برخط</span>
+                          <strong style="color:#fff; font-size:12px;">🗄️ Supabase Cloud DB</strong>
+                          <span id="pingSupabaseBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 Online</span>
                         </div>
-                        <span style="font-size:11px; color:var(--text-muted); display:block;">جداول سفارشات (orders) و گالری (artworks) همگام</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">Orders & Artworks tables synchronized</span>
                       </div>
 
                       <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                          <strong style="color:#fff; font-size:12px;">🛡️ کلودفلر (Cloudflare CDN)</strong>
-                          <span id="pingCloudflareBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 برخط CDN</span>
+                          <strong style="color:#fff; font-size:12px;">🛡️ Cloudflare Global CDN</strong>
+                          <span id="pingCloudflareBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 Online CDN</span>
                         </div>
-                        <span style="font-size:11px; color:var(--text-muted); display:block;">دامنه tajinkart.space با گواهی امنیتی SSL Full</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">Domain tajinkart.space with Full SSL/TLS</span>
                       </div>
 
                       <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                          <strong style="color:#fff; font-size:12px;">🔐 قفل امنیتی Google OAuth</strong>
-                          <span id="pingGoogleBadge" class="font-mono" style="font-size:10.5px; color:#fbbf24; font-weight:700;">🟢 قفل فرماندهی</span>
+                          <strong style="color:#fff; font-size:12px;">🔐 Google OAuth Security</strong>
+                          <span id="pingGoogleBadge" class="font-mono" style="font-size:10.5px; color:#fbbf24; font-weight:700;">🟢 Director Lock Active</span>
                         </div>
-                        <span style="font-size:11px; color:var(--text-muted); display:block;">دسترسی ادمین انحصاری tajinkart@gmail.com</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">Exclusive director access for tajinkart@gmail.com</span>
                       </div>
 
                       <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                          <strong style="color:#fff; font-size:12px;">📡 ربات مخابره تلگرام</strong>
-                          <span id="pingTelegramBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 آماده مخابره</span>
+                          <strong style="color:#fff; font-size:12px;">📡 Telegram Broadcast Bot</strong>
+                          <span id="pingTelegramBadge" class="font-mono" style="font-size:10.5px; color:var(--cyan-electric); font-weight:700;">🟢 Dispatch Ready</span>
                         </div>
-                        <span style="font-size:11px; color:var(--text-muted); display:block;">ارسال خودکار بریف‌ها و کانسپت‌ها به کانال‌ها</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">Auto-dispatch briefs and artwork to channels</span>
                       </div>
 
                       <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                          <strong style="color:#fff; font-size:12px;">☁️ فضای ابری تصاویر Cloudinary</strong>
-                          <span id="pingCloudinaryBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 متصل</span>
+                          <strong style="color:#fff; font-size:12px;">☁️ Cloudinary Image Host</strong>
+                          <span id="pingCloudinaryBadge" class="font-mono" style="font-size:10.5px; color:#10b981; font-weight:700;">🟢 Connected</span>
                         </div>
-                        <span style="font-size:11px; color:var(--text-muted); display:block;">آپلود مستقیم تصاویر پروژه با لینک ابری CDN</span>
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">Direct upload with global CDN delivery</span>
                       </div>
                     </div>
 
                     <!-- پیکربندی ادغام‌شده فضای ابری تصاویر -->
                     <div style="background:#04060a; border:1px solid rgba(0,240,255,0.2); border-radius:12px; padding:14px 16px; margin-top:4px;">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-                        <span style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">⚙️ پیکربندی شناسه فضای ابری تصاویر (Cloudinary Host)</span>
+                        <span style="font-size:12.5px; font-weight:800; color:var(--cyan-electric);">⚙️ Cloudinary Host Configuration</span>
                         <button type="button" onclick="saveCloudinarySettingsDirect()" class="btn-gold" style="font-size:11px; padding:6px 14px; font-weight:800; border-radius:6px; cursor:pointer;">
-                          ✓ ذخیره تنظیمات فضای ابری
+                          ✓ Save Cloudinary Settings
                         </button>
                       </div>
                       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
@@ -1717,25 +1717,25 @@
                       <div style="display:flex; align-items:center; gap:10px;">
                         <span style="font-size:24px;">👑</span>
                         <div>
-                          <span style="font-size:14px; font-weight:900; color:#fbbf24; display:block;">سید سروش تاج (خالق اثر و مدیر ارشد استودیو)</span>
+                          <span style="font-size:14px; font-weight:900; color:#fbbf24; display:block;">Seyed Soroush Taj (Studio Director & Lead Worldbuilder)</span>
                           <span class="font-mono" style="font-size:11px; color:var(--cyan-electric);">tajinkart@gmail.com</span>
                         </div>
                       </div>
-                      <span class="tier-tag tier-creator" style="padding:4px 12px; font-size:11px;">مالکیت ۱۰۰٪ تجاری و معنوی 👑</span>
+                      <span class="tier-tag tier-creator" style="padding:4px 12px; font-size:11px;">100% Commercial & IP Ownership 👑</span>
                     </div>
 
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin-top:6px;">
                       <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
-                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🗝️ حق امتیاز پایپلاین‌ها</span>
-                        <span style="font-size:11px; color:#cbd5e1;">مالکیت کامل شش پایپلاین کانسپت آرت و استودیو</span>
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🗝️ Pipeline IP</span>
+                        <span style="font-size:11px; color:#cbd5e1;">Full copyright of all concept art pipelines</span>
                       </div>
                       <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
-                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🌌 جهان‌های روایی TAJINKART</span>
-                        <span style="font-size:11px; color:#cbd5e1;">حق کپی‌رایت انحصاری جهان‌های اکستوپیا، آرکان و نیواورس</span>
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🌌 TAJINKART Universes</span>
+                        <span style="font-size:11px; color:#cbd5e1;">Exclusive IP of Extopia, Arcane & Genesis worlds</span>
                       </div>
                       <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px;">
-                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🛡️ امنیت و فرماندهی ابری</span>
-                        <span style="font-size:11px; color:#cbd5e1;">دسترسی روت ادمین با تایید ۲ مرحله‌ای گوگل کلود</span>
+                        <span style="font-size:11px; color:#fbbf24; font-weight:800; display:block;">🛡️ Cloud Governance</span>
+                        <span style="font-size:11px; color:#cbd5e1;">Root console access via Google Cloud 2FA</span>
                       </div>
                     </div>
                   </div>
@@ -1748,35 +1748,35 @@
                   <!-- کارت ۲-الف: ربات تلگرام استودیو -->
                   <div style="background:#06080d; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">🤖 اتصال ربات تلگرام استودیو (@tajinkart_bot)</span>
+                      <span style="font-size:13.5px; font-weight:900; color:var(--cyan-electric);">🤖 Telegram Dispatch Bot (@tajinkart_bot)</span>
                       <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.12);">ACTIVE BOT</span>
                     </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">توکن ربات و کانال‌های مقصد را وارد کرده و با دکمه اختصاصی زیر مستقیماً ذخیره کنید.</p>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6; margin:0;">Enter bot token and destination channels, then click save below.</p>
                     
                     <div>
-                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">توکن ربات تلگرام (Bot Token از BotFather):</label>
-                      <input type="text" id="setTgToken" placeholder="مثال: 7123456789:AAFlq..." class="font-mono" style="font-size:11.5px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">Bot Token (from @BotFather):</label>
+                      <input type="text" id="setTgToken" placeholder="e.g. 7123456789:AAFlq..." class="font-mono" style="font-size:11.5px; direction:ltr; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff;" />
                     </div>
 
                     <div>
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <label style="font-size:11px; color:var(--cyan-electric); font-weight:700;">کانال‌ها یا چت‌های مقصد ارسال:</label>
+                        <label style="font-size:11px; color:var(--cyan-electric); font-weight:700;">Destination Channels or Chat IDs:</label>
                         <button type="button" onclick="addTgChannelField()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric); font-weight:700;">
-                          + افزودن کانال / چت دیگر
+                          + Add Another Channel / Chat
                         </button>
                       </div>
                       <div id="telegramChannelsList" style="display:flex; flex-direction:column; gap:8px;"></div>
-                      <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">می‌توانید آیدی کانال عمومی (مانند tajinkart@) یا شناسه عددی چت را وارد کنید.</p>
+                      <p style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">Enter public channel handle (e.g. @tajinkart) or numeric chat ID.</p>
                     </div>
 
                     <div>
-                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">متن پیش‌فرض ثابت در انتهای پیام‌های تلگرام (فوتر / امضای سراسری):</label>
-                      <textarea id="setTgDefaultFooter" rows="2" placeholder="متنی که می‌خواهید همیشه به صورت پیش‌فرض در انتهای پیام‌های تلگرام به عنوان فوتر/امضا قرار بگیرد (اختیاری)..." style="font-size:11.5px; line-height:1.6; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;"></textarea>
+                      <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">Default Footer / Global Signature for Telegram Posts:</label>
+                      <textarea id="setTgDefaultFooter" rows="2" placeholder="Text to automatically append to all Telegram posts (optional)..." style="font-size:11.5px; line-height:1.6; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px 10px; width:100%; box-sizing:border-box; color:#fff; resize:vertical;"></textarea>
                     </div>
 
                     <div style="margin-top:6px;">
                       <button type="button" onclick="saveTelegramSettingsDirect()" class="btn-gold" style="width:100%; padding:11px 16px; font-size:12.5px; font-weight:800;">
-                        ✓ ثبت و ذخیره تنظیمات تلگرام
+                        ✓ Save Telegram Settings
                       </button>
                     </div>
                   </div>
@@ -1784,10 +1784,10 @@
                   <!-- کارت ۲-ج: مرکز اتوماسیون ۱۲ شبکه اجتماعی (POSSE Hub) -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:13px; font-weight:800; color:var(--gold);">📡 مرکز توزیع خودکار سراسری (POSSE 12-Network Hub)</span>
+                      <span style="font-size:13px; font-weight:800; color:var(--gold);">📡 Omnichannel POSSE Distribution Hub (12 Networks)</span>
                       <span class="font-mono" style="font-size:10px; color:var(--gold); padding:2px 8px; border-radius:4px; background:rgba(250,204,21,0.12);">OMNICHANNEL READY</span>
                     </div>
-                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">کلیدهای ارتباطی و توکن‌های پلتفرم‌ها جهت ارسال خودکار فایل‌های اصلی، آلبوم‌ها و ویدیوها.</p>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.6;">API keys and tokens for multi-platform publishing.</p>
 
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                       <div>
@@ -2486,23 +2486,23 @@
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
-    <button onclick="switchView('showcase')" class="mob-nav-btn active">
+    <button onclick="switchView('showcase')" data-view-target="showcase" class="mob-nav-btn active">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
       <span>Showcase</span>
     </button>
-    <button onclick="switchView('store')" class="mob-nav-btn">
+    <button onclick="switchView('store')" data-view-target="store" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
       <span>Atelier</span>
     </button>
-    <button onclick="switchView('genesis')" class="mob-nav-btn">
+    <button onclick="switchView('genesis')" data-view-target="genesis" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
       <span>Genesis</span>
     </button>
-    <button onclick="switchView('academy')" class="mob-nav-btn">
+    <button onclick="switchView('academy')" data-view-target="academy" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
       <span>Academy</span>
     </button>
-    <button onclick="handleMembersIconClick()" class="mob-nav-btn">
+    <button onclick="handleMembersIconClick()" data-view-target="member-dashboard" class="mob-nav-btn">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
       <span>Portal</span>
     </button>
@@ -2514,18 +2514,22 @@
   <div id="instagramPinchBackdrop" class="instagram-pinch-backdrop"></div>
 
   <!-- Google Translate Engine (Asynchronous Load) -->
+  <!-- Google Translate Engine (Asynchronous Load) -->
   <script type="text/javascript">
-    function googleTranslateElementInit() {
+    window.googleTranslateElementInit = function() {
       try {
         if (window.google && window.google.translate) {
-          new google.translate.TranslateElement({
+          new window.google.translate.TranslateElement({
             pageLanguage: 'en',
-            autoDisplay: false
+            autoDisplay: false,
+            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
           }, 'google_translate_element');
         }
-      } catch(e) {}
-    }
+      } catch(e) {
+        console.warn('Google Translate initialization:', e);
+      }
+    };
   </script>
-  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
