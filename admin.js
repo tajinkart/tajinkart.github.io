@@ -803,40 +803,45 @@ window.removeStagingPhase = function(idx) {
 window.handlePhaseImageUpload = async function(idx, inputEl) {
   if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
   const file = inputEl.files[0];
-  showToast('Uploading and processing image...', 'info', 2500);
+  showToast('Optimizing and compressing image to KB...', 'info', 2000);
 
   try {
-    let cloudUrl = await uploadFileToCloudinary(file);
-    if (cloudUrl) {
-      if (stagingProjectPhases[idx]) {
-        stagingProjectPhases[idx].img = cloudUrl;
-        stagingProjectPhases[idx].image = cloudUrl;
-      }
-      const container = document.getElementById('adminProjectPhasesList');
-      if (container) container.innerHTML = renderStagingPhasesHtml();
-      showToast('Image uploaded to Cloudinary successfully!', 'success');
-      return;
+    // ۱. فشرده‌سازی در مبدأ (کانواس مرورگر): کاهش حجم از چند مگابایت به ۲۰۰-۳۰۰ کیلوبایت
+    const compressed = await compressImageForStorage(file, 1600, 1600, 0.82);
+
+    // ۲. ارسال تصویر بهینه‌شده به کلادینری جهت حفظ سقف ۲۵ گیگابایت
+    let cloudUrl = null;
+    try {
+      cloudUrl = await uploadFileToCloudinary(compressed);
+    } catch(cloudErr) {
+      console.warn('Cloudinary upload bypass:', cloudErr);
     }
 
-    const compressed = await compressImageForStorage(file, 1600, 1600, 0.82);
-    if (stagingProjectPhases[idx]) {
-      stagingProjectPhases[idx].img = compressed;
-      stagingProjectPhases[idx].image = compressed;
+    const finalImage = cloudUrl || compressed;
+
+    if (stagingProjectPhases && stagingProjectPhases[idx]) {
+      stagingProjectPhases[idx].img = finalImage;
+      stagingProjectPhases[idx].image = finalImage;
     }
     const container = document.getElementById('adminProjectPhasesList');
     if (container) container.innerHTML = renderStagingPhasesHtml();
-    showToast('Image processed and saved with high fidelity.', 'success');
+
+    if (cloudUrl) {
+      showToast('Image compressed to KB & synced with Cloudinary! ✓', 'success', 3000);
+    } else {
+      showToast('Image compressed to lightweight KB & cached locally! ✓', 'success', 3000);
+    }
   } catch (err) {
     console.error('Phase upload error:', err);
     const reader = new FileReader();
     reader.onload = (e) => {
-      if (stagingProjectPhases[idx]) {
+      if (stagingProjectPhases && stagingProjectPhases[idx]) {
         stagingProjectPhases[idx].img = e.target.result;
         stagingProjectPhases[idx].image = e.target.result;
       }
       const container = document.getElementById('adminProjectPhasesList');
       if (container) container.innerHTML = renderStagingPhasesHtml();
-      showToast('Image loaded successfully.', 'success');
+      showToast('Image loaded.', 'info');
     };
     reader.readAsDataURL(file);
   }
