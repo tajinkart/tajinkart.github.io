@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=22.0.0">
+  <link rel="stylesheet" href="style.css?v=22.3.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -41,6 +41,19 @@
       <span class="top-dot"></span>
       <span>TAJINKART</span>
     </button>
+
+    <!-- فهرست شناور انتخاب ژانر آثار (بین نشان برند TAJINKART و دسته‌بندی آثار) -->
+    <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
+      <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter by Universe Genre">
+        <span class="cat-item-dot" style="width:7px; height:7px; border-radius:50%; background:#f43f5e; box-shadow:0 0 6px #f43f5e; display:inline-block;"></span>
+        <span id="currentGenrePillLabel">All Genres</span>
+        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+      </button>
+
+      <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
+        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      </div>
+    </div>
 
     <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان برند TAJINKART -->
     <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
@@ -61,7 +74,7 @@
     <!-- ۲. داک عمودی ناوبری راست -->
     <!-- ۲. داک عمودی ناوبری راست (شامل تمام ۶ آیکون اصلی + تریگر هوشمند) -->
     <!-- ۲. داک عمودی ناوبری راست (در موبایل بسته به سه خط، در دسکتاپ حین اسکرول به پایین سه خط) -->
-  <nav id="rightVerticalNav" class="dock-collapsed">
+  <nav id="rightVerticalNav">
     <!-- سه خط آبی معروف استودیو (Trigger) -->
     <div id="dockMasterTrigger" title="Menu Navigation" onclick="toggleDockExpand(event)">
       <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1003,7 +1016,7 @@
                     <label style="display:block; font-size:12px; font-weight:800; color:var(--gold); margin-bottom:6px;">
                       1. Category Internal Title / Tag:
                     </label>
-                    <input type="text" id="adminEditCatTitleFA" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:rtl;" />
+                    <input type="text" id="adminEditCatTitleFA" placeholder="e.g. Character Design & Heroes" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:ltr;" />
                   </div>
                   <div>
                     <label style="display:block; font-size:12px; font-weight:800; color:var(--cyan-electric); margin-bottom:6px;">
@@ -1041,6 +1054,82 @@
               <!-- لیست افقی و فشرده دسته‌بندی‌ها به شکل پیل‌های شیک -->
               <div id="adminGalleryCategoriesList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
                 <!-- داینامیک توسط renderAdminGalleryCategories پر می‌شود -->
+              </div>
+            </div>
+
+            <!-- مدیریت جامع ژانرها و دنیاهای کانسپت استودیو (Studio Genres & Worlds Management) -->
+            <div style="margin-top:20px; background:#06080d; border:1px solid rgba(244,63,94,0.28); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <h4 style="font-size:13.5px; font-weight:800; color:#f43f5e; margin:0;">🌌 Studio Concept Genres & Worlds</h4>
+                  <span id="adminGenreCountBadge" class="font-mono" style="font-size:10.5px; color:#f43f5e; background:rgba(244,63,94,0.12); padding:2px 8px; border-radius:10px; border:1px solid rgba(244,63,94,0.25);">6 Active Genres</span>
+                </div>
+                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px; background:rgba(244,63,94,0.18); border-color:#f43f5e; color:#fff;">
+                  + Add New Genre
+                </button>
+              </div>
+
+              <!-- ردیف اینلاین ایجاد ژانر جدید -->
+              <div id="adminInlineAddGenreRow" style="display:none; background:#04060a; border:1px solid rgba(244,63,94,0.35); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
+                <input type="text" id="adminNewGenreTitle" placeholder="Genre Title (e.g. Space Opera / Cyberpunk)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:160px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
+                <input type="text" id="adminNewGenreId" placeholder="Genre Slug (e.g. space_opera)" class="font-mono" style="font-size:11px; padding:6px 10px; width:140px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#f43f5e; direction:ltr;" />
+                <div style="display:flex; align-items:center; gap:6px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; padding:4px 8px;">
+                  <span style="font-size:10.5px; color:var(--text-muted);">Neon Color:</span>
+                  <input type="color" id="adminNewGenreColor" value="#f43f5e" style="width:22px; height:22px; border:none; padding:0; background:transparent; cursor:pointer;" />
+                </div>
+                <button type="button" onclick="adminSubmitNewGenreInline()" class="btn-gold" style="font-size:11px; padding:6px 14px; background:#f43f5e; border-color:#f43f5e; color:#fff;">
+                  ✓ Register Genre
+                </button>
+                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
+                  Cancel
+                </button>
+              </div>
+
+              <!-- فرم ویرایش ژانر مشخصات -->
+              <div id="adminInlineEditGenreRow" style="display:none; margin-bottom:16px; background:#06080d; border:1.5px solid #f43f5e; border-radius:14px; padding:18px 20px; box-shadow:0 0 30px rgba(244,63,94,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                  <span style="font-size:14px; font-weight:800; color:#f43f5e;">✏️ Edit Concept Genre Specifications</span>
+                  <button type="button" onclick="closeAdminGenreEditForm()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;" title="Close">✕</button>
+                </div>
+                <input type="hidden" id="adminEditGenreOriginalId" />
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                  <div>
+                    <label style="display:block; font-size:12px; font-weight:800; color:var(--gold); margin-bottom:6px;">
+                      1. Genre Display Title:
+                    </label>
+                    <input type="text" id="adminEditGenreTitle" placeholder="e.g. Dark Fantasy" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;" />
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:12px; font-weight:800; color:#f43f5e; margin-bottom:6px;">
+                      2. Genre Slug (Unique ID):
+                    </label>
+                    <input type="text" id="adminEditGenreId" class="font-mono" placeholder="dark_fantasy" style="width:100%; box-sizing:border-box; font-size:13.5px; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; direction:ltr;" />
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; color:var(--text-muted);">Neon Color:</span>
+                    <input type="color" id="adminEditGenreColorPicker" onchange="document.getElementById('adminEditGenreColor').value = this.value" style="width:36px; height:36px; border:none; padding:0; background:transparent; cursor:pointer;" />
+                    <input type="text" id="adminEditGenreColor" class="font-mono" style="width:100px; padding:8px 10px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:#fff; font-size:12px;" />
+                  </div>
+                  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" onclick="adminDeleteCurrentEditingGenre()" class="btn-secondary" style="padding:10px 18px; font-size:12px; color:#fda4af; border:1px solid rgba(244,63,94,0.45); background:rgba(244,63,94,0.12); cursor:pointer;">
+                      🗑️ Delete Genre
+                    </button>
+                    <button type="button" onclick="closeAdminGenreEditForm()" class="btn-secondary" style="padding:10px 18px; font-size:12px; cursor:pointer;">
+                      Cancel
+                    </button>
+                    <button type="button" onclick="saveAdminGenreEdit()" class="btn-gold" style="padding:10px 22px; font-size:12px; font-weight:800; cursor:pointer;">
+                      💾 Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- لیست افقی و فشرده پیل‌های ژانر -->
+              <div id="adminGalleryGenresList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <!-- داینامیک توسط renderAdminGalleryGenres پر می‌شود -->
               </div>
             </div>
 
@@ -1312,7 +1401,7 @@
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gold);">
                 Section 1: General Membership, Account Terms & Anti-AI Model Training Clause:
               </label>
-              <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+              <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;"></textarea>
             </div>
 
             <!-- بخش ۲: قرارداد کمیسیون -->
@@ -1320,7 +1409,7 @@
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--cyan-electric);">
                 Section 2: Official Commission SLA, 50% Retainer, Revision Caps & Abandonment Clause:
               </label>
-              <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+              <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;"></textarea>
             </div>
 
             <!-- بخش ۳: لایسنس دارایی‌ها -->
@@ -1328,7 +1417,7 @@
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--emerald);">
                 Section 3: Digital Assets Vault EULA & No-Refund Digital Goods Policy:
               </label>
-              <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+              <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;"></textarea>
             </div>
 
             <!-- بخش ۴: آکادمی و کامیونیتی -->
@@ -1336,7 +1425,7 @@
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--violet);">
                 Section 4: Concept Art Academy Terms, Video IP Rights & Community Standards:
               </label>
-              <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:rtl; text-align:right;"></textarea>
+              <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;"></textarea>
             </div>
 
             <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -2481,8 +2570,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=22.0.0"></script>
-  <script src="app.js?v=22.0.0"></script>
+  <script src="data.js?v=22.4.0"></script>
+  <script src="app.js?v=22.4.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
@@ -2526,6 +2615,6 @@
       } catch(e) {}
     }
   </script>
-  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
