@@ -456,21 +456,35 @@ window.switchView = function(vKey) {
     }
   }
 
-  const catMenu = document.getElementById('floatingGalleryCategoryMenu');
+  // مدیریت سخت‌گیرانه نمایش هدر برند و دکمه‌های گالری: منحصراً و فقط در صفحه اول (Showcase)
   if (vKey === 'showcase') {
-    if (catMenu) catMenu.style.display = 'block';
-    renderShowcaseGrid();
+    if (topBar) {
+      topBar.style.display = 'flex';
+      topBar.style.removeProperty('display');
+      topBar.classList.add('visible');
+    }
+    const catMenu = document.getElementById('floatingGalleryCategoryMenu');
+    if (catMenu) catMenu.style.display = 'inline-block';
+    const genreMenu = document.getElementById('floatingGalleryGenreMenu');
+    if (genreMenu) genreMenu.style.display = 'inline-block';
+
+    if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
     if (homeBtn) homeBtn.classList.remove('hidden');
-    if (window.scrollY <= 140 && window.innerWidth > 768) { if (dock) dock.classList.remove("dock-collapsed");
-      /* topBar is permanently visible */
-    } else {
-      if (topBar) topBar.classList.add('visible');
+    if (window.scrollY <= 140 && window.innerWidth > 768 && dock) {
+      dock.classList.remove('dock-collapsed');
     }
   } else {
+    // در تمام صفحات دیگر (ادمین، فروشگاه، جنسیس، آکادمی، اعضا) هدر کاملاً مخفی می‌شود
+    if (topBar) {
+      topBar.style.display = 'none';
+      topBar.classList.remove('visible');
+    }
     const catMenu = document.getElementById('floatingGalleryCategoryMenu');
     if (catMenu) catMenu.style.display = 'none';
+    const genreMenu = document.getElementById('floatingGalleryGenreMenu');
+    if (genreMenu) genreMenu.style.display = 'none';
+
     if (homeBtn) homeBtn.classList.remove('hidden');
-    if (topBar) topBar.classList.add('visible');
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };

@@ -70,7 +70,7 @@ window.renderAdminStudioGenres = function() {
 window.renderAdminGalleryCategories = function() {
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
-  const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) ? galleryCategories : [];
+  const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0) ? galleryCategories : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : (typeof DEFAULT_GALLERY_CATEGORIES !== 'undefined' ? DEFAULT_GALLERY_CATEGORIES : []));
   const badge = document.getElementById('adminCategoryCountBadge');
   if (badge) badge.textContent = `${cats.length} Active Categories`;
 
@@ -995,7 +995,7 @@ window.switchAdminTab = function(tabKey, btn) {
     if (el) el.classList.toggle('hidden', t !== tabKey);
   });
 
-  document.querySelectorAll('.admin-sidebar-menu .admin-nav-item').forEach(b => {
+  document.querySelectorAll('.admin-top-tab-btn, .admin-sidebar-menu .admin-nav-item').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-tab') === tabKey);
   });
 

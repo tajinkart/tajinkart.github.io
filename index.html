@@ -69,7 +69,6 @@
       </div>
     </div>
   </div>
-  </div>
 
     <!-- ۲. داک عمودی ناوبری راست -->
     <!-- ۲. داک عمودی ناوبری راست -->
@@ -888,82 +887,44 @@
       </div>
 
       <div id="adminWorkspace" class="hidden">
-        <div class="section-head">
+        <div class="section-head" style="margin-bottom:16px;">
           <div>
-            <span class="font-mono" style="font-size:11px; color:var(--gold);">STUDIO_DIRECTOR: SEYED_SOROUSH_TAJ</span>
-            <h2 class="view-hero-title">Studio Command Console & Control Center</h2>
+            <h2 class="view-hero-title" style="margin:0;">Studio Command Console & Control Center</h2>
           </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="Lock Console & Sign Out">Lock Console</button>
           </div>
         </div>
 
-        <!-- چیدمان داشبورد ادمین: سایدبار عمودی در سمت راست (RTL) و تب‌ها در سمت چپ -->
-        <div class="admin-dashboard-layout">
-          
-          <!-- سایدبار دسته‌بندی‌ها (سمت راست) -->
-          <aside class="admin-vertical-sidebar">
-            <div class="admin-sidebar-header">
-              <span class="font-mono" style="font-size:10.5px; color:var(--gold);">STUDIO DIRECTOR</span>
-              <h3 style="font-size:14.5px; font-weight:800; color:#fff; margin-top:2px;">Studio Director Menu</h3>
-            </div>
-            
-                        <nav class="admin-sidebar-menu">
-              <!-- 1. Gallery & Portfolio -->
-              <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-nav-item active" data-tab="artworks">
-                <span class="admin-nav-icon">🖼️</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">1. Gallery & Portfolio</span>
-                  <span class="admin-nav-sub">Curate Artworks & Showcase Layout</span>
-                </div>
-              </button>
+        <!-- نوار افقی شیک و منظم تب‌های مدیریت در بالای صفحه -->
+        <nav class="admin-top-tabs-bar">
+          <button type="button" onclick="switchAdminTab('artworks', this)" class="admin-top-tab-btn active" data-tab="artworks">
+            <span class="admin-tab-icon">🖼️</span>
+            <span>1. Gallery Curation</span>
+          </button>
+          <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-top-tab-btn" data-tab="pipelines">
+            <span class="admin-tab-icon">⚡</span>
+            <span>2. Atelier & Pipelines</span>
+          </button>
+          <button type="button" onclick="switchAdminTab('members', this)" class="admin-top-tab-btn" data-tab="members">
+            <span class="admin-tab-icon">👥</span>
+            <span>3. Members & Dossiers</span>
+          </button>
+          <button type="button" onclick="switchAdminTab('products', this)" class="admin-top-tab-btn" data-tab="products">
+            <span class="admin-tab-icon">💎</span>
+            <span>4. Digital Vault Assets</span>
+          </button>
+          <button type="button" onclick="switchAdminTab('terms', this)" class="admin-top-tab-btn" data-tab="terms">
+            <span class="admin-tab-icon">⚖️</span>
+            <span>5. Studio Legal Charter</span>
+          </button>
+          <button type="button" onclick="switchAdminTab('settings', this)" class="admin-top-tab-btn" data-tab="settings">
+            <span class="admin-tab-icon">⚙️</span>
+            <span>6. Settings & Cloud</span>
+          </button>
+        </nav>
 
-              <!-- ۲. آتلیه، پایپلاین و تعرفه‌ها -->
-              <button type="button" onclick="switchAdminTab('pipelines', this)" class="admin-nav-item" data-tab="pipelines">
-                <span class="admin-nav-icon">⚡</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">2. Atelier & Pricing</span>
-                  <span class="admin-nav-sub">Pipelines & Rate Matrix</span>
-                </div>
-              </button>
-
-              <!-- ۳. اعضا، کاربران و سفارش‌های دریافتی (ادغام شده) -->
-              <button type="button" onclick="switchAdminTab('members', this)" class="admin-nav-item" data-tab="members">
-                <span class="admin-nav-icon">👥</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">3. Members & Client Dossiers</span>
-                  <span class="admin-nav-sub">Client Inquiries & Briefs</span>
-                </div>
-              </button>
-
-              <!-- 4. Digital Vault Assetsی دیجیتال -->
-              <button type="button" onclick="switchAdminTab('products', this)" class="admin-nav-item" data-tab="products">
-                <span class="admin-nav-icon">💎</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">4. Digital Vault Assets</span>
-                  <span class="admin-nav-sub">Packs, Brush Engines & Comics</span>
-                </div>
-              </button>
-
-              <!-- 5. Studio Legal Charter -->
-              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
-                <span class="admin-nav-icon">⚖️</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">5. Studio Legal Charter</span>
-                  <span class="admin-nav-sub">Terms of Service & EULA</span>
-                </div>
-              </button>
-
-              <!-- ۷. مرکز تنظیمات و زیرساخت استودیو -->
-              <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
-                <span class="admin-nav-icon">⚙️</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">6. Settings & Infrastructure</span>
-                  <span class="admin-nav-sub">Branding, Availability & Cloud Health</span>
-                </div>
-              </button>
-            </nav>
-          </aside>
+        <div class="admin-dashboard-layout full-width-layout">
 
           <!-- کانتینر اصلی تب‌های ادمین (همه ۶ تب مستقل و خواهر-برادر) -->
           <main class="admin-main-panes-holder">
@@ -2515,15 +2476,8 @@
       </div>
       
       <!-- Google Translate Integration (Custom Dark Atelier Style) -->
-      <div class="atelier-translate-wrapper" title="Translate TAJINKART Website">
-        <span class="atelier-translate-label">
-          <span>🌐</span>
-          <span>Translate:</span>
-        </span>
-        <!-- moved to floating widget -->
       </div>
-    </div>
-  </footer>
+    </footer>
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <script src="data.js?v=22.0.0"></script>
   <script src="core.js?v=22.0.0"></script>
@@ -2593,253 +2547,53 @@
         <button type="button" onclick="toggleGoogleTranslateMenu(event)" class="lang-close-btn" title="Close">✕</button>
       </div>
 
-      <!-- نوار جستجوی اختصاصی زبان‌ها -->
+      <!-- نوار جستجوی زبان‌ها -->
       <div class="lang-search-wrapper">
-        <input type="text" id="googleTranslateSearchInput" placeholder="🔍 Search language / جستجوی زبان..." oninput="filterGoogleTranslateLanguages(this.value)" autocomplete="off" />
+        <input type="text" id="googleTranslateSearchInput" placeholder="🔍 Search language / جستجو..." oninput="filterGoogleTranslateLanguages(this.value)" autocomplete="off" />
       </div>
 
-      <!-- فهرست زبان‌ها با فارسی در صدر لیست -->
+      <!-- فهرست الفبایی زبان‌ها همراه با فارسی -->
       <div id="googleTranslateLanguagesList" class="lang-options-scroll">
-        <div class="lang-option-card" data-lang="ar" data-search="arabic العربية ar" onclick="selectStudioLanguage('ar', 'AR', 'العربية')">
-          <span class="lang-flag">🇦🇪</span>
-          <div class="lang-names">
-            <span class="lang-native">العربية</span>
-            <span class="lang-eng">Arabic</span>
-          </div>
-          <span class="lang-badge">AR</span>
-        </div>
-        <div class="lang-option-card" data-lang="bn" data-search="bengali বাংলা bn" onclick="selectStudioLanguage('bn', 'BN', 'বাংলা')">
-          <span class="lang-flag">🇧🇩</span>
-          <div class="lang-names">
-            <span class="lang-native">বাংলা</span>
-            <span class="lang-eng">Bengali</span>
-          </div>
-          <span class="lang-badge">BN</span>
-        </div>
-        <div class="lang-option-card" data-lang="zh-CN" data-search="chinese (simplified) 中文 (简体) zh-cn" onclick="selectStudioLanguage('zh-CN', 'ZH', '中文 (简体)')">
-          <span class="lang-flag">🇨🇳</span>
-          <div class="lang-names">
-            <span class="lang-native">中文 (简体)</span>
-            <span class="lang-eng">Chinese (Simplified)</span>
-          </div>
-          <span class="lang-badge">ZH</span>
-        </div>
-        <div class="lang-option-card" data-lang="zh-TW" data-search="chinese (traditional) 中文 (繁體) zh-tw" onclick="selectStudioLanguage('zh-TW', 'ZH', '中文 (繁體)')">
-          <span class="lang-flag">🇹🇼</span>
-          <div class="lang-names">
-            <span class="lang-native">中文 (繁體)</span>
-            <span class="lang-eng">Chinese (Traditional)</span>
-          </div>
-          <span class="lang-badge">ZH</span>
-        </div>
-        <div class="lang-option-card" data-lang="cs" data-search="czech čeština cs" onclick="selectStudioLanguage('cs', 'CS', 'Čeština')">
-          <span class="lang-flag">🇨🇿</span>
-          <div class="lang-names">
-            <span class="lang-native">Čeština</span>
-            <span class="lang-eng">Czech</span>
-          </div>
-          <span class="lang-badge">CS</span>
-        </div>
-        <div class="lang-option-card" data-lang="da" data-search="danish dansk da" onclick="selectStudioLanguage('da', 'DA', 'Dansk')">
-          <span class="lang-flag">🇩🇰</span>
-          <div class="lang-names">
-            <span class="lang-native">Dansk</span>
-            <span class="lang-eng">Danish</span>
-          </div>
-          <span class="lang-badge">DA</span>
-        </div>
-        <div class="lang-option-card" data-lang="nl" data-search="dutch nederlands nl" onclick="selectStudioLanguage('nl', 'NL', 'Nederlands')">
-          <span class="lang-flag">🇳🇱</span>
-          <div class="lang-names">
-            <span class="lang-native">Nederlands</span>
-            <span class="lang-eng">Dutch</span>
-          </div>
-          <span class="lang-badge">NL</span>
-        </div>
-        <div class="lang-option-card" data-lang="en" data-search="english (original) english en" onclick="selectStudioLanguage('en', 'EN', 'English')">
-          <span class="lang-flag">🇬🇧</span>
-          <div class="lang-names">
-            <span class="lang-native">English</span>
-            <span class="lang-eng">English (Original)</span>
-          </div>
-          <span class="lang-badge">EN</span>
-        </div>
-        <div class="lang-option-card" data-lang="fi" data-search="finnish suomi fi" onclick="selectStudioLanguage('fi', 'FI', 'Suomi')">
-          <span class="lang-flag">🇫🇮</span>
-          <div class="lang-names">
-            <span class="lang-native">Suomi</span>
-            <span class="lang-eng">Finnish</span>
-          </div>
-          <span class="lang-badge">FI</span>
-        </div>
-        <div class="lang-option-card" data-lang="fr" data-search="french français fr" onclick="selectStudioLanguage('fr', 'FR', 'Français')">
-          <span class="lang-flag">🇫🇷</span>
-          <div class="lang-names">
-            <span class="lang-native">Français</span>
-            <span class="lang-eng">French</span>
-          </div>
-          <span class="lang-badge">FR</span>
-        </div>
-        <div class="lang-option-card" data-lang="de" data-search="german deutsch de" onclick="selectStudioLanguage('de', 'DE', 'Deutsch')">
-          <span class="lang-flag">🇩🇪</span>
-          <div class="lang-names">
-            <span class="lang-native">Deutsch</span>
-            <span class="lang-eng">German</span>
-          </div>
-          <span class="lang-badge">DE</span>
-        </div>
-        <div class="lang-option-card" data-lang="el" data-search="greek ελληνικά el" onclick="selectStudioLanguage('el', 'EL', 'Ελληνικά')">
-          <span class="lang-flag">🇬🇷</span>
-          <div class="lang-names">
-            <span class="lang-native">Ελληνικά</span>
-            <span class="lang-eng">Greek</span>
-          </div>
-          <span class="lang-badge">EL</span>
-        </div>
-        <div class="lang-option-card" data-lang="he" data-search="hebrew עבריت he" onclick="selectStudioLanguage('he', 'HE', 'עבריت')">
-          <span class="lang-flag">🇮🇱</span>
-          <div class="lang-names">
-            <span class="lang-native">עבריت</span>
-            <span class="lang-eng">Hebrew</span>
-          </div>
-          <span class="lang-badge">HE</span>
-        </div>
-        <div class="lang-option-card" data-lang="hi" data-search="hindi हिन्दी hi" onclick="selectStudioLanguage('hi', 'HI', 'हिन्दी')">
-          <span class="lang-flag">🇮🇳</span>
-          <div class="lang-names">
-            <span class="lang-native">हिन्दी</span>
-            <span class="lang-eng">Hindi</span>
-          </div>
-          <span class="lang-badge">HI</span>
-        </div>
-        <div class="lang-option-card" data-lang="id" data-search="indonesian bahasa indonesia id" onclick="selectStudioLanguage('id', 'ID', 'Bahasa Indonesia')">
-          <span class="lang-flag">🇮🇩</span>
-          <div class="lang-names">
-            <span class="lang-native">Bahasa Indonesia</span>
-            <span class="lang-eng">Indonesian</span>
-          </div>
-          <span class="lang-badge">ID</span>
-        </div>
-        <div class="lang-option-card" data-lang="it" data-search="italian italiano it" onclick="selectStudioLanguage('it', 'IT', 'Italiano')">
-          <span class="lang-flag">🇮🇹</span>
-          <div class="lang-names">
-            <span class="lang-native">Italiano</span>
-            <span class="lang-eng">Italian</span>
-          </div>
-          <span class="lang-badge">IT</span>
-        </div>
-        <div class="lang-option-card" data-lang="ja" data-search="japanese 日本語 ja" onclick="selectStudioLanguage('ja', 'JA', '日本語')">
-          <span class="lang-flag">🇯🇵</span>
-          <div class="lang-names">
-            <span class="lang-native">日本語</span>
-            <span class="lang-eng">Japanese</span>
-          </div>
-          <span class="lang-badge">JA</span>
-        </div>
-        <div class="lang-option-card" data-lang="ko" data-search="korean 한국어 ko" onclick="selectStudioLanguage('ko', 'KO', '한국어')">
-          <span class="lang-flag">🇰🇷</span>
-          <div class="lang-names">
-            <span class="lang-native">한국어</span>
-            <span class="lang-eng">Korean</span>
-          </div>
-          <span class="lang-badge">KO</span>
-        </div>
-        <div class="lang-option-card" data-lang="no" data-search="norwegian norsk no" onclick="selectStudioLanguage('no', 'NO', 'Norsk')">
-          <span class="lang-flag">🇳🇴</span>
-          <div class="lang-names">
-            <span class="lang-native">Norsk</span>
-            <span class="lang-eng">Norwegian</span>
-          </div>
-          <span class="lang-badge">NO</span>
-        </div>
-        <div class="lang-option-card" data-lang="fa" data-search="persian (farsi) فارسی fa" onclick="selectStudioLanguage('fa', 'FA', 'فارسی')">
-          <span class="lang-flag">🇮🇷</span>
-          <div class="lang-names">
-            <span class="lang-native">فارسی</span>
-            <span class="lang-eng">Persian (Farsi)</span>
-          </div>
-          <span class="lang-badge">FA</span>
-        </div>
-        <div class="lang-option-card" data-lang="pl" data-search="polish polski pl" onclick="selectStudioLanguage('pl', 'PL', 'Polski')">
-          <span class="lang-flag">🇵🇱</span>
-          <div class="lang-names">
-            <span class="lang-native">Polski</span>
-            <span class="lang-eng">Polish</span>
-          </div>
-          <span class="lang-badge">PL</span>
-        </div>
-        <div class="lang-option-card" data-lang="pt" data-search="portuguese português pt" onclick="selectStudioLanguage('pt', 'PT', 'Português')">
-          <span class="lang-flag">🇵🇹</span>
-          <div class="lang-names">
-            <span class="lang-native">Português</span>
-            <span class="lang-eng">Portuguese</span>
-          </div>
-          <span class="lang-badge">PT</span>
-        </div>
-        <div class="lang-option-card" data-lang="ru" data-search="russian русский ru" onclick="selectStudioLanguage('ru', 'RU', 'Русский')">
-          <span class="lang-flag">🇷🇺</span>
-          <div class="lang-names">
-            <span class="lang-native">Русский</span>
-            <span class="lang-eng">Russian</span>
-          </div>
-          <span class="lang-badge">RU</span>
-        </div>
-        <div class="lang-option-card" data-lang="es" data-search="spanish español es" onclick="selectStudioLanguage('es', 'ES', 'Español')">
-          <span class="lang-flag">🇪🇸</span>
-          <div class="lang-names">
-            <span class="lang-native">Español</span>
-            <span class="lang-eng">Spanish</span>
-          </div>
-          <span class="lang-badge">ES</span>
-        </div>
-        <div class="lang-option-card" data-lang="sv" data-search="swedish svenska sv" onclick="selectStudioLanguage('sv', 'SV', 'Svenska')">
-          <span class="lang-flag">🇸🇪</span>
-          <div class="lang-names">
-            <span class="lang-native">Svenska</span>
-            <span class="lang-eng">Swedish</span>
-          </div>
-          <span class="lang-badge">SV</span>
-        </div>
-        <div class="lang-option-card" data-lang="tr" data-search="turkish türkçe tr" onclick="selectStudioLanguage('tr', 'TR', 'Türkçe')">
-          <span class="lang-flag">🇹🇷</span>
-          <div class="lang-names">
-            <span class="lang-native">Türkçe</span>
-            <span class="lang-eng">Turkish</span>
-          </div>
-          <span class="lang-badge">TR</span>
-        </div>
-        <div class="lang-option-card" data-lang="uk" data-search="ukrainian українська uk" onclick="selectStudioLanguage('uk', 'UK', 'Українська')">
-          <span class="lang-flag">🇺🇦</span>
-          <div class="lang-names">
-            <span class="lang-native">Українська</span>
-            <span class="lang-eng">Ukrainian</span>
-          </div>
-          <span class="lang-badge">UK</span>
-        </div>
-        <div class="lang-option-card" data-lang="vi" data-search="vietnamese tiếng việt vi" onclick="selectStudioLanguage('vi', 'VI', 'Tiếng Việt')">
-          <span class="lang-flag">🇻🇳</span>
-          <div class="lang-names">
-            <span class="lang-native">Tiếng Việt</span>
-            <span class="lang-eng">Vietnamese</span>
-          </div>
-          <span class="lang-badge">VI</span>
-        </div>
+        <div class="lang-option-card" data-lang="ar" data-search="arabic العربية ar" onclick="selectStudioLanguage('ar', 'AR', 'العربية')"><span class="lang-flag">🇦🇪</span><div class="lang-names"><span class="lang-native">العربية</span><span class="lang-eng">Arabic</span></div><span class="lang-badge">AR</span></div>
+        <div class="lang-option-card" data-lang="bn" data-search="bengali বাংলা bn" onclick="selectStudioLanguage('bn', 'BN', 'বাংলা')"><span class="lang-flag">🇧🇩</span><div class="lang-names"><span class="lang-native">বাংলা</span><span class="lang-eng">Bengali</span></div><span class="lang-badge">BN</span></div>
+        <div class="lang-option-card" data-lang="zh-CN" data-search="chinese (simplified) 中文 (简体) zh" onclick="selectStudioLanguage('zh-CN', 'ZH', '中文 (简体)')"><span class="lang-flag">🇨🇳</span><div class="lang-names"><span class="lang-native">中文 (简体)</span><span class="lang-eng">Chinese (Simplified)</span></div><span class="lang-badge">ZH</span></div>
+        <div class="lang-option-card" data-lang="zh-TW" data-search="chinese (traditional) 中文 (繁體) zh" onclick="selectStudioLanguage('zh-TW', 'ZH', '中文 (繁體)')"><span class="lang-flag">🇹🇼</span><div class="lang-names"><span class="lang-native">中文 (繁體)</span><span class="lang-eng">Chinese (Traditional)</span></div><span class="lang-badge">ZH</span></div>
+        <div class="lang-option-card" data-lang="cs" data-search="czech čeština cs" onclick="selectStudioLanguage('cs', 'CS', 'Čeština')"><span class="lang-flag">🇨🇿</span><div class="lang-names"><span class="lang-native">Čeština</span><span class="lang-eng">Czech</span></div><span class="lang-badge">CS</span></div>
+        <div class="lang-option-card" data-lang="da" data-search="danish dansk da" onclick="selectStudioLanguage('da', 'DA', 'Dansk')"><span class="lang-flag">🇩🇰</span><div class="lang-names"><span class="lang-native">Dansk</span><span class="lang-eng">Danish</span></div><span class="lang-badge">DA</span></div>
+        <div class="lang-option-card" data-lang="nl" data-search="dutch nederlands nl" onclick="selectStudioLanguage('nl', 'NL', 'Nederlands')"><span class="lang-flag">🇳🇱</span><div class="lang-names"><span class="lang-native">Nederlands</span><span class="lang-eng">Dutch</span></div><span class="lang-badge">NL</span></div>
+        <div class="lang-option-card" data-lang="en" data-search="english (original) english en" onclick="selectStudioLanguage('en', 'EN', 'English')"><span class="lang-flag">🇬🇧</span><div class="lang-names"><span class="lang-native">English</span><span class="lang-eng">English (Original)</span></div><span class="lang-badge">EN</span></div>
+        <div class="lang-option-card" data-lang="fi" data-search="finnish suomi fi" onclick="selectStudioLanguage('fi', 'FI', 'Suomi')"><span class="lang-flag">🇫🇮</span><div class="lang-names"><span class="lang-native">Suomi</span><span class="lang-eng">Finnish</span></div><span class="lang-badge">FI</span></div>
+        <div class="lang-option-card" data-lang="fr" data-search="french français fr" onclick="selectStudioLanguage('fr', 'FR', 'Français')"><span class="lang-flag">🇫🇷</span><div class="lang-names"><span class="lang-native">Français</span><span class="lang-eng">French</span></div><span class="lang-badge">FR</span></div>
+        <div class="lang-option-card" data-lang="de" data-search="german deutsch de" onclick="selectStudioLanguage('de', 'DE', 'Deutsch')"><span class="lang-flag">🇩🇪</span><div class="lang-names"><span class="lang-native">Deutsch</span><span class="lang-eng">German</span></div><span class="lang-badge">DE</span></div>
+        <div class="lang-option-card" data-lang="el" data-search="greek ελληνικά el" onclick="selectStudioLanguage('el', 'EL', 'Ελληνικά')"><span class="lang-flag">🇬🇷</span><div class="lang-names"><span class="lang-native">Ελληνικά</span><span class="lang-eng">Greek</span></div><span class="lang-badge">EL</span></div>
+        <div class="lang-option-card" data-lang="he" data-search="hebrew עבריت he" onclick="selectStudioLanguage('he', 'HE', 'עבריت')"><span class="lang-flag">🇮🇱</span><div class="lang-names"><span class="lang-native">עבריت</span><span class="lang-eng">Hebrew</span></div><span class="lang-badge">HE</span></div>
+        <div class="lang-option-card" data-lang="hi" data-search="hindi हिन्दी hi" onclick="selectStudioLanguage('hi', 'HI', 'हिन्दी')"><span class="lang-flag">🇮🇳</span><div class="lang-names"><span class="lang-native">हिन्दी</span><span class="lang-eng">Hindi</span></div><span class="lang-badge">HI</span></div>
+        <div class="lang-option-card" data-lang="id" data-search="indonesian bahasa indonesia id" onclick="selectStudioLanguage('id', 'ID', 'Bahasa Indonesia')"><span class="lang-flag">🇮🇩</span><div class="lang-names"><span class="lang-native">Bahasa Indonesia</span><span class="lang-eng">Indonesian</span></div><span class="lang-badge">ID</span></div>
+        <div class="lang-option-card" data-lang="it" data-search="italian italiano it" onclick="selectStudioLanguage('it', 'IT', 'Italiano')"><span class="lang-flag">🇮🇹</span><div class="lang-names"><span class="lang-native">Italiano</span><span class="lang-eng">Italian</span></div><span class="lang-badge">IT</span></div>
+        <div class="lang-option-card" data-lang="ja" data-search="japanese 日本語 ja" onclick="selectStudioLanguage('ja', 'JA', '日本語')"><span class="lang-flag">🇯🇵</span><div class="lang-names"><span class="lang-native">日本語</span><span class="lang-eng">Japanese</span></div><span class="lang-badge">JA</span></div>
+        <div class="lang-option-card" data-lang="ko" data-search="korean 한국어 ko" onclick="selectStudioLanguage('ko', 'KO', '한국어')"><span class="lang-flag">🇰🇷</span><div class="lang-names"><span class="lang-native">한국어</span><span class="lang-eng">Korean</span></div><span class="lang-badge">KO</span></div>
+        <div class="lang-option-card" data-lang="no" data-search="norwegian norsk no" onclick="selectStudioLanguage('no', 'NO', 'Norsk')"><span class="lang-flag">🇳🇴</span><div class="lang-names"><span class="lang-native">Norsk</span><span class="lang-eng">Norwegian</span></div><span class="lang-badge">NO</span></div>
+        <div class="lang-option-card" data-lang="fa" data-search="persian (farsi) فارسی fa farsi" onclick="selectStudioLanguage('fa', 'FA', 'فارسی')"><span class="lang-flag">🇮🇷</span><div class="lang-names"><span class="lang-native" style="color:var(--gold); font-weight:800;">فارسی</span><span class="lang-eng">Persian (Farsi)</span></div><span class="lang-badge">FA</span></div>
+        <div class="lang-option-card" data-lang="pl" data-search="polish polski pl" onclick="selectStudioLanguage('pl', 'PL', 'Polski')"><span class="lang-flag">🇵🇱</span><div class="lang-names"><span class="lang-native">Polski</span><span class="lang-eng">Polish</span></div><span class="lang-badge">PL</span></div>
+        <div class="lang-option-card" data-lang="pt" data-search="portuguese português pt" onclick="selectStudioLanguage('pt', 'PT', 'Português')"><span class="lang-flag">🇵🇹</span><div class="lang-names"><span class="lang-native">Português</span><span class="lang-eng">Portuguese</span></div><span class="lang-badge">PT</span></div>
+        <div class="lang-option-card" data-lang="ru" data-search="russian русский ru" onclick="selectStudioLanguage('ru', 'RU', 'Русский')"><span class="lang-flag">🇷🇺</span><div class="lang-names"><span class="lang-native">Русский</span><span class="lang-eng">Russian</span></div><span class="lang-badge">RU</span></div>
+        <div class="lang-option-card" data-lang="es" data-search="spanish español es" onclick="selectStudioLanguage('es', 'ES', 'Español')"><span class="lang-flag">🇪🇸</span><div class="lang-names"><span class="lang-native">Español</span><span class="lang-eng">Spanish</span></div><span class="lang-badge">ES</span></div>
+        <div class="lang-option-card" data-lang="sv" data-search="swedish svenska sv" onclick="selectStudioLanguage('sv', 'SV', 'Svenska')"><span class="lang-flag">🇸🇪</span><div class="lang-names"><span class="lang-native">Svenska</span><span class="lang-eng">Swedish</span></div><span class="lang-badge">SV</span></div>
+        <div class="lang-option-card" data-lang="tr" data-search="turkish türkçe tr" onclick="selectStudioLanguage('tr', 'TR', 'Türkçe')"><span class="lang-flag">🇹🇷</span><div class="lang-names"><span class="lang-native">Türkçe</span><span class="lang-eng">Turkish</span></div><span class="lang-badge">TR</span></div>
+        <div class="lang-option-card" data-lang="uk" data-search="ukrainian українська uk" onclick="selectStudioLanguage('uk', 'UK', 'Українська')"><span class="lang-flag">🇺🇦</span><div class="lang-names"><span class="lang-native">Українська</span><span class="lang-eng">Ukrainian</span></div><span class="lang-badge">UK</span></div>
+        <div class="lang-option-card" data-lang="vi" data-search="vietnamese tiếng việt vi" onclick="selectStudioLanguage('vi', 'VI', 'Tiếng Việt')"><span class="lang-flag">🇻🇳</span><div class="lang-names"><span class="lang-native">Tiếng Việt</span><span class="lang-eng">Vietnamese</span></div><span class="lang-badge">VI</span></div>
       </div>
-      <!-- کانتینر فنی پیش‌فرض گوگل جهت اتصال موتور ترجمه -->
+
       <div id="google_translate_element" style="display:none;"></div>
     </div>
 
-    <!-- دکمه شناور لوکس گوشه چپ پایین با کادر نئونی، آیکون و برچسب زبان فعال -->
-    <button type="button" id="googleTranslateTriggerBtn" onclick="toggleGoogleTranslateMenu(event)" class="floating-lang-trigger-btn" title="Translate Website / تغییر زبان">
-      <span class="lang-icon-badge">
-        <svg class="lang-globe-svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" stroke-width="1.8"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12h19M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-        </svg>
+    <!-- دقیقاً دکمه زرد رنگ استودیو منتقل‌شده به گوشه چپ پایین -->
+    <button type="button" id="googleTranslateTriggerBtn" onclick="toggleGoogleTranslateMenu(event)" class="atelier-translate-wrapper floating-lang-trigger-btn" title="Translate Website / تغییر زبان">
+      <span class="atelier-translate-label" style="display:inline-flex; align-items:center; gap:6px;">
+        <span style="font-size:16px;">🌐</span>
+        <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:800; color:var(--gold); letter-spacing:0.08em;">TRANSLATE:</span>
       </span>
-      <span class="lang-title-text">LANGUAGE</span>
-      <span id="activeLanguageLabel" class="lang-active-pill">EN</span>
-      <span class="lang-chevron-arrow">▲</span>
+      <span id="activeLanguageLabel" class="lang-active-pill font-mono" style="font-size:11.5px; font-weight:900; color:#000; background:var(--gold); padding:2px 8px; border-radius:6px; box-shadow:0 0 10px rgba(250,204,21,0.5);">EN</span>
     </button>
   </div>
 

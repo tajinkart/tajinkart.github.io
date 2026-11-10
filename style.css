@@ -8191,3 +8191,194 @@ font {
   gap: 10px !important;
   animation: flyoutSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
+
+
+
+/* ==============================================================================
+   TOP BAR STRICT VIEW SCOPING (ONLY ON SHOWCASE / GALLERY)
+   ============================================================================== */
+#topCenterBrandBar {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body[data-view="showcase"] #topCenterBrandBar {
+  display: flex !important;
+  pointer-events: auto !important;
+}
+
+body:not([data-view="showcase"]) #topCenterBrandBar,
+body[data-view="admin"] #topCenterBrandBar,
+body[data-view="store"] #topCenterBrandBar,
+body[data-view="genesis"] #topCenterBrandBar,
+body[data-view="academy"] #topCenterBrandBar,
+body[data-view="society"] #topCenterBrandBar,
+body[data-view="member-dashboard"] #topCenterBrandBar {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Ensure Category & Genre Pills are visible in top bar on Showcase */
+body[data-view="showcase"] #topCenterBrandBar #floatingGalleryGenreMenu,
+body[data-view="showcase"] #topCenterBrandBar #floatingGalleryCategoryMenu {
+  display: inline-block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* ==============================================================================
+   ADMIN TOP HORIZONTAL NAVIGATION TABS BAR
+   ============================================================================== */
+.admin-top-tabs-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  background: #060911 !important;
+  border: 1px solid rgba(250, 204, 21, 0.25) !important;
+  border-radius: 14px !important;
+  padding: 8px 12px !important;
+  margin-bottom: 20px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6) !important;
+  scrollbar-width: thin !important;
+}
+
+.admin-top-tab-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  padding: 9px 16px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #94a3b8 !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+  white-space: nowrap !important;
+  outline: none !important;
+}
+
+.admin-top-tab-btn:hover {
+  background: rgba(250, 204, 21, 0.1) !important;
+  border-color: rgba(250, 204, 21, 0.4) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin-top-tab-btn.active {
+  background: rgba(250, 204, 21, 0.16) !important;
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.35) !important;
+}
+
+.admin-tab-icon {
+  font-size: 14px !important;
+}
+
+.admin-dashboard-layout.full-width-layout {
+  display: block !important;
+  width: 100% !important;
+}
+
+.admin-main-panes-holder {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+
+
+/* ==============================================================================
+   TOP-LEFT BRAND CONTROLS: STRICT HORIZONTAL ROW (ONLY ON SHOWCASE)
+   ============================================================================== */
+#topCenterBrandBar {
+  display: none !important;
+}
+
+body[data-view="showcase"] #topCenterBrandBar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  top: 16px !important;
+  left: 20px !important;
+  z-index: 9990 !important;
+}
+
+body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+@media (max-width: 768px) {
+  body[data-view="showcase"] #topCenterBrandBar {
+    top: 10px !important;
+    left: 10px !important;
+  }
+  body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
+    gap: 6px !important;
+  }
+}
+
+body:not([data-view="showcase"]) #topCenterBrandBar,
+body[data-view="admin"] #topCenterBrandBar,
+body[data-view="store"] #topCenterBrandBar,
+body[data-view="genesis"] #topCenterBrandBar,
+body[data-view="academy"] #topCenterBrandBar,
+body[data-view="society"] #topCenterBrandBar,
+body[data-view="member-dashboard"] #topCenterBrandBar {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* ==============================================================================
+   YELLOW TRANSLATE BUTTON MOVED TO BOTTOM-LEFT
+   ============================================================================== */
+.floating-translate-widget {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 24px !important;
+  z-index: 9998 !important;
+  display: block !important;
+}
+
+@media (max-width: 768px) {
+  .floating-translate-widget {
+    bottom: 84px !important;
+    left: 16px !important;
+  }
+}
+
+.floating-lang-trigger-btn.atelier-translate-wrapper {
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background: rgba(8, 12, 20, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1.5px solid var(--gold) !important;
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  box-shadow: 0 0 20px rgba(250, 204, 21, 0.4), inset 0 0 8px rgba(250, 204, 21, 0.2), 0 8px 25px rgba(0, 0, 0, 0.85) !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  outline: none !important;
+}
+
+.floating-lang-trigger-btn.atelier-translate-wrapper:hover {
+  border-color: #ffe55a !important;
+  box-shadow: 0 0 28px rgba(250, 204, 21, 0.7), inset 0 0 12px rgba(250, 204, 21, 0.3), 0 10px 30px rgba(0, 0, 0, 0.95) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+}
