@@ -2,6 +2,134 @@
 // ==============================================================================
 // موتور داینامیک دسته‌بندی‌های گالری آثار استودیو (Studio Gallery Categories Engine)
 // ==============================================================================
+const DEFAULT_STUDIO_GENRES = [
+  'Dark Fantasy',
+  'Cyberpunk',
+  'Sci-Fi',
+  'Mythic & Ancient',
+  'Post-Apocalyptic',
+  'Horror & Eldritch',
+  'High Fantasy',
+  'Steampunk',
+  'Mecha & Industrial',
+  'Anime & Stylized',
+  'Historical & Military'
+];
+
+let studioGenres = [];
+try {
+  studioGenres = JSON.parse(localStorage.getItem('tajinkart_studio_genres_v1')) || DEFAULT_STUDIO_GENRES;
+  if (!Array.isArray(studioGenres) || studioGenres.length === 0) studioGenres = DEFAULT_STUDIO_GENRES;
+} catch(e) {
+  studioGenres = DEFAULT_STUDIO_GENRES;
+}
+window.studioGenres = studioGenres;
+
+let currentGallerySearchQuery = '';
+let currentGalleryGenreFilter = 'all';
+
+// Search Bar Controller
+window.toggleGallerySearchBar = function(e) {
+  if (e) e.stopPropagation();
+  const wrap = document.getElementById('gallerySearchWrapper');
+  if (!wrap) return;
+  const isExp = wrap.classList.toggle('expanded');
+  if (isExp) {
+    const input = document.getElementById('gallerySearchInput');
+    if (input) setTimeout(() => input.focus(), 80);
+  } else {
+    if (currentGallerySearchQuery) {
+      window.clearGallerySearch();
+    }
+  }
+};
+
+window.clearGallerySearch = function(e) {
+  if (e) e.stopPropagation();
+  const input = document.getElementById('gallerySearchInput');
+  if (input) input.value = '';
+  currentGallerySearchQuery = '';
+  renderShowcaseGrid();
+};
+
+window.searchGalleryArtworks = function(query) {
+  currentGallerySearchQuery = (query || '').trim().toLowerCase();
+  renderShowcaseGrid();
+};
+
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('gallerySearchWrapper');
+  if (wrap && wrap.classList.contains('expanded') && !wrap.contains(e.target)) {
+    const input = document.getElementById('gallerySearchInput');
+    if (!input || !input.value.trim()) {
+      wrap.classList.remove('expanded');
+    }
+  }
+});
+
+// Admin Studio Genres Management
+window.renderAdminStudioGenres = function() {
+  const container = document.getElementById('adminStudioGenresList');
+  if (!container) return;
+  const badge = document.getElementById('adminGenreCountBadge');
+  if (badge) badge.textContent = `${studioGenres.length} Active Genres`;
+
+  container.innerHTML = studioGenres.map((g, idx) => `
+    <div style="display:inline-flex; align-items:center; gap:8px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:20px; padding:6px 14px; box-shadow:0 0 10px rgba(0,240,255,0.15); font-size:12px; color:#fff;">
+      <span style="color:var(--cyan-electric); font-size:11px;">🌌</span>
+      <span style="font-weight:700;">${g}</span>
+      <button type="button" onclick="adminDeleteStudioGenre('${g}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 2px; margin-left:4px; line-height:1;" title="Delete this genre" onmouseover="this.style.color='var(--crimson)'" onmouseout="this.style.color='var(--text-muted)'">✕</button>
+    </div>
+  `).join('');
+};
+
+window.adminToggleAddGenreForm = function() {
+  const row = document.getElementById('adminInlineAddGenreRow');
+  if (!row) return;
+  const isHidden = (row.style.display === 'none' || !row.style.display);
+  row.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) {
+    const input = document.getElementById('adminNewGenreTitle');
+    if (input) setTimeout(() => input.focus(), 80);
+  }
+};
+
+window.adminSubmitNewGenreInline = function() {
+  const input = document.getElementById('adminNewGenreTitle');
+  const val = input ? input.value.trim() : '';
+  if (!val) {
+    showToast('Please enter a genre name.', 'warning');
+    return;
+  }
+  if (studioGenres.includes(val)) {
+    showToast('This genre already exists in studio directory.', 'info');
+    return;
+  }
+  studioGenres.push(val);
+  try {
+    localStorage.setItem('tajinkart_studio_genres_v1', JSON.stringify(studioGenres));
+  } catch(e) {}
+  if (input) input.value = '';
+  window.adminToggleAddGenreForm();
+  window.renderAdminStudioGenres();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  showToast(`Genre '${val}' added successfully!`, 'success');
+};
+
+window.adminDeleteStudioGenre = function(genreName) {
+  if (studioGenres.length <= 1) {
+    showToast('At least one studio genre must remain active.', 'warning');
+    return;
+  }
+  studioGenres = studioGenres.filter(g => g !== genreName);
+  try {
+    localStorage.setItem('tajinkart_studio_genres_v1', JSON.stringify(studioGenres));
+  } catch(e) {}
+  window.renderAdminStudioGenres();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  showToast(`Genre '${genreName}' removed.`, 'info');
+};
+
 const DEFAULT_GALLERY_CATEGORIES = [
   { id: 'character', title: 'Character Design', color: '#facc15' },
   { id: 'environment', title: 'Environment & Worlds', color: '#38bdf8' },
@@ -27,20 +155,30 @@ window.renderFloatingCategoryDropdown = function() {
   const dropdown = document.getElementById('categoryFilterDropdown');
   if (!dropdown) return;
 
+  const isAllActive = (currentGalleryFilter === 'all' && currentGalleryGenreFilter === 'all' && !currentGallerySearchQuery);
+
   let itemsHtml = `
-    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
+    <!-- Search within dropdown -->
+    <div style="padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;" onclick="event.stopPropagation()">
+      <input type="text" id="dropdownSearchInput" placeholder="🔍 Filter categories & genres..." oninput="filterDropdownMenuOptions(this.value)" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid rgba(250,204,21,0.3); border-radius: 6px; padding: 6px 10px; font-size: 11.5px; color: #fff; outline: none;" />
+    </div>
+
+    <!-- All Artworks item -->
+    <div class="cat-dropdown-item ${isAllActive ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
       <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
       <span class="cat-item-text">All Artworks</span>
     </div>
+
+    <div style="padding: 6px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase;">Categories</div>
   `;
 
   if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
     galleryCategories.forEach(cat => {
-      const isActive = currentGalleryFilter === cat.id;
+      const isActive = (currentGalleryFilter === cat.id && currentGalleryGenreFilter === 'all');
       const color = cat.color || '#38bdf8';
       const title = cat.titleEN || cat.title || cat.id;
       itemsHtml += `
-        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+        <div class="cat-dropdown-item cat-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
           <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
           <span class="cat-item-text">${title}</span>
         </div>
@@ -48,10 +186,56 @@ window.renderFloatingCategoryDropdown = function() {
     });
   }
 
+  itemsHtml += `
+    <div style="padding: 10px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--cyan-electric); letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px;">Genres & Themes</div>
+  `;
+
+  const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres)) ? studioGenres : DEFAULT_STUDIO_GENRES;
+  genres.forEach(g => {
+    const isActive = (currentGalleryGenreFilter === g);
+    itemsHtml += `
+      <div class="cat-dropdown-item genre-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByGenre('${g}')">
+        <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+        <span class="cat-item-text">${g}</span>
+      </div>
+    `;
+  });
+
   dropdown.innerHTML = itemsHtml;
 };
 
+window.filterGalleryByGenre = function(genreName) {
+  currentGalleryGenreFilter = genreName;
+  currentGalleryFilter = 'all';
+  const labelEl = document.getElementById('currentCategoryPillLabel');
+  if (labelEl) labelEl.textContent = `Genre: ${genreName}`;
+
+  const pillBtn = document.getElementById('currentCategoryPillBtn');
+  if (pillBtn) {
+    pillBtn.style.setProperty('--pill-accent-color', 'var(--cyan-electric)', 'important');
+    pillBtn.style.setProperty('--pill-glow-color', 'rgba(0,240,255,0.55)', 'important');
+    pillBtn.style.setProperty('border-color', 'var(--cyan-electric)', 'important');
+  }
+
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  renderShowcaseGrid();
+  const gEl = document.getElementById('showcaseGrid');
+  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
+};
+
+window.filterDropdownMenuOptions = function(val) {
+  const q = (val || '').trim().toLowerCase();
+  document.querySelectorAll('#categoryFilterDropdown .cat-dropdown-item').forEach(item => {
+    const txt = item.textContent.toLowerCase();
+    item.style.display = (!q || txt.includes(q)) ? 'flex' : 'none';
+  });
+};
+
+
 window.renderAdminGalleryCategories = function() {
+  if (typeof renderAdminStudioGenres === 'function') renderAdminStudioGenres();
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
   const badge = document.getElementById('adminCategoryCountBadge');
@@ -647,6 +831,7 @@ async function syncArtworksFromSupabase() {
           title: row.title,
           desc: row.desc_text || '',
           pipelineKey: pipe,
+        genre: genre,
           image: row.image,
           colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
           lore: row.lore || 'Extopia Universe',
@@ -1168,33 +1353,32 @@ function renderStagingPhasesHtml() {
           </div>
         `}
 
-        <!-- Sheet category and pipeline assignment -->
+        <!-- Unified Category & Pipeline, Specialized Subcategory, and Universe Genre -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
           <div>
-            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 Gallery Category:</label>
-            <select onchange="stagingProjectPhases[${idx}].category = this.value; stagingProjectPhases[${idx}].tag = this.value;" style="font-size:11px; padding:5px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
-              ${(typeof galleryCategories !== 'undefined' ? galleryCategories : []).map(cat => `
-                <option value="${cat.id}" ${(p.category === cat.id || (!p.category && cat.id === (PIPELINE_TO_CATEGORY_MAP[pipeKey] || 'character'))) ? 'selected' : ''}>
-                  ${cat.title} (${cat.id})
-                </option>
-              `).join('')}
-            </select>
-          </div>
-          <div>
-            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">Pipeline Category:</label>
-            <select onchange="handlePhasePipelineChange(${idx}, this.value)" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
+            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📂 Category & Pipeline:</label>
+            <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
               <option value="sketch1" ${pipeKey === 'sketch1' ? 'selected' : ''}>Character Design & Heroes</option>
-              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>Creatures & Bosses</option>
-              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>Environment & Worlds</option>
-              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>Keyframes & Covers</option>
-              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>Props, Weapons & UI</option>
-              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>Comics & Sequential</option>
+              <option value="sketch_creature" ${pipeKey === 'sketch_creature' ? 'selected' : ''}>Creatures, Titans & Monsters</option>
+              <option value="sketch2" ${pipeKey === 'sketch2' ? 'selected' : ''}>Environment, Worlds & Architecture</option>
+              <option value="sketch3" ${pipeKey === 'sketch3' ? 'selected' : ''}>Cinematic Keyframes & Covers</option>
+              <option value="sketch4" ${pipeKey === 'sketch4' ? 'selected' : ''}>Props, Weapons & Artifacts</option>
+              <option value="sketch5" ${pipeKey === 'sketch5' ? 'selected' : ''}>Comics, Manga & Sequential Art</option>
+              <option value="sketch_mascot" ${pipeKey === 'sketch_mascot' ? 'selected' : ''}>Brand Mascot & Studio Crest</option>
             </select>
           </div>
           <div>
-            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">Specialized Subcategory:</label>
-            <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:5px 8px; margin:0; width:100%;">
+            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">📐 Specialized Subcategory:</label>
+            <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
               ${subcats.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10.5px; color:var(--emerald, #10b981); font-weight:700; display:block; margin-bottom:2px;">🌌 Universe Genre:</label>
+            <select onchange="stagingProjectPhases[${idx}].genre = this.value" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
+              ${(typeof studioGenres !== 'undefined' ? studioGenres : ['Dark Fantasy', 'Cyberpunk', 'Sci-Fi', 'Mythic & Ancient', 'Post-Apocalyptic', 'Horror & Eldritch']).map(g => `
+                <option value="${g}" ${(p.genre === g || (!p.genre && g === 'Dark Fantasy')) ? 'selected' : ''}>${g}</option>
+              `).join('')}
             </select>
           </div>
         </div>
@@ -1336,7 +1520,8 @@ window.confirmSaveArtwork = async function() {
   const primaryPhase = validPhases[0];
   const img = primaryPhase.img || primaryPhase.image || '';
   const pipe = primaryPhase.pipelineKey || 'sketch1';
-  const cat = PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
+  const cat = (primaryPhase.category) || PIPELINE_TO_CATEGORY_MAP[pipe] || 'character';
+  const genre = primaryPhase.genre || 'Dark Fantasy';
   const colorSpace = 'Master 4K / 16-Bit ProPhoto RGB';
 
   try {
@@ -1395,6 +1580,7 @@ window.confirmSaveArtwork = async function() {
       art.tag = cat;
       art.category = cat;
       art.pipelineKey = pipe;
+      art.genre = genre;
       art.image = img;
       art.desc = desc;
       art.isProductionPack = isPack;
@@ -1661,43 +1847,74 @@ window.renderShowcaseGrid = function() {
   const grid = document.getElementById('showcaseGrid');
   if (!grid) return;
 
-  const filteredArtworks = (currentGalleryFilter && currentGalleryFilter !== 'all')
-    ? showcaseArtworks.filter(art => {
-        // ۱. بررسی تطابق مستقیم دسته‌بندی و پایپلاین کاور اصلی پروژه
-        const cat = art.category || art.tag || (art.pipelineKey ? (PIPELINE_TO_CATEGORY_MAP[art.pipelineKey] || 'character') : 'character');
-        const pipe = art.pipelineKey;
-        const mainMatch = cat === currentGalleryFilter || 
-                          pipe === currentGalleryFilter || 
-                          (PIPELINE_TO_CATEGORY_MAP[pipe] && PIPELINE_TO_CATEGORY_MAP[pipe] === currentGalleryFilter) ||
-                          art.tag === currentGalleryFilter;
-        if (mainMatch) return true;
+  const filteredArtworks = showcaseArtworks.filter(art => {
+    // 1. Category Filter
+    if (currentGalleryFilter && currentGalleryFilter !== 'all') {
+      const cat = art.category || art.tag || (art.pipelineKey ? (PIPELINE_TO_CATEGORY_MAP[art.pipelineKey] || 'character') : 'character');
+      const pipe = art.pipelineKey;
+      let catMatch = (cat === currentGalleryFilter || 
+                      pipe === currentGalleryFilter || 
+                      (PIPELINE_TO_CATEGORY_MAP[pipe] && PIPELINE_TO_CATEGORY_MAP[pipe] === currentGalleryFilter) ||
+                      art.tag === currentGalleryFilter);
+      if (!catMatch && art.phases && Array.isArray(art.phases)) {
+        catMatch = art.phases.some(p => {
+          const pPipe = p.pipelineKey;
+          const pCat = p.category || (pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '');
+          const pSub = (p.subcategory || '').toLowerCase();
+          if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
+          if (currentGalleryFilter === 'environment' && (pSub.includes('env') || pSub.includes('world') || pSub.includes('arch'))) return true;
+          if (currentGalleryFilter === 'character' && (pSub.includes('char') || pSub.includes('hero') || pSub.includes('mascot'))) return true;
+          if (currentGalleryFilter === 'creature' && (pSub.includes('creature') || pSub.includes('monster') || pSub.includes('titan') || pSub.includes('boss'))) return true;
+          if (currentGalleryFilter === 'keyframe' && (pSub.includes('keyframe') || pSub.includes('cover') || pSub.includes('splash'))) return true;
+          if (currentGalleryFilter === 'props' && (pSub.includes('prop') || pSub.includes('weapon') || pSub.includes('relic') || pSub.includes('ui'))) return true;
+          if (currentGalleryFilter === 'comic' && (pSub.includes('comic') || pSub.includes('manga') || pSub.includes('storyboard'))) return true;
+          return false;
+        });
+      }
+      if (!catMatch) return false;
+    }
 
-        // ۲. فیلتر عمیق شیت‌ها و فازهای الحاقی (Deep Supplemental Phase Matching):
-        // حتی اگر اثر در شاخه کاراکتر باشد اما شیت دوم/سوم آن فضاسازی یا پراپ باشد، در دسته‌بندی مربوطه کشف می‌شود
-        if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
-          return art.phases.some(p => {
-            const pPipe = p.pipelineKey;
-            const pCat = pPipe ? (PIPELINE_TO_CATEGORY_MAP[pPipe] || '') : '';
-            const pSub = p.subcategory || '';
-            if (pCat === currentGalleryFilter || pPipe === currentGalleryFilter) return true;
-            if (currentGalleryFilter === 'environment' && (pSub.toLowerCase().includes('env') || pSub.toLowerCase().includes('world') || pSub.toLowerCase().includes('arch') || pSub.includes('محیط'))) return true;
-            if (currentGalleryFilter === 'character' && (pSub.toLowerCase().includes('char') || pSub.toLowerCase().includes('hero') || pSub.toLowerCase().includes('mascot') || pSub.includes('کاراکتر'))) return true;
-            if (currentGalleryFilter === 'creature' && (pSub.toLowerCase().includes('creature') || pSub.toLowerCase().includes('monster') || pSub.toLowerCase().includes('titan') || pSub.toLowerCase().includes('boss') || pSub.includes('موجود'))) return true;
-            if (currentGalleryFilter === 'keyframe' && (pSub.toLowerCase().includes('keyframe') || pSub.toLowerCase().includes('cover') || pSub.toLowerCase().includes('splash') || pSub.includes('کی‌فریم'))) return true;
-            if (currentGalleryFilter === 'props' && (pSub.toLowerCase().includes('prop') || pSub.toLowerCase().includes('weapon') || pSub.toLowerCase().includes('relic') || pSub.toLowerCase().includes('ui') || pSub.includes('پراپ'))) return true;
-            if (currentGalleryFilter === 'comic' && (pSub.toLowerCase().includes('comic') || pSub.toLowerCase().includes('manga') || pSub.toLowerCase().includes('storyboard') || pSub.includes('کمیک'))) return true;
-            return false;
-          });
-        }
+    // 2. Genre Filter
+    if (currentGalleryGenreFilter && currentGalleryGenreFilter !== 'all') {
+      const gTarget = currentGalleryGenreFilter.toLowerCase();
+      let genreMatch = (art.genre || '').toLowerCase() === gTarget;
+      if (!genreMatch && art.phases && Array.isArray(art.phases)) {
+        genreMatch = art.phases.some(p => (p.genre || '').toLowerCase() === gTarget);
+      }
+      if (!genreMatch) return false;
+    }
+
+    // 3. Search Query Filter
+    if (currentGallerySearchQuery) {
+      const q = currentGallerySearchQuery;
+      const titleMatch = (art.title || '').toLowerCase().includes(q);
+      const slugMatch = (art.shortSlug || '').toLowerCase().includes(q);
+      const descMatch = (art.desc || '').toLowerCase().includes(q);
+      const tagMatch = (art.tag || '').toLowerCase().includes(q);
+      const catMatch = (art.category || '').toLowerCase().includes(q);
+      const genreMatch = (art.genre || '').toLowerCase().includes(q);
+      let phaseMatch = false;
+      if (art.phases && Array.isArray(art.phases)) {
+        phaseMatch = art.phases.some(p => 
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.subcategory || '').toLowerCase().includes(q) ||
+          (p.desc || '').toLowerCase().includes(q) ||
+          (p.genre || '').toLowerCase().includes(q)
+        );
+      }
+      if (!titleMatch && !slugMatch && !descMatch && !tagMatch && !catMatch && !genreMatch && !phaseMatch) {
         return false;
-      })
-    : showcaseArtworks;
+      }
+    }
+
+    return true;
+  });
 
   if (filteredArtworks.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); width: 100%;">
-        <p style="font-size: 15px; margin-bottom: 12px; color: #fff;">No artworks found in this category.</p>
-        <button onclick="filterGalleryByCategory('all', 'All Artworks')" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">Display All Artworks</button>
+        <p style="font-size: 15px; margin-bottom: 12px; color: #fff;">No artworks found matching your filter / search.</p>
+        <button onclick="resetGalleryFilters()" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">Display All Artworks</button>
       </div>
     `;
     return;
@@ -1994,7 +2211,8 @@ function renderArtStationProject(art) {
       phaseNum: '01',
       desc: mainDesc,
       pipe: mainPipe,
-      sub: ''
+      sub: '',
+      genre: art.genre || (art.phases && art.phases[0] && art.phases[0].genre) || ''
     });
   }
 
@@ -2006,13 +2224,15 @@ function renderArtStationProject(art) {
         const phaseDesc = p.desc || p.description || p.note || '';
         const phasePipe = p.pipelineKey || mainPipe;
         const phaseSub = p.subcategory || '';
+        const phaseGenre = p.genre || art.genre || '';
         imageList.push({
           src: pSrc,
           name: phaseName,
           phaseNum: (imageList.length + 1 < 10 ? `0${imageList.length + 1}` : `${imageList.length + 1}`),
           desc: phaseDesc,
           pipe: phasePipe,
-          sub: phaseSub
+          sub: phaseSub,
+          genre: phaseGenre
         });
       }
     });
@@ -2036,7 +2256,7 @@ function renderArtStationProject(art) {
             </div>
             <div style="flex-shrink: 0; text-align: left;">
               <span class="stream-phase-pipe font-mono" style="display: inline-block; padding: 4px 12px; border-radius: 6px; background: rgba(250, 204, 21, 0.12); border: 1px solid rgba(250, 204, 21, 0.35); color: var(--gold); font-size: 11px; font-weight: 800;">
-                ${pipeInfo}${item.sub ? ` • ${item.sub}` : ''}
+                ${pipeInfo}${item.sub ? ` • ${item.sub}` : ''}${item.genre ? ` • 🌌 ${item.genre}` : ''}
               </span>
             </div>
           </div>
@@ -7440,20 +7660,30 @@ window.renderFloatingCategoryDropdown = function() {
   const dropdown = document.getElementById('categoryFilterDropdown');
   if (!dropdown) return;
 
+  const isAllActive = (currentGalleryFilter === 'all' && currentGalleryGenreFilter === 'all' && !currentGallerySearchQuery);
+
   let itemsHtml = `
-    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
+    <!-- Search within dropdown -->
+    <div style="padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;" onclick="event.stopPropagation()">
+      <input type="text" id="dropdownSearchInput" placeholder="🔍 Filter categories & genres..." oninput="filterDropdownMenuOptions(this.value)" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid rgba(250,204,21,0.3); border-radius: 6px; padding: 6px 10px; font-size: 11.5px; color: #fff; outline: none;" />
+    </div>
+
+    <!-- All Artworks item -->
+    <div class="cat-dropdown-item ${isAllActive ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
       <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
       <span class="cat-item-text">All Artworks</span>
     </div>
+
+    <div style="padding: 6px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase;">Categories</div>
   `;
 
   if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
     galleryCategories.forEach(cat => {
-      const isActive = currentGalleryFilter === cat.id;
+      const isActive = (currentGalleryFilter === cat.id && currentGalleryGenreFilter === 'all');
       const color = cat.color || '#38bdf8';
       const title = cat.titleEN || cat.title || cat.id;
       itemsHtml += `
-        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+        <div class="cat-dropdown-item cat-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
           <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
           <span class="cat-item-text">${title}</span>
         </div>
@@ -7461,8 +7691,53 @@ window.renderFloatingCategoryDropdown = function() {
     });
   }
 
+  itemsHtml += `
+    <div style="padding: 10px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--cyan-electric); letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px;">Genres & Themes</div>
+  `;
+
+  const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres)) ? studioGenres : DEFAULT_STUDIO_GENRES;
+  genres.forEach(g => {
+    const isActive = (currentGalleryGenreFilter === g);
+    itemsHtml += `
+      <div class="cat-dropdown-item genre-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByGenre('${g}')">
+        <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+        <span class="cat-item-text">${g}</span>
+      </div>
+    `;
+  });
+
   dropdown.innerHTML = itemsHtml;
 };
+
+window.filterGalleryByGenre = function(genreName) {
+  currentGalleryGenreFilter = genreName;
+  currentGalleryFilter = 'all';
+  const labelEl = document.getElementById('currentCategoryPillLabel');
+  if (labelEl) labelEl.textContent = `Genre: ${genreName}`;
+
+  const pillBtn = document.getElementById('currentCategoryPillBtn');
+  if (pillBtn) {
+    pillBtn.style.setProperty('--pill-accent-color', 'var(--cyan-electric)', 'important');
+    pillBtn.style.setProperty('--pill-glow-color', 'rgba(0,240,255,0.55)', 'important');
+    pillBtn.style.setProperty('border-color', 'var(--cyan-electric)', 'important');
+  }
+
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  renderShowcaseGrid();
+  const gEl = document.getElementById('showcaseGrid');
+  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
+};
+
+window.filterDropdownMenuOptions = function(val) {
+  const q = (val || '').trim().toLowerCase();
+  document.querySelectorAll('#categoryFilterDropdown .cat-dropdown-item').forEach(item => {
+    const txt = item.textContent.toLowerCase();
+    item.style.display = (!q || txt.includes(q)) ? 'flex' : 'none';
+  });
+};
+
 
 // ۳. ویرایشگر کامل مشخصات دسته‌بندی در پنل ادمین (کادر فرم کامل)
 window.renderAdminGalleryCategories = function() {
@@ -7632,20 +7907,30 @@ window.renderFloatingCategoryDropdown = function() {
   const dropdown = document.getElementById('categoryFilterDropdown');
   if (!dropdown) return;
 
+  const isAllActive = (currentGalleryFilter === 'all' && currentGalleryGenreFilter === 'all' && !currentGallerySearchQuery);
+
   let itemsHtml = `
-    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
+    <!-- Search within dropdown -->
+    <div style="padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;" onclick="event.stopPropagation()">
+      <input type="text" id="dropdownSearchInput" placeholder="🔍 Filter categories & genres..." oninput="filterDropdownMenuOptions(this.value)" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid rgba(250,204,21,0.3); border-radius: 6px; padding: 6px 10px; font-size: 11.5px; color: #fff; outline: none;" />
+    </div>
+
+    <!-- All Artworks item -->
+    <div class="cat-dropdown-item ${isAllActive ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
       <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
       <span class="cat-item-text">All Artworks</span>
     </div>
+
+    <div style="padding: 6px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase;">Categories</div>
   `;
 
   if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
     galleryCategories.forEach(cat => {
-      const isActive = currentGalleryFilter === cat.id;
+      const isActive = (currentGalleryFilter === cat.id && currentGalleryGenreFilter === 'all');
       const color = cat.color || '#38bdf8';
       const title = cat.titleEN || cat.title || cat.id;
       itemsHtml += `
-        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+        <div class="cat-dropdown-item cat-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
           <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
           <span class="cat-item-text">${title}</span>
         </div>
@@ -7653,8 +7938,53 @@ window.renderFloatingCategoryDropdown = function() {
     });
   }
 
+  itemsHtml += `
+    <div style="padding: 10px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--cyan-electric); letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px;">Genres & Themes</div>
+  `;
+
+  const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres)) ? studioGenres : DEFAULT_STUDIO_GENRES;
+  genres.forEach(g => {
+    const isActive = (currentGalleryGenreFilter === g);
+    itemsHtml += `
+      <div class="cat-dropdown-item genre-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByGenre('${g}')">
+        <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+        <span class="cat-item-text">${g}</span>
+      </div>
+    `;
+  });
+
   dropdown.innerHTML = itemsHtml;
 };
+
+window.filterGalleryByGenre = function(genreName) {
+  currentGalleryGenreFilter = genreName;
+  currentGalleryFilter = 'all';
+  const labelEl = document.getElementById('currentCategoryPillLabel');
+  if (labelEl) labelEl.textContent = `Genre: ${genreName}`;
+
+  const pillBtn = document.getElementById('currentCategoryPillBtn');
+  if (pillBtn) {
+    pillBtn.style.setProperty('--pill-accent-color', 'var(--cyan-electric)', 'important');
+    pillBtn.style.setProperty('--pill-glow-color', 'rgba(0,240,255,0.55)', 'important');
+    pillBtn.style.setProperty('border-color', 'var(--cyan-electric)', 'important');
+  }
+
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  renderShowcaseGrid();
+  const gEl = document.getElementById('showcaseGrid');
+  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
+};
+
+window.filterDropdownMenuOptions = function(val) {
+  const q = (val || '').trim().toLowerCase();
+  document.querySelectorAll('#categoryFilterDropdown .cat-dropdown-item').forEach(item => {
+    const txt = item.textContent.toLowerCase();
+    item.style.display = (!q || txt.includes(q)) ? 'flex' : 'none';
+  });
+};
+
 
 // ۳. ویرایشگر خطی و شیک دسته‌بندی‌ها دقیقاً بالای لیست دسته‌ها در پنل ادمین
 window.renderAdminGalleryCategories = function() {
@@ -7854,20 +8184,30 @@ window.renderFloatingCategoryDropdown = function() {
   const dropdown = document.getElementById('categoryFilterDropdown');
   if (!dropdown) return;
 
+  const isAllActive = (currentGalleryFilter === 'all' && currentGalleryGenreFilter === 'all' && !currentGallerySearchQuery);
+
   let itemsHtml = `
-    <div class="cat-dropdown-item ${currentGalleryFilter === 'all' ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
+    <!-- Search within dropdown -->
+    <div style="padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;" onclick="event.stopPropagation()">
+      <input type="text" id="dropdownSearchInput" placeholder="🔍 Filter categories & genres..." oninput="filterDropdownMenuOptions(this.value)" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid rgba(250,204,21,0.3); border-radius: 6px; padding: 6px 10px; font-size: 11.5px; color: #fff; outline: none;" />
+    </div>
+
+    <!-- All Artworks item -->
+    <div class="cat-dropdown-item ${isAllActive ? 'active' : ''}" onclick="filterGalleryByCategory('all', 'All Artworks')">
       <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
       <span class="cat-item-text">All Artworks</span>
     </div>
+
+    <div style="padding: 6px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase;">Categories</div>
   `;
 
   if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
     galleryCategories.forEach(cat => {
-      const isActive = currentGalleryFilter === cat.id;
+      const isActive = (currentGalleryFilter === cat.id && currentGalleryGenreFilter === 'all');
       const color = cat.color || '#38bdf8';
       const title = cat.titleEN || cat.title || cat.id;
       itemsHtml += `
-        <div class="cat-dropdown-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
+        <div class="cat-dropdown-item cat-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByCategory('${cat.id}', '${title}')">
           <span class="cat-item-dot" style="background:${color}; box-shadow:0 0 8px ${color};"></span>
           <span class="cat-item-text">${title}</span>
         </div>
@@ -7875,8 +8215,53 @@ window.renderFloatingCategoryDropdown = function() {
     });
   }
 
+  itemsHtml += `
+    <div style="padding: 10px 12px 2px; font-size: 9.5px; font-weight: 800; color: var(--cyan-electric); letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px;">Genres & Themes</div>
+  `;
+
+  const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres)) ? studioGenres : DEFAULT_STUDIO_GENRES;
+  genres.forEach(g => {
+    const isActive = (currentGalleryGenreFilter === g);
+    itemsHtml += `
+      <div class="cat-dropdown-item genre-option-item ${isActive ? 'active' : ''}" onclick="filterGalleryByGenre('${g}')">
+        <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
+        <span class="cat-item-text">${g}</span>
+      </div>
+    `;
+  });
+
   dropdown.innerHTML = itemsHtml;
 };
+
+window.filterGalleryByGenre = function(genreName) {
+  currentGalleryGenreFilter = genreName;
+  currentGalleryFilter = 'all';
+  const labelEl = document.getElementById('currentCategoryPillLabel');
+  if (labelEl) labelEl.textContent = `Genre: ${genreName}`;
+
+  const pillBtn = document.getElementById('currentCategoryPillBtn');
+  if (pillBtn) {
+    pillBtn.style.setProperty('--pill-accent-color', 'var(--cyan-electric)', 'important');
+    pillBtn.style.setProperty('--pill-glow-color', 'rgba(0,240,255,0.55)', 'important');
+    pillBtn.style.setProperty('border-color', 'var(--cyan-electric)', 'important');
+  }
+
+  const dropdown = document.getElementById('categoryFilterDropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  renderShowcaseGrid();
+  const gEl = document.getElementById('showcaseGrid');
+  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
+};
+
+window.filterDropdownMenuOptions = function(val) {
+  const q = (val || '').trim().toLowerCase();
+  document.querySelectorAll('#categoryFilterDropdown .cat-dropdown-item').forEach(item => {
+    const txt = item.textContent.toLowerCase();
+    item.style.display = (!q || txt.includes(q)) ? 'flex' : 'none';
+  });
+};
+
 
 // ویرایشگر خطی دسته‌بندی‌ها در پنل ادمین (اولی فارسی، دومی انگلیسی)
 window.renderAdminGalleryCategories = function() {
@@ -8441,4 +8826,29 @@ window.saveStudioModeDirect = function(mode, event) {
   if (activeCard) activeCard.classList.add('active');
 
   showToast(`Studio status set to ${mode.toUpperCase()} and saved! ✓`, 'success', 3500);
+};
+
+window.resetGalleryFilters = function() {
+  currentGalleryFilter = 'all';
+  currentGalleryGenreFilter = 'all';
+  currentGallerySearchQuery = '';
+  const searchInput = document.getElementById('gallerySearchInput');
+  if (searchInput) searchInput.value = '';
+  const searchWrap = document.getElementById('gallerySearchWrapper');
+  if (searchWrap) searchWrap.classList.remove('expanded');
+  const labelEl = document.getElementById('currentCategoryPillLabel');
+  if (labelEl) labelEl.textContent = 'All Artworks';
+  renderShowcaseGrid();
+};
+
+window.handlePhaseUnifiedCategoryChange = function(phaseIdx, pipeKey) {
+  if (!stagingProjectPhases || !stagingProjectPhases[phaseIdx]) return;
+  const p = stagingProjectPhases[phaseIdx];
+  p.pipelineKey = pipeKey;
+  p.category = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined' && PIPELINE_TO_CATEGORY_MAP[pipeKey]) ? PIPELINE_TO_CATEGORY_MAP[pipeKey] : 'character';
+  p.tag = p.category;
+  const pipelines = typeof PIPELINE_DATA !== 'undefined' ? PIPELINE_DATA : {};
+  const subcats = (pipelines[pipeKey] && pipelines[pipeKey].subcategories) ? pipelines[pipeKey].subcategories : ['Standard Concept Execution'];
+  p.subcategory = subcats[0] || 'Standard Concept Execution';
+  renderAdminStagingPhasesOnly();
 };

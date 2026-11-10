@@ -35,26 +35,39 @@
   <!-- بوم پارتیکل‌های معلق کیهانی و جوهر استودیو (Ambient Cosmic & Ink Particles) -->
   <canvas id="ambientParticleCanvas"></canvas>
 
-  <!-- ۱. نشان شناور برند در بالا-چپ همراه با سوئیچر زبان -->
+  <!-- ۱. نشان شناور برند در بالا-چپ همراه با سرچ‌بار داینامیک و سوئیچر دسته‌بندی -->
   <div id="topCenterBrandBar">
-    <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
-      <span class="top-dot"></span>
-      <span>TAJINKART</span>
-    </button>
-
-    <!-- فهرست شناور دسته‌بندی آثار دقیقاً زیر نشان برند TAJINKART -->
-    <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-      <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks">
-        <span id="currentCategoryPillLabel">All Artworks</span>
-        <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+    <div class="top-brand-controls-row">
+      <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
+        <span class="top-dot"></span>
+        <span>TAJINKART</span>
       </button>
 
-      <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-        <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+      <!-- نوار جستجوی پیشرفته آثار و ژانرها با آیکون بازشونده در گوشه چپ -->
+      <div id="gallerySearchWrapper" class="gallery-search-wrapper" title="Click to search artworks, genres & lore">
+        <button type="button" id="gallerySearchTriggerBtn" class="gallery-search-icon-btn" onclick="toggleGallerySearchBar(event)" title="Search Artworks, Genres & Lore">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+          </svg>
+        </button>
+        <div class="gallery-search-input-box">
+          <input type="text" id="gallerySearchInput" placeholder="Search artworks, genres, lore..." oninput="searchGalleryArtworks(this.value)" autocomplete="off" />
+          <button type="button" class="gallery-search-clear-btn" onclick="clearGallerySearch(event)" title="Clear Search">✕</button>
+        </div>
+      </div>
+
+      <!-- فهرست شناور دسته‌بندی و ژانرهای آثار -->
+      <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
+        <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category or Genre">
+          <span id="currentCategoryPillLabel">All Artworks</span>
+          <span style="font-size:8px; opacity:0.75; margin-right:4px;">▼</span>
+        </button>
+
+        <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
+          <!-- داینامیک از جاوااسکریپت لود می‌شود -->
+        </div>
       </div>
     </div>
-
-    
   </div>
 
     <!-- ۲. داک عمودی ناوبری راست -->
@@ -1041,6 +1054,35 @@
               <!-- لیست افقی و فشرده دسته‌بندی‌ها به شکل پیل‌های شیک -->
               <div id="adminGalleryCategoriesList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
                 <!-- داینامیک توسط renderAdminGalleryCategories پر می‌شود -->
+              </div>
+            </div>
+
+            <!-- مدیریت ژانرهای آثار استودیو (Studio Genres & Worldbuilding Themes) -->
+            <div style="margin-top:16px; background:#06080d; border:1px solid rgba(0,240,255,0.25); border-radius:14px; padding:14px 18px; width:100%; box-sizing:border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">🌌 Universe Genres & Themes</h4>
+                  <span id="adminGenreCountBadge" class="font-mono" style="font-size:10.5px; color:var(--gold); background:rgba(250,204,21,0.1); padding:2px 8px; border-radius:10px; border:1px solid rgba(250,204,21,0.25);">Active Genres</span>
+                </div>
+                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-gold" style="font-size:11px; padding:5px 12px; border-radius:8px;">
+                  + Add New Genre
+                </button>
+              </div>
+
+              <!-- ردیف اینلاین ایجاد ژانر جدید -->
+              <div id="adminInlineAddGenreRow" style="display:none; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:10px; padding:10px 12px; margin-bottom:12px; align-items:center; gap:8px; flex-wrap:wrap;">
+                <input type="text" id="adminNewGenreTitle" placeholder="Genre Name (e.g. Grimdark, Solar-Punk, Gothic Horror)" style="font-size:11.5px; padding:6px 10px; flex:1; min-width:180px; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;" />
+                <button type="button" onclick="adminSubmitNewGenreInline()" class="btn-gold" style="font-size:11px; padding:6px 14px;">
+                  ✓ Save Genre
+                </button>
+                <button type="button" onclick="adminToggleAddGenreForm()" class="btn-secondary" style="font-size:11px; padding:6px 10px;">
+                  Cancel
+                </button>
+              </div>
+
+              <!-- لیست افقی ژانرها به شکل بج‌های باوقار -->
+              <div id="adminStudioGenresList" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <!-- داینامیک توسط renderAdminStudioGenres پر می‌شود -->
               </div>
             </div>
 

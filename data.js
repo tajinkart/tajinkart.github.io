@@ -1,3 +1,17 @@
+
+const DEFAULT_STUDIO_GENRES = [
+  'Dark Fantasy',
+  'Cyberpunk',
+  'Sci-Fi',
+  'Mythic & Ancient',
+  'Post-Apocalyptic',
+  'Horror & Eldritch',
+  'High Fantasy',
+  'Steampunk',
+  'Mecha & Industrial',
+  'Anime & Stylized',
+  'Historical & Military'
+];
 /**
  * TAJINKART Master Spec v2.1 Data Store
  * Studio Director & Lead Worldbuilder: Seyed Soroush Taj
