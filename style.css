@@ -6401,3 +6401,832 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
     max-width: 44px !important;
   }
 }
+
+
+/* ==========================================================================
+   TAJINKART DIEGETIC ATELIER MEMBER CONSOLE (v21.0.0)
+   "Genesis Codex / Atelier Workstation Console"
+   ========================================================================== */
+
+.member-console-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+/* ۱. هدر سندی و پرونده آتلیه (Atelier Dossier Card) */
+.atelier-dossier-card {
+  background: radial-gradient(circle at 10% 20%, rgba(14, 22, 38, 0.95), rgba(5, 8, 16, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 20px;
+  padding: 26px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.atelier-dossier-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan-electric), var(--gold), transparent);
+  pointer-events: none;
+}
+
+.atelier-dossier-profile {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.atelier-avatar-halo {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #090e18;
+  border: 1.5px solid var(--cyan-electric);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.atelier-avatar-halo.director-halo {
+  border-color: var(--gold);
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.45);
+}
+
+.atelier-avatar-glyph {
+  font-size: 28px;
+}
+
+.atelier-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  animation: atelierPulse 3s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes atelierPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+.atelier-identity-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.atelier-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--cyan-electric);
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 3px 12px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.atelier-rank-badge.director-rank {
+  color: var(--gold);
+  background: rgba(250, 204, 21, 0.1);
+  border-color: rgba(250, 204, 21, 0.35);
+}
+
+.rank-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.atelier-member-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.atelier-meta-coords {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.coord-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.atelier-protocol-badge {
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.atelier-quick-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn-atelier-gold {
+  background: linear-gradient(135deg, #facc15, #ca8a04);
+  color: #040507;
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(250, 204, 21, 0.6);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(250, 204, 21, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-atelier-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(250, 204, 21, 0.45);
+}
+
+.btn-atelier-cipher {
+  background: rgba(250, 204, 21, 0.08);
+  color: var(--gold);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-atelier-cipher:hover {
+  background: rgba(250, 204, 21, 0.16);
+  border-color: var(--gold);
+}
+
+.btn-atelier-accent {
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--cyan-electric);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+  transition: all 0.2s;
+}
+
+.btn-atelier-accent:hover {
+  background: var(--cyan-electric);
+  color: #040507;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-atelier-disconnect {
+  background: rgba(244, 63, 94, 0.08);
+  color: #fda4af;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-atelier-disconnect:hover {
+  background: rgba(244, 63, 94, 0.18);
+  color: #fff;
+  border-color: #f43f5e;
+}
+
+
+/* ۲. استیج تعاملی بوم پروداکشن (Interactive Multi-Layer Artifact Inspector) */
+.atelier-stage-module {
+  background: #060913;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.atelier-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stage-terminal-tag {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cyan-electric);
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stage-heading {
+  font-size: 17px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+}
+
+.atelier-layer-controls {
+  display: flex;
+  background: #03050a;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 4px;
+}
+
+.layer-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid transparent;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.layer-pill-btn .layer-num {
+  font-family: monospace;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.layer-pill-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.layer-pill-btn.active {
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--cyan-electric);
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+}
+
+.layer-pill-btn.active .layer-num {
+  background: var(--cyan-electric);
+  color: #000;
+  font-weight: 900;
+}
+
+.atelier-canvas-viewport {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.atelier-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #020306;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
+}
+
+.atelier-stage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.4s ease, transform 0.4s ease;
+  user-select: none;
+}
+
+/* فیلترهای شبیه‌ساز لایه‌های آتلیه */
+.layer-mode-silhouette {
+  filter: grayscale(100%) contrast(260%) brightness(0.85);
+}
+
+.layer-mode-value {
+  filter: grayscale(100%) contrast(145%) brightness(0.95);
+}
+
+.layer-mode-master {
+  filter: saturate(1.1) contrast(1.05);
+}
+
+.canvas-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* پین‌های بازخورد زنده بر بوم آرت‌ورک */
+.atelier-pin-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.pin-core {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #080d1a;
+  border: 2px solid var(--cyan-electric);
+  color: var(--cyan-electric);
+  font-size: 11px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.atelier-pin-hotspot:hover .pin-core {
+  transform: scale(1.2);
+  background: var(--cyan-electric);
+  color: #000;
+}
+
+.pin-beacon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  animation: pinPulse 2s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes pinPulse {
+  0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+.pin-hover-card {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 50%;
+  transform: translateX(50%) translateY(10px);
+  background: rgba(4, 7, 14, 0.96);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+  width: 220px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+.pin-hover-card strong {
+  display: block;
+  font-size: 11.5px;
+  color: var(--cyan-electric);
+  margin-bottom: 4px;
+}
+
+.pin-hover-card p {
+  font-size: 10.5px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.atelier-pin-hotspot:hover .pin-hover-card,
+.atelier-pin-hotspot.active .pin-hover-card {
+  opacity: 1;
+  transform: translateX(50%) translateY(0);
+  pointer-events: auto;
+}
+
+.canvas-bracket {
+  position: absolute;
+  font-family: monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bracket-tl { top: 12px; left: 14px; }
+.bracket-tr { top: 12px; right: 14px; }
+.bracket-bl { bottom: 12px; left: 14px; }
+.bracket-br { bottom: 12px; right: 14px; }
+
+/* نوار تله‌متری پایین بوم */
+.atelier-canvas-telemetry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #03050a;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.telemetry-items {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.telemetry-chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.telemetry-chip.active-layer {
+  color: var(--cyan-electric);
+  font-weight: 700;
+}
+
+.telemetry-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-telemetry-action {
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-telemetry-action:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  color: var(--cyan-electric);
+}
+
+
+/* ۳. ماتریس زبانه‌ها و ماژول‌های کنسول (Console Sub-Nav Matrix) */
+.atelier-tabs-wrapper {
+  margin-top: 10px;
+}
+
+.atelier-tab-nav {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.atelier-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.atelier-tab-btn:hover {
+  color: #fff;
+}
+
+.atelier-tab-btn.active {
+  color: var(--cyan-electric);
+  border-bottom-color: var(--cyan-electric);
+}
+
+.tab-count-badge {
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--cyan-electric);
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+.atelier-tab-pane {
+  display: none;
+  animation: paneFadeIn 0.3s ease;
+}
+
+.atelier-tab-pane.active {
+  display: block;
+}
+
+@keyframes paneFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pane-head-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pane-heading {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 3px 0;
+}
+
+.pane-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.btn-atelier-invoice {
+  background: rgba(250, 204, 21, 0.08);
+  color: var(--gold);
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-atelier-invoice:hover {
+  background: rgba(250, 204, 21, 0.18);
+  border-color: var(--gold);
+}
+
+/* شبکه کارت‌های کدکس (Digital Artifacts Codex) */
+.atelier-codex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 20px;
+}
+
+.codex-vault-card {
+  background: #060913;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.codex-vault-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 12px 35px rgba(168, 85, 247, 0.15);
+}
+
+.codex-card-thumb {
+  width: 100%;
+  height: 140px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #020408;
+  position: relative;
+}
+
+.codex-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.codex-card-format {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  color: var(--cyan-electric);
+  font-family: monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.codex-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.codex-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.codex-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10.5px;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 10px;
+  margin-top: auto;
+}
+
+.btn-codex-download {
+  width: 100%;
+  padding: 9px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(0, 240, 255, 0.15));
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-codex-download:hover {
+  background: linear-gradient(135deg, var(--violet), var(--cyan-electric));
+  color: #000;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
+}
+
+/* شبکه ماتریس امنیت (Security Matrix) */
+.atelier-security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 20px;
+}
+
+.security-card {
+  background: #060913;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sec-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.sec-card-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.sec-status-pill {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sec-status-pill.verified {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sec-contact-display {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+}
+
+/* ریسپانسیو کنسول در دستگاه‌های همراه */
+@media (max-width: 900px) {
+  .atelier-dossier-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .atelier-quick-actions {
+    width: 100%;
+  }
+  .atelier-quick-actions button {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+  .atelier-canvas-wrapper {
+    height: 340px;
+  }
+}
+
+@media (max-width: 600px) {
+  .member-console-container {
+    padding: 20px 12px 60px;
+  }
+  .atelier-dossier-profile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .atelier-canvas-wrapper {
+    height: 260px;
+  }
+  .atelier-layer-controls {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .layer-pill-btn {
+    flex: 1;
+    font-size: 10.5px;
+    padding: 6px 8px;
+  }
+}

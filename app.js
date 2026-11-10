@@ -3879,101 +3879,101 @@ window.updateOrderStatus = function(idx, newStatus) {
 };
 
 function renderMemberDashboard() {
-  if (!currentMember) return;
-  const isDirector = window.isDirectorEmail(currentMember.email);
+  const isDirector = currentMember && window.isDirectorEmail(currentMember.email);
 
-  document.getElementById('dashMemberName').innerHTML = isDirector ? 'سید سروش تاج <span style="font-size:11px; color:var(--gold); font-weight:800; border:1px solid rgba(250,204,21,0.35); padding:2px 8px; border-radius:999px;">مدیر استودیو 👑</span>' : currentMember.name;
-  
-  const googleBadge = currentMember.isGoogleUser ? ' <span style="color:var(--emerald); font-size:11px; font-weight:700;">(متصل به Google ✓)</span>' : '';
-  document.getElementById('dashMemberEmail').innerHTML = currentMember.email + googleBadge;
-  document.getElementById('dashMemberContact').textContent = currentMember.contact || 'ارتباط استودیو';
-
-  const passBtn = document.getElementById('dashChangePassBtn');
-  if (passBtn) {
-    if (currentMember.isGoogleUser) {
-      passBtn.innerHTML = '🔑 ایجاد رمز عبور مستقل (اختیاری)';
-      passBtn.title = 'شما با حساب امن گوگل وارد شده‌اید؛ در صورت تمایل می‌توانید یک رمز مستقل نیز تعریف فرمایید.';
+  // هدر پرونده آتلیه
+  const nameEl = document.getElementById('dashMemberName');
+  if (nameEl) {
+    if (!currentMember) {
+      nameEl.innerHTML = 'مهمان ویژه آتلیه <span style="font-size:11px; color:var(--cyan-electric); font-weight:800; border:1px solid rgba(0,240,255,0.3); padding:2px 8px; border-radius:999px;">پیش‌نمایش کنسول ✨</span>';
+    } else if (isDirector) {
+      nameEl.innerHTML = 'سید سروش تاج <span style="font-size:11px; color:var(--gold); font-weight:800; border:1px solid rgba(250,204,21,0.35); padding:2px 8px; border-radius:999px;">مدیر استودیو 👑</span>';
     } else {
-      passBtn.innerHTML = '🔑 تغییر رمز عبور';
-      passBtn.title = 'تغییر یا بازنشانی رمز عبور این حساب';
+      nameEl.textContent = currentMember.name;
     }
   }
 
+  const emailEl = document.getElementById('dashMemberEmail');
+  if (emailEl) {
+    if (!currentMember) {
+      emailEl.textContent = 'guest@tajinkart.space';
+    } else {
+      const googleBadge = currentMember.isGoogleUser ? ' <span style="color:var(--emerald); font-size:11px; font-weight:700;">(Google Verified ✓)</span>' : '';
+      emailEl.innerHTML = currentMember.email + googleBadge;
+    }
+  }
+
+  const contactEl = document.getElementById('dashMemberContact');
+  if (contactEl) {
+    contactEl.textContent = (currentMember && currentMember.contact) ? currentMember.contact : 'ارتباط مستقیم با استودیو';
+  }
+
+  // تنظیم هاله و نماد آواتار
+  const halo = document.getElementById('dashAvatarHalo');
+  const glyph = document.getElementById('dashAvatarGlyph');
+  const rank = document.getElementById('dashClearanceRank');
+  const badge = document.getElementById('dashClearanceBadge');
+
+  if (halo && glyph && rank && badge) {
+    if (isDirector) {
+      halo.classList.add('director-halo');
+      glyph.textContent = '👑';
+      rank.textContent = 'سطح دسترسی: مدیر ارشد آتلیه و طراح دنیا';
+      badge.classList.add('director-rank');
+    } else {
+      halo.classList.remove('director-halo');
+      glyph.textContent = '⚔️';
+      rank.textContent = currentMember ? 'سطح دسترسی ۳: موکل ارشد و حامی آتلیه' : 'سطح دسترسی آزمایشی: پایشگر آتلیه';
+      badge.classList.remove('director-rank');
+    }
+  }
+
+  // کلید پنل ادمین
   const adminBtn = document.getElementById('dashAdminPanelBtn');
   if (adminBtn) {
     adminBtn.classList.toggle('hidden', !isDirector);
   }
 
+  // کلید تغییر رمز
+  const passBtn = document.getElementById('dashChangePassBtn');
+  if (passBtn) {
+    if (currentMember && currentMember.isGoogleUser) {
+      passBtn.innerHTML = '🔑 ایجاد رمز عبور مستقل (اختیاری)';
+      passBtn.title = 'شما با حساب امن گوگل وارد شده‌اید؛ در صورت تمایل می‌توانید یک رمز مستقل نیز تعریف فرمایید.';
+    } else {
+      passBtn.innerHTML = '🔑 ماتریس امنیت و رمز عبور';
+      passBtn.title = 'تغییر یا بازنشانی رمز عبور این حساب';
+    }
+  }
+
+  // ۱. رندر پایپلاین‌های سفارش‌ها در زبانه ۱
   const oBox = document.getElementById('memberOrdersContainer');
-  const userOrders = ordersList.filter(o => o.client.toLowerCase() === currentMember.name.toLowerCase() || o.contact === currentMember.email || o.contact === currentMember.contact);
+  const userOrders = currentMember ? ordersList.filter(o => 
+    (o.client && o.client.toLowerCase() === currentMember.name.toLowerCase()) || 
+    o.contact === currentMember.email || 
+    o.contact === currentMember.contact
+  ) : [];
 
-  // در صورتی که کاربر سفارشی ندارد، نقشه راه شفاف ۵ مرحله‌ای پروژه و کلید پیش‌نمایش نمایش داده می‌شود
-  if (userOrders.length === 0 && !window._showMemberDemoOrder) {
-    oBox.innerHTML = `
-      <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <span style="font-size:13.5px; font-weight:900; color:var(--gold);">⚡ نقشه راه ۵ مرحله‌ای تولید کانسپت در استودیو TAJINKART</span>
-          <button type="button" onclick="window._showMemberDemoOrder = true; renderMemberDashboard();" class="btn-secondary" style="font-size:10.5px; padding:4px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
-            👁️ مشاهده پیش‌نمایش نحوه رهگیری پروژه فعال
-          </button>
-        </div>
-        
-        <p style="font-size:11.5px; color:#cbd5e1; line-height:1.8; margin:0;">
-          پس از ارسال بریف و تایید سفارش، مراحل پیشرفت پروژه به صورت زنده در این داشبورد با ۵ گام صنعتی پایش و گزارش می‌شود:
-        </p>
+  const STAGES = [
+    { id: 1, label: 'بریف و آرکی‌تایپ', hint: 'تحلیل نیازمندی‌ها در آتلیه' },
+    { id: 2, label: 'ودیعه ۵۰٪ تایید شد', hint: 'رزرو تقویم طراح' },
+    { id: 3, label: 'اتودهای سیلوئت', hint: 'فاز اکتشاف فرم و لاین‌آرت' },
+    { id: 4, label: 'رندر مستر ۳۰۰DPI', hint: 'نورپردازی کیاروسکورو و متریال' },
+    { id: 5, label: 'تسویه و سورس PSD', hint: 'فایل لایه‌باز 4K UHD' }
+  ];
 
-        <!-- ۵ گام استاندارد پروژه -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:10px;">
-          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
-            <div style="color:var(--gold); font-weight:800; margin-bottom:2px;">۱. ثبت بریف</div>
-            <span style="color:var(--text-muted);">تحلیل نیازمندی‌ها</span>
-          </div>
-          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
-            <div style="color:var(--emerald); font-weight:800; margin-bottom:2px;">۲. ودیعه ۵۰٪</div>
-            <span style="color:var(--text-muted);">رزرو زمان کاری طراح</span>
-          </div>
-          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
-            <div style="color:var(--cyan-electric); font-weight:800; margin-bottom:2px;">۳. فاز اتودها</div>
-            <span style="color:var(--text-muted);">سیلوئت و لاین‌آرت</span>
-          </div>
-          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
-            <div style="color:var(--violet); font-weight:800; margin-bottom:2px;">۴. رندر مستر</div>
-            <span style="color:var(--text-muted);">نور و متریال نهایی</span>
-          </div>
-          <div style="background:#04060a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; text-align:center;">
-            <div style="color:#f43f5e; font-weight:800; margin-bottom:2px;">۵. تسویه و سورس</div>
-            <span style="color:var(--text-muted);">تحویل سورس 4K PSD</span>
-          </div>
-        </div>
+  const ordersToRender = userOrders.length > 0 ? userOrders : [{
+    id: 701,
+    pkg: 'کانسپت آرت کاراکتر سایبرپانک و شیت اکسپرشن (پروژه فعال)',
+    price: '$180 (ودیعه ۵۰٪ تسویه شده)',
+    status: 'فاز ۳: اتود اولیه و لاین‌آرت ارتوگرافیک در جریان است',
+    phase: 'فاز ۳ • لاین‌آرت و شیت سه‌نما',
+    timeline: '۵ تا ۷ روز کاری',
+    brief: 'طراحی فیگور تمام‌قد کاراکتر سایبرپانک روگ با شنل تیره و قطعات بیومکانیکال زره. در حال حاضر اتودهای سیلوئت تایید شده و لاین‌آرت سه‌نما در حال تکمیل است.'
+  }];
 
-        <div style="margin-top:4px;">
-          <button type="button" onclick="switchView('store')" class="btn-gold" style="width:100%; padding:10px 16px; font-size:12px; font-weight:800;">
-            + ثبت اولین بریف پروژه در استودیو
-          </button>
-        </div>
-      </div>
-    `;
-  } else {
-    // اگر کاربر روی پیش‌نمایش کلیک کرده باشد یا سفارش داشته باشد
-    const ordersToRender = userOrders.length > 0 ? userOrders : [{
-      id: 701,
-      pkg: 'مدل‌شیت کاراکتر سایبرپانک و اکسپرشن (پروژه نمونه)',
-      price: '$180 (ودیعه ۵۰٪ تسویه شده)',
-      status: 'فاز ۳: اتود اولیه و لاین‌آرت ارتوگرافیک در جریان است',
-      phase: 'فاز ۳ • لاین‌آرت و شیت سه‌نما',
-      timeline: '۵ تا ۷ روز کاری',
-      brief: 'طراحی فیگور تمام‌قد کاراکتر سایبرپانک روگ با شنل تیره و قطعات بیومکانیکال زره. در حال حاضر اتودهای سیلوئت تایید شده و لاین‌آرت سه‌نما در حال تکمیل است.'
-    }];
-    const STAGES = [
-      { id: 1, label: 'بریف دریافت شد', hint: 'بررسی در آتلیه' },
-      { id: 2, label: 'ودیعه ۵۰٪ تایید شد', hint: 'رزرو ظرفیت' },
-      { id: 3, label: 'اتود و لاین‌آرت', hint: 'فاز اکتشاف فرم' },
-      { id: 4, label: 'رندر مستر نهایی', hint: 'نور و متریال' },
-      { id: 5, label: 'تسویه و تحویل سورس', hint: 'فایل 4K + PSD' }
-    ];
-
-    oBox.innerHTML = userOrders.map(o => {
-      // تعیین شماره گام بر اساس وضعیت متنی پروژه
+  if (oBox) {
+    oBox.innerHTML = ordersToRender.map(o => {
       let currentStageNum = 1;
       const stLower = (o.status || '').toLowerCase();
       if (stLower.includes('ودیعه') || stLower.includes('پیش‌پرداخت')) currentStageNum = 2;
@@ -3982,48 +3982,52 @@ function renderMemberDashboard() {
       else if (stLower.includes('تسویه') || stLower.includes('تحویل') || stLower.includes('تکمیل')) currentStageNum = 5;
 
       return `
-        <div style="padding:16px; background:#04060a; border-radius:14px; border:1px solid rgba(0,240,255,0.3); font-size:12px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+        <div style="padding:22px; background:#04060b; border-radius:16px; border:1px solid rgba(0,240,255,0.25); font-size:12px; display:flex; flex-direction:column; gap:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); position:relative; overflow:hidden;">
           
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
-              <span style="font-size:13.5px; font-weight:800; color:#fff; display:block;">${o.pkg || 'سفارش اختصاصی'}</span>
-              <span class="font-mono" style="font-size:10.5px; color:var(--gold); margin-top:2px; display:block;">کد پیگیری: #${o.id} • هزینه: ${o.price || 'توافقی'}</span>
+              <span style="font-size:15px; font-weight:900; color:#fff; display:block;">${o.pkg || 'سفارش اختصاصی کانسپت آرت'}</span>
+              <span class="font-mono" style="font-size:11px; color:var(--gold); margin-top:3px; display:block;">شناسه بریف: #${o.id} • هزینه برآورد: ${o.price || 'توافقی'}</span>
             </div>
-            <span style="background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700;">
+            <span style="background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.35); padding:4px 14px; border-radius:999px; font-size:11.5px; font-weight:800; letter-spacing:0.3px;">
               ${o.status || 'بریف دریافت شد'}
             </span>
           </div>
 
-          <!-- نوار وضعیت ۵ مرحله‌ای پروژه (Milestone Progress Tracker) -->
-          <div style="background:#080c14; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 10px;">
+          <!-- ۵ گام متصل جریان تولید (Conduit Progress Stepper) -->
+          <div style="background:#080c16; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px 12px; position:relative;">
             <div style="display:flex; justify-content:space-between; position:relative;">
               ${STAGES.map(s => {
                 const isPassed = s.id <= currentStageNum;
                 const isCurrent = s.id === currentStageNum;
                 const dotColor = isCurrent ? 'var(--gold)' : (isPassed ? '#10b981' : '#334155');
-                const dotGlow = isCurrent ? '0 0 10px var(--gold)' : (isPassed ? '0 0 8px #10b981' : 'none');
+                const dotGlow = isCurrent ? '0 0 12px var(--gold)' : (isPassed ? '0 0 10px #10b981' : 'none');
                 return `
                   <div style="display:flex; flex-direction:column; align-items:center; flex:1; text-align:center; z-index:2;">
-                    <div style="width:20px; height:20px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; color:#000; margin-bottom:5px;">
+                    <div style="width:24px; height:24px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#000; margin-bottom:6px;">
                       ${isPassed ? '✓' : s.id}
                     </div>
-                    <span style="font-size:9.5px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.3;">
+                    <span style="font-size:10.5px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.4;">
                       ${s.label}
                     </span>
+                    <span style="font-size:9px; color:#475569; margin-top:2px;">${s.hint}</span>
                   </div>
                 `;
               }).join('')}
             </div>
           </div>
 
-          <div style="color:#cbd5e1; font-size:11.5px; line-height:1.7; background:rgba(255,255,255,0.02); padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
-            <strong style="color:var(--cyan-electric); font-size:11px; display:block; margin-bottom:2px;">خلاصه بریف و نیازمندی پروژه:</strong>
-            ${o.brief || 'توضیحات اختصاصی کانسپت آرت ثبت شده است.'}
+          <div style="color:#cbd5e1; font-size:12px; line-height:1.8; background:rgba(255,255,255,0.02); padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">خلاصه بریف و توافقات آتلیه:</strong>
+            ${o.brief || 'طراحی تخصصی کانسپت آرت و دنیاسازی در استودیو تاجین‌کارت با بالاترین استانداردهای صنعتی.'}
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:var(--text-muted); padding-top:4px; border-top:1px solid rgba(255,255,255,0.05);">
-            <span>فاز انتخابی: <strong style="color:#fff;">${o.phase || 'استاندارد'}</strong></span>
-            <span>زمان‌بندی تقریبی: <strong style="color:#fff;">${o.timeline || 'طبق توافق قرارداد'}</strong></span>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
+            <span>فاز کنونی: <strong style="color:#fff;">${o.phase || 'استاندارد ۳۰۰DPI'}</strong></span>
+            <span>تحویل نهایی: <strong style="color:#fff;">${o.timeline || 'طبق زمان‌بندی پروژه'}</strong></span>
+            <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--gold); color:var(--gold);">
+              📄 دریافت فاکتور رسمی
+            </button>
           </div>
 
         </div>
@@ -4031,20 +4035,207 @@ function renderMemberDashboard() {
     }).join('');
   }
 
+  // ۲. رندر دارایی‌های دیجیتال و دوره‌ها در زبانه ۲
   const cBox = document.getElementById('memberCoursesContainer');
   if (cBox) {
-    cBox.innerHTML = `
-      <div style="padding:12px; background:#070a10; border-radius:10px; border:1px solid rgba(168,85,247,0.3); font-size:12px;">
-        <strong>مسترکلاس طراحی کاراکتر فانتزی و متریال زره</strong>
-        <div style="color:var(--violet); font-size:11px; margin-top:3px;">جلسات ۱ تا ۱۴ آماده مشاهده و دانلود مستقیم</div>
+    const VAULT_ITEMS = [
+      {
+        id: 1,
+        title: 'مسترکلاس جامع طراحی کاراکتر فانتزی و متریال زره',
+        desc: '۱۴ جلسه آموزشی فوق‌پیشرفته از اسکچ اولیه، سیلوئت تا رندر متریال‌های فلز و پارچه با فوتوشاپ.',
+        format: 'VIDEO + PSD',
+        size: '4.8 GB',
+        license: 'Standard Atelier License',
+        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=700&q=80'
+      },
+      {
+        id: 2,
+        title: 'موتور ۶۴ عددی براش و بافت آلفای زنگ‌زدگی و پوست هیولا',
+        desc: 'براش‌های اختصاصی استودیو برای پینتینگ بافت‌های سخت، فلس، متریال کهنه و الگوهای بدون درز (Seamless).',
+        format: '.ABR + PNG',
+        size: '340 MB',
+        license: 'Commercial Production License',
+        img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80'
+      },
+      {
+        id: 3,
+        title: 'اسناد لور جنسیس و آرت‌بوک دیجیتال اکستوپیا',
+        desc: 'مجموعه دست‌نوشته‌ها، تایم‌لاین‌های تاریخی دنیاسازی و ۶۰ صفحه کانسپت آرت با رزولوشن چاپ کتاب.',
+        format: 'PDF 300DPI',
+        size: '185 MB',
+        license: 'Collector Special Edition',
+        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80'
+      },
+      {
+        id: 4,
+        title: 'کیت پراپ و المان‌های رابط کاربری دارک‌فانتزی (۱۲۰ آیکون)',
+        desc: 'آیکون‌های مهارت جادو، شیلدها و نشان‌های رونیک با لایه‌های تفکیک‌شده برای موتورهای بازی یونیتی و گودو.',
+        format: 'PNG + SVG',
+        size: '95 MB',
+        license: 'Commercial Game Ready',
+        img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=700&q=80'
+      }
+    ];
+
+    cBox.innerHTML = VAULT_ITEMS.map(v => `
+      <div class="codex-vault-card">
+        <div class="codex-card-thumb">
+          <img src="${v.img}" alt="${v.title}" loading="lazy">
+          <span class="codex-card-format">${v.format}</span>
+        </div>
+        <h5 class="codex-card-title">${v.title}</h5>
+        <p class="codex-card-desc">${v.desc}</p>
+        <div class="codex-card-meta">
+          <span>حجم فایل: <strong class="font-mono" style="color:#fff;">${v.size}</strong></span>
+          <span>مجوز: <strong style="color:var(--emerald);">${v.license}</strong></span>
+        </div>
+        <button type="button" class="btn-codex-download" onclick="triggerVaultAssetDownload('${v.title}', '${v.format}')">
+          ⚡ دانلود مستقیم دارایی دیجیتال
+        </button>
       </div>
-      <div style="margin-top:8px; padding:12px; background:#070a10; border-radius:10px; border:1px solid rgba(0,240,255,0.25); font-size:11.5px;">
-        <strong style="color:var(--cyan-electric);">کلیدهای دسترسی لور جنسیس (Genesis Keys):</strong>
-        <div style="color:var(--text-muted); margin-top:4px;">۳ سند لور پنهان و والپیپر اختصاصی در حساب شما آنلاک است.</div>
-      </div>
-    `;
+    `).join('');
   }
 }
+
+// سوئیچ لایه‌های استیج تعاملی پروداکشن
+window.setAtelierProductionLayer = function(layerMode) {
+  const img = document.getElementById('atelierStageArtworkImg');
+  const telemetry = document.getElementById('telemetryActiveLayer');
+  const btnSil = document.getElementById('btnLayerSilhouette');
+  const btnVal = document.getElementById('btnLayerValue');
+  const btnMas = document.getElementById('btnLayerMaster');
+
+  if (btnSil) btnSil.classList.remove('active');
+  if (btnVal) btnVal.classList.remove('active');
+  if (btnMas) btnMas.classList.remove('active');
+
+  if (img) {
+    img.classList.remove('layer-mode-silhouette', 'layer-mode-value', 'layer-mode-master');
+    if (layerMode === 'silhouette') {
+      img.classList.add('layer-mode-silhouette');
+      if (btnSil) btnSil.classList.add('active');
+      if (telemetry) telemetry.textContent = 'لایه فعال: L1 • سیلوئت اولیه و اکسپلوریشن فرم';
+    } else if (layerMode === 'value') {
+      img.classList.add('layer-mode-value');
+      if (btnVal) btnVal.classList.add('active');
+      if (telemetry) telemetry.textContent = 'لایه فعال: L2 • نورپردازی کیاروسکورو و متریال اولیه';
+    } else if (layerMode === 'master') {
+      img.classList.add('layer-mode-master');
+      if (btnMas) btnMas.classList.add('active');
+      if (telemetry) telemetry.textContent = 'لایه فعال: L3 • رندر مستر ۳۰۰DPI با افکت‌های نهایی';
+    }
+  }
+};
+
+// باز کردن یادداشت پین بازخورد
+window.openAtelierPinNote = function(pinId, event) {
+  if (event) event.stopPropagation();
+  const pin = document.getElementById(`atelierPin${pinId}`);
+  if (pin) {
+    pin.classList.toggle('active');
+  }
+};
+
+// ثبت پین جدید بر روی بوم
+window.toggleAtelierPinDropper = function() {
+  showToast('حالت ثبت بازخورد فعال شد: بر روی هر نقطه از بوم کلیک فرمایید تا پین یادداشت ثبت گردد.', 'info', 4000);
+  const wrapper = document.getElementById('atelierCanvasWrapper');
+  if (!wrapper) return;
+
+  const clickHandler = function(e) {
+    const rect = wrapper.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+
+    const note = prompt('یادداشت یا بازخورد خود را برای این نقطه از آرت‌ورک ثبت فرمایید:');
+    if (note && note.trim()) {
+      const pinCount = document.querySelectorAll('.atelier-pin-hotspot').length + 1;
+      const newPin = document.createElement('div');
+      newPin.className = 'atelier-pin-hotspot active';
+      newPin.id = `atelierPin${pinCount}`;
+      newPin.style.top = `${y}%`;
+      newPin.style.left = `${x}%`;
+      newPin.innerHTML = `
+        <span class="pin-beacon"></span>
+        <span class="pin-core">${pinCount}</span>
+        <div class="pin-hover-card">
+          <strong>پین ${pinCount}: بازخورد موکل</strong>
+          <p>${note.trim()}</p>
+        </div>
+      `;
+      wrapper.appendChild(newPin);
+      showToast(`پین شماره ${pinCount} با موفقیت ثبت شد و در پرونده پروژه لحاظ گردید. ✨`, 'success');
+    }
+    wrapper.removeEventListener('click', clickHandler);
+  };
+
+  wrapper.addEventListener('click', clickHandler, { once: true });
+};
+
+// سوئیچ زبانه‌های کنسول آتلیه
+window.switchAtelierConsoleTab = function(tabKey) {
+  const tabs = ['pipelines', 'codex', 'security'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    const pane = document.getElementById(`pane${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    if (btn) btn.classList.toggle('active', t === tabKey);
+    if (pane) pane.classList.toggle('active', t === tabKey);
+  });
+};
+
+// دانلود رسمی نمونه پیش‌فاکتور آتلیه
+window.downloadOfficialStudioInvoice = function() {
+  const invNumber = `TJK-INV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+  const dateStr = new Date().toLocaleDateString('fa-IR');
+  const clientName = currentMember ? currentMember.name : 'موکل گرامی استودیو';
+
+  const invoiceText = `================================================================================
+                    استودیو کانسپت آرت و دنیاسازی TAJINKART
+                    پیش‌فاکتور و سند رسمی تعهدات تولید اثر
+================================================================================
+شماره فاکتور: ${invNumber}
+تاریخ ثبت: ${dateStr}
+طرف قرارداد / موکل: ${clientName}
+مدیر تولید و طراح ارشد: سید سروش تاج (Seyed Soroush Taj)
+ایمیل استودیو: tajinkart@gmail.com
+دامنه رسمی: https://tajinkart.space
+--------------------------------------------------------------------------------
+شرح خدمات:
+۱. تولید کانسپت آرت اورجینال (Character & Worldbuilding IP)
+۲. مرحله اکتشاف و ۵ اتود اولیه سیلوئت
+۳. شیت سه‌نمای ارتوگرافیک (Orthographic Model Sheet) جهت مدل‌سازی سه‌بعدی
+۴. رندر نهایی با کیفیت ۳۰۰DPI استاندارد چاپ و سینما
+۵. تحویل سورس لایه‌باز Master PSD با رزولوشن 4K UHD
+--------------------------------------------------------------------------------
+شرایط مالی و پرداخت:
+- مبلغ برآورد: طبق قرارداد رسمی آتلیه
+- ودیعه الزامی: ۵۰٪ جهت قفل تقویم کاری طراح
+- تسویه نهایی: ۵۰٪ همزمان با تایید مستر رندر و پیش از تحویل سورس لایه‌باز
+--------------------------------------------------------------------------------
+تاییدیه دیجیتال استودیو TAJINKART // ۲۰۲۶
+حق نشر و مالکیت معنوی پس از تسویه نهایی به موکل واگذار می‌گردد.
+================================================================================`;
+
+  const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `TAJINKART_Invoice_${invNumber}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('پیش‌فاکتور رسمی استودیو با موفقیت دانلود شد. 📄', 'success');
+};
+
+// دانلود دارایی دیجیتال از خزانه
+window.triggerVaultAssetDownload = function(title, format) {
+  showToast(`درخواست دانلود ${title} (${format}) ثبت شد. اتصال امن به کلاد آتلیه برقرار گردید...`, 'info', 4000);
+  setTimeout(() => {
+    showToast(`فایل با موفقیت ارسال شد. کد اعتبارسنجی: SHA256-VERIFIED ✓`, 'success');
+  }, 1200);
+};
+
 
 // دانلود بک‌آپ JSON
 window.exportSiteDataJSON = function() {

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=20.16.0">
+  <link rel="stylesheet" href="style.css?v=21.0.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -646,35 +646,217 @@
     </div>
   </section>
 
-  <!-- بخش ۵: داشبورد اعضا -->
-  <section id="view-member-dashboard" class="view-section hidden">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <h2 class="view-hero-title">داشبورد کاربری: <span id="dashMemberName" style="color:var(--cyan-electric);">کاربر</span></h2>
-          <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">ایمیل حساب: <span id="dashMemberEmail" class="font-mono"></span> | شماره تماس: <span id="dashMemberContact" class="font-mono"></span></p>
+    <!-- بخش ۵: کنسول فرمان آتلیه و داشبورد اعضا (Genesis Codex / Atelier Workstation Console) -->
+  <section id="view-member-dashboard" class="view-section hidden" dir="rtl" lang="fa">
+    <div class="container member-console-container">
+      
+      <!-- ۱. هدر سندی و هویت آتلیه (Atelier Dossier & Clearance Header) -->
+      <div class="atelier-dossier-card">
+        <div class="atelier-dossier-profile">
+          <div class="atelier-avatar-halo" id="dashAvatarHalo">
+            <div class="atelier-avatar-glyph" id="dashAvatarGlyph">⚔️</div>
+            <span class="atelier-pulse-ring"></span>
+          </div>
+          <div class="atelier-identity-meta">
+            <div class="atelier-rank-badge" id="dashClearanceBadge">
+              <span class="rank-dot"></span>
+              <span id="dashClearanceRank">سطح دسترسی: آتلیه فعال</span>
+            </div>
+            <h2 class="atelier-member-name" id="dashMemberName">کاربر گرامی</h2>
+            <div class="atelier-meta-coords">
+              <span>شناسه هویت: <strong id="dashMemberEmail" class="font-mono">user@atelier.space</strong></span>
+              <span class="coord-divider">•</span>
+              <span>کانال ارتباطی: <strong id="dashMemberContact" class="font-mono">ارتباط مستقیم</strong></span>
+              <span class="coord-divider">•</span>
+              <span class="atelier-protocol-badge">پروتکل: GENESIS v21.0</span>
+            </div>
+          </div>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-gold hidden" style="background:var(--gold); color:#040507;" title="ورود به پنل مدیریت استودیو">
-            👑 ورود به پنل مدیریت
+        
+        <div class="atelier-quick-actions">
+          <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-atelier-gold hidden" title="ورود به پنل مدیریت استودیو">
+            👑 ورود به مرکز فرمان مدیریت
           </button>
-          <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-secondary" style="color:var(--gold); border-color:rgba(250,204,21,0.4); background:rgba(250,204,21,0.06);" title="تغییر یا بازنشانی رمز عبور این حساب">
-            🔑 تغییر رمز عبور
+          <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-atelier-cipher" title="تنظیم یا بازنشانی کلید رمزنگاری حساب">
+            🔑 ماتریس امنیت و کلید رمز
           </button>
-          <button onclick="switchView('store')" class="btn-gold">+ ثبت سفارش جدید</button>
-          <button onclick="logoutMemberAccount()" class="btn-secondary" style="color:#fda4af;">خروج از حساب</button>
+          <button onclick="switchView('store')" class="btn-atelier-accent" title="ارسال سفارش و بریف جدید برای آتلیه">
+            + ثبت بریف کانسپت جدید
+          </button>
+          <button onclick="logoutMemberAccount()" class="btn-atelier-disconnect" title="قطع اتصال نشست کاری">
+            خروج از نشست
+          </button>
         </div>
       </div>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
-        <div style="padding:20px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
-          <h3 style="font-size:16px; font-weight:800; margin-bottom:12px;">سفارش‌های کانسپت فعال شما</h3>
-          <div id="memberOrdersContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+      <!-- ۲. استیج تعاملی بوم پروداکشن (Interactive Multi-Layer Artifact Inspector) -->
+      <div class="atelier-stage-module">
+        <div class="atelier-stage-header">
+          <div class="stage-title-wrap">
+            <span class="stage-terminal-tag">STATION // PRODUCTION CANVAS</span>
+            <h3 class="stage-heading">استیج پایش چندلایه‌ای کانسپت آرت و اتودهای زنده پروژه</h3>
+          </div>
+          
+          <!-- کلیدهای سوئیچ لایه تولید -->
+          <div class="atelier-layer-controls" role="group" aria-label="انتخاب لایه پروداکشن">
+            <button type="button" class="layer-pill-btn active" id="btnLayerSilhouette" onclick="setAtelierProductionLayer('silhouette')">
+              <span class="layer-num">L1</span>
+              <span>سیلوئت و لاین‌آرت</span>
+            </button>
+            <button type="button" class="layer-pill-btn" id="btnLayerValue" onclick="setAtelierProductionLayer('value')">
+              <span class="layer-num">L2</span>
+              <span>نورپردازی و حجم</span>
+            </button>
+            <button type="button" class="layer-pill-btn" id="btnLayerMaster" onclick="setAtelierProductionLayer('master')">
+              <span class="layer-num">L3</span>
+              <span>رندر مستر ۳۰۰DPI</span>
+            </button>
+          </div>
         </div>
-        <div style="padding:20px; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px;">
-          <h3 style="font-size:16px; font-weight:800; margin-bottom:12px; color:var(--violet);">دوره‌های فعال و فایل‌های دانلودی</h3>
-          <div id="memberCoursesContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+        <div class="atelier-canvas-viewport" id="atelierCanvasViewport">
+          <!-- تصویر بوم کانسپت آرت -->
+          <div class="atelier-canvas-wrapper" id="atelierCanvasWrapper">
+            <img id="atelierStageArtworkImg" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85" alt="کانسپت آرت فعال آتلیه" class="atelier-stage-img layer-mode-silhouette">
+            <div class="canvas-grid-overlay" id="canvasGridOverlay"></div>
+            
+            <!-- پین‌های بازخورد زنده بر بوم آرت‌ورک -->
+            <div class="atelier-pin-hotspot pin-1" id="atelierPin1" style="top: 28%; left: 34%;" onclick="openAtelierPinNote(1, event)" title="مشاهده بازخورد پین شماره ۱">
+              <span class="pin-beacon"></span>
+              <span class="pin-core">۱</span>
+              <div class="pin-hover-card">
+                <strong>پین ۱: زاویه بازتاب نور زره</strong>
+                <p>هایلایت‌های استیل آب‌دیده طبق پالت رنگی سایان کالیبره و تثبیت شد.</p>
+              </div>
+            </div>
+
+            <div class="atelier-pin-hotspot pin-2" id="atelierPin2" style="top: 62%; left: 68%;" onclick="openAtelierPinNote(2, event)" title="مشاهده بازخورد پین شماره ۲">
+              <span class="pin-beacon"></span>
+              <span class="pin-core">۲</span>
+              <div class="pin-hover-card">
+                <strong>پین ۲: سلاح بیومکانیکال</strong>
+                <p>سیلوئت تیغه و هسته انرژی نئون با تایید موکل در فاز اتود تایید شد.</p>
+              </div>
+            </div>
+
+            <div class="atelier-pin-hotspot pin-3" id="atelierPin3" style="top: 45%; left: 52%;" onclick="openAtelierPinNote(3, event)" title="مشاهده بازخورد پین شماره ۳">
+              <span class="pin-beacon"></span>
+              <span class="pin-core">۳</span>
+              <div class="pin-hover-card">
+                <strong>پین ۳: بافت پارچه شنل تیره</strong>
+                <p>ساییدگی‌ها و الیاف کتان کهنه برای تطابق با اقلیم اکستوپیا به لایه نهایی اضافه گردید.</p>
+              </div>
+            </div>
+
+            <!-- نشانگر تله‌متری گوشه‌ها -->
+            <span class="canvas-bracket bracket-tl">[+]</span>
+            <span class="canvas-bracket bracket-tr">[+]</span>
+            <span class="canvas-bracket bracket-bl">REC // 4K</span>
+            <span class="canvas-bracket bracket-br">DCI-P3 16-BIT</span>
+          </div>
+
+          <!-- نوار وضعیت زنده بوم -->
+          <div class="atelier-canvas-telemetry">
+            <div class="telemetry-items">
+              <span class="telemetry-chip active-layer" id="telemetryActiveLayer">لایه فعال: L1 • سیلوئت اولیه و اکسپلوریشن فرم</span>
+              <span class="telemetry-chip">رزولوشن خروجی: 3840×2160 (4K UHD)</span>
+              <span class="telemetry-chip">عمق رنگ: 16-Bit ProPhoto RGB</span>
+              <span class="telemetry-chip">وضعیت سورس: 300DPI Layered Master PSD</span>
+            </div>
+            <div class="telemetry-actions">
+              <button type="button" class="btn-telemetry-action" onclick="toggleAtelierPinDropper()">
+                📍 ثبت بازخورد نقطه‌ای بر روی بوم
+              </button>
+              <button type="button" class="btn-telemetry-action" onclick="window.open(document.getElementById('atelierStageArtworkImg').src, '_blank')">
+                🔍 بزرگنمایی تمام‌صفحه
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- ۳. ماتریس زبانه‌ها و ماژول‌های کنسول (Console Sub-Nav Matrix) -->
+      <div class="atelier-tabs-wrapper">
+        <div class="atelier-tab-nav" role="tablist">
+          <button type="button" class="atelier-tab-btn active" id="tabBtnPipelines" onclick="switchAtelierConsoleTab('pipelines')">
+            <span class="tab-icon">⚡</span>
+            <span>جریان فعال پروژه‌ها و رهگیری تولید</span>
+            <span class="tab-count-badge" id="dashPipelineCount">۱</span>
+          </button>
+          <button type="button" class="atelier-tab-btn" id="tabBtnCodex" onclick="switchAtelierConsoleTab('codex')">
+            <span class="tab-icon">💎</span>
+            <span>خزانه دارایی‌های دیجیتال و فایل‌های دانلودی</span>
+            <span class="tab-count-badge" id="dashCodexCount">۴</span>
+          </button>
+          <button type="button" class="atelier-tab-btn" id="tabBtnSecurity" onclick="switchAtelierConsoleTab('security')">
+            <span class="tab-icon">🛡️</span>
+            <span>ماتریس امنیت و رمزنگاری هویت</span>
+          </button>
+        </div>
+
+        <!-- محتوای زبانه ۱: خطوط تولید و سفارش‌ها -->
+        <div class="atelier-tab-pane active" id="panePipelines">
+          <div class="pane-head-bar">
+            <div>
+              <h4 class="pane-heading">پایپلاین‌های در جریان و رهگیری ۵ گام صنعتی</h4>
+              <p class="pane-sub">وضعیت پیشرفت بریف‌های سفارشی، فازهای طراحی و فایل‌های نهایی آماده تحویل</p>
+            </div>
+            <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-atelier-invoice">
+              📄 دریافت نمونه پیش‌فاکتور رسمی استودیو
+            </button>
+          </div>
+          <div id="memberOrdersContainer" class="atelier-orders-stream"></div>
+        </div>
+
+        <!-- محتوای زبانه ۲: دارایی‌های دانلودی و کدکس -->
+        <div class="atelier-tab-pane" id="paneCodex">
+          <div class="pane-head-bar">
+            <div>
+              <h4 class="pane-heading">آرشیو دارایی‌های دیجیتال، دوره‌ها و فایل‌های آنلاک شده</h4>
+              <p class="pane-sub">مسترکلاس‌های ویدئویی، ست‌های براش استودیو و اسناد لور جهان جنسیس</p>
+            </div>
+          </div>
+          <div id="memberCoursesContainer" class="atelier-codex-grid"></div>
+        </div>
+
+        <!-- محتوای زبانه ۳: ماتریس امنیت -->
+        <div class="atelier-tab-pane" id="paneSecurity">
+          <div class="pane-head-bar">
+            <div>
+              <h4 class="pane-heading">پروتکل‌های امنیتی، تایید هویت و کلیدهای رمزنگاری</h4>
+              <p class="pane-sub">مدیریت اطلاعات ارتباطی استودیو و تنظیمات ورود دو مرحله‌ای</p>
+            </div>
+          </div>
+          <div class="atelier-security-grid">
+            <div class="security-card">
+              <h5 class="sec-card-title">🔐 رمزنگاری و گذرواژه حساب</h5>
+              <p class="sec-card-desc">برای حفظ امنیت بریف‌های محرمانه و مالکیت معنوی طرح‌ها، از گذرواژه‌های قدرتمند با پروتکل هش پیشرفته استفاده فرمایید.</p>
+              <div class="sec-actions">
+                <button type="button" onclick="openChangePasswordModal()" class="btn-atelier-accent" style="width:100%;">
+                  🔑 تغییر یا ایجاد رمز عبور جدید
+                </button>
+              </div>
+            </div>
+            <div class="security-card">
+              <h5 class="sec-card-title">🌐 تایید هویت Google OAuth</h5>
+              <p class="sec-card-desc">اتصال حساب کاربری شما با استانداردهای رسمی امنیتی گوگل تایید گردیده و دسترسی آنی بدون نیاز به ذخیره رمز را فراهم می‌آورد.</p>
+              <div id="secGoogleStatusBadge" class="sec-status-pill verified">
+                ✓ حساب شما با تاییدیه Google امن است
+              </div>
+            </div>
+            <div class="security-card">
+              <h5 class="sec-card-title">📡 پروتکل ارتباطی با آتلیه</h5>
+              <p class="sec-card-desc">کانال اصلی تبادل فایل‌های حجیم و هماهنگی جلسات بررسی اتود با طراح ارشد استودیو.</p>
+              <div class="sec-contact-display">
+                <span>ارتباط استودیو: <strong>tajinkart@gmail.com</strong></span>
+                <span>پشتیبانی تلگرام: <strong>@tajinkart</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -2294,8 +2476,8 @@
       </div>
     </div>
   </footer>
-  <script src="data.js?v=20.16.0"></script>
-  <script src="app.js?v=20.16.0"></script>
+  <script src="data.js?v=21.0.0"></script>
+  <script src="app.js?v=21.0.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
