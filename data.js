@@ -29,6 +29,7 @@ window.safeSetStorage = safeSetStorage;
 
 
 const KEYS = {
+  CATEGORIES: 'tajinkart_gallery_categories_v2',
   ORDERS: 'tajinkart_orders_fa_v2',
   SETTINGS: 'tajinkart_settings_fa_v2',
   ARTWORKS: 'tajinkart_artworks_fa_v2',
@@ -37,6 +38,8 @@ const KEYS = {
   MEMBERS: 'tajinkart_members_fa_v2',
   DELETED_ARTWORKS: 'tajinkart_deleted_artworks_v2'
 };
+if (typeof window !== "undefined") window.KEYS = KEYS;
+if (typeof global !== "undefined") global.KEYS = KEYS;
 
 var currentView = 'showcase';
 var currentMember = null;
@@ -74,7 +77,91 @@ window.siteSettings = siteSettings;
 // گالری آثار همراه با لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study) و دیپ‌لینک به آتلیه
 // بارگذاری آثار ثبت‌شده هنرمند (فیلتر و پاکسازی کامل آثار ماک‌آپ آزمایشی قدیمی ۱ تا ۸)
 // کانسپت‌های پیش‌فرض و غنی استودیو (Fallback جهت تضمین عدم خالی شدن گالری)
-const DEFAULT_STUDIO_ARTWORKS = [];
+const DEFAULT_STUDIO_ARTWORKS = [
+  {
+    id: 9,
+    title: 'Rook Knight: Sovereign Vanguard of Extopia',
+    shortSlug: 'Rook Knight',
+    desc: 'Flagship character concept exploration featuring heavy biomechanical plate armor, ceremonial dark cloak, and high-frequency energy blade engineered for close-quarters breach combat in the desolate citadel trenches of Extopia.',
+    image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85',
+    category: 'character',
+    tag: 'character',
+    pipelineKey: 'sketch1',
+    phases: [
+      {
+        name: 'Master Keyframe Render 300DPI',
+        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85',
+        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85',
+        pipelineKey: 'sketch1',
+        subcategory: 'Hero / Main Concept (Full IP)'
+      },
+      {
+        name: '360° Orthographic Model Sheet',
+        img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1400&q=85',
+        image: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1400&q=85',
+        pipelineKey: 'sketch1',
+        subcategory: 'Orthographic 3D Model Sheet'
+      }
+    ]
+  },
+  {
+    id: 10,
+    title: 'Gorgon Queen: Abyssal Empress of the Drowned Mire',
+    shortSlug: 'Gorgon Queen',
+    desc: 'Bio-luminescent reptilian character exploration combining serpentine locomotion anatomy with ancient ceremonial regalia and necrotic soul-energy channeling.',
+    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
+    category: 'character',
+    tag: 'character',
+    pipelineKey: 'sketch1',
+    phases: [
+      {
+        name: 'Master Keyframe Render 300DPI',
+        img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
+        pipelineKey: 'sketch1',
+        subcategory: 'Hero / Main Concept (Full IP)'
+      }
+    ]
+  },
+  {
+    id: 11,
+    title: 'Citadel of the Ashborn: Sunless Horizon',
+    shortSlug: 'Citadel of Ash',
+    desc: 'Wide-angle cinematic establishing environment concept illustrating the monumental gothic architecture and brutalist volcanic spires of the central bastion in the Genesis Universe.',
+    image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=85',
+    category: 'environment',
+    tag: 'environment',
+    pipelineKey: 'sketch2',
+    phases: [
+      {
+        name: 'Cinematic Matte Painting 300DPI',
+        img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=85',
+        image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=85',
+        pipelineKey: 'sketch2',
+        subcategory: 'Exterior Establishing Shot'
+      }
+    ]
+  },
+  {
+    id: 12,
+    title: 'Leviathan of the Void: Abyssal Apex Behemoth',
+    shortSlug: 'Void Leviathan',
+    desc: 'Creature design exploration exploring speculative predatory anatomy, chitinous armor plating, and human scale comparison for high-end cinematic creature production.',
+    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=85',
+    category: 'creature',
+    tag: 'creature',
+    pipelineKey: 'sketch_creature',
+    phases: [
+      {
+        name: 'Master Creature Keyframe 300DPI',
+        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=85',
+        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=85',
+        pipelineKey: 'sketch_creature',
+        subcategory: 'Predatory Locomotion & Anatomy'
+      }
+    ]
+  }
+];
 
 var storedArtworks = [];
 try {
@@ -85,7 +172,7 @@ try {
   storedArtworks = [];
 }
 var showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
-if (showcaseArtworks.length === 0) {
+if (!showcaseArtworks || showcaseArtworks.length === 0) {
   showcaseArtworks = JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
 }
 window.showcaseArtworks = showcaseArtworks;
