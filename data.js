@@ -58,7 +58,7 @@ var siteSettings = {
   tgToken: '',
   tgChat: '',
   adminPass: 'tajinkart',
-  commissionCapacity: '۲ از ۳ ظرفیت آتلیه رزرو شده'
+  commissionCapacity: '2 of 3 Atelier Capacity Slots Reserved'
 };
 try {
   const _s = safeGetStorage(KEYS.SETTINGS);
@@ -466,7 +466,7 @@ var ordersList = [];
 try {
   const _storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS));
   if (Array.isArray(_storedOrders)) {
-    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'استودیو نوا' && !String(o.client).includes('نوا'));
+    ordersList = _storedOrders.filter(o => o && o.id !== 501 && o.client !== 'Studio Nova' && !String(o.client).includes('Nova'));
   }
 } catch(e) {
   ordersList = [];
@@ -486,42 +486,42 @@ var siteMembersData = [];
 let _defaultMembers = [
   {
     id: 101,
-    name: 'سید سروش تاج',
+    name: 'Seyed Soroush Taj',
     email: 'soroush@tajinkart.com',
     contact: '09120000000',
     tier: 'VIP',
     balance: ',450',
     withdrawn: ',200',
     assetsBought: [
-      'کمیک دیجیتال و ناول مصور جنسیس: فصل ۱ تا ۳ + مستر PSD',
-      'موتور براش، بافت و آلفای زنگ‌زدگی (۶۴ عددی)',
-      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ'
+      'Genesis Graphic Novel: Chapters 1 to 3 + Master PSDs',
+      'Master Brush Engine & Rust Alphas (64 Set)',
+      'Rook Knight 2D Game Sprite Animation Pack'
     ],
     totalSpent: '20'
   },
   {
     id: 102,
-    name: 'استودیو پایا گیمز',
+    name: 'Paya Games Studio',
     email: 'director@payagames.ir',
     contact: '09350000000',
     tier: 'PRO',
     balance: '50',
     withdrawn: '50',
     assetsBought: [
-      'بسته اسپرایت و انیمیشن دوبعدی شوالیه کلاغ',
-      'لوپ‌های ویدیویی منوی بازی و اسپلش سینمایی 4K'
+      'Rook Knight 2D Game Sprite Animation Pack',
+      'Cinematic Video Loops & 4K Splash Sequences'
     ],
     totalSpent: '90'
   },
   {
     id: 103,
-    name: 'آریا کیان',
+    name: 'Arya Kian',
     email: 'aria@gmail.com',
     contact: '09190000000',
     tier: 'STANDARD',
     balance: '/usr/bin/bash',
     withdrawn: '/usr/bin/bash',
-    assetsBought: ['موتور براش، بافت و آلفای زنگ‌زدگی و پوست هیولا'],
+    assetsBought: ['Master Brush Engine & Monster Skin Alphas'],
     totalSpent: '9'
   }
 ];

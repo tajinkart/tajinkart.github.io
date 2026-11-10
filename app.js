@@ -55,7 +55,7 @@ window.renderAdminGalleryCategories = function() {
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
   const badge = document.getElementById('adminCategoryCountBadge');
-  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
+  if (badge) badge.textContent = `${galleryCategories.length} Active Categories`;
 
   container.innerHTML = galleryCategories.map((cat) => {
     const color = cat.color || '#38bdf8';
@@ -139,7 +139,7 @@ window.adminUpdateCategoryColor = function(catId, newColor) {
 window.adminDeleteGalleryCategory = function(catId) {
   const cat = galleryCategories.find(c => c.id === catId);
   const catName = cat ? cat.title : catId;
-  if (!confirm(`آیا از حذف دسته‌بندی «${catName}» اطمینان دارید؟`)) return;
+  if (!confirm(`Are you sure you want to delete category "${catName}"?`)) return;
 
   galleryCategories = galleryCategories.filter(c => c.id !== catId);
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
@@ -415,7 +415,7 @@ function applyLoggedInMember(user, isExplicitLogin = false) {
         if (typeof switchAdminTab === 'function') {
           switchAdminTab('artworks', artworksTabBtn);
         }
-        showToast('درود بر مدیر استودیو، سید سروش تاج. پنل کنترل استودیو باز شد! 👑', 'success', 6000);
+        showToast('Welcome, Studio Director Seyed Soroush Taj. Command Console unlocked! 👑', 'success', 6000);
       }, 250);
     }
   } else {
@@ -582,7 +582,7 @@ async function syncMembersFromSupabase(showNotification = false) {
 
       if (showNotification) {
         if (siteMembersData.length > 0) {
-          showToast(`✓ لیست اعضا با موفقیت از دیتابیس ابری همگام شد (${siteMembersData.length} عضو فعال).`, 'success');
+          showToast(`✓ لیست اعضا با موفقیت از دیتابیس ابری همگام شد (${siteMembersData.length} Active Member).`, 'success');
         } else {
           showToast('✓ همگام‌سازی کامل شد: تمام اعضای حذف‌شده از پنل سایت نیز پاک شدند (لیست همگام با دیتابیس ابری شد).', 'info');
         }
@@ -664,7 +664,7 @@ async function syncArtworksFromSupabase() {
       return;
     }
 
-    // ۲. فقط در صورتی که دیتابیس نو و کاملاً خالی است و حذفی هم ثبت نشده
+    // ۲. فقط در صورتی که دیتابیس نو و کاملاً خالی است و حذفی هم Unspecified
     const localArtworks = (showcaseArtworks || []).filter(item => !deletedSet.has(Number(item.id)));
     if (localArtworks.length > 0 && (!cloudArtworks || cloudArtworks.length === 0) && deletedSet.size === 0) {
       const rowsToInsert = localArtworks.map(a => ({
@@ -1049,7 +1049,7 @@ function renderAdminArtModalForm(art, isNew) {
         <div style="margin-top:14px;">
           <button type="button" onclick="addStagingPhase()" class="btn-secondary" style="width:100%; padding:12px 16px; font-size:12.5px; font-weight:800; border:1px dashed var(--cyan-electric); color:var(--cyan-electric); background:rgba(0,240,255,0.04); display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px;">
             <span style="font-size:16px;">➕</span>
-            <span>افزودن شیت تکمیلی به این اثر</span>
+            <span>افزودن Complementary Sheet به این اثر</span>
           </button>
         </div>
       </div>
@@ -1091,7 +1091,7 @@ function renderAdminArtModalForm(art, isNew) {
 function renderStagingPhasesHtml() {
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
     return `<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#04060a; border-radius:10px; border:1px dashed rgba(255,255,255,0.15);">
-      هیچ شیتی وجود ندارد. روی دکمه «+ افزودن شیت تکمیلی به این اثر» کلیک کنید.
+      هیچ شیتی وجود ندارد. روی دکمه «+ افزودن Complementary Sheet به این اثر» کلیک کنید.
     </div>`;
   }
 
@@ -1124,13 +1124,13 @@ function renderStagingPhasesHtml() {
           <div style="background:rgba(0,0,0,0.65); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
               <span class="font-mono" style="font-size:10.5px; padding:3px 10px; border-radius:6px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.18)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'}; border:1px solid ${isCover ? 'rgba(250,204,21,0.35)' : 'rgba(0,240,255,0.3)'};">
-                ${isCover ? '🖼️ کاور اصلی و تصویر شاخص پروژه (شیت ۱)' : `شیت تکمیلی شماره ${idx + 1}`}
+                ${isCover ? '🖼️ کاور اصلی و تصویر شاخص پروژه (شیت ۱)' : `Complementary Sheet شماره ${idx + 1}`}
               </span>
               <div style="display:flex; align-items:center; gap:8px;">
                 <button type="button" onclick="document.getElementById('phaseFileInput_${idx}').click()" class="btn-secondary" style="font-size:11px; padding:4px 12px; border-color:rgba(255,255,255,0.25); cursor:pointer;">
                   🔄 تغییر تصویر
                 </button>
-                ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:3px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px;" title="حذف این شیت">✕</button>` : ''}
+                ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:3px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px;" title="Delete Sheet">✕</button>` : ''}
               </div>
               <input type="file" id="phaseFileInput_${idx}" accept="image/*" style="display:none;" onchange="handlePhaseImageUpload(${idx}, this)" />
             </div>
@@ -1142,7 +1142,7 @@ function renderStagingPhasesHtml() {
 
             <div>
               <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:3px;">عنوان این شیت:</label>
-              <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این فاز (مثال: مدل‌شیت سه‌نما / طراحی مسکات / اثر نهایی)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:7px 12px; margin:0;" />
+              <input type="text" value="${p.name || ''}" placeholder="عنوان دقیق این Phases (مثال: مدل‌شیت سه‌نما / طراحی مسکات / اثر نهایی)..." onchange="stagingProjectPhases[${idx}].name = this.value.trim()" style="font-size:12px; font-weight:700; padding:7px 12px; margin:0;" />
             </div>
           </div>
         ` : `
@@ -1151,7 +1151,7 @@ function renderStagingPhasesHtml() {
               <span class="font-mono" style="font-size:10.5px; padding:3px 10px; border-radius:6px; font-weight:800; background:${isCover ? 'rgba(250,204,21,0.15)' : 'rgba(0,240,255,0.15)'}; color:${isCover ? 'var(--gold)' : 'var(--cyan-electric)'};">
                 ${isCover ? '🖼️ کاور اصلی و تصویر شاخص پروژه (شیت ۱)' : `شیت شماره ${idx + 1}`}
               </span>
-              ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px;" title="حذف این شیت">✕</button>` : ''}
+              ${stagingProjectPhases.length > 1 ? `<button type="button" onclick="removeStagingPhase(${idx})" style="color:var(--crimson); font-size:18px; padding:2px 8px; cursor:pointer; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:6px;" title="Delete Sheet">✕</button>` : ''}
             </div>
 
             <div onclick="document.getElementById('phaseFileInput_${idx}').click()" style="cursor:pointer; background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:26px 16px; text-align:center; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
@@ -1199,7 +1199,7 @@ function renderStagingPhasesHtml() {
           </div>
         </div>
 
-        <textarea rows="2" placeholder="توضیحات تخصصی این فاز (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
+        <textarea rows="2" placeholder="توضیحات تخصصی این Phases (کاربرد صنعتی، تفاوت با اثر پایه و چرایی هزینه مستقل)..." onchange="stagingProjectPhases[${idx}].desc = this.value.trim()" style="font-size:11px; padding:6px 10px; margin:0; line-height:1.6; resize:vertical; background:#070a12;">${p.desc || p.description || ''}</textarea>
 
         <!-- مقاصد انتشار چندکاناله استودیو (دراور شیک و اسکرول‌پذیر با باکس متن کاملاً اختصاصی هر شبکه) -->
         <details id="phaseSocialDetails_${idx}" ontoggle="stagingProjectPhases[${idx}].isSocialOpen = this.open" ${p.isSocialOpen ? 'open' : ''} style="background:#070a14; border:1px solid rgba(250,204,21,0.25); border-radius:12px; padding:10px 14px; margin-top:2px;">
@@ -1237,7 +1237,7 @@ window.addStagingPhase = function() {
   const defSub = (pipelines[defPipe] && pipelines[defPipe].subcategories) ? pipelines[defPipe].subcategories[0] : 'طراحی و اجرای استاندارد';
 
   stagingProjectPhases.push({
-    name: `شیت تکمیلی ${nextNum}`,
+    name: `Complementary Sheet ${nextNum}`,
     img: '',
     image: '',
     pipelineKey: defPipe,
@@ -1551,7 +1551,7 @@ function pushModalState(modalName) {
  * استودیو کانسپت آرت و توسعه بصری — سید سروش تاج
  */
 
-// تبدیل زنده نرخ دلار به تومان
+// تبدیل زنده نرخ دلار به TOMAN
 function formatPrice(usdPrice) {
   if (typeof usdPrice === 'string') {
     if (currencyMode === 'TOMAN') {
@@ -1559,7 +1559,7 @@ function formatPrice(usdPrice) {
       if (matches && matches.length > 0) {
         const tomans = matches.map(m => {
           const val = parseInt(m, 10) * (siteSettings.usdRate || 72000);
-          return (val / 1000).toLocaleString('fa-IR') + ' هزار تومان';
+          return (val / 1000).toLocaleString('fa-IR') + ' هزار TOMAN';
         });
         return tomans.join(' تا ');
       }
@@ -1568,7 +1568,7 @@ function formatPrice(usdPrice) {
   }
   if (currencyMode === 'TOMAN') {
     const tomanVal = usdPrice * (siteSettings.usdRate || 72000);
-    return tomanVal.toLocaleString('fa-IR') + ' تومان';
+    return tomanVal.toLocaleString('fa-IR') + ' TOMAN';
   }
   return `$${usdPrice}`;
 }
@@ -1582,7 +1582,7 @@ window.setCurrencyMode = function(mode) {
   renderProducts();
   selectPipeline(currentSelectedPipeKey, null, false);
   recalcWizardPrice();
-  showToast(`واحد پولی نمایش داده شده به ${mode === 'TOMAN' ? 'تومان' : 'دلار ($)'} تغییر یافت.`, 'info');
+  showToast(`واحد پولی نمایش داده شده به ${mode === 'TOMAN' ? 'TOMAN' : 'دلار ($)'} تغییر یافت.`, 'info');
 };
 
 // سیستم توست نوتیفیکیشن دارک فانتزی
@@ -1686,7 +1686,7 @@ window.renderShowcaseGrid = function() {
                           art.tag === currentGalleryFilter;
         if (mainMatch) return true;
 
-        // ۲. فیلتر عمیق شیت‌ها و فازهای الحاقی (Deep Supplemental Phase Matching):
+        // ۲. فیلتر عمیق شیت‌ها و Phasesهای الحاقی (Deep Supplemental Phase Matching):
         // حتی اگر اثر در شاخه کاراکتر باشد اما شیت دوم/سوم آن فضاسازی یا پراپ باشد، در دسته‌بندی مربوطه کشف می‌شود
         if (art.phases && Array.isArray(art.phases) && art.phases.length > 0) {
           return art.phases.some(p => {
@@ -1821,7 +1821,7 @@ window.renderShowcaseGrid = function() {
       soft: hexToRgbaStr(catHex, 0.35)
     };
 
-    // برچسب زیرین هویت اثر: نمایش پکیج پروداکشن در آثار چندفازی یا شاخه کانسپت
+    // برچسب زیرین هویت اثر: نمایش پکیج پروداکشن در آثار چندPhasesی یا شاخه کانسپت
     let subLabel = '';
     if (art.phases && Array.isArray(art.phases) && art.phases.length > 1) {
       subLabel = `Production Case Study • ${art.phases.length} Sheets`;
@@ -2016,7 +2016,7 @@ function renderArtStationProject(art) {
     art.phases.forEach((p, pIdx) => {
       const pSrc = p.img || p.image;
       if (pSrc && pSrc !== mainSrc) {
-        const phaseName = p.name || `شیت پروژه • فاز ${imageList.length + 1}`;
+        const phaseName = p.name || `شیت پروژه • Phases ${imageList.length + 1}`;
         const phaseDesc = p.desc || p.description || p.note || '';
         const phasePipe = p.pipelineKey || mainPipe;
         const phaseSub = p.subcategory || '';
@@ -2210,7 +2210,7 @@ function updateCaseStudyPhaseView() {
   const badgeEl = document.getElementById('caseStudyPhaseBadge');
   const displayImg = currentPhase.img || activeCaseStudyArt.image;
   if (imgEl) imgEl.src = getOptimizedImageUrl(displayImg, 1600);
-  if (badgeEl) badgeEl.textContent = `فاز ${activeCaseStudyPhaseIdx + 1} • ${currentPhase.name}`;
+  if (badgeEl) badgeEl.textContent = `Phases ${activeCaseStudyPhaseIdx + 1} • ${currentPhase.name}`;
 }
 
 // دیپ‌لینک هوشمند از مطالعه موردی به پایپلاین آتلیه کمیسیون
@@ -2637,18 +2637,18 @@ window.saveTelegramSettingsDirect = function() {
   siteSettings.tgChat = siteSettings.tgChannels[0] || '';
 
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  showToast('تنظیمات ربات و کانال‌های تلگرام با موفقیت ثبت و ذخیره شد! ✓', 'success', 4000);
+  showToast('Telegram bot credentials and channels saved successfully! ✓', 'success', 4000);
 };
 
 
 window.autoDetectTelegramChannelId = async function() {
   const token = document.getElementById('setTgToken')?.value.trim() || siteSettings.tgToken;
   if (!token) {
-    showToast('لطفاً ابتدا توکن ربات تلگرام را وارد کنید.', 'error', 4500);
+    showToast('Please provide the Telegram Bot Token first.', 'error', 4500);
     return;
   }
 
-  showToast('در حال استعلام و شناسایی خودکار کانال‌های متصل به ربات...', 'info', 3000);
+  showToast('Querying and auto-detecting Telegram channels...', 'info', 3000);
 
   try {
     const resp = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
@@ -2680,7 +2680,7 @@ window.autoDetectTelegramChannelId = async function() {
       showToast('کانال یافت نشد! لطفاً یک پیام دلخواه داخل کانال بفرستید، سپس دوباره این دکمه را بزنید.', 'info', 7000);
     }
   } catch(e) {
-    showToast('خطا در ارتباط با سرور تلگرام (بررسی فیلترشکن).', 'error', 5000);
+    showToast('Network error connecting to Telegram API.', 'error', 5000);
   }
 };
 
@@ -2700,7 +2700,7 @@ window.testTelegramConnection = async function() {
   }
 
   if (!token || channels.length === 0) {
-    showToast('لطفاً ابتدا توکن ربات و حداقل یک آیدی کانال یا چت تلگرام را وارد کنید.', 'error', 4500);
+    showToast('Please enter Bot Token and at least one channel ID.', 'error', 4500);
     return;
   }
 
@@ -3188,7 +3188,7 @@ window.handleMembersIconClick = async function() {
       const artworksTabBtn = document.querySelector('.admin-sidebar-menu .admin-nav-item[data-tab="artworks"]');
       switchAdminTab('artworks', artworksTabBtn);
     }
-    showToast('پنل مدیریت استودیو باز شد.', 'info');
+    showToast('Studio Command Console opened.', 'info');
   } else {
     // کاربر عادی به داشبورد کاربری خود می‌رود
     renderMemberDashboard();
@@ -3318,7 +3318,7 @@ window.logoutAdmin = async function() {
   if (adminGate) adminGate.classList.remove('hidden');
 
   switchView('showcase');
-  showToast('از حساب مدیریت خارج شدید و پنل استودیو قفل شد.', 'info', 4000);
+  showToast('Logged out of Director session. Console locked.', 'info', 4000);
 };
 
 // مدیریت پنل ادمین ۶ زبانه طبق Master Spec v2.1
@@ -3348,7 +3348,7 @@ function renderAdminSketch1() {
   catList.innerHTML = Object.keys(PIPELINE_DATA).map(key => `
     <div class="admin-cat-item ${key === currentSelectedPipeKey ? 'active' : ''}" onclick="selectAdminCategory('${key}')">
       <span style="font-size:12.5px; font-weight:700;">${PIPELINE_DATA[key].topSub}</span>
-      <span class="font-mono" style="font-size:10.5px; color:var(--gold);">${PIPELINE_DATA[key].tiles.length} فاز</span>
+      <span class="font-mono" style="font-size:10.5px; color:var(--gold);">${PIPELINE_DATA[key].tiles.length} Phases</span>
     </div>
   `).join('');
 
@@ -3378,7 +3378,7 @@ function renderAdminStagesList() {
         </div>
         <div style="text-align:left; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
           <span class="font-mono" style="color:var(--gold); font-size:15px; font-weight:800;">${t.price}</span>
-          <button onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px;">حذف فاز</button>
+          <button onclick="event.stopPropagation(); adminDeleteStage(${idx})" style="color:var(--crimson); font-size:11px;">حذف Phases</button>
         </div>
       </div>
     `).join('');
@@ -3405,7 +3405,7 @@ function renderAdminStageLiveEditor() {
         <input type="text" value="${tile.badge}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'badge', this.value)" />
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">عنوان کامل فاز</label>
+        <label style="font-size:11px; color:var(--text-muted);">عنوان کامل Phases</label>
         <input type="text" value="${tile.title}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'title', this.value)" />
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
@@ -3427,7 +3427,7 @@ function renderAdminStageLiveEditor() {
         <textarea rows="3" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'desc', this.value)">${tile.desc}</textarea>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر زمینه فاز</label>
+        <label style="font-size:11px; color:var(--text-muted);">لینک تصویر زمینه Phases</label>
         <input type="text" value="${tile.img}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'img', this.value)" class="font-mono" />
       </div>
       <div style="margin-top:6px; height:80px; border-radius:8px; overflow:hidden; border:1px solid var(--border-subtle);">
@@ -3441,16 +3441,16 @@ window.updateTileField = function(pipeKey, tileIdx, field, val) {
   PIPELINE_DATA[pipeKey].tiles[tileIdx][field] = val;
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   selectPipeline(pipeKey, null, false);
-  showToast('تغییرات فاز ذخیره شد.', 'success');
+  showToast('تغییرات Phases ذخیره شد.', 'success');
 };
 
 window.adminAddNewStage = function() {
   if (!PIPELINE_DATA[currentSelectedPipeKey]) return;
   PIPELINE_DATA[currentSelectedPipeKey].tiles.push({
     span: 'col-span-4',
-    badge: `فاز ${PIPELINE_DATA[currentSelectedPipeKey].tiles.length + 1}`,
-    title: 'فاز جدید توسعه کانسپت',
-    desc: 'مشخصات خروجی این فاز را در فرم ستون کناری تکمیل فرمایید.',
+    badge: `Phases ${PIPELINE_DATA[currentSelectedPipeKey].tiles.length + 1}`,
+    title: 'Phases جدید توسعه کانسپت',
+    desc: 'مشخصات خروجی این Phases را در فرم ستون کناری تکمیل فرمایید.',
     price: '$120 - $160',
     usdVal: 130,
     timeline: '۴ تا ۶ روز کاری',
@@ -3460,7 +3460,7 @@ window.adminAddNewStage = function() {
   currentSelectedStageIdx = PIPELINE_DATA[currentSelectedPipeKey].tiles.length - 1;
   renderAdminStagesList();
   selectPipeline(currentSelectedPipeKey, null, false);
-  showToast('فاز جدید به پایپلاین اضافه شد.', 'success');
+  showToast('Phases جدید به پایپلاین اضافه شد.', 'success');
 };
 
 window.adminDeleteStage = function(idx) {
@@ -3473,7 +3473,7 @@ window.adminDeleteStage = function(idx) {
   currentSelectedStageIdx = Math.max(0, currentSelectedStageIdx - 1);
   renderAdminStagesList();
   selectPipeline(currentSelectedPipeKey, null, false);
-  showToast('فاز مورد نظر حذف شد.', 'info');
+  showToast('Phases مورد نظر حذف شد.', 'info');
 };
 
 window.adminAddNewCategory = function() {
@@ -3485,7 +3485,7 @@ window.adminAddNewCategory = function() {
     subcategories: ['زیرشاخه ۱', 'زیرشاخه ۲'],
     note: 'پایپلاین سفارشی استودیو.',
     tiles: [
-      { span: 'col-span-12', badge: 'فاز ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ مفهومی', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
+      { span: 'col-span-12', badge: 'Phases ۱ • اتود اولیه', title: 'ایده‌پردازی و اسکچ مفهومی', desc: 'خروجی اولیه همراه با تاییدیه کارفرما.', price: '$80 - $110', usdVal: 90, timeline: '۳ تا ۵ روز کاری', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80' }
     ]
   };
   localStorage.setItem(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
@@ -3573,7 +3573,7 @@ window.updateArtPhaseImg = function(artIdx, phaseIdx, url) {
   if (showcaseArtworks[artIdx] && showcaseArtworks[artIdx].phases && showcaseArtworks[artIdx].phases[phaseIdx]) {
     showcaseArtworks[artIdx].phases[phaseIdx].img = url.trim();
     safeSetStorage(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-    showToast(`تصویر فاز ${phaseIdx + 1} مطالعه موردی ذخیره شد.`, 'success');
+    showToast(`تصویر Phases ${phaseIdx + 1} مطالعه موردی ذخیره شد.`, 'success');
   }
 };
 
@@ -3736,7 +3736,7 @@ function renderAdminSketch3(filterText = '') {
   }
 
   if (filtered.length === 0) {
-    listEl.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:14px; text-align:center;">کاربری یافت نشد.</div>`;
+    listEl.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:14px; text-align:center;">No members found.</div>`;
     renderAdminMemberDetail(null);
     return;
   }
@@ -3748,11 +3748,11 @@ function renderAdminSketch3(filterText = '') {
           ${(m.name || 'U').charAt(0).toUpperCase()}
         </div>
         <div style="overflow:hidden;">
-          <div style="font-size:12px; font-weight:800; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${m.name || 'کاربر مهمان'}</div>
+          <div style="font-size:12px; font-weight:800; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${m.name || 'Guest User'}</div>
           <div class="font-mono" style="font-size:10px; color:var(--text-muted); white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${m.email || ''}</div>
         </div>
       </div>
-      <span style="font-size:10px; color:var(--emerald); background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 6px; border-radius:6px; flex-shrink:0;">عضو فعال</span>
+      <span style="font-size:10px; color:var(--emerald); background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 6px; border-radius:6px; flex-shrink:0;">Active Member</span>
     </div>
   `).join('');
 
@@ -3805,20 +3805,20 @@ function renderAdminMemberDetail(m) {
             <span style="font-size:20px;">👑</span>
             <h3 style="font-size:17px; font-weight:900; color:#fbbf24; margin:0;">${m.name}</h3>
           </div>
-          <span class="tier-tag tier-creator" style="font-size:11px;">خالق و معمار جهان 👑</span>
+          <span class="tier-tag tier-creator" style="font-size:11px;">Creator & Worldbuilder 👑</span>
         </div>
-        <div class="font-mono" style="font-size:12px; color:#fff; margin-top:8px;">حساب رسمی گوگل: <span style="color:var(--cyan-electric); font-weight:700;">${m.email}</span> (متصل به 2FA ✓)</div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">جایگاه: <span style="color:var(--gold); font-weight:700;">کارگردان هنری و مالک IP استودیو TAJINKART</span></div>
+        <div class="font-mono" style="font-size:12px; color:#fff; margin-top:8px;">Official Google CID: <span style="color:var(--cyan-electric); font-weight:700;">${m.email}</span> (2FA Verified ✓)</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">Role: <span style="color:var(--gold); font-weight:700;">Art Director & IP Owner of TAJINKART</span></div>
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
         <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid rgba(245,158,11,0.3);">
-          <div style="font-size:11px; color:var(--text-muted);">سطح دسترسی مالی:</div>
-          <div class="font-mono" style="font-size:15px; font-weight:800; color:#fbbf24; margin-top:3px;">صاحب‌امتیاز کل</div>
+          <div style="font-size:11px; color:var(--text-muted);">Financial Clearance:</div>
+          <div class="font-mono" style="font-size:15px; font-weight:800; color:#fbbf24; margin-top:3px;">Sole Proprietor</div>
         </div>
         <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid rgba(245,158,11,0.3);">
-          <div style="font-size:11px; color:var(--text-muted);">وضعیت حساب:</div>
-          <div class="font-mono" style="font-size:15px; font-weight:800; color:var(--emerald); margin-top:3px;">مدیر ارشد انحصاری 👑</div>
+          <div style="font-size:11px; color:var(--text-muted);">Account Status:</div>
+          <div class="font-mono" style="font-size:15px; font-weight:800; color:var(--emerald); margin-top:3px;">Exclusive Studio Director 👑</div>
         </div>
       </div>
 
@@ -3826,15 +3826,15 @@ function renderAdminMemberDetail(m) {
       <div style="margin-top:20px; border-top:1px solid rgba(250,204,21,0.3); padding-top:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
           <h4 style="font-size:14.5px; font-weight:800; color:var(--gold); margin:0;">
-            📦 تمامی سفارش‌ها و بریف‌های دریافتی استودیو (${allStudioOrders.length})
+            📦 All Studio Incoming Orders & Client Briefs (${allStudioOrders.length})
           </h4>
           <button type="button" onclick="syncOrdersFromSupabase()" class="btn-secondary" style="font-size:10.5px; padding:4px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
-            🔄 واکشی از کلود
+            🔄 Sync Cloud DB
           </button>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:10px;">
-          ${allStudioOrders.length === 0 ? '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; text-align:center;">هنوز سفارشی در سامانه ثبت نشده است.</div>' : 
+          ${allStudioOrders.length === 0 ? '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; text-align:center;">No orders registered in system yet.</div>' : 
             allStudioOrders.map(o => renderOrderAdminSnippet(o)).join('')
           }
         </div>
@@ -3858,30 +3858,30 @@ function renderAdminMemberDetail(m) {
         <h3 style="font-size:16px; font-weight:900; color:${tierColor}; margin:0;">${m.name}</h3>
         <span class="tier-tag tier-${(m.tier || 'member').toLowerCase()}">${m.tier || 'MEMBER'}</span>
       </div>
-      <div class="font-mono" style="font-size:12px; color:var(--text-muted); margin-top:4px;">ایمیل: ${m.email || 'ثبت نشده'}</div>
-      <div class="font-mono" style="font-size:12px; color:var(--text-muted);">تماس: ${m.contact || 'ثبت نشده'}</div>
+      <div class="font-mono" style="font-size:12px; color:var(--text-muted); margin-top:4px;">Email: ${m.email || 'Unspecified'}</div>
+      <div class="font-mono" style="font-size:12px; color:var(--text-muted);">Contact: ${m.contact || 'Unspecified'}</div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
       <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid var(--border-subtle);">
-        <div style="font-size:11px; color:var(--text-muted);">موجودی قابل برداشت:</div>
+        <div style="font-size:11px; color:var(--text-muted);">Available Balance:</div>
         <div class="font-mono" style="font-size:17px; font-weight:800; color:var(--cyan-electric); margin-top:3px;">${m.balance || '0 $'}</div>
       </div>
       <div style="padding:12px; background:#080c14; border-radius:10px; border:1px solid var(--border-subtle);">
-        <div style="font-size:11px; color:var(--text-muted);">مجموع خریدهای ثبت‌شده:</div>
+        <div style="font-size:11px; color:var(--text-muted);">Total Purchases:</div>
         <div class="font-mono" style="font-size:17px; font-weight:800; color:var(--gold); margin-top:3px;">${m.totalSpent || '0 $'}</div>
       </div>
     </div>
 
     <div>
-      <h5 style="font-size:12.5px; font-weight:800; margin-bottom:8px; color:#fff;">دارایی‌های دیجیتال و لایسنس‌های فعال:</h5>
+      <h5 style="font-size:12.5px; font-weight:800; margin-bottom:8px; color:#fff;">Digital Assets & Active Licenses:</h5>
       <div style="display:flex; flex-direction:column; gap:6px;">
         ${(m.assetsBought && m.assetsBought.length > 0) ? m.assetsBought.map(a => `
           <div style="padding:8px 10px; background:#070a10; border-radius:8px; border:1px solid var(--border-subtle); font-size:12px; display:flex; justify-content:space-between; align-items:center;">
             <span>${a}</span>
-            <span style="color:var(--emerald); font-size:11px; font-weight:700;">✓ دسترسی فعال</span>
+            <span style="color:var(--emerald); font-size:11px; font-weight:700;">✓ Active Access</span>
           </div>
-        `).join('') : '<div style="font-size:11px; color:var(--text-muted); padding:8px 10px; background:#070a10; border-radius:8px;">لایسنس دانلودی فعالی ندارد.</div>'}
+        `).join('') : '<div style="font-size:11px; color:var(--text-muted); padding:8px 10px; background:#070a10; border-radius:8px;">No active downloadable licenses.</div>'}
       </div>
     </div>
 
@@ -3889,13 +3889,13 @@ function renderAdminMemberDetail(m) {
     <div style="margin-top:20px; border-top:1px solid rgba(0,240,255,0.25); padding-top:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h4 style="font-size:14px; font-weight:800; color:var(--cyan-electric); margin:0;">
-          📦 سفارش‌ها و پروژه‌های دریافتی این موکل (${userOrders.length})
+          📦 Client Project Briefs & Orders (${userOrders.length})
         </h4>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${userOrders.length === 0 ? 
-          '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; border:1px dashed rgba(255,255,255,0.1); text-align:center;">هنوز سفارشی توسط این کاربر ثبت نشده است.</div>' : 
+          '<div style="font-size:11.5px; color:var(--text-muted); padding:14px; background:#04060a; border-radius:8px; border:1px dashed rgba(255,255,255,0.1); text-align:center;">هنوز سفارشی توسط این کاربر Unspecified است.</div>' : 
           userOrders.map(o => renderOrderAdminSnippet(o)).join('')
         }
       </div>
@@ -3903,7 +3903,7 @@ function renderAdminMemberDetail(m) {
 
     <div style="margin-top:20px; padding-top:14px; border-top:1px solid var(--border-subtle);">
       <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="width:100%; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
-        🗑️ حذف این کاربر
+        🗑️ Delete Member
       </button>
     </div>
   `;
@@ -3923,8 +3923,8 @@ function renderOrderAdminSnippet(o) {
     <div style="padding:14px; background:#04060b; border:1px solid rgba(255,255,255,0.08); border-radius:10px; display:flex; flex-direction:column; gap:10px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
         <div>
-          <strong style="font-size:13px; color:#fff;">${o.pkg || 'سفارش کانسپت آرت'}</strong>
-          <span class="font-mono" style="font-size:10.5px; color:var(--gold); display:block; margin-top:2px;">#${o.id} • هزینه: ${o.price || 'توافقی'}</span>
+          <strong style="font-size:13px; color:#fff;">${o.pkg || 'Concept Art Commission'}</strong>
+          <span class="font-mono" style="font-size:10.5px; color:var(--gold); display:block; margin-top:2px;">#${o.id} • Quote: ${o.price || 'توافقی'}</span>
         </div>
         <select onchange="updateOrderStatusFromAdmin(${o.id}, this.value)" style="font-size:11px; padding:4px 8px; background:#080c14; border:1px solid rgba(0,240,255,0.35); border-radius:6px; color:var(--cyan-electric); font-weight:700;">
           ${STAGES.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
@@ -3932,24 +3932,24 @@ function renderOrderAdminSnippet(o) {
       </div>
 
       <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:6px;">
-        <span style="color:var(--text-muted); font-size:10.5px; display:block; margin-bottom:2px;">متن بریف و توافق:</span>
-        ${o.brief || 'توضیحات اختصاصی کانسپت آرت'}
+        <span style="color:var(--text-muted); font-size:10.5px; display:block; margin-bottom:2px;">Brief & Agreed Scope:</span>
+        ${o.brief || 'Custom concept art brief details'}
       </div>
 
       ${o.refLink && o.refLink.startsWith('http') ? `
         <div style="font-size:11px;">
           <a href="${o.refLink}" target="_blank" rel="noopener" style="color:var(--cyan-electric); text-decoration:underline;">
-            🔗 مشاهده لینک رفرنس و مودبورد ارسالی
+            🔗 View Attached Moodboard / Reference Link
           </a>
         </div>
       ` : ''}
 
       <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05); font-size:11px;">
         <button type="button" onclick="downloadOrderInvoiceById(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-color:var(--gold); color:var(--gold);">
-          📄 پیش‌فاکتور
+          📄 Invoice
         </button>
         <button type="button" onclick="adminDeleteOrderById(${o.id})" style="background:none; border:none; color:var(--crimson); font-size:11px; cursor:pointer;">
-          🗑️ حذف سفارش
+          🗑️ Delete Order
         </button>
       </div>
     </div>
@@ -3976,7 +3976,7 @@ window.updateOrderStatusFromAdmin = function(orderId, newStatus) {
 
 // حذف سفارش توسط ادمین
 window.adminDeleteOrderById = function(orderId) {
-  if (!confirm(`آیا از حذف سفارش شماره #${orderId} اطمینان دارید؟`)) return;
+  if (!confirm(`Are you sure you want to delete order #${orderId} اطمینان دارید؟`)) return;
   ordersList = ordersList.filter(x => x.id !== orderId);
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
   if (window.supabaseClient) {
@@ -3984,7 +3984,7 @@ window.adminDeleteOrderById = function(orderId) {
       console.log('[Supabase Orders] Order deleted from cloud.');
     });
   }
-  showToast('سفارش با موفقیت حذف گردید.', 'info');
+  showToast('Order deleted successfully.', 'info');
   const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'سید سروش تاج', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
   renderAdminMemberDetail(currentMemberObj);
 };
@@ -3998,22 +3998,22 @@ window.downloadOrderInvoiceById = function(orderId) {
 
   const invoiceText = `================================================================================
                     استودیو کانسپت آرت و دنیاسازی TAJINKART
-                    پیش‌فاکتور و سند رسمی تعهدات سفارش #${o.id}
+                    Official Studio Invoice & Commission Agreement #${o.id}
 ================================================================================
-شماره فاکتور: ${invNumber}
-تاریخ: ${dateStr}
-طرف قرارداد / موکل: ${o.client}
-پل ارتباطی: ${o.contact}
-عنوان پکیج: ${o.pkg}
-فاز طراحی: ${o.phase || 'استاندارد'}
-مبلغ کل برآورد: ${o.price}
-زمان‌بندی تقریبی: ${o.timeline || 'طبق توافق'}
+Invoice CID: ${invNumber}
+Date: ${dateStr}
+Client / Studio: ${o.client}
+Contact Channel: ${o.contact}
+Package Title: ${o.pkg}
+Phases طراحی: ${o.phase || 'استاندارد'}
+Total Estimate: ${o.price}
+Production Timeline: ${o.timeline || 'طبق توافق'}
 --------------------------------------------------------------------------------
-خلاصه بریف و نیازمندی:
+Brief Summary & Specifications:
 ${o.brief}
 --------------------------------------------------------------------------------
-لینک رفرنس: ${o.refLink || 'ارائه نشده'}
-وضعیت کنونی پروژه: ${o.status}
+Reference Link: ${o.refLink || 'ارائه نشده'}
+Current Status: ${o.status}
 ================================================================================`;
 
   const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8' });
@@ -4025,7 +4025,7 @@ ${o.brief}
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast(`پیش‌فاکتور سفارش #${o.id} دانلود شد. 📄`, 'success');
+  showToast(`Invoice for Order #${o.id} downloaded successfully. 📄`, 'success');
 };
 
 function renderAdminLists() {
@@ -4037,15 +4037,15 @@ function renderAdminLists() {
           <span>${o.client} <span class="font-mono" style="color:var(--text-muted); font-size:11px;">(${o.contact})</span></span>
           <span class="font-mono" style="color:var(--gold);">${o.pkg}</span>
         </div>
-        <div style="font-size:12px; color:var(--cyan-electric); margin:4px 0;">فاز انتخابی: ${o.phase || 'استاندارد'}</div>
+        <div style="font-size:12px; color:var(--cyan-electric); margin:4px 0;">Phases انتخابی: ${o.phase || 'استاندارد'}</div>
         <div style="color:var(--text-muted); font-size:12.5px; margin:4px 0; line-height:1.6;">${o.brief}</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:11.5px;">
           <span style="color:var(--amber);">وضعیت پروژه: <strong>${o.status}</strong></span>
           <select onchange="updateOrderStatus(${idx}, this.value)" style="width:auto; padding:4px 8px; font-size:11.5px;">
             <option value="بریف دریافت شد" ${o.status === 'بریف دریافت شد' ? 'selected' : ''}>بریف دریافت شد</option>
-            <option value="فاز ۱: اتود اولیه" ${o.status === 'فاز ۱: اتود اولیه' ? 'selected' : ''}>فاز ۱: اتود اولیه</option>
-            <option value="فاز ۲: لاین‌آرت" ${o.status === 'فاز ۲: لاین‌آرت' ? 'selected' : ''}>فاز ۲: لاین‌آرت</option>
-            <option value="فاز ۳: رندر و نور" ${o.status === 'فاز ۳: رندر و نور' ? 'selected' : ''}>فاز ۳: رندر و نور</option>
+            <option value="Phases ۱: اتود اولیه" ${o.status === 'Phases ۱: اتود اولیه' ? 'selected' : ''}>Phases ۱: اتود اولیه</option>
+            <option value="Phases ۲: لاین‌آرت" ${o.status === 'Phases ۲: لاین‌آرت' ? 'selected' : ''}>Phases ۲: لاین‌آرت</option>
+            <option value="Phases ۳: رندر و نور" ${o.status === 'Phases ۳: رندر و نور' ? 'selected' : ''}>Phases ۳: رندر و نور</option>
             <option value="تحویل نهایی و تکمیل" ${o.status === 'تحویل نهایی و تکمیل' ? 'selected' : ''}>تحویل نهایی و تکمیل</option>
           </select>
         </div>
@@ -4150,8 +4150,8 @@ function renderMemberDashboard() {
     id: 701,
     pkg: 'کانسپت آرت کاراکتر سایبرپانک و شیت اکسپرشن (پروژه فعال)',
     price: '$180 (ودیعه ۵۰٪ تسویه شده)',
-    status: 'فاز ۳: اتود اولیه و لاین‌آرت ارتوگرافیک در جریان است',
-    phase: 'فاز ۳ • لاین‌آرت و شیت سه‌نما',
+    status: 'Phases ۳: اتود اولیه و لاین‌آرت ارتوگرافیک در جریان است',
+    phase: 'Phases ۳ • لاین‌آرت و شیت سه‌نما',
     timeline: '۵ تا ۷ روز کاری',
     brief: 'طراحی فیگور تمام‌قد کاراکتر سایبرپانک روگ با شنل تیره و قطعات بیومکانیکال زره. در حال حاضر اتودهای سیلوئت تایید شده و لاین‌آرت سه‌نما در حال تکمیل است.'
   }];
@@ -4377,9 +4377,9 @@ window.downloadOfficialStudioInvoice = function() {
                     استودیو کانسپت آرت و دنیاسازی TAJINKART
                     پیش‌فاکتور و سند رسمی تعهدات تولید اثر
 ================================================================================
-شماره فاکتور: ${invNumber}
+Invoice CID: ${invNumber}
 تاریخ ثبت: ${dateStr}
-طرف قرارداد / موکل: ${clientName}
+Client / Studio: ${clientName}
 مدیر تولید و طراح ارشد: سید سروش تاج (Seyed Soroush Taj)
 ایمیل استودیو: tajinkart@gmail.com
 دامنه رسمی: https://tajinkart.space
@@ -4409,7 +4409,7 @@ window.downloadOfficialStudioInvoice = function() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('پیش‌فاکتور رسمی استودیو با موفقیت دانلود شد. 📄', 'success');
+  showToast('پیش‌فاکتور رسمی استودیو با موفقیت downloaded successfully. 📄', 'success');
 };
 
 // دانلود دارایی دیجیتال از خزانه
@@ -5201,13 +5201,13 @@ const DEFAULT_STUDIO_TERMS = `### ۱. اصل صحت اطلاعات و سلب م�
 استودیو تاج‌اینک‌آرت با مدیریت سید سروش تاج به‌صورت مستقل در ایران مستقر بوده و به شکل فریلنس و بین‌المللی با کارفرمایان سراسر جهان همکاری می‌نماید. ساعات کاری رسمی استودیو بر پایه منطقه زمانی ایران (UTC+3:30) تنظیم شده است. در صورت وقوع هرگونه اختلال یا کندی موقت در شبکه زیرساخت اینترنت منطقه‌ای، استودیو از کانال‌های امن و پایدار پشتیبان (شامل تلگرام و ایمیل‌های رمزنگاری‌شده) جهت حفظ پیوستگی ارتباطات استفاده می‌نماید.
 
 ### ۴. روش‌های پرداخت بین‌المللی و تسویه ارزی (Global Payments & Cryptocurrency)
-سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل تومانی نرخ روز صورت می‌پذیرد.
+سفارش‌دهندگان بین‌المللی می‌توانند پیش‌پرداخت و تسویه نهایی سفارش‌های خود را از طریق استیبل‌کوین‌های معتبر نظیر تتر (USDT بر بستر TRC20 یا ERC20) یا سایر روش‌های تسویه ارزی مورد توافق استودیو پرداخت نمایند. نوسانات نرخ ارز یا کارمزدهای شبکه انتقال بر عهده پرداخت‌کننده است. برای مشتریان داخلی، تسویه بر پایه معادل TOMANی نرخ روز صورت می‌پذیرد.
 
 ### ۵. تضمین اصالت رفرنس‌های ارسالی مشتری (Client Materials Indemnity)
 مشتری متعهد و ضامن است که تمامی تصاویر، کانسپت‌ها، لوگوها و فایل‌های متنی که به عنوان بریف یا رفرنس به استودیو ارسال می‌کند، یا در مالکیت قانونی اوست یا حق بهره‌برداری از آن‌ها را دارد. در صورت بروز هرگونه ادعای نقض کپی‌رایت توسط اشخاص ثالث علیه استودیو ناشی از مواد ارائه‌شده توسط مشتری، مسئولیت حقوقی و جبران کامل خسارت منحصراً متوجه مشتری خواهد بود.
 
 ### ۶. بند بلاتکلیفی و رهاسازی سفارش (Inactivity & Abandonment Clause)
-پس از ارسال اتودها یا فازهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.
+پس از ارسال اتودها یا Phasesهای رندر توسط آرتیست، مشتری موظف است حداکثر ظرف مدت ۱۴ روز کاری نظرات و اصلاحات خود را اعلام نماید. در صورت عدم پاسخگویی و سکوت مشتری بیش از ۳۰ روز تقویمی، پروژه به عنوان «رهاشده (Abandoned)» تلقی گردیده، تعهد زمانی استودیو لغو، ودیعه ۵۰٪ به عنوان خسارت اشغال ظرفیت آتلیه ضبط و سفارش بدون حق ادعا مختومه می‌شود. بازگشایی مجدد نیازمند عقد متمم جدید خواهد بود.
 
 ### ۷. سیاست مدرن هوش مصنوعی و هدایت هنری (Modern AI Transparency)
 استودیو تاج‌اینک‌آرت استفاده از فناوری‌های نوین و مدل‌های هوش مصنوعی را به عنوان کپیلوت (دستیار فنی، کدنویسی و تسریع پایپلاین) به کار می‌بندد؛ با این وجود، جهان‌سازی جنسیس، داستان‌ها، نژادها، کاراکترهای اورجینال و هدایت بصری، دستاورد فکری سید سروش تاج است. هرگونه کپی‌برداری تجاری، آموزش مدل‌های اختصاصی (مانند LoRA) جهت بازتولید عامدانه کاراکترهای استودیو، یا جعل هویت تجاری تاج‌اینک‌آرت ممنوع و دارای پیگرد است.
@@ -5322,7 +5322,7 @@ window.saveStudioTerms = async function() {
   }
 
   renderTermsModal();
-  showToast('منشور قوانین و لایسنس استودیو با موفقیت ذخیره و در سایت منتشر شد!', 'success');
+  showToast('Studio Legal Charter and EULA saved and published!', 'success');
 };
 
 // بازنشانی متن به استاندارد رسمی
@@ -5334,7 +5334,7 @@ window.resetStudioTermsToDefault = function() {
   }
   localStorage.removeItem('tajinkart_studio_terms');
   renderTermsModal();
-  showToast('متن قوانین به نسخه پیش‌فرض بازگردانی شد. جهت اعمال دکمه ذخیره را بزنید.', 'info');
+  showToast('Legal charter restored to defaults. Click Save to publish.', 'info');
 };
 
 
@@ -5572,7 +5572,7 @@ window.resendConfirmationEmail = async function(emailAddress) {
       email: email
     });
     if (error) {
-      showToast('خطا در ارسال مجدد ایمیل: ' + error.message, 'error');
+      showToast('خطا در ارسال مجدد Email: ' + error.message, 'error');
     } else {
       showToast('لینک تایید جدید با موفقیت به ' + email + ' ارسال گردید.', 'success', 5000);
     }
@@ -5834,7 +5834,7 @@ document.addEventListener('touchend', () => {
 }, { passive: true });
 
 // =========================================================
-// کشوی شیک و پرستیژدار تشریح فازهای تخصصی (Phase Scope Drawer)
+// کشوی شیک و پرستیژدار تشریح Phasesهای تخصصی (Phase Scope Drawer)
 // =========================================================
 let currentDrawerPipelineKey = 'sketch1';
 
@@ -5848,7 +5848,7 @@ function escapeQuotes(str) {
 // =========================================================
 window.handleImageClick = function(imgEl, phaseTitle, pipeKey, phaseDesc, phaseSub, e) {
   if (window.innerWidth <= 992) {
-    // در موبایل: باز شدن کشوی مشخصات فنی فاز به سبک Bottom Sheet
+    // در موبایل: باز شدن کشوی مشخصات فنی Phases به سبک Bottom Sheet
     openPhaseScopeDrawer(phaseTitle, pipeKey, phaseDesc, phaseSub);
   } else {
     // در دسکتاپ: باز شدن ذره‌بین متمرکز وسط صفحه با امکان هدایت آزادانه لنز
@@ -5910,7 +5910,7 @@ window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '', cus
   if (!overlay) return;
 
   const titleEl = document.getElementById('drawerPhaseTitle');
-  if (titleEl) titleEl.textContent = phaseTitle || 'فاز تخصصی پروداکشن';
+  if (titleEl) titleEl.textContent = phaseTitle || 'Phases تخصصی پروداکشن';
 
   const pipeData = (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[currentDrawerPipelineKey]) ? 
                    PIPELINE_DATA[currentDrawerPipelineKey] : { topSub: 'طراحی کاراکتر و کانسپت' };
@@ -5927,9 +5927,9 @@ window.openPhaseScopeDrawer = function(phaseTitle, pipeKey, customDesc = '', cus
     } else if (phaseTitle.includes('سه‌نما') || phaseTitle.includes('ارتوگرافیک') || phaseTitle.includes('Turnaround')) {
       purposeEl.textContent = 'این شیت برای تثبیت زوایای تراز ارتوگرافیک (روبرو، نیم‌رخ و پشت) طراحی شده است و به عنوان نقشه فنی اصلی در اختیار تیم مدلسازی سه‌بعدی و انیمیشن قرار می‌گیرد.';
     } else if (phaseTitle.includes('اکسپرشن') || phaseTitle.includes('چهره') || phaseTitle.includes('حالات')) {
-      purposeEl.textContent = 'این فاز به بررسی حالات روحی، احساسات دینامیک و میمیک چهره کاراکتر در شرایط نبرد، خشم، تمرکز و دیالوگ اختصاص دارد تا روح روایی اثر حفظ گردد.';
+      purposeEl.textContent = 'این Phases به بررسی حالات روحی، احساسات دینامیک و میمیک چهره کاراکتر در شرایط نبرد، خشم، تمرکز و دیالوگ اختصاص دارد تا روح روایی اثر حفظ گردد.';
     } else if (phaseTitle.includes('اتود') || phaseTitle.includes('سیلوئت') || phaseTitle.includes('اسکچ')) {
-      purposeEl.textContent = 'کشف فرم اولیه، تناسبات هندسی و هویت سیلوئت کلی اثر در فاز کانسپت پایه؛ این مرحله پایه تصمیم‌گیری‌های پروداکشن و تعیین مسیر نهایی طراحی است.';
+      purposeEl.textContent = 'کشف فرم اولیه، تناسبات هندسی و هویت سیلوئت کلی اثر در Phases کانسپت پایه؛ این مرحله پایه تصمیم‌گیری‌های پروداکشن و تعیین مسیر نهایی طراحی است.';
     } else if (phaseTitle.includes('رندر') || phaseTitle.includes('مستر') || phaseTitle.includes('نور')) {
       purposeEl.textContent = 'تفکیک متریال‌ها، نورپردازی مقداری، پردازش بافت‌های پوستی/فلزی و خروجی باکیفیت پولیش نهایی با قابلیت چاپ و استفاده مستقیم در پروموشن تجاری.';
     } else {
@@ -6284,7 +6284,7 @@ window.saveStudioCurrencySetting = function() {
     siteSettings.usdRate = Number(rateInput.value);
     safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
     renderAllPrices();
-    showToast(`نرخ تسعیر دلار به ${siteSettings.usdRate.toLocaleString('fa-IR')} تومان ثبت شد.`, 'success', 3500);
+    showToast(`نرخ تسعیر دلار به ${siteSettings.usdRate.toLocaleString('fa-IR')} TOMAN ثبت شد.`, 'success', 3500);
   }
 };
 // =========================================================
@@ -6456,7 +6456,7 @@ window.saveMultiCloudIntegrationsDirect = function() {
   if (typeof safeSetStorage === 'function') {
     safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   }
-  showToast('تنظیمات وب‌هوک گوگل شیتس و آنالیتیکس کلادفلر با موفقیت ثبت شد! ✓', 'success', 4000);
+  showToast('Google Sheets Webhook & Cloudflare Analytics settings saved! ✓', 'success', 4000);
 };
 
 // فراخوانی خودکار همگام‌سازی ابری سفارش‌ها در لود صفحه
@@ -6515,7 +6515,7 @@ window.saveAboutStudioManifestoDirect = function() {
     aboutParagraph.innerHTML = siteSettings.aboutText;
   }
   
-  showToast('متن و مانیفست «درباره استودیو» با موفقیت به‌روزرسانی و ذخیره شد! ✓', 'success', 4000);
+  showToast('Studio Manifesto and Director Biography updated! ✓', 'success', 4000);
 };
 
 // ==============================================================================
@@ -6648,7 +6648,7 @@ window.saveStudioTerms = function() {
     notice.style.display = 'inline-block';
     setTimeout(() => { notice.style.display = 'none'; }, 3500);
   }
-  showToast('تمامی بخش‌های منشور قوانین استودیو با موفقیت ذخیره و منتشر شد! ✓', 'success', 4000);
+  showToast('All sections of studio legal charter saved and published! ✓', 'success', 4000);
 };
 
 // مقداردهی اولیه اینپوت‌های قوانین در ادمین
@@ -6663,7 +6663,7 @@ document.addEventListener('DOMContentLoaded', () => {
       accInput.value = siteSettings.termsAccount || `کاربر با ثبت‌نام و استفاده از سایت، صحت اطلاعات هویتی و ارتباطی خود را تایید می‌نماید. حفظ محرمانگی رمز عبور بر عهده کاربر است.\n\nبند منع صریح هوش مصنوعی (Anti-AI): هرگونه اسکرپ داده، کپی‌برداری اتوماتیک یا استفاده از کانسپت‌ها و آثار استودیو TAJINKART جهت آموزش مدل‌های هوش مصنوعی مولد اکیداً ممنوع بوده و نقض حقوق مالکیت معنوی بین‌المللی تلقی می‌گردد.`;
     }
     if (commInput) {
-      commInput.value = siteSettings.termsCommission || `قانون تغییرناپذیر ودیعه ۵۰٪ (The 50% Deposit Rule): فرآیند طراحی و تخصیص زمان آتلیه منحصراً پس از واریز قطعی ۵۰٪ مبلغ کل سفارش به عنوان پیش‌پرداخت غیرقابل‌استرداد آغاز می‌گردد. تسویه ۵۰٪ باقیمانده پیش از تحویل سورس‌فایل نهایی رزولوشن بالا و فایل لایه‌باز PSD الزامی است.\n\nمراحل فیدبک و بازبینی (Revision Policy): در فاز اتودهای اولیه و سیلوئت تا ۲ مرحله ویرایش آزاد منظور شده است. پس از تایید لاین‌آرت و ورود به فاز رندر مستر نهایی، تغییرات اساسی در تناسبات شامل هزینه مازاد خواهد بود.\n\nبند رهاسازی سفارش (Abandonment Clause): در صورت عدم پاسخگویی یا سکوت کارفرما به مدت بیش از ۳۰ روز تقویمی، پروژه رهاشده تلقی شده و با ضبط ودیعه مختومه می‌گردد.`;
+      commInput.value = siteSettings.termsCommission || `قانون تغییرناپذیر ودیعه ۵۰٪ (The 50% Deposit Rule): فرآیند طراحی و تخصیص زمان آتلیه منحصراً پس از واریز قطعی ۵۰٪ مبلغ کل سفارش به عنوان پیش‌پرداخت غیرقابل‌استرداد آغاز می‌گردد. تسویه ۵۰٪ باقیمانده پیش از تحویل سورس‌فایل نهایی رزولوشن بالا و فایل لایه‌باز PSD الزامی است.\n\nمراحل فیدبک و بازبینی (Revision Policy): در Phases اتودهای اولیه و سیلوئت تا ۲ مرحله ویرایش آزاد منظور شده است. پس از تایید لاین‌آرت و ورود به Phases رندر مستر نهایی، تغییرات اساسی در تناسبات شامل هزینه مازاد خواهد بود.\n\nبند رهاسازی سفارش (Abandonment Clause): در صورت عدم پاسخگویی یا سکوت کارفرما به مدت بیش از ۳۰ روز تقویمی، پروژه رهاشده تلقی شده و با ضبط ودیعه مختومه می‌گردد.`;
     }
     if (assInput) {
       assInput.value = siteSettings.termsAssets || `موافقت‌نامه لایسنس دارایی‌های دیجیتال (EULA): خرید محصولات دیجیتال و فایل‌های آماده از استودیو منحصراً حق استفاده غیرانحصاری در محصول نهایی (مانند بازی یا انیمیشن) را اعطا می‌کند؛ هرگونه بازفروش سورس خام، انتشار عمومی یا توزیع مجدد دارایی‌ها ممنوع است.\n\nاسقاط حق انصراف کالای دیجیتال: دانلود موفق فایل سورس دیجیتال به منزله تحویل قطعی کالا بوده و قابلیت استرداد وجه ندارد.`;
@@ -6820,7 +6820,7 @@ window.pingAllCloudServices = async function() {
     btn.disabled = false;
     btn.innerHTML = '⚡ استعلام مجدد وضعیت اتصالات';
   }
-  showToast('استعلام وضعیت زنده زیرساخت ابری با موفقیت انجام شد! ✓', 'success', 3000);
+  showToast('Multi-cloud infrastructure health check completed successfully! ✓', 'success', 3000);
 };
 
 window.saveCloudinarySettingsDirect = function() {
@@ -6833,7 +6833,7 @@ window.saveCloudinarySettingsDirect = function() {
     siteSettings.cloudinaryPreset = cPresetEl.value.trim();
   }
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  showToast('تنظیمات فضای ابری تصاویر (Cloudinary) با موفقیت ذخیره شد! ✓', 'success', 3500);
+  showToast('Cloudinary Image CDN settings saved! ✓', 'success', 3500);
 };
 
 // ==============================================================================
@@ -6913,7 +6913,7 @@ window.saveStudioPricingMatrixDirect = function() {
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   if (typeof selectPipeline === 'function') selectPipeline(currentSelectedPipeKey, null, false);
-  showToast('ماتریس قیمت‌ها و ضرایب آتلیه با موفقیت ذخیره و اعمال شد! ✓', 'success', 3500);
+  showToast('Studio Pricing Matrix and formulas saved successfully! ✓', 'success', 3500);
 };
 
 window.loadStudioPricingMatrixToForm = function() {
@@ -6932,7 +6932,7 @@ window.loadStudioPricingMatrixToForm = function() {
 window.adminEditCategoryTitle = function(catId) {
   const cat = galleryCategories.find(c => c.id === catId);
   if (!cat) return;
-  const newTitle = prompt('ویرایش نام دسته‌بندی:', cat.title);
+  const newTitle = prompt('Edit Category Name:', cat.title);
   if (newTitle && newTitle.trim()) {
     cat.title = newTitle.trim();
     safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
@@ -7186,12 +7186,12 @@ window.addAdminSloganPairRow = function() {
   safeSetStorage('tajinkart_brand_pairs', JSON.stringify(BRAND_SIGNATURE_PAIRS));
   renderAdminSloganPairs();
   if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
-  showToast('ردیف شعار جدید اضافه شد. برای ذخیره دائمی دکمه ثبت را بزنید.', 'info');
+  showToast('New slogan row added. Click Save to commit.', 'info');
 };
 
 window.removeAdminSloganPairRow = function(idx) {
   if (BRAND_SIGNATURE_PAIRS.length <= 1) {
-    showToast('حداقل یک شعار باید در لیست هدر باقی بماند.', 'warning', 3000);
+    showToast('At least one slogan must remain active.', 'warning', 3000);
     return;
   }
   BRAND_SIGNATURE_PAIRS.splice(idx, 1);
@@ -7199,7 +7199,7 @@ window.removeAdminSloganPairRow = function(idx) {
   safeSetStorage('tajinkart_brand_pairs', JSON.stringify(BRAND_SIGNATURE_PAIRS));
   renderAdminSloganPairs();
   if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
-  showToast('شعار مورد نظر حذف و تغییرات ذخیره شد. ✓', 'success', 3000);
+  showToast('Slogan deleted and committed successfully. ✓', 'success', 3000);
 };
 
 window.saveAdminSlogansSettings = function() {
@@ -7241,7 +7241,7 @@ window.saveAdminSlogansSettings = function() {
     initDynamicBrandHeader();
   }
 
-  showToast('تمامی عناوین، زیرعنوان سبک‌ها و شعارهای متحرک هدر با موفقیت ذخیره شدند! ✓', 'success', 4000);
+  showToast('All brand titles, subtitles, and rotating taglines saved! ✓', 'success', 4000);
 };
 
 // اجرای اولیه بارگذاری شعارها
@@ -7470,7 +7470,7 @@ window.renderAdminGalleryCategories = function() {
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
   const badge = document.getElementById('adminCategoryCountBadge');
-  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
+  if (badge) badge.textContent = `${galleryCategories.length} Active Categories`;
 
   container.innerHTML = galleryCategories.map((cat) => {
     const color = cat.color || '#38bdf8';
@@ -7662,7 +7662,7 @@ window.renderAdminGalleryCategories = function() {
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
   const badge = document.getElementById('adminCategoryCountBadge');
-  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
+  if (badge) badge.textContent = `${galleryCategories.length} Active Categories`;
 
   container.innerHTML = galleryCategories.map((cat) => {
     const color = cat.color || '#38bdf8';
@@ -7884,7 +7884,7 @@ window.renderAdminGalleryCategories = function() {
   const container = document.getElementById('adminGalleryCategoriesList');
   if (!container) return;
   const badge = document.getElementById('adminCategoryCountBadge');
-  if (badge) badge.textContent = `${galleryCategories.length} دسته فعال`;
+  if (badge) badge.textContent = `${galleryCategories.length} Active Categories`;
 
   container.innerHTML = galleryCategories.map((cat) => {
     const color = cat.color || '#38bdf8';
@@ -8347,7 +8347,7 @@ window.adminDeleteCurrentEditingCategory = function() {
   const cat = galleryCategories.find(c => c.id === origId);
   const catName = cat ? (cat.title || cat.titleFA || origId) : origId;
   
-  if (!confirm(`آیا از حذف دسته‌بندی «${catName}» اطمینان دارید؟ آثار منتسب به این دسته حذف نخواهند شد.`)) return;
+  if (!confirm(`Are you sure you want to delete category "${catName}"? Artworks assigned to this category will not be deleted.`)) return;
 
   galleryCategories = galleryCategories.filter(c => c.id !== origId);
   safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
@@ -8441,5 +8441,5 @@ window.saveStudioModeDirect = function(mode, event) {
   const activeCard = document.getElementById(`cardMode${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
   if (activeCard) activeCard.classList.add('active');
 
-  showToast(`وضعیت استودیو با موفقیت بر روی «${mode.toUpperCase()}» تنظیم و ذخیره شد! ✓`, 'success', 3500);
+  showToast(`Studio presence status set to "${mode.toUpperCase()}" and committed! ✓`, 'success', 3500);
 };
