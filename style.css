@@ -7320,3 +7320,139 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   border-bottom-color: var(--cat-color, var(--gold)) !important;
   box-shadow: 0 0 0 1px var(--cat-color, var(--gold)), 0 12px 32px var(--cat-color-glow, rgba(250, 204, 21, 0.4)) !important;
 }
+
+
+/* ==========================================================================
+   TAJINKART REFINEMENTS v21.3.0
+   1. Consistent Right Dock Halogen Glow across ALL 6 Buttons
+   2. Calm Resting State for Top-Left Pills (TAJINKART & All Artworks)
+   3. 7% Scale Zoom and Category Dynamic Color for Commissions
+   ========================================================================== */
+
+/* ۱. آرام‌سازی هالوژن دکمه‌های بالا چپ در حالت استراحت و هاور باوقار */
+.top-center-pill,
+#currentCategoryPillBtn,
+.floating-cat-pill {
+  background: rgba(8, 11, 18, 0.94) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+  color: #e2e8f0 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.top-center-pill:hover,
+#currentCategoryPillBtn:hover,
+.floating-cat-pill:hover,
+.floating-cat-pill.active {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.45), 0 6px 22px rgba(0, 0, 0, 0.8) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ۲. تضمین هاله نوری و خط محیطی ۱.۵px یکدست برای تمامی ۶ دکمه داک راست */
+.dock-store-wrapper {
+  overflow: visible !important;
+}
+
+#rightVerticalNav .right-exp-btn.home-theme,
+#rightVerticalNav #rightDockHomeBtn,
+.right-exp-btn.home-theme,
+#rightDockHomeBtn {
+  border: 1.5px solid #ff4500 !important;
+  box-shadow: 0 0 14px rgba(255, 69, 0, 0.45), inset 0 0 6px rgba(255, 69, 0, 0.2) !important;
+  color: #ff4500 !important;
+}
+#rightVerticalNav .right-exp-btn.home-theme .right-exp-icon,
+#rightDockHomeBtn .right-exp-icon {
+  color: #ff4500 !important;
+}
+
+#rightVerticalNav .right-exp-btn.cyan-theme,
+.right-exp-btn.cyan-theme {
+  border: 1.5px solid #00f0ff !important;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.45), inset 0 0 6px rgba(0, 240, 255, 0.2) !important;
+  color: #00f0ff !important;
+}
+#rightVerticalNav .right-exp-btn.cyan-theme .right-exp-icon {
+  color: #00f0ff !important;
+}
+
+#rightVerticalNav .right-exp-btn.gold-theme,
+#rightVerticalNav #dockStoreMainBtn,
+.right-exp-btn.gold-theme,
+#dockStoreMainBtn {
+  border: 1.5px solid #f59e0b !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.45), inset 0 0 6px rgba(245, 158, 11, 0.2) !important;
+  color: #f59e0b !important;
+}
+#rightVerticalNav .right-exp-btn.gold-theme .right-exp-icon,
+#dockStoreMainBtn .right-exp-icon {
+  color: #f59e0b !important;
+}
+
+#rightVerticalNav .right-exp-btn.crimson-theme,
+.right-exp-btn.crimson-theme {
+  border: 1.5px solid #e11d48 !important;
+  box-shadow: 0 0 14px rgba(225, 29, 72, 0.45), inset 0 0 6px rgba(225, 29, 72, 0.2) !important;
+  color: #e11d48 !important;
+}
+#rightVerticalNav .right-exp-btn.crimson-theme .right-exp-icon {
+  color: #e11d48 !important;
+}
+
+#rightVerticalNav .right-exp-btn.purple-theme,
+.right-exp-btn.purple-theme {
+  border: 1.5px solid #9333ea !important;
+  box-shadow: 0 0 14px rgba(147, 51, 234, 0.45), inset 0 0 6px rgba(147, 51, 234, 0.2) !important;
+  color: #9333ea !important;
+}
+#rightVerticalNav .right-exp-btn.purple-theme .right-exp-icon {
+  color: #9333ea !important;
+}
+
+#rightVerticalNav .right-exp-btn.emerald-theme,
+.right-exp-btn.emerald-theme {
+  border: 1.5px solid #059669 !important;
+  box-shadow: 0 0 14px rgba(5, 150, 105, 0.45), inset 0 0 6px rgba(5, 150, 105, 0.2) !important;
+  color: #059669 !important;
+}
+#rightVerticalNav .right-exp-btn.emerald-theme .right-exp-icon {
+  color: #059669 !important;
+}
+
+/* ۳. بزرگنمایی ۷ درصد و انطباق کامل کارت‌های پایپلاین با دسته‌بندی گالری */
+.service-nav-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.25s ease, 
+              box-shadow 0.25s ease !important;
+  border-bottom: 3.5px solid var(--cat-color) !important;
+  position: relative !important;
+}
+
+.service-nav-card:hover {
+  transform: scale(1.07) !important;
+  z-index: 15 !important;
+  border-color: var(--cat-color) !important;
+  border-bottom-color: var(--cat-color) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75), 0 0 22px var(--cat-color-glow) !important;
+}
+
+.service-nav-card.active {
+  border-color: var(--cat-color) !important;
+  border-bottom-color: var(--cat-color) !important;
+  box-shadow: 0 0 0 1.5px var(--cat-color), 0 14px 35px var(--cat-color-glow) !important;
+}
+
+/* ۴. تایل‌های زیرشاخه و پکیج‌های کمیسیون */
+.pipeline-tile {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.pipeline-tile:hover {
+  border-color: var(--tile-accent, var(--gold)) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85), 0 0 22px var(--tile-accent, rgba(250, 204, 21, 0.35)) !important;
+  transform: translateY(-2px) !important;
+}

@@ -2222,37 +2222,71 @@ window.deepLinkToPipeline = function() {
 
 // closeArtModalDirect handled uniformly above
 
-// پایپلاین‌های ۶گانه آتلیه
+// پایپلاین‌های ۶گانه آتلیه - اتصال زنده به رنگ دسته‌بندی گالری و زیرشاخه‌ها (v21.3.0)
 window.selectPipeline = function(key, cardEl, userClicked) {
   currentSelectedPipeKey = key;
+  
+  // ۱. نگاشت پایپلاین به دسته‌بندی گالری و واکشی رنگ زنده آن
+  const catId = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? (PIPELINE_TO_CATEGORY_MAP[key] || 'character') : 'character';
+  let catColor = '#facc15';
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    const foundCat = galleryCategories.find(c => c.id === catId);
+    if (foundCat && foundCat.color) {
+      catColor = foundCat.color;
+    }
+  }
+
+  // ۲. به‌روزرسانی وضعیت اکتیو کارت‌های سایدبار
   document.querySelectorAll('#atelierServiceCards .service-nav-card').forEach(c => {
-    c.classList.toggle('active', c.getAttribute('data-pipeline') === key);
+    const isActive = c.getAttribute('data-pipeline') === key;
+    c.classList.toggle('active', isActive);
   });
+
+  if (typeof applyCategoryColorsToServiceCards === 'function') {
+    applyCategoryColorsToServiceCards();
+  }
 
   const data = PIPELINE_DATA[key];
   if (!data) return;
 
-  document.getElementById('sketchTopSubTitle').textContent = data.topSub;
-  document.getElementById('sketchAnnotationNote').textContent = data.note;
-  document.getElementById('sketchBadgeSlug').textContent = data.badgeSlug;
+  const topSubEl = document.getElementById('sketchTopSubTitle');
+  if (topSubEl) {
+    topSubEl.textContent = data.topSub;
+    topSubEl.style.borderRight = `3px solid ${catColor}`;
+    topSubEl.style.paddingRight = '10px';
+  }
 
+  const badgeSlugEl = document.getElementById('sketchBadgeSlug');
+  if (badgeSlugEl) {
+    badgeSlugEl.textContent = data.badgeSlug;
+    badgeSlugEl.style.color = catColor;
+    badgeSlugEl.style.borderColor = catColor;
+    badgeSlugEl.style.background = `${catColor}18`;
+    badgeSlugEl.style.boxShadow = `0 0 14px ${catColor}44`;
+  }
+
+  const noteEl = document.getElementById('sketchAnnotationNote');
+  if (noteEl) noteEl.textContent = data.note;
+
+  // ۳. رندر تایل‌های مرحله و پکیج‌ها متصل به رنگ زنده دسته‌بندی
   const container = document.getElementById('mosaicStageContainer');
   if (container) {
     container.innerHTML = data.tiles.map((tile, idx) => {
       const displayPrice = formatPrice(tile.price);
       return `
-        <div class="pipeline-tile ${tile.span}" onclick="openModal('${tile.title}', '${tile.desc}', '${displayPrice}', '${tile.img}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
+        <div class="pipeline-tile ${tile.span}" style="--tile-accent:${catColor};" onclick="openModal('${tile.title}', '${tile.desc}', '${displayPrice}', '${tile.img}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
           <img src="${tile.img}" class="pipeline-tile-img" alt="${tile.title}" />
           <div class="pipeline-tile-overlay">
-            
             <h4 class="pipeline-tile-title">${tile.title}</h4>
             <p class="pipeline-tile-desc">${tile.desc}</p>
             <div class="pipeline-tile-footer">
               <div>
-                <span class="font-mono" style="color:var(--gold); font-size:13.5px; font-weight:800;">${displayPrice}</span>
+                <span class="font-mono" style="color:${catColor}; font-size:14px; font-weight:800; text-shadow:0 0 10px ${catColor}55;">${displayPrice}</span>
                 <span style="color:var(--cyan-electric); font-size:11px; margin-right:8px;">(${tile.timeline})</span>
               </div>
-              <span style="font-size:11.5px; color:var(--iris); font-weight:700;">Quote & Submit Brief →</span>
+              <span style="font-size:11.5px; color:${catColor}; font-weight:800; display:flex; align-items:center; gap:4px;">
+                Quote & Submit Brief →
+              </span>
             </div>
           </div>
         </div>
@@ -2983,7 +3017,7 @@ window.switchView = function(vKey) {
   if (vKey === 'showcase') {
     if (catMenu) catMenu.style.display = 'block';
     renderShowcaseGrid();
-    if (homeBtn) homeBtn.classList.add('hidden');
+    if (homeBtn) homeBtn.classList.remove('hidden');
     if (window.scrollY <= 140 && window.innerWidth > 768) { if (dock) dock.classList.remove("dock-collapsed");
       /* topBar is permanently visible */
     } else {
@@ -8316,19 +8350,19 @@ window.adminDeleteCurrentEditingCategory = function() {
 };
 
 
-// اتصال زنده رنگ‌های دسته‌بندی گالری به کارت‌های پایپلاین استودیو (v21.2.0)
+// اتصال زنده رنگ‌های دسته‌بندی گالری به کارت‌های پایپلاین استودیو (v21.3.0)
 window.applyCategoryColorsToServiceCards = function() {
-  const cards = document.querySelectorAll('.service-nav-card');
+  const cards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
   if (!cards || cards.length === 0) return;
 
   cards.forEach(card => {
     const pipeKey = card.getAttribute('data-pipeline');
     if (!pipeKey) return;
 
-    // نگاشت پایپلاین به دسته‌بندی گالری
+    // نگاشت دقیق پایپلاین به شناسه دسته‌بندی گالری
     const catId = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? (PIPELINE_TO_CATEGORY_MAP[pipeKey] || 'character') : 'character';
     
-    // دریافت رنگ زنده این دسته‌بندی از آرایه گالری ادمین
+    // دریافت رنگ زنده این دسته‌بندی از آرایه گالری ادمین بدون پیش‌فرض ثابت
     let catColor = '#facc15';
     if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
       const foundCat = galleryCategories.find(c => c.id === catId);
@@ -8339,7 +8373,7 @@ window.applyCategoryColorsToServiceCards = function() {
 
     // اعمال متغیرهای CSS روی هر کارت
     card.style.setProperty('--cat-color', catColor);
-    card.style.setProperty('--cat-color-glow', `${catColor}55`); // 33% opacity hex
+    card.style.setProperty('--cat-color-glow', `${catColor}66`);
     card.style.borderBottomColor = catColor;
 
     // تنظیم رنگ شماره سرفصل (01., 02., ...)
@@ -8348,10 +8382,13 @@ window.applyCategoryColorsToServiceCards = function() {
       numSpan.style.color = catColor;
     }
 
-    // اگر کارت در حال حاضر فعال است
+    // اگر کارت فعال است، اعمال دقیق بوردر و هاله با رنگ دسته‌بندی
     if (card.classList.contains('active')) {
       card.style.borderColor = catColor;
-      card.style.boxShadow = `0 0 0 1px ${catColor}, 0 12px 30px ${catColor}44`;
+      card.style.boxShadow = `0 0 0 1.5px ${catColor}, 0 14px 35px ${catColor}55`;
+    } else {
+      card.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+      card.style.boxShadow = 'none';
     }
   });
 };
