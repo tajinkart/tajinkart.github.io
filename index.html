@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=21.5.1">
+  <link rel="stylesheet" href="style.css?v=21.6.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -2470,10 +2470,19 @@
       <div style="font-family:var(--font-brand); font-size:12px; letter-spacing:0.05em; color:var(--text-muted);">
         Directed by Seyed Soroush Taj • All Rights Reserved
       </div>
+      
+      <!-- Google Translate Integration (Custom Dark Atelier Style) -->
+      <div class="atelier-translate-wrapper" title="Translate TAJINKART Website">
+        <span class="atelier-translate-label">
+          <span>🌐</span>
+          <span>Translate:</span>
+        </span>
+        <div id="google_translate_element"></div>
+      </div>
     </div>
   </footer>
-  <script src="data.js?v=21.5.1"></script>
-  <script src="app.js?v=21.5.1"></script>
+  <script src="data.js?v=21.6.0"></script>
+  <script src="app.js?v=21.6.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
@@ -2503,5 +2512,20 @@
 
 
   <div id="instagramPinchBackdrop" class="instagram-pinch-backdrop"></div>
+
+  <!-- Google Translate Engine (Asynchronous Load) -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      try {
+        if (window.google && window.google.translate) {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            autoDisplay: false
+          }, 'google_translate_element');
+        }
+      } catch(e) {}
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

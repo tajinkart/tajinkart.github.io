@@ -7477,3 +7477,103 @@ h1, h2, h3, h4, h5, h6,
   font-family: var(--font-brand) !important;
   letter-spacing: 0.05em !important;
 }
+
+
+/* ==========================================================================
+   ATELIER GOOGLE TRANSLATE CUSTOM DARK WIDGET (v21.6.0)
+   ========================================================================== */
+
+/* مخفی‌سازی کامل بنر سفید پیش‌فرض گوگل و جلوگیری از هل دادن صفحه به پایین */
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+.goog-te-banner {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+/* استایل کپسول دارک در فوتر سایت */
+.atelier-translate-wrapper {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(8, 12, 20, 0.95);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 999px;
+  padding: 5px 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  transition: all 0.25s ease;
+}
+
+.atelier-translate-wrapper:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.45);
+  transform: translateY(-1px);
+}
+
+.atelier-translate-label {
+  font-family: var(--font-brand);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+#google_translate_element {
+  display: inline-block;
+}
+
+/* سفارشی‌سازی المان پیش‌فرض گجت گوگل به سبک دارک */
+.goog-te-gadget {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+}
+
+.goog-te-gadget .goog-te-combo {
+  background: #050811 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 8px !important;
+  padding: 5px 12px !important;
+  font-family: inherit !important;
+  font-size: 11.5px !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.goog-te-gadget .goog-te-combo:hover,
+.goog-te-gadget .goog-te-combo:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.4) !important;
+}
+
+/* مخفی‌سازی لوگو و المان‌های تبلیغاتی پیش‌فرض گوگل */
+.goog-logo-link,
+.goog-te-gadget > span,
+.goog-te-gadget > div {
+  display: none !important;
+}
+
+/* جلوگیری از افکت‌ها و فونت‌های زشت هایلایت گوگل روی کلمات متن */
+font {
+  background: transparent !important;
+  box-shadow: none !important;
+  vertical-align: inherit !important;
+}
+
+.goog-text-highlight {
+  background: transparent !important;
+  box-shadow: none !important;
+}
