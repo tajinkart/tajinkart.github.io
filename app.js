@@ -2995,11 +2995,21 @@ window.switchStoreTab = function(tabKey, btn) {
 let scrollTicking = false;
 
 function handleOptimizedScroll() {
+  const dock = document.getElementById('rightVerticalNav');
+  const trigger = document.getElementById('dockMasterTrigger');
+
+  // ۱. بستن فوری داک بازشده به محض هرگونه اسکرول (تبدیل فوری به سه خط)
+  if (dock && dock.classList.contains('dock-open')) {
+    dock.classList.remove('dock-open');
+    dock.classList.add('dock-collapsed');
+    if (trigger) trigger.blur();
+  }
+
   const scrolled = window.scrollY || window.pageYOffset || 0;
   const topBar = document.getElementById('topCenterBrandBar');
   const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
 
-  // ۱. کنترل پدیدار شدن نشان تاژین کارت و دسته‌بندی آثار با اسکرول به پایین در گالری
+  // ۲. پدیدار شدن نشان برند و دسته‌بندی با اسکرول در گالری
   if (topBar) {
     if (cView === 'showcase') {
       if (scrolled > 80) {
@@ -3012,14 +3022,13 @@ function handleOptimizedScroll() {
     }
   }
 
-  // ۲. مدیریت داک در موبایل: همیشه بسته می‌ماند و اسکرول تأثیری رویش ندارد
-  const dock = document.getElementById('rightVerticalNav');
-  if (!dock) return;
+  // ۳. مدیریت داک در موبایل: همیشه بسته می‌ماند
   if (window.innerWidth <= 768) {
+    if (dock) dock.classList.add('dock-collapsed');
     return;
   }
 
-  // ۳. بازگشت رسمی سه خط به دسکتاپ: در بالای صفحه باز است، با اسکرول به پایین (>100px) جمع می‌شود به سه خط
+  // ۴. دسکتاپ: در بالای صفحه (scrolled <= 100) باز است، با اسکرول به پایین جمع می‌شود به سه خط
   if (cView !== 'showcase') {
     dock.classList.add('dock-collapsed');
     return;
@@ -3029,7 +3038,6 @@ function handleOptimizedScroll() {
     dock.classList.add('dock-collapsed');
   } else {
     dock.classList.remove('dock-collapsed');
-    dock.classList.remove('dock-open');
   }
 }
 
@@ -5352,32 +5360,30 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
 
   const pillBtn = document.getElementById('currentCategoryPillBtn');
   if (pillBtn) {
-    let color = '#f59e0b';
-    let glow = 'rgba(245, 158, 11, 0.55)';
-
-    const categoryColorMap = {
-      'all': '#f59e0b',
-      'character': '#ff4500',
-      'characters': '#ff4500',
-      'environment': '#00f0ff',
-      'environments': '#00f0ff',
-      'creature': '#059669',
-      'creatures': '#059669',
-      'keyframe': '#e11d48',
-      'keyframes': '#e11d48',
-      'props': '#9333ea',
-      'comic': '#fb923c',
-      'comics': '#fb923c',
-      'mascot': '#ec4899'
-    };
+    let color = '#facc15'; // پیش‌فرض زرد / طلایی
+    let glow = 'rgba(250, 204, 21, 0.55)';
 
     if (categoryKey !== 'all') {
-      if (categoryColorMap[categoryKey]) {
-        color = categoryColorMap[categoryKey];
+      const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
+        ? galleryCategories.find(c => c.id === categoryKey) : null;
+      if (cat && cat.color) {
+        color = cat.color;
       } else {
-        const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
-          ? galleryCategories.find(c => c.id === categoryKey) : null;
-        if (cat && cat.color) color = cat.color;
+        const categoryColorMap = {
+          'character': '#facc15', // زرد هماهنگ با نقطه دسته‌بندی
+          'characters': '#facc15',
+          'environment': '#00f0ff',
+          'environments': '#00f0ff',
+          'creature': '#059669',
+          'creatures': '#059669',
+          'keyframe': '#e11d48',
+          'keyframes': '#e11d48',
+          'props': '#9333ea',
+          'comic': '#fb923c',
+          'comics': '#fb923c',
+          'mascot': '#ec4899'
+        };
+        color = categoryColorMap[categoryKey] || '#38bdf8';
       }
       glow = color.startsWith('#') ? `${color}88` : color;
     }
@@ -6299,13 +6305,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==============================================================================
 let brandMorphInterval = null;
 const BRAND_SIGNATURE_PAIRS = [
-  { title: 'TAJINKART', sub: 'FROM INK TO UNIVERSE' },
-  { title: 'FROM INK TO UNIVERSE', sub: 'CONCEPT ART & WORLDBUILDING STUDIO' },
-  { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' }
+  { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' },
+  { title: 'TAJINKART', sub: 'CONCEPT ART & VISUAL DEVELOPMENT ATELIER' },
+  { title: 'FROM INK TO UNIVERSE', sub: 'ORIGINAL DARK FANTASY & SCI-FI WORLDS' }
 ];
 let currentBrandPairIdx = 0;
 
 window.initDynamicBrandHeader = function() {
+
   const titleEl = document.getElementById('brandMorphTitle');
   const subEl = document.getElementById('brandMorphSub');
   if (!titleEl || !subEl) return;
@@ -7922,4 +7929,24 @@ window.toggleDockExpand = function(e) {
     dock.classList.add('dock-open');
     dock.classList.remove('dock-collapsed');
   }
+};
+
+window.adminDeleteCurrentEditingCategory = function() {
+  const origId = document.getElementById('adminEditCatOriginalId')?.value;
+  if (!origId) return;
+  const cat = galleryCategories.find(c => c.id === origId);
+  const catName = cat ? (cat.title || cat.titleFA || origId) : origId;
+  
+  if (!confirm(`آیا از حذف دسته‌بندی «${catName}» اطمینان دارید؟ آثار منتسب به این دسته حذف نخواهند شد.`)) return;
+
+  galleryCategories = galleryCategories.filter(c => c.id !== origId);
+  safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+  
+  closeAdminCategoryEditForm();
+  if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (currentGalleryFilter === origId) {
+    filterGalleryByCategory('all', 'All Artworks');
+  }
+  showToast(`دسته‌بندی «${catName}» با موفقیت حذف شد.`, 'info');
 };

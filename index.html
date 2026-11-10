@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=20.13.0">
+  <link rel="stylesheet" href="style.css?v=20.16.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -185,11 +185,13 @@
         <img id="brandCrestImg" src="" alt="TAJINKART Master Crest" class="brand-crest-img" />
       </div>
       <h1 class="brand-giant-title brand-morph-title" id="brandMorphTitle">TAJINKART</h1>
+
+      <!-- شعار چرخشی برند با انیمیشن محو و ظاهر شدن -->
+      <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN</div>
       
       
 
-      <!-- شعار چرخشی برند -->
-      <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">FROM INK TO UNIVERSE</div>
+      
 
       <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" style="margin-top:4px;" title="Studio Availability & Brief Acceptance">
         <span class="status-pulse-dot"></span>
@@ -255,7 +257,7 @@
             </div>
             <div>
               <span class="font-mono" style="font-size:14px; font-weight:900; color:var(--gold); display:block; letter-spacing:0.1em;">TAJINKART STUDIO</span>
-              <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Tehran • Remote Pre-Production with Studios Worldwide</span>
+              <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Remote Pre-Production with Studios Worldwide</span>
             </div>
             <div style="width:100%; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; font-size:11.5px; color:#94a3b8; line-height:1.7;">
               Pre-production for games, cinematic concept art, and entertainment design on official studio contract milestones.
@@ -279,14 +281,7 @@
           <span style="font-size:12px; color:var(--text-muted);">Pre-production for games, cinematic concept art, and entertainment design directed by Seyed Soroush Taj.</span>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="storeSubTabBtnCommissions" type="button" onclick="switchStoreTab('commissions', this)" class="store-dual-btn active" style="padding:9px 18px; font-size:12px; font-weight:700;">
-            🎨 Concept Commissions (7 Pipelines)
-          </button>
-          <button id="storeSubTabBtnProducts" type="button" onclick="switchStoreTab('products', this)" class="store-dual-btn" style="padding:9px 18px; font-size:12px; font-weight:700;">
-            💎 Digital Assets & Vault
-          </button>
-        </div>
+        
       </div>
 
       <!-- تب ۱: میزکار کمیسیون -->
@@ -859,7 +854,10 @@
                       <input type="text" id="adminEditCatColor" class="font-mono" style="flex:1; padding:10px 14px; background:#020306; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff; font-size:13px;" />
                     </div>
                   </div>
-                  <div style="display:flex; gap:10px;">
+                  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" onclick="adminDeleteCurrentEditingCategory()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; font-weight:700; color:#fda4af; border:1px solid rgba(244,63,94,0.45); background:rgba(244,63,94,0.12); cursor:pointer;" title="حذف این دسته‌بندی از استودیو">
+                      🗑️ حذف دسته‌بندی
+                    </button>
                     <button type="button" onclick="closeAdminCategoryEditForm()" class="btn-secondary" style="padding:10px 18px; font-size:12.5px; cursor:pointer;">
                       انصراف
                     </button>
@@ -2286,19 +2284,18 @@
 
   <!-- فوتر تک‌خطی دارک با لینک‌های حقوقی و رده‌بندی سنی -->
     <!-- پاورقی رسمی و مدرن استودیو TAJINKART همراه با سوئیچر زبان -->
-  <footer id="globalFooter" style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:22px 32px; text-align:center;">
-    <div style="max-width:1440px; margin:0 auto; font-size:12.5px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
-      <div style="font-family:var(--font-brand); letter-spacing:0.04em; color:#cbd5e1;">
-        © 2026 TAJINKART Studio • Directed by Seyed Soroush Taj. All Rights Reserved.
+  <footer id="globalFooter" style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:28px 24px 34px; text-align:center;">
+    <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+      <div style="font-family:var(--font-brand); font-size:14px; letter-spacing:0.08em; color:#f1f5f9; font-weight:700;">
+        © 2026 TAJINKART Studio
       </div>
-      <button type="button" onclick="toggleSiteLanguage()" class="footer-lang-pill" id="siteLangToggleBtn" title="تغییر زبان / Switch Language" style="display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:999px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; font-size:12px; cursor:pointer; transition:all 0.25s;">
-        <span style="font-size:13px;">🌐</span>
-        <span id="siteLangToggleLabel" style="font-weight:700;">EN | فارسی</span>
-      </button>
+      <div style="font-family:var(--font-brand); font-size:12px; letter-spacing:0.05em; color:var(--text-muted);">
+        Directed by Seyed Soroush Taj • All Rights Reserved
+      </div>
     </div>
   </footer>
-  <script src="data.js?v=20.13.0"></script>
-  <script src="app.js?v=20.13.0"></script>
+  <script src="data.js?v=20.16.0"></script>
+  <script src="app.js?v=20.16.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
