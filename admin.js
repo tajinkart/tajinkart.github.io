@@ -869,7 +869,7 @@ window.confirmSaveArtwork = async function() {
   const img = primaryPhase.img || primaryPhase.image || '';
   const pipe = primaryPhase.pipelineKey || 'sketch1';
   const cat = (primaryPhase.category) || (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined' ? PIPELINE_TO_CATEGORY_MAP[pipe] : 'character') || 'character';
-  const genre = primaryPhase.genre || 'Dark Fantasy';
+  const genre = document.getElementById('editArtGenreSelect')?.value || primaryPhase.genre || 'Dark Fantasy';
   const colorSpace = 'Master 4K / 16-Bit ProPhoto RGB';
 
   try {

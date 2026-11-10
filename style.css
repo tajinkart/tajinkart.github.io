@@ -7849,18 +7849,23 @@ body[data-view="showcase"] #topCenterBrandBar.visible {
    FLOATING GOOGLE TRANSLATE WIDGET (BOTTOM-LEFT CORNER WITH SEARCH & PERSIAN)
    ============================================================================== */
 .floating-translate-widget {
-  position: fixed !important;
-  bottom: 24px !important;
-  left: 24px !important;
-  z-index: 9996 !important;
-  display: block !important;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  z-index: 100 !important;
+  margin: 0 !important;
 }
 
 @media (max-width: 768px) {
   .floating-translate-widget {
-    bottom: 82px !important;
-    left: 16px !important;
-  }
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  z-index: 100 !important;
+  margin: 0 !important;
+}
 }
 
 .floating-lang-trigger-btn {
@@ -8064,18 +8069,23 @@ body[data-view="showcase"] #topCenterBrandBar.visible {
    ENHANCED HIGH-VISIBILITY FLOATING LANGUAGE TRIGGER (Prominent Glowing Ring)
    ============================================================================== */
 .floating-translate-widget {
-  position: fixed !important;
-  bottom: 24px !important;
-  left: 24px !important;
-  z-index: 9998 !important;
-  display: block !important;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  z-index: 100 !important;
+  margin: 0 !important;
 }
 
 @media (max-width: 768px) {
   .floating-translate-widget {
-    bottom: 84px !important;
-    left: 16px !important;
-  }
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  z-index: 100 !important;
+  margin: 0 !important;
+}
 }
 
 .floating-lang-trigger-btn {
@@ -8205,7 +8215,17 @@ body[data-view="showcase"] #topCenterBrandBar.visible {
 
 body[data-view="showcase"] #topCenterBrandBar {
   display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  position: fixed !important;
+  top: 16px !important;
+  left: 20px !important;
+  z-index: 9990 !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
   pointer-events: auto !important;
+  visibility: visible !important;
 }
 
 body:not([data-view="showcase"]) #topCenterBrandBar,
@@ -8303,12 +8323,17 @@ body[data-view="showcase"] #topCenterBrandBar #floatingGalleryCategoryMenu {
 
 body[data-view="showcase"] #topCenterBrandBar {
   display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
   gap: 8px !important;
+  position: fixed !important;
   top: 16px !important;
   left: 20px !important;
   z-index: 9990 !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
 }
 
 body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
@@ -8321,9 +8346,19 @@ body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
 
 @media (max-width: 768px) {
   body[data-view="showcase"] #topCenterBrandBar {
-    top: 10px !important;
-    left: 10px !important;
-  }
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  position: fixed !important;
+  top: 16px !important;
+  left: 20px !important;
+  z-index: 9990 !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
   body[data-view="showcase"] #topCenterBrandBar .top-brand-controls-row {
     gap: 6px !important;
   }
@@ -8346,18 +8381,23 @@ body[data-view="member-dashboard"] #topCenterBrandBar {
    YELLOW TRANSLATE BUTTON MOVED TO BOTTOM-LEFT
    ============================================================================== */
 .floating-translate-widget {
-  position: fixed !important;
-  bottom: 24px !important;
-  left: 24px !important;
-  z-index: 9998 !important;
-  display: block !important;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  z-index: 100 !important;
+  margin: 0 !important;
 }
 
 @media (max-width: 768px) {
   .floating-translate-widget {
-    bottom: 84px !important;
-    left: 16px !important;
-  }
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-block !important;
+  z-index: 100 !important;
+  margin: 0 !important;
+}
 }
 
 .floating-lang-trigger-btn.atelier-translate-wrapper {

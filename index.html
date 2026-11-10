@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=23.8.0">
+  <link rel="stylesheet" href="style.css?v=24.0.0">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
@@ -2511,76 +2511,11 @@
 
   <!-- فوتر تک‌خطی دارک با لینک‌های حقوقی و رده‌بندی سنی -->
     <!-- پاورقی رسمی و مدرن استودیو TAJINKART همراه با سوئیچر زبان -->
-  <footer id="globalFooter" style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:28px 24px 34px; text-align:center;">
-    <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
-      <div style="font-family:var(--font-brand); font-size:14px; letter-spacing:0.08em; color:#f1f5f9; font-weight:700;">
-        © 2026 TAJINKART Studio
-      </div>
-      <div style="font-family:var(--font-brand); font-size:12px; letter-spacing:0.05em; color:var(--text-muted);">
-        Directed by Seyed Soroush Taj • All Rights Reserved
-      </div>
-      
-      <!-- Google Translate Integration (Custom Dark Atelier Style) -->
-      </div>
-    </footer>
-  <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
-  <script src="data.js?v=23.8.0"></script>
-  <script src="core.js?v=23.8.0"></script>
-  <script src="gallery.js?v=23.8.0"></script>
-  <script src="portal.js?v=23.8.0"></script>
-  <script src="admin.js?v=23.8.0"></script>
-  <script src="translate.js?v=23.8.0"></script>
-
-  <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
-  <div id="mobileBottomNav">
-    <button onclick="switchView('showcase')" data-view-target="showcase" class="mob-nav-btn active">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-      <span>Showcase</span>
-    </button>
-    <button onclick="switchView('store')" data-view-target="store" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
-      <span>Atelier</span>
-    </button>
-    <button onclick="switchView('genesis')" data-view-target="genesis" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
-      <span>Genesis</span>
-    </button>
-    <button onclick="switchView('academy')" data-view-target="academy" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
-      <span>Academy</span>
-    </button>
-    <button onclick="handleMembersIconClick()" data-view-target="member-dashboard" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-      <span>Portal</span>
-    </button>
-  </div>
-
-
-
-
-  <div id="instagramPinchBackdrop" class="instagram-pinch-backdrop"></div>
-
-  <!-- Google Translate Engine (Asynchronous Load) -->
-  <!-- Google Translate Engine (Asynchronous Load) -->
-  <script type="text/javascript">
-    window.googleTranslateElementInit = function() {
-      try {
-        if (window.google && window.google.translate) {
-          new window.google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'fa,en,ar,tr,fr,de,es,ru,ja,ko,zh-CN,it,pt,nl,sv,pl,hi,id',
-            autoDisplay: false,
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
-          }, 'google_translate_element');
-        }
-      } catch(e) {
-        console.warn('Google Translate initialization:', e);
-      }
-    };
-  </script>
-  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-  <!-- ویجت شناور گوگل ترنسلیت با آیکون در گوشه چپ پایین، نوار سرچ و پشتیبانی کامل از زبان فارسی -->
+    <!-- پاورقی رسمی و مدرن استودیو TAJINKART همراه با سوئیچر زبان فیکس‌شده در پایین -->
+  <footer id="globalFooter" style="margin-top:auto; position:relative; z-index:40; background:#040609; border-top:1px solid rgba(255,255,255,0.08); padding:20px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+    <!-- سمت چپ: دکمه و منوی ترجمه زبان در پایین‌ترین بخش سایت -->
+    <div id="footerTranslateSlot" style="display:flex; align-items:center;">
+      <!-- ویجت شناور گوگل ترنسلیت با آیکون در گوشه چپ پایین، نوار سرچ و پشتیبانی کامل از زبان فارسی -->
   <div id="floatingGoogleTranslateWidget" class="floating-translate-widget">
     <!-- پنجره بازشونده جستجو و انتخاب زبان -->
     <div id="googleTranslateMenuFlyout" class="google-translate-flyout hidden">
@@ -2641,6 +2576,75 @@
       <span id="activeLanguageLabel" class="lang-active-pill font-mono" style="font-size:11.5px; font-weight:900; color:#000; background:var(--gold); padding:2px 8px; border-radius:6px; box-shadow:0 0 10px rgba(250,204,21,0.5);">EN</span>
     </button>
   </div>
+    </div>
 
+    <!-- مرکز و راست: کپی‌رایت و امضای استودیو -->
+    <div style="text-align:right;">
+      <div style="font-family:var(--font-brand); font-size:13.5px; letter-spacing:0.08em; color:#f1f5f9; font-weight:700;">
+        © 2026 TAJINKART Studio
+      </div>
+      <div style="font-family:var(--font-brand); font-size:11.5px; letter-spacing:0.05em; color:var(--text-muted); margin-top:2px;">
+        Directed by Seyed Soroush Taj • All Rights Reserved
+      </div>
+    </div>
+  </footer>
+  <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
+  <script src="data.js?v=24.0.0"></script>
+  <script src="core.js?v=24.0.0"></script>
+  <script src="gallery.js?v=24.0.0"></script>
+  <script src="portal.js?v=24.0.0"></script>
+  <script src="admin.js?v=24.0.0"></script>
+  <script src="translate.js?v=24.0.0"></script>
+
+  <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
+  <div id="mobileBottomNav">
+    <button onclick="switchView('showcase')" data-view-target="showcase" class="mob-nav-btn active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      <span>Showcase</span>
+    </button>
+    <button onclick="switchView('store')" data-view-target="store" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+      <span>Atelier</span>
+    </button>
+    <button onclick="switchView('genesis')" data-view-target="genesis" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+      <span>Genesis</span>
+    </button>
+    <button onclick="switchView('academy')" data-view-target="academy" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
+      <span>Academy</span>
+    </button>
+    <button onclick="handleMembersIconClick()" data-view-target="member-dashboard" class="mob-nav-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      <span>Portal</span>
+    </button>
+  </div>
+
+
+
+
+  <div id="instagramPinchBackdrop" class="instagram-pinch-backdrop"></div>
+
+  <!-- Google Translate Engine (Asynchronous Load) -->
+  <!-- Google Translate Engine (Asynchronous Load) -->
+  <script type="text/javascript">
+    window.googleTranslateElementInit = function() {
+      try {
+        if (window.google && window.google.translate) {
+          new window.google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'fa,en,ar,tr,fr,de,es,ru,ja,ko,zh-CN,it,pt,nl,sv,pl,hi,id',
+            autoDisplay: false,
+            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
+          }, 'google_translate_element');
+        }
+      } catch(e) {
+        console.warn('Google Translate initialization:', e);
+      }
+    };
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  
 </body>
 </html>

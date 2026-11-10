@@ -90,9 +90,7 @@ window.toggleGenreFilterMenu = function(e) {
   const catDropdown = document.getElementById('categoryFilterDropdown');
   if (catDropdown) catDropdown.classList.add('hidden');
 
-  if (!dropdown.children || dropdown.children.length === 0) {
-    window.renderFloatingGenreDropdown();
-  }
+  window.renderFloatingGenreDropdown();
 
   dropdown.classList.toggle('hidden');
 };
@@ -156,9 +154,7 @@ window.toggleCategoryFilterMenu = function(e) {
   const genreDropdown = document.getElementById('genreFilterDropdown');
   if (genreDropdown) genreDropdown.classList.add('hidden');
 
-  if (!dropdown.children || dropdown.children.length === 0) {
-    window.renderFloatingCategoryDropdown();
-  }
+  window.renderFloatingCategoryDropdown();
 
   dropdown.classList.toggle('hidden');
 };
