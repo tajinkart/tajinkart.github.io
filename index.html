@@ -2829,10 +2829,17 @@
       <div id="google_translate_element" style="display:none;"></div>
     </div>
 
-    <!-- دکمه شناور گوشه چپ پایین با آیکون کره زمین و برچسب زبان فعال -->
+    <!-- دکمه شناور لوکس گوشه چپ پایین با کادر نئونی، آیکون و برچسب زبان فعال -->
     <button type="button" id="googleTranslateTriggerBtn" onclick="toggleGoogleTranslateMenu(event)" class="floating-lang-trigger-btn" title="Translate Website / تغییر زبان">
-      <span class="lang-globe-icon">🌐</span>
-      <span id="activeLanguageLabel" class="lang-active-text">EN</span>
+      <span class="lang-icon-badge">
+        <svg class="lang-globe-svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke-width="1.8"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12h19M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+        </svg>
+      </span>
+      <span class="lang-title-text">LANGUAGE</span>
+      <span id="activeLanguageLabel" class="lang-active-pill">EN</span>
+      <span class="lang-chevron-arrow">▲</span>
     </button>
   </div>
 

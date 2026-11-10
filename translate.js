@@ -7,7 +7,9 @@ window.toggleGoogleTranslateMenu = function(e) {
   if (e) e.stopPropagation();
   const flyout = document.getElementById('googleTranslateMenuFlyout');
   if (!flyout) return;
+  const widget = document.getElementById('floatingGoogleTranslateWidget');
   const isOpening = flyout.classList.contains('hidden');
+  if (widget) widget.classList.toggle('open', isOpening);
   flyout.classList.toggle('hidden');
   if (isOpening) {
     const searchInput = document.getElementById('googleTranslateSearchInput');
@@ -57,6 +59,8 @@ window.selectStudioLanguage = function(langCode, shortLabel, fullLabel) {
   // Close flyout
   const flyout = document.getElementById('googleTranslateMenuFlyout');
   if (flyout) flyout.classList.add('hidden');
+  const widget = document.getElementById('floatingGoogleTranslateWidget');
+  if (widget) widget.classList.remove('open');
 
   showToast(`Language set to ${fullLabel}`, 'info', 2500);
 
@@ -73,6 +77,8 @@ document.addEventListener('click', (e) => {
   if (widget && !widget.contains(e.target)) {
     const flyout = document.getElementById('googleTranslateMenuFlyout');
     if (flyout) flyout.classList.add('hidden');
+  const widget = document.getElementById('floatingGoogleTranslateWidget');
+  if (widget) widget.classList.remove('open');
   }
 });
 
