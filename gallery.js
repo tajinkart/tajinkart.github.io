@@ -166,10 +166,8 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
 
   const pillBtn = document.getElementById('currentCategoryPillBtn');
   if (pillBtn) {
-    let color = '#facc15';
-    let glow = 'rgba(250, 204, 21, 0.55)';
-
     if (categoryKey !== 'all') {
+      let color = '#facc15';
       const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
         ? galleryCategories.find(c => c.id === categoryKey) : null;
       if (cat && cat.color) {
@@ -177,23 +175,29 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
       } else {
         const categoryColorMap = {
           'character': '#facc15',
-          'environment': '#00f0ff',
-          'creature': '#059669',
-          'keyframe': '#e11d48',
-          'props': '#9333ea',
+          'environment': '#38bdf8',
+          'creature': '#10b981',
+          'keyframe': '#f43f5e',
+          'props': '#a855f7',
           'comic': '#fb923c',
           'mascot': '#ec4899'
         };
         color = categoryColorMap[categoryKey] || '#38bdf8';
       }
-      glow = color.startsWith('#') ? `${color}88` : color;
+      const glow = color.startsWith('#') ? `${color}88` : color;
+      pillBtn.style.setProperty('--pill-accent-color', color, 'important');
+      pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
+      pillBtn.style.setProperty('border-color', color, 'important');
+      pillBtn.style.setProperty('box-shadow', `0 0 18px ${glow}, inset 0 0 8px ${glow}`, 'important');
+      if (labelEl) labelEl.style.setProperty('color', color, 'important');
+    } else {
+      // حالت خنثی، آرام و شیشه‌ای اولیه دقیقاً مانند All Genres
+      pillBtn.style.setProperty('--pill-accent-color', 'rgba(255,255,255,0.2)', 'important');
+      pillBtn.style.setProperty('--pill-glow-color', 'transparent', 'important');
+      pillBtn.style.setProperty('border-color', 'rgba(255,255,255,0.25)', 'important');
+      pillBtn.style.setProperty('box-shadow', 'none', 'important');
+      if (labelEl) labelEl.style.setProperty('color', '#fff', 'important');
     }
-
-    pillBtn.style.setProperty('--pill-accent-color', color, 'important');
-    pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
-    pillBtn.style.setProperty('border-color', color, 'important');
-    pillBtn.style.setProperty('box-shadow', `0 0 18px ${glow}, inset 0 0 8px ${glow}`, 'important');
-    if (labelEl) labelEl.style.setProperty('color', color, 'important');
   }
 
   const dropdown = document.getElementById('categoryFilterDropdown');
@@ -357,7 +361,11 @@ window.renderShowcaseGrid = function() {
       const artD = (art.desc || '').toLowerCase();
       const artTag = (art.tag || '').toLowerCase();
 
-      let genreMatch = (artG === gTarget || artG.includes(gTarget) || artT.includes(gTarget) || artD.includes(gTarget));
+      let subMatch = false;
+      if (art.subgenres && Array.isArray(art.subgenres)) {
+        subMatch = art.subgenres.some(sg => String(sg).toLowerCase() === gTarget || String(sg).toLowerCase().includes(gTarget));
+      }
+      let genreMatch = (artG === gTarget || artG.includes(gTarget) || artT.includes(gTarget) || artD.includes(gTarget) || subMatch);
 
       if (!genreMatch && art.phases && Array.isArray(art.phases)) {
         genreMatch = art.phases.some(p => {
@@ -521,20 +529,24 @@ window.renderShowcaseGrid = function() {
       subLabel = `${catBadgeName} Concept`;
     }
 
+    // زیرعنوان شیک در هاور: نمایش ژانر اثر و در صورت وجود ساب‌ژانر یا شیت‌های متعدد
+    let hoverGenreLabel = art.genre || 'Dark Fantasy';
+    if (art.subgenres && Array.isArray(art.subgenres) && art.subgenres.length > 0) {
+      hoverGenreLabel += ' • ' + art.subgenres.slice(0, 2).join(' / ');
+    }
+    if (art.phases && Array.isArray(art.phases) && art.phases.length > 1) {
+      hoverGenreLabel += ` (${art.phases.length} Sheets)`;
+    }
+
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
            style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft}; border-color:${neon.border} !important;" 
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         
-        <!-- بج شیک شاخه هنری در گوشه بالا-راست تایل با رنگ نئون منطبق -->
-        <span class="tile-category-badge font-mono" style="position:absolute; top:8px; right:8px; z-index:3; font-size:9.5px; font-weight:800; padding:3px 8px; border-radius:5px; background:rgba(4,6,10,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:${neon.border}; border:1px solid ${neon.border}; box-shadow:0 0 10px ${neon.soft}; text-transform:uppercase; letter-spacing:0.04em; pointer-events:none;">
-          ${catBadgeName}
-        </span>
-
         <div class="tile-center-title">
-          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 14px ${neon.glow}; font-size:13px; font-weight:800;"># ${displayTitle} #</span>
-          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:36px;"></span>
-          <span class="tile-sub" style="font-size:11.5px; opacity:0.92; color:#e2e8f0;">${subLabel}</span>
+          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 16px ${neon.glow}; font-size:13.5px; font-weight:900;"># ${displayTitle} #</span>
+          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:38px;"></span>
+          <span class="tile-sub font-mono" style="font-size:11.5px; font-weight:700; opacity:0.95; color:#f1f5f9; letter-spacing:0.04em;">${hoverGenreLabel}</span>
         </div>
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>

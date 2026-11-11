@@ -7477,13 +7477,13 @@ body:not([data-view="showcase"]) #floatingGalleryCategoryMenu {
   z-index: 15 !important;
   border-color: var(--cat-color) !important;
   border-bottom-color: var(--cat-color) !important;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75), 0 0 22px var(--cat-color-glow) !important;
+  box-shadow: -8px 14px 34px rgba(0, 0, 0, 0.8), -6px 6px 24px var(--cat-color-glow), 0 0 22px var(--cat-color-glow) !important;
 }
 
 .service-nav-card.active {
   border-color: var(--cat-color) !important;
   border-bottom-color: var(--cat-color) !important;
-  box-shadow: 0 0 0 1.5px var(--cat-color), 0 14px 35px var(--cat-color-glow) !important;
+  box-shadow: 0 0 0 1.5px var(--cat-color), -8px 14px 35px var(--cat-color-glow), 0 0 20px var(--cat-color-glow) !important;
 }
 
 /* ۴. تایل‌های زیرشاخه و پکیج‌های کمیسیون */

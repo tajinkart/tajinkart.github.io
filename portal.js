@@ -116,17 +116,14 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   const topSubEl = document.getElementById('sketchTopSubTitle');
   if (topSubEl) {
     topSubEl.textContent = data.topSub;
-    topSubEl.style.borderRight = `3px solid ${catColor}`;
-    topSubEl.style.paddingRight = '10px';
+    topSubEl.style.color = catColor;
+    topSubEl.style.borderRight = 'none';
+    topSubEl.style.paddingRight = '0';
   }
 
   const badgeSlugEl = document.getElementById('sketchBadgeSlug');
   if (badgeSlugEl) {
-    badgeSlugEl.textContent = data.badgeSlug;
-    badgeSlugEl.style.color = catColor;
-    badgeSlugEl.style.borderColor = catColor;
-    badgeSlugEl.style.background = `${catColor}18`;
-    badgeSlugEl.style.boxShadow = `0 0 14px ${catColor}44`;
+    badgeSlugEl.style.display = 'none';
   }
 
   const noteEl = document.getElementById('sketchAnnotationNote');

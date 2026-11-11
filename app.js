@@ -1137,10 +1137,8 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
 
   const pillBtn = document.getElementById('currentCategoryPillBtn');
   if (pillBtn) {
-    let color = '#facc15';
-    let glow = 'rgba(250, 204, 21, 0.55)';
-
     if (categoryKey !== 'all') {
+      let color = '#facc15';
       const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
         ? galleryCategories.find(c => c.id === categoryKey) : null;
       if (cat && cat.color) {
@@ -1148,23 +1146,29 @@ window.filterGalleryByCategory = function(categoryKey, categoryName) {
       } else {
         const categoryColorMap = {
           'character': '#facc15',
-          'environment': '#00f0ff',
-          'creature': '#059669',
-          'keyframe': '#e11d48',
-          'props': '#9333ea',
+          'environment': '#38bdf8',
+          'creature': '#10b981',
+          'keyframe': '#f43f5e',
+          'props': '#a855f7',
           'comic': '#fb923c',
           'mascot': '#ec4899'
         };
         color = categoryColorMap[categoryKey] || '#38bdf8';
       }
-      glow = color.startsWith('#') ? `${color}88` : color;
+      const glow = color.startsWith('#') ? `${color}88` : color;
+      pillBtn.style.setProperty('--pill-accent-color', color, 'important');
+      pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
+      pillBtn.style.setProperty('border-color', color, 'important');
+      pillBtn.style.setProperty('box-shadow', `0 0 18px ${glow}, inset 0 0 8px ${glow}`, 'important');
+      if (labelEl) labelEl.style.setProperty('color', color, 'important');
+    } else {
+      // حالت خنثی، آرام و شیشه‌ای اولیه دقیقاً مانند All Genres
+      pillBtn.style.setProperty('--pill-accent-color', 'rgba(255,255,255,0.2)', 'important');
+      pillBtn.style.setProperty('--pill-glow-color', 'transparent', 'important');
+      pillBtn.style.setProperty('border-color', 'rgba(255,255,255,0.25)', 'important');
+      pillBtn.style.setProperty('box-shadow', 'none', 'important');
+      if (labelEl) labelEl.style.setProperty('color', '#fff', 'important');
     }
-
-    pillBtn.style.setProperty('--pill-accent-color', color, 'important');
-    pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
-    pillBtn.style.setProperty('border-color', color, 'important');
-    pillBtn.style.setProperty('box-shadow', `0 0 18px ${glow}, inset 0 0 8px ${glow}`, 'important');
-    if (labelEl) labelEl.style.setProperty('color', color, 'important');
   }
 
   const dropdown = document.getElementById('categoryFilterDropdown');
@@ -1328,7 +1332,11 @@ window.renderShowcaseGrid = function() {
       const artD = (art.desc || '').toLowerCase();
       const artTag = (art.tag || '').toLowerCase();
 
-      let genreMatch = (artG === gTarget || artG.includes(gTarget) || artT.includes(gTarget) || artD.includes(gTarget));
+      let subMatch = false;
+      if (art.subgenres && Array.isArray(art.subgenres)) {
+        subMatch = art.subgenres.some(sg => String(sg).toLowerCase() === gTarget || String(sg).toLowerCase().includes(gTarget));
+      }
+      let genreMatch = (artG === gTarget || artG.includes(gTarget) || artT.includes(gTarget) || artD.includes(gTarget) || subMatch);
 
       if (!genreMatch && art.phases && Array.isArray(art.phases)) {
         genreMatch = art.phases.some(p => {
@@ -1492,20 +1500,24 @@ window.renderShowcaseGrid = function() {
       subLabel = `${catBadgeName} Concept`;
     }
 
+    // زیرعنوان شیک در هاور: نمایش ژانر اثر و در صورت وجود ساب‌ژانر یا شیت‌های متعدد
+    let hoverGenreLabel = art.genre || 'Dark Fantasy';
+    if (art.subgenres && Array.isArray(art.subgenres) && art.subgenres.length > 0) {
+      hoverGenreLabel += ' • ' + art.subgenres.slice(0, 2).join(' / ');
+    }
+    if (art.phases && Array.isArray(art.phases) && art.phases.length > 1) {
+      hoverGenreLabel += ` (${art.phases.length} Sheets)`;
+    }
+
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
            style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft}; border-color:${neon.border} !important;" 
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         
-        <!-- بج شیک شاخه هنری در گوشه بالا-راست تایل با رنگ نئون منطبق -->
-        <span class="tile-category-badge font-mono" style="position:absolute; top:8px; right:8px; z-index:3; font-size:9.5px; font-weight:800; padding:3px 8px; border-radius:5px; background:rgba(4,6,10,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:${neon.border}; border:1px solid ${neon.border}; box-shadow:0 0 10px ${neon.soft}; text-transform:uppercase; letter-spacing:0.04em; pointer-events:none;">
-          ${catBadgeName}
-        </span>
-
         <div class="tile-center-title">
-          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 14px ${neon.glow}; font-size:13px; font-weight:800;"># ${displayTitle} #</span>
-          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:36px;"></span>
-          <span class="tile-sub" style="font-size:11.5px; opacity:0.92; color:#e2e8f0;">${subLabel}</span>
+          <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 16px ${neon.glow}; font-size:13.5px; font-weight:900;"># ${displayTitle} #</span>
+          <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:38px;"></span>
+          <span class="tile-sub font-mono" style="font-size:11.5px; font-weight:700; opacity:0.95; color:#f1f5f9; letter-spacing:0.04em;">${hoverGenreLabel}</span>
         </div>
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
       </div>
@@ -2340,17 +2352,14 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   const topSubEl = document.getElementById('sketchTopSubTitle');
   if (topSubEl) {
     topSubEl.textContent = data.topSub;
-    topSubEl.style.borderRight = `3px solid ${catColor}`;
-    topSubEl.style.paddingRight = '10px';
+    topSubEl.style.color = catColor;
+    topSubEl.style.borderRight = 'none';
+    topSubEl.style.paddingRight = '0';
   }
 
   const badgeSlugEl = document.getElementById('sketchBadgeSlug');
   if (badgeSlugEl) {
-    badgeSlugEl.textContent = data.badgeSlug;
-    badgeSlugEl.style.color = catColor;
-    badgeSlugEl.style.borderColor = catColor;
-    badgeSlugEl.style.background = `${catColor}18`;
-    badgeSlugEl.style.boxShadow = `0 0 14px ${catColor}44`;
+    badgeSlugEl.style.display = 'none';
   }
 
   const noteEl = document.getElementById('sketchAnnotationNote');
@@ -4838,30 +4847,55 @@ function renderAdminArtModalForm(art, isNew) {
           <span style="font-size:13.5px; font-weight:900; color:var(--gold);">📌 Step 1: Title & Narrative Lore</span>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <!-- ردیف اول: عنوان کامل اثر در کنار ژانر اصلی یونیورس (حذف اسلاگ دستی) -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;">
           <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Full Artwork Title</label>
-            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="Full artwork title..." />
+            <label style="font-size:11.5px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">📌 Full Artwork Title</label>
+            <input type="text" id="editArtTitleInput" value="${art.title || ''}" placeholder="e.g. The Obsidian Vanguard" style="font-size:12.5px; font-weight:700;" />
           </div>
           <div>
-            <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Hover Slug (Card Center Title)</label>
-            <input type="text" id="editArtSlugInput" value="${art.shortSlug || ''}" placeholder="e.g. Red Knight" />
+            <label style="font-size:11.5px; color:var(--cyan-electric); font-weight:800; display:block; margin-bottom:4px;">🌌 Primary Universe Genre</label>
+            <select id="editArtGenreSelect" style="width:100%; padding:9px 12px; background:#080c14; border:1px solid rgba(0,240,255,0.45); border-radius:8px; color:var(--cyan-electric); font-weight:800; font-size:12px; outline:none; height:41px;">
+              ${(function() {
+                const currentGenres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0)
+                  ? studioGenres
+                  : ((window.studioGenres && Array.isArray(window.studioGenres) && window.studioGenres.length > 0)
+                      ? window.studioGenres
+                      : (typeof DEFAULT_STUDIO_GENRES !== 'undefined' ? DEFAULT_STUDIO_GENRES : ['Dark Fantasy', 'Cyberpunk', 'Sci-Fi', 'Mythic & Ancient', 'Post-Apocalyptic', 'Horror & Eldritch', 'High Fantasy', 'Steampunk', 'Mecha & Industrial', 'Anime & Stylized', 'Historical & Military']));
+                const artGenre = art.genre || 'Dark Fantasy';
+                return currentGenres.map(g => `<option value="${g}" ${g === artGenre ? 'selected' : ''}>${g}</option>`).join('');
+              })()}
+            </select>
           </div>
         </div>
 
-        <div>
-          <label style="font-size:11.5px; color:var(--cyan-electric); font-weight:800; display:block; margin-bottom:4px;">🌌 Universe Genre & Worldbuilding Theme (Linked to Top Menu)</label>
-          <select id="editArtGenreSelect" style="width:100%; padding:9px 12px; background:#080c14; border:1px solid rgba(0,240,255,0.4); border-radius:8px; color:var(--cyan-electric); font-weight:700; font-size:12px; outline:none;">
+        <!-- ساب‌ژانرها و تگ‌های کراس‌اور تکمیلی با تیک چندگانه -->
+        <div style="background:rgba(0,240,255,0.03); border:1px solid rgba(0,240,255,0.22); border-radius:10px; padding:12px 14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label style="font-size:11px; color:var(--cyan-electric); font-weight:800; display:flex; align-items:center; gap:6px;">
+              <span>⚡ Optional Sub-Genres & Crossover Tags:</span>
+            </label>
+            <span style="font-size:10px; color:var(--text-muted);">Check all that apply for cross-filter discovery</span>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
             ${(function() {
               const currentGenres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0)
                 ? studioGenres
                 : ((window.studioGenres && Array.isArray(window.studioGenres) && window.studioGenres.length > 0)
                     ? window.studioGenres
-                    : (typeof DEFAULT_STUDIO_GENRES !== 'undefined' ? DEFAULT_STUDIO_GENRES : ['Dark Fantasy', 'Cyberpunk', 'Sci-Fi', 'Mythic & Ancient', 'Post-Apocalyptic', 'Horror & Eldritch', 'High Fantasy', 'Steampunk', 'Mecha & Industrial', 'Anime & Stylized', 'Historical & Military']));
-              const artGenre = art.genre || 'Dark Fantasy';
-              return currentGenres.map(g => `<option value="${g}" ${g === artGenre ? 'selected' : ''}>${g}</option>`).join('');
+                    : (typeof DEFAULT_STUDIO_GENRES !== 'undefined' ? DEFAULT_STUDIO_GENRES : []));
+              const artSubs = (art.subgenres && Array.isArray(art.subgenres)) ? art.subgenres : [];
+              return currentGenres.map(g => {
+                const isChecked = artSubs.includes(g);
+                return `
+                  <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; background:${isChecked ? 'rgba(0,240,255,0.14)' : 'rgba(255,255,255,0.04)'}; border:1px solid ${isChecked ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.12)'}; padding:4px 10px; border-radius:6px; font-size:11px; color:${isChecked ? '#fff' : 'var(--text-muted)'}; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--cyan-electric)'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='rgba(255,255,255,0.12)'">
+                    <input type="checkbox" name="editArtSubgenres" value="${g}" ${isChecked ? 'checked' : ''} style="width:13px; height:13px; accent-color:var(--cyan-electric); cursor:pointer;" onchange="this.parentElement.style.background=this.checked?'rgba(0,240,255,0.14)':'rgba(255,255,255,0.04)'; this.parentElement.style.borderColor=this.checked?'var(--cyan-electric)':'rgba(255,255,255,0.12)'; this.parentElement.style.color=this.checked?'#fff':'var(--text-muted)';" />
+                    <span style="font-weight:700;">${g}</span>
+                  </label>
+                `;
+              }).join('');
             })()}
-          </select>
+          </div>
         </div>
 
         <div>
@@ -5178,7 +5212,9 @@ window.handlePhaseImageUpload = async function(idx, inputEl) {
 
 window.confirmSaveArtwork = async function() {
   const title = document.getElementById('editArtTitleInput')?.value.trim() || '';
-  const slug = document.getElementById('editArtSlugInput')?.value.trim() || '';
+  const genre = document.getElementById('editArtGenreSelect')?.value || 'Dark Fantasy';
+  const subgenres = Array.from(document.querySelectorAll('input[name="editArtSubgenres"]:checked')).map(cb => cb.value);
+  const slug = genre; // اسلاگ خودکار برابر با نام ژانر
   const desc = document.getElementById('editArtDescInput')?.value.trim() || '';
   const isPack = document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true;
 
@@ -5198,7 +5234,7 @@ window.confirmSaveArtwork = async function() {
   const img = primaryPhase.img || primaryPhase.image || '';
   const pipe = primaryPhase.pipelineKey || 'sketch1';
   const cat = (primaryPhase.category) || (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined' ? PIPELINE_TO_CATEGORY_MAP[pipe] : 'character') || 'character';
-  const genre = document.getElementById('editArtGenreSelect')?.value || primaryPhase.genre || 'Dark Fantasy';
+  // genre is already declared and resolved above
   const colorSpace = 'Master 4K / 16-Bit ProPhoto RGB';
 
   try {
@@ -5228,6 +5264,7 @@ window.confirmSaveArtwork = async function() {
         isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
         pipelineKey: pipe,
         genre: genre,
+        subgenres: subgenres,
         image: img,
         colorSpace: colorSpace,
         phases: assembledPhases
@@ -5283,6 +5320,7 @@ window.confirmSaveArtwork = async function() {
       art.category = cat;
       art.pipelineKey = pipe;
       art.genre = genre;
+      art.subgenres = subgenres;
       art.image = img;
       art.desc = desc;
       art.isProductionPack = isPack;
@@ -6644,63 +6682,6 @@ document.addEventListener('click', (e) => {
     if (dropdown) dropdown.classList.add('hidden');
   }
 });
-
-window.filterGalleryByCategory = function(categoryKey, categoryName) {
-  currentGalleryFilter = categoryKey;
-  const labelEl = document.getElementById('currentCategoryPillLabel');
-  if (labelEl) labelEl.textContent = categoryName;
-
-  const pillBtn = document.getElementById('currentCategoryPillBtn');
-  if (pillBtn) {
-    let color = '#facc15'; // Default gold
-    let glow = 'rgba(250, 204, 21, 0.55)';
-
-    if (categoryKey !== 'all') {
-      const cat = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) 
-        ? galleryCategories.find(c => c.id === categoryKey) : null;
-      if (cat && cat.color) {
-        color = cat.color;
-      } else {
-        const categoryColorMap = {
-          'character': '#facc15', // Gold matching category dot
-          'characters': '#facc15',
-          'environment': '#00f0ff',
-          'environments': '#00f0ff',
-          'creature': '#059669',
-          'creatures': '#059669',
-          'keyframe': '#e11d48',
-          'keyframes': '#e11d48',
-          'props': '#9333ea',
-          'comic': '#fb923c',
-          'comics': '#fb923c',
-          'mascot': '#ec4899'
-        };
-        color = categoryColorMap[categoryKey] || '#38bdf8';
-      }
-      glow = color.startsWith('#') ? `${color}88` : color;
-    }
-
-    pillBtn.style.setProperty('--pill-accent-color', color, 'important');
-    pillBtn.style.setProperty('--pill-glow-color', glow, 'important');
-    pillBtn.style.setProperty('border-color', color, 'important');
-    pillBtn.style.setProperty('box-shadow', `0 0 18px ${glow}, inset 0 0 8px ${glow}`, 'important');
-    if (labelEl) {
-      labelEl.style.setProperty('color', color, 'important');
-    }
-  }
-
-  document.querySelectorAll('.cat-dropdown-item').forEach(item => {
-    item.classList.toggle('active', item.textContent.includes(categoryName));
-  });
-
-  const dropdown = document.getElementById('categoryFilterDropdown') || document.getElementById('floatingCategoryDropdown');
-  if (dropdown) dropdown.classList.add('hidden');
-
-  renderShowcaseGrid();
-  const gEl = document.getElementById('showcaseGrid');
-  if (gEl && window.scrollY > 200) { window.scrollTo({ top: gEl.offsetTop - 85, behavior: 'smooth' }); }
-};
-
 
 // مانیتور و ناظر قطعی اسکرول صفحه: تضمین ۱۰۰٪ عدم قفل شدن اسکرول در کامپیوتر و گوشی
 window.unlockBodyScroll = function() {
