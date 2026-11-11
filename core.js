@@ -994,3 +994,45 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
 }
+
+// همگام‌سازی محصولات فروشگاه از جدول ابری products در سوپابیس
+window.syncProductsFromSupabase = async function() {
+  if (!window.supabaseClient) {
+    if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+    if (!window.supabaseClient) return;
+  }
+  try {
+    const { data: cloudProds, error } = await window.supabaseClient
+      .from('products')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (!error && Array.isArray(cloudProds) && cloudProds.length > 0) {
+      digitalStoreProducts = cloudProds.map(row => ({
+        id: Number(row.id),
+        title: row.title,
+        price: Number(row.price) || 29,
+        type: row.type || '2D Game Sprites & Characters',
+        loreKey: row.lore_key || 'Genesis Canon • Lifetime Lore Access',
+        img: row.img || '',
+        desc: row.desc_text || ''
+      }));
+      window.digitalStoreProducts = digitalStoreProducts;
+      safeSetStorage(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
+      if (typeof renderProducts === 'function') renderProducts();
+      if (typeof renderAdminProductsTab === 'function') renderAdminProductsTab();
+      console.log('[Cloud Products] Synchronized from Supabase:', digitalStoreProducts.length);
+    }
+  } catch(e) {
+    console.warn('[Cloud Products Sync Warning]', e);
+  }
+};
+
+// اجرای خودکار لود محصولات ابری در شروع
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { if (window.syncProductsFromSupabase) window.syncProductsFromSupabase(); }, 700);
+  });
+} else {
+  setTimeout(() => { if (window.syncProductsFromSupabase) window.syncProductsFromSupabase(); }, 700);
+}

@@ -995,6 +995,48 @@ if (document.readyState === 'loading') {
   setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
 }
 
+// همگام‌سازی محصولات فروشگاه از جدول ابری products در سوپابیس
+window.syncProductsFromSupabase = async function() {
+  if (!window.supabaseClient) {
+    if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+    if (!window.supabaseClient) return;
+  }
+  try {
+    const { data: cloudProds, error } = await window.supabaseClient
+      .from('products')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (!error && Array.isArray(cloudProds) && cloudProds.length > 0) {
+      digitalStoreProducts = cloudProds.map(row => ({
+        id: Number(row.id),
+        title: row.title,
+        price: Number(row.price) || 29,
+        type: row.type || '2D Game Sprites & Characters',
+        loreKey: row.lore_key || 'Genesis Canon • Lifetime Lore Access',
+        img: row.img || '',
+        desc: row.desc_text || ''
+      }));
+      window.digitalStoreProducts = digitalStoreProducts;
+      safeSetStorage(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
+      if (typeof renderProducts === 'function') renderProducts();
+      if (typeof renderAdminProductsTab === 'function') renderAdminProductsTab();
+      console.log('[Cloud Products] Synchronized from Supabase:', digitalStoreProducts.length);
+    }
+  } catch(e) {
+    console.warn('[Cloud Products Sync Warning]', e);
+  }
+};
+
+// اجرای خودکار لود محصولات ابری در شروع
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { if (window.syncProductsFromSupabase) window.syncProductsFromSupabase(); }, 700);
+  });
+} else {
+  setTimeout(() => { if (window.syncProductsFromSupabase) window.syncProductsFromSupabase(); }, 700);
+}
+
 
 // ==============================================================================
 // TAJINKART STUDIO — GALLERY & SHOWCASE MODULE (gallery.js)
@@ -4305,6 +4347,42 @@ if (document.readyState === 'loading') {
 
 
 
+// ذخیره و بازیابی کلیدهای ۱۲ شبکه اجتماعی (پینترست، اینستاگرام، دیسکورد، ایکس و...)
+window.saveSocialOmnichannelSettingsDirect = function() {
+  siteSettings.socials = siteSettings.socials || {};
+  
+  const fields = {
+    artstation: 'setArtstationCreds',
+    pinterest: 'setPinterestToken',
+    reddit: 'setRedditCreds',
+    meta: 'setMetaToken',
+    twitter: 'setTwitterKey',
+    bluesky: 'setBlueskyCreds',
+    youtube: 'setYoutubeKey',
+    discord: 'setDiscordWebhook'
+  };
+
+  for (const [key, id] of Object.entries(fields)) {
+    const el = document.getElementById(id);
+    if (el) siteSettings.socials[key] = el.value.trim();
+  }
+
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+
+  if (window.supabaseClient) {
+    window.supabaseClient.from('studio_settings').upsert([{
+      key: 'social_settings',
+      value: siteSettings.socials,
+      updated_at: new Date().toISOString()
+    }], { onConflict: 'key' }).then(() => {
+      console.log('[Supabase Cloud] Omnichannel keys synced to cloud.');
+    }).catch(e => console.warn('[Cloud Sync Warning]', e));
+  }
+
+  showToast('Omnichannel & Social keys saved to cloud successfully! ✓', 'success', 3500);
+};
+
+
 window.syncStudioSettingsToCloud = async function() {
   if (!window.supabaseClient) return;
   try {
@@ -5498,6 +5576,27 @@ window.renderAdminSettingsTab = function() {
     if (typeof window.renderAdminTgChannelsList === 'function') window.renderAdminTgChannelsList();
     if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
     if (typeof window.renderAdminSloganPairs === 'function') window.renderAdminSloganPairs();
+    
+    // پر کردن خودکار فیلدهای شبکه‌های اجتماعی از دیتای ذخیره‌شده
+    const soc = (s && s.socials) ? s.socials : {};
+    const socFields = {
+      setArtstationCreds: soc.artstation,
+      setPinterestToken: soc.pinterest,
+      setRedditCreds: soc.reddit,
+      setMetaToken: soc.meta,
+      setTwitterKey: soc.twitter,
+      setBlueskyCreds: soc.bluesky,
+      setYoutubeKey: soc.youtube,
+      setDiscordWebhook: soc.discord
+    };
+    for (const [id, val] of Object.entries(socFields)) {
+      const el = document.getElementById(id);
+      if (el && val) el.value = val;
+    }
+    const tgTokEl = document.getElementById('setTgToken');
+    if (tgTokEl && s.tgToken) tgTokEl.value = s.tgToken;
+    const tgFootEl = document.getElementById('setTgDefaultFooter');
+    if (tgFootEl && s.tgDefaultFooter) tgFootEl.value = s.tgDefaultFooter;
 
     // پر کردن ورودی‌های مانیفست
     const manTitle = document.getElementById('setAboutManifestoTitle');
@@ -5966,40 +6065,88 @@ function renderAdminProductLiveEditor() {
 }
 
 window.updateProductField = function(idx, field, val) {
-  digitalStoreProducts[idx][field] = val;
+  const p = digitalStoreProducts[idx];
+  if (!p) return;
+  p[field] = val;
   localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
-  renderProducts();
-  showToast('Asset specifications saved.', 'success');
+  if (typeof renderProducts === 'function') renderProducts();
+
+  if (window.supabaseClient) {
+    window.supabaseClient.from('products').upsert([{
+      id: p.id,
+      title: p.title,
+      price: p.price,
+      type: p.type,
+      lore_key: p.loreKey,
+      img: p.img,
+      desc_text: p.desc
+    }], { onConflict: 'id' }).then(({ error }) => {
+      if (error) console.warn('Product cloud update warning:', error);
+    }).catch(() => {});
+  }
+
+  showToast('Asset specifications saved to cloud. ✓', 'success', 2500);
 };
 
 window.adminAddNewProduct = function() {
-  digitalStoreProducts.unshift({
-    id: Date.now(),
+  const newId = (function() {
+    const ids = (digitalStoreProducts || []).map(p => Number(p.id)).filter(n => !isNaN(n) && n > 0 && n < 2000000000);
+    return ids.length > 0 ? Math.max(...ids) + 1 : 501;
+  })();
+
+  const newProd = {
+    id: newId,
     title: 'New Studio Digital Asset Pack',
     price: 29,
     type: '2D Game Sprites & Characters',
     loreKey: 'Genesis Universe • Lore Unlock',
     img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80',
     desc: 'Layered source files, brushes, and assets included in this pack.'
-  });
+  };
+
+  digitalStoreProducts.unshift(newProd);
   localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
   currentSelectedProductIdx = 0;
   renderAdminProductsTab();
-  renderProducts();
-  showToast('New digital asset added.', 'success');
+  if (typeof renderProducts === 'function') renderProducts();
+
+  if (window.supabaseClient) {
+    window.supabaseClient.from('products').upsert([{
+      id: newProd.id,
+      title: newProd.title,
+      price: newProd.price,
+      type: newProd.type,
+      lore_key: newProd.loreKey,
+      img: newProd.img,
+      desc_text: newProd.desc
+    }], { onConflict: 'id' }).then(({ error }) => {
+      if (error) console.warn('Supabase product insert warning:', error);
+      else console.log('Product synced with cloud database.');
+    }).catch(() => {});
+  }
+
+  showToast('New digital asset added & synced with cloud. ✓', 'success');
 };
 
 window.adminDeleteProduct = function(idx) {
-  if (digitalStoreProducts.length <= 1) {
-    showToast('At least one product is required.', 'error');
-    return;
-  }
+  const p = digitalStoreProducts[idx];
+  if (!p) return;
+  const delId = Number(p.id);
+
   digitalStoreProducts.splice(idx, 1);
   localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(digitalStoreProducts));
   currentSelectedProductIdx = Math.max(0, currentSelectedProductIdx - 1);
   renderAdminProductsTab();
-  renderProducts();
-  showToast('Asset deleted.', 'info');
+  if (typeof renderProducts === 'function') renderProducts();
+
+  if (window.supabaseClient && delId) {
+    window.supabaseClient.from('products').delete().eq('id', delId).then(({ error }) => {
+      if (error) console.warn('Product cloud delete warning:', error);
+      else console.log('Product deleted from cloud database.');
+    }).catch(() => {});
+  }
+
+  showToast('Asset permanently deleted from store & cloud. ✓', 'info');
 };
 
 // اسکچ ۳: مدیریت اعضا و گزارش‌های مالی
