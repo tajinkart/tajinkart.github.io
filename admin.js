@@ -1500,24 +1500,111 @@ function renderAdminStageLiveEditor() {
   const tile = data.tiles[currentSelectedStageIdx];
   const col = document.getElementById('adminStageEditFormContainer');
   if (!col) return;
+
+  // واکشی اثر متصل به این پایپ‌لاین و مرحله از گالری استودیو
+  const matchingArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline(currentSelectedPipeKey) : [];
+  let linkedArt = null;
+  if (matchingArts.length > 0) {
+    linkedArt = matchingArts[currentSelectedStageIdx % matchingArts.length] || matchingArts[0];
+  }
+
+  const previewImgSrc = (linkedArt && linkedArt.image) ? linkedArt.image : (tile.img || '');
+  const optPreviewImg = (typeof getOptimizedImageUrl === 'function' && previewImgSrc) ? getOptimizedImageUrl(previewImgSrc, 720) : previewImgSrc;
+  const linkedTitle = linkedArt ? (linkedArt.title || 'Studio Concept') : 'Atelier Standard';
+  const linkedStage = linkedArt ? (linkedArt.stage || 'render') : 'render';
+  const linkedComplexity = linkedArt ? (linkedArt.complexity || 'moderate') : 'moderate';
+
+  const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+    'sketch1': 'character',
+    'sketch_creature': 'creature',
+    'sketch2': 'environment',
+    'sketch3': 'keyframe',
+    'sketch4': 'props',
+    'sketch_mascot': 'mascot',
+    'sketch5': 'comic'
+  };
+
+  const CATEGORY_COLORS = {
+    'character': '#facc15',
+    'creature': '#10b981',
+    'environment': '#38bdf8',
+    'keyframe': '#f43f5e',
+    'props': '#a855f7',
+    'comic': '#fb923c',
+    'mascot': '#ec4899'
+  };
+
+  const targetCat = pipeMap[currentSelectedPipeKey] || 'character';
+  let catColor = CATEGORY_COLORS[targetCat] || '#facc15';
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    const fc = galleryCategories.find(c => c.id === targetCat || c.pipeKey === currentSelectedPipeKey);
+    if (fc && fc.color) catColor = fc.color;
+  }
+
   col.innerHTML = `
+    <!-- ۱. کارت پیش‌نمایش بزرگ و زنده مشتری (Client Store Live Preview) -->
+    <div style="background:#020306; border:1.5px solid ${catColor}; border-radius:14px; overflow:hidden; margin-bottom:16px; box-shadow:0 12px 35px rgba(0,0,0,0.8), 0 0 20px ${catColor}44;">
+      <div style="position:relative; width:100%; height:200px; background:#000; overflow:hidden;">
+        <img id="adminStageLivePreviewImg" src="${optPreviewImg}" style="width:100%; height:100%; object-fit:cover; display:block; transition:all 0.3s ease;" alt="Live Stage Preview" />
+        <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%); padding:12px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span id="adminStageLivePreviewBadge" class="pipeline-step-badge" style="background:${catColor}33; color:${catColor}; border:1px solid ${catColor}66; margin:0; font-size:10.5px; padding:3px 9px;">
+              ${tile.badge}
+            </span>
+            <span style="font-size:10px; padding:3px 8px; border-radius:6px; background:rgba(0,240,255,0.15); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.3); font-family:'JetBrains Mono', monospace; font-weight:700;">
+              CLIENT VIEW PREVIEW
+            </span>
+          </div>
+          <div>
+            <h4 id="adminStageLivePreviewTitle" style="font-size:14px; font-weight:900; color:#fff; margin:0 0 4px; text-shadow:0 2px 8px rgba(0,0,0,0.9);">
+              ${tile.title}
+            </h4>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span id="adminStageLivePreviewPrice" class="font-mono" style="color:${catColor}; font-size:15px; font-weight:800; text-shadow:0 0 10px ${catColor}66;">
+                ${tile.price}
+              </span>
+              <span id="adminStageLivePreviewTimeline" style="color:var(--cyan-electric); font-size:11px;">
+                ⏱ ${tile.timeline}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding:10px 14px; background:#05070d; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; font-size:11px;">
+        <div style="display:flex; align-items:center; gap:6px; color:#cbd5e1;">
+          <span style="color:var(--gold);">🖼️ متصل به اثر:</span>
+          <strong style="color:#fff;">"${linkedTitle}"</strong>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <span style="font-size:10px; padding:2px 7px; border-radius:5px; background:rgba(244,63,94,0.15); color:#f43f5e; border:1px solid rgba(244,63,94,0.3); font-weight:700;">
+            ${linkedStage.toUpperCase()}
+          </span>
+          <span style="font-size:10px; padding:2px 7px; border-radius:5px; background:rgba(168,85,247,0.15); color:#a855f7; border:1px solid rgba(168,85,247,0.3); font-weight:700;">
+            ${linkedComplexity.toUpperCase()}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ۲. فیلدهای ویرایش مشخصات مرحله -->
     <div style="display:flex; flex-direction:column; gap:11px;">
       <div>
         <label style="font-size:11px; color:var(--text-muted);">Stage Badge Title</label>
-        <input type="text" value="${tile.badge}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'badge', this.value)" />
+        <input type="text" id="adminInputStageBadge" value="${tile.badge}" oninput="const el = document.getElementById('adminStageLivePreviewBadge'); if(el) el.textContent = this.value;" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'badge', this.value)" />
       </div>
       <div>
         <label style="font-size:11px; color:var(--text-muted);">Full Stage Title</label>
-        <input type="text" value="${tile.title}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'title', this.value)" />
+        <input type="text" id="adminInputStageTitle" value="${tile.title}" oninput="const el = document.getElementById('adminStageLivePreviewTitle'); if(el) el.textContent = this.value;" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'title', this.value)" />
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div>
           <label style="font-size:11px; color:var(--text-muted);">Estimated Quote ($)</label>
-          <input type="text" value="${tile.price}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'price', this.value)" class="font-mono" />
+          <input type="text" id="adminInputStagePrice" value="${tile.price}" oninput="const el = document.getElementById('adminStageLivePreviewPrice'); if(el) el.textContent = this.value;" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'price', this.value)" class="font-mono" />
         </div>
         <div>
           <label style="font-size:11px; color:var(--text-muted);">Timeline</label>
-          <input type="text" value="${tile.timeline}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'timeline', this.value)" />
+          <input type="text" id="adminInputStageTimeline" value="${tile.timeline}" oninput="const el = document.getElementById('adminStageLivePreviewTimeline'); if(el) el.textContent = '⏱ ' + this.value;" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'timeline', this.value)" />
         </div>
       </div>
       <div>
@@ -1529,11 +1616,8 @@ function renderAdminStageLiveEditor() {
         <textarea rows="3" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'desc', this.value)">${tile.desc}</textarea>
       </div>
       <div>
-        <label style="font-size:11px; color:var(--text-muted);">Stage Background Image URL</label>
-        <input type="text" value="${tile.img}" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'img', this.value)" class="font-mono" />
-      </div>
-      <div style="margin-top:6px; height:80px; border-radius:8px; overflow:hidden; border:1px solid var(--border-subtle);">
-        <img src="${tile.img}" style="width:100%; height:100%; object-fit:cover;" />
+        <label style="font-size:11px; color:var(--text-muted);">Fallback Stage Background Image URL (if no gallery art uploaded)</label>
+        <input type="text" value="${tile.img}" oninput="if(this.value) { const el = document.getElementById('adminStageLivePreviewImg'); if(el) el.src = this.value; }" onchange="updateTileField('${currentSelectedPipeKey}', ${currentSelectedStageIdx}, 'img', this.value)" class="font-mono" />
       </div>
     </div>
   `;
