@@ -820,12 +820,26 @@ function renderStagingPhasesHtml() {
           <div>
             <label style="font-size:11px; color:var(--gold); font-weight:800; display:block; margin-bottom:3px;">📂 Sheet Category & Pipeline:</label>
             <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11.5px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#080c14; border:1px solid rgba(250,204,21,0.35); border-radius:8px; color:#fff; outline:none;">
-              <option value="sketch1" ${(pipeKey === 'sketch1' || p.category === 'character') ? 'selected' : ''}>🟡 Character Design & Heroes</option>
-              <option value="sketch_creature" ${(pipeKey === 'sketch_creature' || p.category === 'creature') ? 'selected' : ''}>🟢 Creatures, Titans & Monsters</option>
-              <option value="sketch2" ${(pipeKey === 'sketch2' || p.category === 'environment') ? 'selected' : ''}>🔵 Environment, Worlds & Architecture</option>
-              <option value="sketch3" ${(pipeKey === 'sketch3' || p.category === 'keyframe') ? 'selected' : ''}>🔴 Cinematic Keyframes & Covers</option>
-              <option value="sketch4" ${(pipeKey === 'sketch4' || p.category === 'props') ? 'selected' : ''}>🟣 Props, Weapons & Artifacts</option>
-              <option value="sketch5" ${(pipeKey === 'sketch5' || p.category === 'comic') ? 'selected' : ''}>🟠 Comics, Manga & Sequential Art</option>
+              ${(function() {
+                const availableCats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+                  ? galleryCategories
+                  : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+                if (availableCats && availableCats.length > 0) {
+                  return availableCats.map(c => {
+                    const val = c.pipeKey || c.id;
+                    const isSelected = (pipeKey === val || p.category === c.id || pipeKey === c.id);
+                    return `<option value="${val}" ${isSelected ? 'selected' : ''} style="color:${c.color || '#facc15'};">● ${c.title || c.titleEN || c.id}</option>`;
+                  }).join('');
+                }
+                return `
+                  <option value="sketch1" ${(pipeKey === 'sketch1' || p.category === 'character') ? 'selected' : ''}>🟡 Character Design & Heroes</option>
+                  <option value="sketch_creature" ${(pipeKey === 'sketch_creature' || p.category === 'creature') ? 'selected' : ''}>🟢 Creatures, Titans & Monsters</option>
+                  <option value="sketch2" ${(pipeKey === 'sketch2' || p.category === 'environment') ? 'selected' : ''}>🔵 Environment, Worlds & Architecture</option>
+                  <option value="sketch3" ${(pipeKey === 'sketch3' || p.category === 'keyframe') ? 'selected' : ''}>🔴 Cinematic Keyframes & Covers</option>
+                  <option value="sketch4" ${(pipeKey === 'sketch4' || p.category === 'props') ? 'selected' : ''}>🟣 Props, Weapons & Artifacts</option>
+                  <option value="sketch5" ${(pipeKey === 'sketch5' || p.category === 'comic') ? 'selected' : ''}>🟠 Comics, Manga & Sequential Art</option>
+                `;
+              })()}
             </select>
           </div>
           <div>

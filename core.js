@@ -515,6 +515,20 @@ window.switchStoreTab = function(tabKey, btn) {
   document.getElementById('storePaneProducts').classList.toggle('hidden', tabKey !== 'products');
   document.querySelectorAll('.store-dual-nav .store-dual-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+
+  if (tabKey === 'commissions') {
+    try {
+      if (typeof window.syncAtelierWithGalleryArtworks === 'function') {
+        window.syncAtelierWithGalleryArtworks();
+      }
+      if (typeof window.applyCategoryColorsToServiceCards === 'function') {
+        window.applyCategoryColorsToServiceCards();
+      }
+      if (typeof window.selectPipeline === 'function') {
+        window.selectPipeline(window.currentSelectedPipeKey || 'sketch1', null, false);
+      }
+    } catch(e) {}
+  }
 };
 
 // پارالاکس هیرو سبک ZEN و مدیریت اسکرول بهینه‌سازی شده با رفرش‌ریت ۶۰/۱۲۰ هرتز

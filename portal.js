@@ -25,9 +25,157 @@ window.handleAcademyClick = function() {
 // ==============================================================================
 // اعمال یکدست و زنده رنگ‌ها و پالت‌های نئون دسته‌بندی گالری بر کارت‌های پایپلاین کمیسیون
 // ==============================================================================
+
+// ==============================================================================
+// TAJINKART DYNAMIC ATELIER & GALLERY SHOWCASE AUTO-LINKING ENGINE (v26.4.0)
+// همگام‌سازی خودکار و داینامیک آثار بارگذاری‌شده در گالری با پایپ‌لاین‌های آتلیه و چرخش تصاویر
+// ==============================================================================
+
+window.getArtworksForPipeline = function(pipeKey) {
+  const allArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks) && window.showcaseArtworks.length > 0)
+    ? window.showcaseArtworks
+    : ((typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks)) ? showcaseArtworks : []);
+  
+  if (!allArts || allArts.length === 0) return [];
+
+  const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+    'sketch1': 'character',
+    'sketch_creature': 'creature',
+    'sketch2': 'environment',
+    'sketch3': 'keyframe',
+    'sketch4': 'props',
+    'sketch5': 'comic',
+    'sketch_mascot': 'character'
+  };
+
+  const targetCatId = (pipeMap[pipeKey] || pipeKey || '').toLowerCase().trim();
+  const pipeLower = (pipeKey || '').toLowerCase().trim();
+
+  let catTitle = '';
+  let catTitleEN = '';
+  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
+    const found = galleryCategories.find(c => 
+      (c.id && c.id.toLowerCase() === targetCatId) || 
+      (c.pipeKey && c.pipeKey.toLowerCase() === pipeLower)
+    );
+    if (found) {
+      catTitle = (found.title || '').toLowerCase().trim();
+      catTitleEN = (found.titleEN || '').toLowerCase().trim();
+    }
+  }
+
+  return allArts.filter(a => {
+    if (!a || !a.image) return false;
+    const aCat = (a.category || '').toLowerCase().trim();
+    const aPipe = (a.pipelineKey || a.pipe || '').toLowerCase().trim();
+
+    if (aCat && (aCat === targetCatId || aCat === pipeLower)) return true;
+    if (aPipe && (aPipe === pipeLower || aPipe === targetCatId)) return true;
+    if (catTitle && aCat === catTitle) return true;
+    if (catTitleEN && aCat === catTitleEN) return true;
+
+    // تطبیق نام‌ها و کلیدواژه‌های اصلی برای انعطاف حداکثری
+    if (targetCatId === 'character' && (aCat.includes('character') || aCat.includes('کاراکتر'))) return true;
+    if (targetCatId === 'creature' && (aCat.includes('creature') || aCat.includes('monster') || aCat.includes('هیولا'))) return true;
+    if (targetCatId === 'environment' && (aCat.includes('environment') || aCat.includes('world') || aCat.includes('محیط'))) return true;
+    if (targetCatId === 'keyframe' && (aCat.includes('keyframe') || aCat.includes('cinematic') || aCat.includes('کاور'))) return true;
+    if (targetCatId === 'props' && (aCat.includes('prop') || aCat.includes('weapon') || aCat.includes('سلاح'))) return true;
+    if (targetCatId === 'comic' && (aCat.includes('comic') || aCat.includes('manga') || aCat.includes('کمیک'))) return true;
+
+    return false;
+  });
+};
+
+let atelierRotationTimer = null;
+
+window.syncAtelierWithGalleryArtworks = function() {
+  const cards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
+  if (!cards || cards.length === 0) return;
+
+  cards.forEach(card => {
+    const pipe = card.getAttribute('data-pipeline');
+    if (!pipe) return;
+
+    const matchingArts = window.getArtworksForPipeline(pipe);
+    const validImages = [];
+
+    matchingArts.forEach(art => {
+      if (art.image && !validImages.includes(art.image)) {
+        validImages.push(art.image);
+      }
+      if (Array.isArray(art.phases)) {
+        art.phases.forEach(p => {
+          const pImg = p.image || p.img;
+          if (pImg && !validImages.includes(pImg)) {
+            validImages.push(pImg);
+          }
+        });
+      }
+    });
+
+    card._dynamicArtworkImages = validImages;
+    if (typeof card._currentImgIdx !== 'number') card._currentImgIdx = 0;
+
+    const imgEl = card.querySelector('img');
+    if (imgEl && validImages.length > 0) {
+      // اگر تصویر فعلی پیش‌فرض Unsplash است یا در لیست معتبر نیست، اولین اثر واقعی را ست کن
+      if (!imgEl.src || imgEl.src.includes('images.unsplash.com') || !validImages.includes(imgEl.src)) {
+        imgEl.src = validImages[0];
+      }
+    }
+
+    // چرخش سریع‌تر با هاور موس
+    if (!card._hasHoverCycleListener && validImages.length > 1) {
+      card._hasHoverCycleListener = true;
+      card.addEventListener('mouseenter', function() {
+        if (!this._dynamicArtworkImages || this._dynamicArtworkImages.length <= 1) return;
+        this._currentImgIdx = (this._currentImgIdx + 1) % this._dynamicArtworkImages.length;
+        const targetImg = this.querySelector('img');
+        if (targetImg) {
+          targetImg.style.opacity = '0.15';
+          setTimeout(() => {
+            targetImg.src = this._dynamicArtworkImages[this._currentImgIdx];
+            targetImg.style.opacity = '';
+          }, 180);
+        }
+      });
+    }
+  });
+
+  // تایمر پیوسته چرخش تصاویر در کارت‌های سایدبار (هر ۵.۵ ثانیه)
+  if (!atelierRotationTimer) {
+    atelierRotationTimer = setInterval(() => {
+      const allCards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
+      allCards.forEach(card => {
+        if (card.matches(':hover')) return; // در صورت قرارگیری ماوس، مزاحم کاربر نشو
+        const imgs = card._dynamicArtworkImages;
+        if (Array.isArray(imgs) && imgs.length > 1) {
+          card._currentImgIdx = (card._currentImgIdx + 1) % imgs.length;
+          const img = card.querySelector('img');
+          if (img) {
+            img.style.opacity = '0.15';
+            setTimeout(() => {
+              img.src = imgs[card._currentImgIdx];
+              img.style.opacity = '';
+            }, 250);
+          }
+        }
+      });
+    }, 5500);
+  }
+};
+
+
 window.applyCategoryColorsToServiceCards = function() {
   const cards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
   if (!cards || cards.length === 0) return;
+
+  // فراخوانی خودکار همگام‌سازی تصاویر کارت‌ها با آثار گالری
+  try {
+    if (typeof window.syncAtelierWithGalleryArtworks === 'function') {
+      window.syncAtelierWithGalleryArtworks();
+    }
+  } catch(e) {}
 
   const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
     ? galleryCategories
@@ -129,14 +277,45 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   const noteEl = document.getElementById('sketchAnnotationNote');
   if (noteEl) noteEl.textContent = data.note;
 
-  // ۳. رندر تایل‌های مرحله و پکیج‌ها متصل به رنگ زنده دسته‌بندی
+  // واکشی کارهای واقعی گالری مربوط به این پایپلاین برای تایل‌های مراحل
+  const matchingArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline(key) : [];
+
+  // ۳. رندر تایل‌های مرحله و پکیج‌ها متصل به رنگ زنده دسته‌بندی و تصاویر واقعی گالری
   const container = document.getElementById('mosaicStageContainer');
   if (container) {
     container.innerHTML = data.tiles.map((tile, idx) => {
       const displayPrice = formatPrice(tile.price);
+
+      // انتخاب تصویر و شیت واقعی از گالری در صورت وجود
+      let tileImg = tile.img;
+      let tileTitle = tile.title;
+      let tileDesc = tile.desc;
+
+      if (matchingArts.length > 0) {
+        const matchedArt = matchingArts[idx % matchingArts.length];
+        if (matchedArt) {
+          if (Array.isArray(matchedArt.phases) && matchedArt.phases.length > 0) {
+            if (idx === 0 && matchedArt.phases[0] && (matchedArt.phases[0].image || matchedArt.phases[0].img)) {
+              tileImg = matchedArt.phases[0].image || matchedArt.phases[0].img;
+            } else if (idx === 1 && matchedArt.phases[1] && (matchedArt.phases[1].image || matchedArt.phases[1].img)) {
+              tileImg = matchedArt.phases[1].image || matchedArt.phases[1].img;
+            } else if (matchedArt.phases[idx] && (matchedArt.phases[idx].image || matchedArt.phases[idx].img)) {
+              tileImg = matchedArt.phases[idx].image || matchedArt.phases[idx].img;
+            } else if (matchedArt.image) {
+              tileImg = matchedArt.image;
+            }
+          } else if (matchedArt.image) {
+            tileImg = matchedArt.image;
+          }
+        }
+      }
+
+      const escapedTitle = (tileTitle || '').replace(/'/g, "\\'");
+      const escapedDesc = (tileDesc || '').replace(/'/g, "\\'");
+
       return `
-        <div class="pipeline-tile ${tile.span}" style="--tile-accent:${catColor};" onclick="openModal('${tile.title}', '${tile.desc}', '${displayPrice}', '${tile.img}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
-          <img src="${tile.img}" class="pipeline-tile-img" alt="${tile.title}" />
+        <div class="pipeline-tile ${tile.span}" style="--tile-accent:${catColor};" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${tileImg}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
+          <img src="${tileImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" />
           <div class="pipeline-tile-overlay">
             <h4 class="pipeline-tile-title">${tile.title}</h4>
             <p class="pipeline-tile-desc">${tile.desc}</p>

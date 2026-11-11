@@ -556,6 +556,12 @@ window.renderShowcaseGrid = function() {
       </div>
     `;
   }).join('');
+
+  try {
+    if (typeof window.syncAtelierWithGalleryArtworks === 'function') {
+      window.syncAtelierWithGalleryArtworks();
+    }
+  } catch(e) {}
 };
 
 window.handleImageAutoDetect = function(imgEl, artId) {
