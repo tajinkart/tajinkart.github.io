@@ -1011,10 +1011,15 @@ window.confirmSaveArtwork = async function() {
           color_space: newArtRecord.colorSpace,
           phases: newArtRecord.phases
         }], { onConflict: 'id' }).then(({ error }) => {
-          if (error) console.warn('Supabase insert note:', error);
-          else showToast('Artwork synced with cloud database. ✓', 'info', 2500);
+          if (error) {
+            console.warn('Supabase insert error:', error);
+            showToast('⚠️ Cloud DB Sync: ' + (error.message || 'Check RLS in Supabase'), 'warning', 5000);
+          } else {
+            showToast('Artwork synced with cloud database. ✓', 'info', 2500);
+          }
         }).catch(err => {
           console.warn('Supabase background insert exception:', err);
+          showToast('⚠️ Cloud DB Exception: ' + err.message, 'warning', 5000);
         });
       }
     } else if (showcaseArtworks[currentSelectedArtIdx]) {
@@ -1057,10 +1062,15 @@ window.confirmSaveArtwork = async function() {
           color_space: art.colorSpace,
           phases: art.phases
         }).eq('id', art.id).then(({ error }) => {
-          if (error) console.warn('Supabase update note:', error);
-          else showToast('Changes synchronized with cloud database.', 'info', 2500);
+          if (error) {
+            console.warn('Supabase update error:', error);
+            showToast('⚠️ Cloud DB Sync: ' + (error.message || 'Check RLS in Supabase'), 'warning', 5000);
+          } else {
+            showToast('Changes synchronized with cloud database.', 'info', 2500);
+          }
         }).catch(err => {
           console.warn('Supabase background update exception:', err);
+          showToast('⚠️ Cloud DB Exception: ' + err.message, 'warning', 5000);
         });
       }
     }
