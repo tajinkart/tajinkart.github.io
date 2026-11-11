@@ -2118,10 +2118,22 @@ window.syncArtworksFromSupabase = async function() {
   }
 
   try {
-    const { data: cloudArtworks, error } = await window.supabaseClient
+    const supaPromise = window.supabaseClient
       .from('artworks')
       .select('*')
       .order('id', { ascending: false });
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Sync timeout')), 3500));
+    
+    let cloudArtworks = null;
+    let error = null;
+    try {
+      const res = await Promise.race([supaPromise, timeoutPromise]);
+      cloudArtworks = res.data;
+      error = res.error;
+    } catch(tErr) {
+      console.warn('Supabase mobile connection timeout or network block, using instant cache:', tErr.message);
+      return;
+    }
 
     if (error) {
       console.warn('Supabase fetch error, maintaining local cache:', error);
@@ -5549,6 +5561,11 @@ window.renderAdminSettingsTab = function() {
     // پر کردن ورودی‌های مانیفست
     const manTitle = document.getElementById('setAboutManifestoTitle');
     if (manTitle) manTitle.value = safeGetStorage('tajinkart_manifesto_title') || 'About TAJINKART Studio';
+    const cCloudEl = document.getElementById('setCloudinaryCloud');
+    if (cCloudEl) cCloudEl.value = s.cloudinaryCloudName || 'tajinkart';
+    const cPresetEl = document.getElementById('setCloudinaryPreset');
+    if (cPresetEl) cPresetEl.value = s.cloudinaryPreset || 'erlvtkx9';
+
     const manText = document.getElementById('setAboutManifestoText');
     if (manText) manText.value = safeGetStorage('tajinkart_manifesto_desc') || 'TAJINKART Studio was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: «From Ink to Universe».';
 

@@ -1147,10 +1147,22 @@ window.syncArtworksFromSupabase = async function() {
   }
 
   try {
-    const { data: cloudArtworks, error } = await window.supabaseClient
+    const supaPromise = window.supabaseClient
       .from('artworks')
       .select('*')
       .order('id', { ascending: false });
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Sync timeout')), 3500));
+    
+    let cloudArtworks = null;
+    let error = null;
+    try {
+      const res = await Promise.race([supaPromise, timeoutPromise]);
+      cloudArtworks = res.data;
+      error = res.error;
+    } catch(tErr) {
+      console.warn('Supabase mobile connection timeout or network block, using instant cache:', tErr.message);
+      return;
+    }
 
     if (error) {
       console.warn('Supabase fetch error, maintaining local cache:', error);

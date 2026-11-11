@@ -1211,6 +1211,11 @@ window.renderAdminSettingsTab = function() {
     // پر کردن ورودی‌های مانیفست
     const manTitle = document.getElementById('setAboutManifestoTitle');
     if (manTitle) manTitle.value = safeGetStorage('tajinkart_manifesto_title') || 'About TAJINKART Studio';
+    const cCloudEl = document.getElementById('setCloudinaryCloud');
+    if (cCloudEl) cCloudEl.value = s.cloudinaryCloudName || 'tajinkart';
+    const cPresetEl = document.getElementById('setCloudinaryPreset');
+    if (cPresetEl) cPresetEl.value = s.cloudinaryPreset || 'erlvtkx9';
+
     const manText = document.getElementById('setAboutManifestoText');
     if (manText) manText.value = safeGetStorage('tajinkart_manifesto_desc') || 'TAJINKART Studio was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: «From Ink to Universe».';
 
