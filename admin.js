@@ -1086,57 +1086,6 @@ window.confirmSaveArtwork = async function() {
 
 
 
-window.exportAndDownloadDataJs = async function() {
-  try {
-    const arts = (typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks)) ? showcaseArtworks : (window.showcaseArtworks || []);
-    if (!arts || arts.length === 0) {
-      showToast('No artworks found in current session to export.', 'warning');
-      return;
-    }
-
-    let rawTemplate = '';
-    try {
-      const res = await fetch('data.js?t=' + Date.now());
-      if (res.ok) rawTemplate = await res.text();
-    } catch(e) {}
-
-    let newContent = '';
-    if (rawTemplate && rawTemplate.includes('const DEFAULT_STUDIO_ARTWORKS')) {
-      newContent = rawTemplate.replace(
-        /const DEFAULT_STUDIO_ARTWORKS\s*=\s*\[[\s\S]*?\];/,
-        'const DEFAULT_STUDIO_ARTWORKS = ' + JSON.stringify(arts, null, 2) + ';'
-      );
-    } else {
-      newContent = `// TAJINKART STUDIO - OFFICIAL PRODUCTION DATA
-const DEFAULT_STUDIO_ARTWORKS = ${JSON.stringify(arts, null, 2)};
-
-var storedArtworks = [];
-try {
-  const rawArt = localStorage.getItem(KEYS.ARTWORKS);
-  storedArtworks = rawArt ? JSON.parse(rawArt) : [];
-  if (!Array.isArray(storedArtworks)) storedArtworks = [];
-} catch(e) { storedArtworks = []; }
-var showcaseArtworks = storedArtworks.length > 0 ? storedArtworks : JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
-window.showcaseArtworks = showcaseArtworks;
-`;
-    }
-
-    const blob = new Blob([newContent], { type: 'application/javascript;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.js';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('فایل data.js با موفقیت دانلود شد! آن را در گیت‌هاب جایگزین کنید. ✓', 'success', 5000);
-  } catch(err) {
-    console.error('Export data.js error:', err);
-    showToast('Error exporting data.js', 'error');
-  }
-};
-
 window.forceResyncGalleryFromCloud = async function() {
   showToast('Fetching latest artworks from cloud database...', 'info');
   try {
