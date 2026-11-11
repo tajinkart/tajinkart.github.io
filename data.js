@@ -5,7 +5,8 @@ window.SIX_PIPELINE_CATEGORIES = [
   { id: 'environment', title: 'Environment, Worlds & Architecture', titleEN: 'Environment, Worlds & Architecture', color: '#38bdf8', pipeKey: 'sketch2' },
   { id: 'keyframe', title: 'Cinematic Keyframes & Covers', titleEN: 'Cinematic Keyframes & Covers', color: '#f43f5e', pipeKey: 'sketch3' },
   { id: 'props', title: 'Props, Weapons & Artifacts', titleEN: 'Props, Weapons & Artifacts', color: '#a855f7', pipeKey: 'sketch4' },
-  { id: 'comic', title: 'Comics, Manga & Sequential Art', titleEN: 'Comics, Manga & Sequential Art', color: '#fb923c', pipeKey: 'sketch5' }
+  { id: 'comic', title: 'Comics, Manga & Sequential Art', titleEN: 'Comics, Manga & Sequential Art', color: '#fb923c', pipeKey: 'sketch5' },
+  { id: 'mascot', title: 'Brand Mascot & Crest', titleEN: 'Brand Mascot & Crest', color: '#ec4899', pipeKey: 'sketch_mascot' }
 ];
 window.DEFAULT_GALLERY_CATEGORIES = window.SIX_PIPELINE_CATEGORIES;
 window.galleryCategories = window.SIX_PIPELINE_CATEGORIES;

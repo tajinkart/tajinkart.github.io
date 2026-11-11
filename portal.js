@@ -85,6 +85,11 @@ window.getArtworksForPipeline = function(pipeKey) {
       aCat.includes('prop') || aPipe.includes('sketch4') || aCat.includes('weapon') || aCat.includes('سلاح')
     )) return true;
 
+    if (targetCatId === 'mascot' && (
+      aCat.includes('mascot') || aPipe.includes('mascot') || aPipe.includes('sketch_mascot') || aCat.includes('مسکات') || aCat.includes('برند') ||
+      aTitle.includes('mascot') || aTitle.includes('مسکات')
+    )) return true;
+
     if (targetCatId === 'comic' && (
       aCat.includes('comic') || aPipe.includes('sketch5') || aCat.includes('manga') || aCat.includes('کمیک')
     )) return true;
@@ -103,6 +108,7 @@ window.getArtworksForPipeline = function(pipeKey) {
         if (targetCatId === 'creature' && (pCat.includes('creature') || pPipe.includes('creature'))) return true;
         if (targetCatId === 'environment' && (pCat.includes('env') || pPipe.includes('sketch2'))) return true;
         if (targetCatId === 'props' && (pCat.includes('prop') || pPipe.includes('sketch4'))) return true;
+        if (targetCatId === 'mascot' && (pCat.includes('mascot') || pPipe.includes('mascot') || pPipe.includes('sketch_mascot'))) return true;
         if (targetCatId === 'comic' && (pCat.includes('comic') || pPipe.includes('sketch5'))) return true;
         return false;
       });
