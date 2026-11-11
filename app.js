@@ -5417,14 +5417,26 @@ window.renderAdminSettingsTab = function() {
     const radioEl = document.getElementById(`studioMode${curMode.charAt(0).toUpperCase() + curMode.slice(1)}`);
     if (radioEl) radioEl.checked = true;
 
-    if (typeof previewStudioStatusSelection === 'function') previewStudioStatusSelection();
-    if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories();
-    if (typeof renderAdminTgChannelsList === 'function') renderAdminTgChannelsList();
-    if (typeof loadStudioPricingMatrixToForm === 'function') loadStudioPricingMatrixToForm();
-    if (typeof updateStudioLogoDisplay === 'function') updateStudioLogoDisplay();
+    // برجسته‌سازی کارت وضعیت استودیو
+    document.querySelectorAll('.studio-status-option-card').forEach(c => c.classList.remove('active'));
+    const activeCard = document.getElementById(`cardMode${curMode.charAt(0).toUpperCase() + curMode.slice(1)}`);
+    if (activeCard) activeCard.classList.add('active');
 
-    if (typeof switchSettingsSubTab === 'function') {
-      switchSettingsSubTab('identity');
+    if (typeof window.previewStudioStatusSelection === 'function') window.previewStudioStatusSelection();
+    if (typeof updateStudioLiveStatus === 'function') updateStudioLiveStatus();
+    if (typeof window.renderAdminTgChannelsList === 'function') window.renderAdminTgChannelsList();
+    if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
+    if (typeof window.renderAdminSloganPairs === 'function') window.renderAdminSloganPairs();
+
+    // پر کردن ورودی‌های مانیفست
+    const manTitle = document.getElementById('setAboutManifestoTitle');
+    if (manTitle) manTitle.value = safeGetStorage('tajinkart_manifesto_title') || 'About TAJINKART Studio';
+    const manText = document.getElementById('setAboutManifestoText');
+    if (manText) manText.value = safeGetStorage('tajinkart_manifesto_desc') || 'TAJINKART Studio was born from an endless passion for engineering dark fantasy, cyberpunk, and mythic universes. With over a decade of dedicated focus on visual development, our mission transcends mere illustration: we architect complete visual languages, architectural logics, tactile materials, and organic mythologies for cinematic and gaming worlds—from the very first drop of ink to the infinite cosmic expanse: «From Ink to Universe».';
+
+    // سوئیچ پیش‌فرض به ساب‌تب اول
+    if (typeof window.switchSettingsSubTab === 'function') {
+      window.switchSettingsSubTab('identity');
     }
   } catch(e) {
     console.warn('renderAdminSettingsTab error:', e);
@@ -6478,60 +6490,31 @@ window.closeTermsModal = function() {
   if (modal) modal.style.display = 'none';
 };
 
-// رندرینگ بخش ویرایشگر قوانین در پنل ادمین
+// رندرینگ کامل و ماژولار بخش ویرایشگر قوانین در پنل ادمین
 window.renderAdminTerms = function() {
-  const textarea = document.getElementById('adminTermsContentInput');
-  if (textarea) {
-    textarea.value = getStudioTermsContent();
+  const accInput = document.getElementById('adminTermsAccountInput');
+  const commInput = document.getElementById('adminTermsCommissionInput');
+  const assInput = document.getElementById('adminTermsAssetsInput');
+  const acadInput = document.getElementById('adminTermsAcademyInput');
+
+  const s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+
+  if (accInput) {
+    accInput.value = s.termsAccount || `By registering, the client warrants that all credentials are authentic. Protecting passwords is client responsibility.\n\nStrict Anti-AI Ban: Scraping, automated copying, or utilizing TAJINKART Studio concept art and visual assets to train generative AI models is strictly prohibited.`;
   }
-};
-
-// ذخیره تغییرات قوانین توسط ادمین در حافظه محلی و دیتابیس ابری
-window.saveStudioTerms = async function() {
-  const textarea = document.getElementById('adminTermsContentInput');
-  if (!textarea) return;
-
-  const newContent = textarea.value.trim();
-  if (newContent.length < 20) {
-    showToast('Terms content cannot be empty or under 20 characters.', 'error');
-    return;
+  if (commInput) {
+    commInput.value = s.termsCommission || `The 50% Retainer Rule: Creative production begins exclusively upon settlement of a 50% non-refundable retainer. The remaining 50% balance is required prior to high-resolution master PSD delivery.\n\nRevision Policy: Up to 2 iterative revisions are included during thumbnail and silhouette exploration phases. Major proportional redesigns after linework approval incur additional scope fees.\n\nAbandonment Clause: Silence exceeding 30 calendar days deems the project abandoned, forfeiting the retainer.`;
   }
-
-  localStorage.setItem('tajinkart_studio_terms', newContent);
-
-  // تلاش برای ذخیره ابری در سوپابیس در صورت وجود
-  if (window.supabaseClient) {
-    try {
-      await window.supabaseClient.from('studio_settings').upsert([{
-        key: 'studio_terms',
-        value: newContent,
-        updated_at: new Date().toISOString()
-      }], { onConflict: 'key' });
-    } catch(e) {
-      console.warn('[Supabase Terms Save]', e);
-    }
+  if (assInput) {
+    assInput.value = s.termsAssets || `Digital Assets EULA: Purchasing digital assets grants a non-exclusive license for integration into commercial end-products (games, film). Raw redistribution is strictly prohibited.\n\nDigital Goods Policy: Immediate digital download constitutes final delivery with no refunds.`;
+  }
+  if (acadInput) {
+    acadInput.value = s.termsAcademy || `Academy & Community Code of Conduct: Masterclasses and instructional assets are the exclusive intellectual property of Seyed Soroush Taj. Unauthorized redistribution is subject to legal action.\n\nStudio channels maintain professional artistic standards, zero spam, and mutual respect.`;
   }
 
-  const notice = document.getElementById('termsSaveNotice');
-  if (notice) {
-    notice.style.display = 'inline';
-    setTimeout(() => { notice.style.display = 'none'; }, 3000);
+  if (typeof switchAdminTermsEditorTab === 'function') {
+    switchAdminTermsEditorTab('account', document.querySelector('.terms-tab-btn'));
   }
-
-  renderTermsModal();
-  showToast('Studio Legal Charter & EULA saved and published! ✓', 'success');
-};
-
-// بازنشانی متن به Standard رسمی
-window.resetStudioTermsToDefault = function() {
-  if (!confirm('Are you sure you want to reset the studio charter to default?')) return;
-  const textarea = document.getElementById('adminTermsContentInput');
-  if (textarea) {
-    textarea.value = DEFAULT_STUDIO_TERMS;
-  }
-  localStorage.removeItem('tajinkart_studio_terms');
-  renderTermsModal();
-  showToast('Legal terms reset to default. Click save to publish.', 'info');
 };
 
 
