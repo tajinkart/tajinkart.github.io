@@ -170,13 +170,16 @@ if (!window.supabaseClient) {
   let retryCount = 0;
   const retryTimer = setInterval(() => {
     retryCount++;
-    if (window.ensureSupabaseClient() || retryCount > 20) {
+    if (window.ensureSupabaseClient() || retryCount > 25) {
       clearInterval(retryTimer);
-      if (window.supabaseClient && typeof initSupabaseAuthSession === 'function') {
-        initSupabaseAuthSession();
+      if (window.supabaseClient) {
+        if (typeof initSupabaseAuthSession === 'function') initSupabaseAuthSession();
+        if (typeof window.syncArtworksFromSupabase === 'function') {
+          window.syncArtworksFromSupabase();
+        }
       }
     }
-  }, 250);
+  }, 150);
 }
 
 // =========================================================
@@ -375,7 +378,7 @@ function getOptimizedImageUrl(url, width = 800) {
   // بهینه‌سازی خودکار در Cloudinary با فرمت نسل جدید WebP/AVIF و کیفیت تطبیقی
   if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
     if (!url.includes('/upload/f_auto') && !url.includes('/upload/q_auto')) {
-      return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
+      return url.replace('/upload/', `/upload/f_auto,q_auto:good,w_${width},c_limit/`);
     }
   }
 

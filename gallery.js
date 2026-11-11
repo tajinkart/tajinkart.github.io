@@ -418,7 +418,14 @@ window.renderShowcaseGrid = function() {
   });
 
   if (filteredArtworks.length === 0) {
-    grid.innerHTML = `
+    const isColdStart = (!allArts || allArts.length === 0);
+    grid.innerHTML = isColdStart ? `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 70px 20px; color: var(--gold); width: 100%;">
+        <div style="width:36px; height:36px; border:3px solid rgba(250,204,21,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px;"></div>
+        <p style="font-size: 15px; font-weight:800; color: #fff; letter-spacing:0.04em;">Connecting to TAJINKART Atelier Cloud Vault...</p>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-top:6px;">Fetching high-fidelity concept showcase from Supabase</p>
+      </div>
+    ` : `
       <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); width: 100%;">
         <p style="font-size: 15px; margin-bottom: 12px; color: #fff;">No artworks found matching your filter / search.</p>
         <button onclick="resetGalleryFilters()" class="btn-gold" style="font-size: 12px; padding: 7px 16px;">Display All Artworks</button>
@@ -502,7 +509,8 @@ window.renderShowcaseGrid = function() {
       if (matchIdx !== -1) {
         const matchedPhase = art.phases[matchIdx];
         if (matchedPhase.img || matchedPhase.image) {
-          tileImg = matchedPhase.img || matchedPhase.image;
+          const rawPhaseImg = matchedPhase.img || matchedPhase.image;
+          tileImg = (typeof getOptimizedImageUrl === 'function' && rawPhaseImg && !rawPhaseImg.startsWith('data:')) ? getOptimizedImageUrl(rawPhaseImg, 720) : rawPhaseImg;
           targetPhaseIdx = matchIdx + 1;
           displayTitle = matchedPhase.name || art.title;
           displaySlug = matchedPhase.subcategory || (CATEGORY_LABELS[targetCat] ? `${CATEGORY_LABELS[targetCat]} Concept` : slug);
@@ -1150,9 +1158,22 @@ document.addEventListener('touchend', (e) => {
 // همگام‌سازی دوطرفه و ادغام هوشمند آثار (بدون حذف کارهای جدید ذخیره‌شده محلی)
 // ==============================================================================
 window.syncArtworksFromSupabase = async function() {
+  // ۱. اطمینان از راه‌اندازی کلاینت سوپابیس با مکانیسم انتظار هوشمند
   if (!window.supabaseClient) {
     if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
-    if (!window.supabaseClient) return;
+  }
+  if (!window.supabaseClient) {
+    let retries = 0;
+    while (!window.supabaseClient && retries < 25) {
+      await new Promise(r => setTimeout(r, 120));
+      if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+      retries++;
+    }
+  }
+
+  if (!window.supabaseClient) {
+    console.warn('Supabase client not available on this network pass.');
+    return;
   }
 
   try {
@@ -1160,7 +1181,7 @@ window.syncArtworksFromSupabase = async function() {
       .from('artworks')
       .select('*')
       .order('id', { ascending: false });
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Sync timeout')), 3500));
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Sync timeout')), 7500));
     
     let cloudArtworks = null;
     let error = null;
@@ -1222,12 +1243,13 @@ window.syncArtworksFromSupabase = async function() {
   }
 };
 
+// اجرای آنی و بدون تاخیر همگام‌سازی ابری در اولین میلی‌ثانیه لود صفحه
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
+    if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase();
   });
 } else {
-  setTimeout(() => { if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase(); }, 500);
+  if (typeof window.syncArtworksFromSupabase === 'function') window.syncArtworksFromSupabase();
 }
 
 
