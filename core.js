@@ -967,3 +967,30 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(checkInitialHashRoute, 40);
 }
+
+window.syncStudioSettingsFromCloud = async function() {
+  if (!window.supabaseClient) {
+    if (typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+    if (!window.supabaseClient) return;
+  }
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('studio_settings')
+      .select('value')
+      .eq('key', 'site_settings')
+      .single();
+    if (data && data.value) {
+      siteSettings = Object.assign(siteSettings || {}, data.value);
+      safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+      console.log('[Cloud Settings] Restored studio settings from Supabase.');
+    }
+  } catch(e) {}
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
+  });
+} else {
+  setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
+}

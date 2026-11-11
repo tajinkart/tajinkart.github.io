@@ -544,7 +544,7 @@ window.renderShowcaseGrid = function() {
 
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
-           style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft}; border-color:${neon.border} !important;" 
+           style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         
         <div class="tile-center-title">

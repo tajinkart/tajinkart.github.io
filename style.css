@@ -8488,3 +8488,45 @@ body[data-view="member-dashboard"] #topCenterBrandBar {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ==============================================================================
+   MOSAIC TILE: RESTING VS HOVER NEON BORDER (REFINED)
+   ============================================================================== */
+.mosaic-tile {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.28s !important;
+}
+
+.mosaic-tile:hover {
+  border-color: var(--neon-border, #facc15) !important;
+  box-shadow: 0 0 25px var(--neon-glow, rgba(250, 204, 21, 0.55)), 
+              0 0 50px var(--neon-soft, rgba(250, 204, 21, 0.25)), 
+              0 14px 35px rgba(0, 0, 0, 0.9) !important;
+}
+
+@media (max-width: 768px) {
+  #topCenterBrandBar.visible {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    top: 12px !important;
+    left: 12px !important;
+    right: 68px !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    scrollbar-width: none !important;
+  }
+  #topCenterBrandBar.visible::-webkit-scrollbar {
+    display: none !important;
+  }
+  .top-center-pill,
+  .floating-cat-pill {
+    padding: 5px 10px !important;
+    font-size: 10.5px !important;
+    height: 30px !important;
+    flex-shrink: 0 !important;
+    border-radius: 999px !important;
+  }
+}

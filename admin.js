@@ -1,4 +1,39 @@
 
+window.syncStudioSettingsToCloud = async function() {
+  if (!window.supabaseClient) return;
+  try {
+    const s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+    await window.supabaseClient.from('studio_settings').upsert([{
+      key: 'site_settings',
+      value: s,
+      updated_at: new Date().toISOString()
+    }], { onConflict: 'key' });
+    console.log('[Cloud Settings] Synchronized studio settings to Supabase cloud.');
+  } catch(e) {
+    console.warn('[Cloud Settings Save Error]', e);
+  }
+};
+
+
+window.handleNewCategoryTitleInput = function(val) {
+  const idInp = document.getElementById('adminNewCatId');
+  if (idInp) {
+    idInp.value = (val || '').trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  }
+};
+
+window.adminDeleteCategoryDirect = function(catId) {
+  if (!confirm('Are you sure you want to delete this category?')) return;
+  galleryCategories = (galleryCategories || []).filter(c => c.id !== catId);
+  window.galleryCategories = galleryCategories;
+  safeSetStorage('tajinkart_gallery_categories_v1', JSON.stringify(galleryCategories));
+  window.renderAdminGalleryCategories();
+  if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
+  if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
+  showToast('Category deleted.', 'info');
+};
+
+
 function generateSafeArtworkId() {
   const arts = (typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks)) ? showcaseArtworks : (window.showcaseArtworks || []);
   const existingIds = arts.map(a => Number(a.id)).filter(n => !isNaN(n) && n > 0 && n < 2000000000);
@@ -200,6 +235,7 @@ window.renderAdminGalleryCategories = function() {
         <span style="width:8px; height:8px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color};"></span>
         <span style="font-weight:700;">${cat.titleEN || cat.title || cat.id}</span>
         <span style="font-size:11px; opacity:0.7;">✏️</span>
+        <span onclick="event.stopPropagation(); adminDeleteCategoryDirect('${cat.id}')" style="font-size:12px; color:#ef4444; opacity:0.7; padding:2px 4px; border-radius:4px;" title="Delete Category" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">✕</span>
       </div>
     `;
   }).join('');
@@ -2887,7 +2923,7 @@ window.saveCloudinarySettingsDirect = function() {
     siteSettings.cloudinaryPreset = cPresetEl.value.trim();
   }
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  showToast('Cloudinary image host settings saved successfully! ✓', 'success', 3500);
+  if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud(); showToast('Cloudinary image host settings saved successfully! ✓', 'success', 3500);
 };
 
 
@@ -3053,7 +3089,7 @@ window.saveTelegramSettingsDirect = function() {
   siteSettings.tgChat = siteSettings.tgChannels[0] || '';
 
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
-  showToast('Telegram bot and channel settings saved successfully! ✓', 'success', 4000);
+  if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud(); showToast('Telegram bot and channel settings saved successfully! ✓', 'success', 4000);
 };
 
 
