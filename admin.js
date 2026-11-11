@@ -1067,6 +1067,19 @@ window.confirmSaveArtwork = async function() {
   }
 };
 
+
+window.forceResyncGalleryFromCloud = async function() {
+  showToast('Fetching latest artworks from cloud database...', 'info');
+  try {
+    if (typeof window.syncArtworksFromSupabase === 'function') {
+      await window.syncArtworksFromSupabase();
+      showToast('Gallery synchronized with cloud database! ✓', 'success');
+    }
+  } catch(e) {
+    showToast('Failed to sync with cloud.', 'error');
+  }
+};
+
 window.adminDeleteArtwork = function(idx) {
   if (!showcaseArtworks || showcaseArtworks.length <= 0) {
     showToast('No artwork found to delete.', 'error');

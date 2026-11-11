@@ -2128,28 +2128,46 @@ window.syncArtworksFromSupabase = async function() {
       return;
     }
 
-    let deletedIds = [];
-    try {
-      const delKey = (typeof KEYS !== 'undefined' && KEYS.DELETED_ARTWORKS) ? KEYS.DELETED_ARTWORKS : 'tajinkart_deleted_artworks_v2';
-      deletedIds = JSON.parse(localStorage.getItem(delKey) || '[]').map(Number);
-    } catch(e) { deletedIds = []; }
-    const deletedSet = new Set(deletedIds);
-
-    // واکشی کارهای فعلی محلی (جهت ادغام و عدم حذف کارهای جدید اضافه شده در ادمین)
-    const localArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks) && window.showcaseArtworks.length > 0)
-      ? window.showcaseArtworks
-      : (typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks) ? showcaseArtworks : []);
-
-    const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {};
-    const mergedMap = new Map();
-
-    // ۱. ابتدا کارهای کلود معتبر را نگاشت و اضافه می‌کنیم
     if (cloudArtworks && Array.isArray(cloudArtworks)) {
-      const validCloud = cloudArtworks.filter(row => Number(row.id) > 8 && !deletedSet.has(Number(row.id)));
-      validCloud.forEach(row => {
+      const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {};
+      
+      // شناسایی و پاکسازی خودکار آثار دمو/آزمایشی قدیمی از سوپابیس
+      const legacySampleIds = [];
+      const validCloud = [];
+
+      cloudArtworks.forEach(row => {
+        if (!row || !row.id) return;
+        const id = Number(row.id);
+        const img = (row.image || '').toLowerCase();
+        const title = (row.title || '').toLowerCase();
+        const isLegacy = (id <= 8) || (id >= 101 && id <= 106) ||
+          img.includes('images.unsplash.com') ||
+          title.includes('obsidian vanguard') ||
+          title.includes('abyssal leviathan') ||
+          title.includes('neo-tirann') ||
+          title.includes('eclipse sovereign') ||
+          title.includes('runeforged vorpal') ||
+          title.includes('chronicles of extopia') ||
+          title.includes('potato');
+
+        if (isLegacy) {
+          legacySampleIds.push(id);
+        } else {
+          validCloud.push(row);
+        }
+      });
+
+      // در صورت وجود آثار دمو در دیتابیس کلود، آنها را از سوپابیس به طور دائمی پاک می‌کنیم
+      if (legacySampleIds.length > 0 && window.supabaseClient) {
+        window.supabaseClient.from('artworks').delete().in('id', legacySampleIds)
+          .then(() => console.log('Purged legacy sample artworks from cloud database:', legacySampleIds))
+          .catch(e => console.warn('Purge error:', e));
+      }
+
+      const freshArtworks = validCloud.map(row => {
         const pipe = row.pipeline_key || 'sketch1';
         const mappedCat = row.category || row.tag || pipeMap[pipe] || 'character';
-        mergedMap.set(Number(row.id), {
+        return {
           id: Number(row.id),
           orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
           tag: mappedCat,
@@ -2159,52 +2177,25 @@ window.syncArtworksFromSupabase = async function() {
           desc: row.desc_text || '',
           pipelineKey: pipe,
           genre: row.genre || 'Dark Fantasy',
+          subgenres: row.subgenres || [],
           image: row.image,
           colorSpace: row.color_space || 'Master 4K / 16-Bit ProPhoto RGB',
           lore: row.lore || 'Extopia Universe',
           phases: row.phases || []
-        });
+        };
+      }).sort((a, b) => {
+        if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
+        return b.id - a.id;
       });
-    }
 
-    // ۲. کارهای جدید محلی را به ادغام اضافه می‌کنیم و اگر در کلود نیستند، بک‌آپ می‌گیریم
-    localArts.forEach(art => {
-      const artId = Number(art.id);
-      if (artId > 8 && !deletedSet.has(artId)) {
-        if (!mergedMap.has(artId)) {
-          mergedMap.set(artId, art);
-          // ثبت خودکار اثر محلی جدید در دیتابیس ابری
-          if (window.supabaseClient) {
-            window.supabaseClient.from('artworks').upsert([{
-              id: art.id,
-              tag: art.tag || 'character',
-              short_slug: art.shortSlug || art.title,
-              title: art.title,
-              desc_text: art.desc || '',
-              pipeline_key: art.pipelineKey || 'sketch1',
-              genre: art.genre || 'Dark Fantasy',
-              image: art.image,
-              color_space: art.colorSpace || 'Master 4K / 16-Bit ProPhoto RGB',
-              phases: art.phases || []
-            }]).then(() => {}).catch(() => {});
-          }
-        }
-      }
-    });
-
-    const finalArtworks = Array.from(mergedMap.values()).sort((a, b) => {
-      if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
-      return b.id - a.id;
-    });
-
-    if (finalArtworks.length > 0) {
-      showcaseArtworks = finalArtworks;
-      window.showcaseArtworks = finalArtworks;
+      showcaseArtworks = freshArtworks;
+      window.showcaseArtworks = freshArtworks;
       const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
-      safeSetStorage(artKey, JSON.stringify(finalArtworks));
+      safeSetStorage(artKey, JSON.stringify(freshArtworks));
+      
       if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
       if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
-      console.log('Automated two-way cloud sync merged complete. Artworks count:', finalArtworks.length);
+      console.log('Direct cloud sync complete. True artworks count:', freshArtworks.length);
     }
   } catch (err) {
     console.warn('Auto-sync execution error:', err);
@@ -5366,6 +5357,19 @@ window.confirmSaveArtwork = async function() {
     if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
     if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
     showToast('Artwork added to current session successfully.', 'success');
+  }
+};
+
+
+window.forceResyncGalleryFromCloud = async function() {
+  showToast('Fetching latest artworks from cloud database...', 'info');
+  try {
+    if (typeof window.syncArtworksFromSupabase === 'function') {
+      await window.syncArtworksFromSupabase();
+      showToast('Gallery synchronized with cloud database! ✓', 'success');
+    }
+  } catch(e) {
+    showToast('Failed to sync with cloud.', 'error');
   }
 };
 

@@ -125,159 +125,8 @@ window.siteSettings = siteSettings;
 
 // Showcase Gallery with multi-phase case study lightbox and atelier deep-linking
 // Load artist artworks (filtered and cleaned from legacy mockups)
-// Studio fallback concepts
-const DEFAULT_STUDIO_ARTWORKS = [
-  {
-    id: 101,
-    tag: 'character',
-    category: 'character',
-    shortSlug: 'Obsidian Vanguard',
-    title: 'The Obsidian Vanguard • Knight Commander',
-    desc: 'Heavy dark-fantasy armor exploration with modular Pauldrons, silhouetted thumbnail iterations, and master cinematic lighting render in ProPhoto RGB.',
-    pipelineKey: 'sketch1',
-    genre: 'Dark Fantasy',
-    image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=85',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
-    lore: 'Extopia Universe • Order of the Black Sun',
-    phases: [
-      {
-        name: 'Master Cinematic Cover & Presentation Sheet',
-        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=85',
-        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=85',
-        pipelineKey: 'sketch1',
-        subcategory: 'Hero / Main Concept (Full IP)',
-        desc: '300DPI production master with multi-pass atmospheric rim light and material callouts.',
-        socials: { telegram: true },
-        socialCaptions: {}
-      }
-    ]
-  },
-  {
-    id: 102,
-    tag: 'creature',
-    category: 'creature',
-    shortSlug: 'Abyssal Titan',
-    title: 'Abyssal Leviathan • Apex Deep-Sea Titan',
-    desc: 'Speculative bioluminescent physiology, predatory locomotion mechanics, jaw articulation diagrams, and human scale comparison sheet.',
-    pipelineKey: 'sketch_creature',
-    genre: 'Horror & Eldritch',
-    image: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=85',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
-    lore: 'Abyssal Trench Fauna • Extopia Marine Depths',
-    phases: [
-      {
-        name: 'Apex Predator Scale & Morphology Master',
-        img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=85',
-        image: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=85',
-        pipelineKey: 'sketch_creature',
-        subcategory: 'Predatory Locomotion & Anatomy',
-        desc: 'Tactile scale texture maps, predatory dorsal plates, and translucent bioluminescent sacs.',
-        socials: { telegram: true },
-        socialCaptions: {}
-      }
-    ]
-  },
-  {
-    id: 103,
-    tag: 'environment',
-    category: 'environment',
-    shortSlug: 'Cyber Spire',
-    title: 'Neo-Tirann Overpass • Cyber Spire Sector 9',
-    desc: 'Volumetric depth haze, modular architectural kitbash set, multi-tier neon billboards, and panoramic establishing matte shot.',
-    pipelineKey: 'sketch2',
-    genre: 'Cyberpunk',
-    image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=85',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
-    lore: 'Upper Megastructure • Neo-Tirann Metropolitan Grid',
-    phases: [
-      {
-        name: 'Panoramic Establishing Matte Shot',
-        img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=85',
-        image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=85',
-        pipelineKey: 'sketch2',
-        subcategory: 'Wide Panoramic Establishing Shot',
-        desc: 'Atmospheric light-bleed render with layered fog passes and architectural callout assets.',
-        socials: { telegram: true },
-        socialCaptions: {}
-      }
-    ]
-  },
-  {
-    id: 104,
-    tag: 'keyframe',
-    category: 'keyframe',
-    shortSlug: 'Sovereign Battle',
-    title: 'Eclipse Sovereign • Narrative Climax Keyframe',
-    desc: 'Climactic cinematic splash moment depicting the rupture of the celestial seal. Rendered with extreme dynamic range and focal blur.',
-    pipelineKey: 'sketch3',
-    genre: 'Dark Fantasy',
-    image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
-    lore: 'The Fall of the Sunless Throne',
-    phases: [
-      {
-        name: 'Narrative Climax & Battle Moment Sheet',
-        img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
-        image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
-        pipelineKey: 'sketch3',
-        subcategory: 'Flagship Cinematic Splash Art',
-        desc: 'Keyframe composition breakdown with focal hierarchy and cinematic color grading.',
-        socials: { telegram: true },
-        socialCaptions: {}
-      }
-    ]
-  },
-  {
-    id: 105,
-    tag: 'props',
-    category: 'props',
-    shortSlug: 'Vorpal Greatsword',
-    title: 'Runeforged Vorpal Blade • Relic Weapon Set',
-    desc: 'Ancient ceremonial weapon forged from meteoric obsidian. Complete with engraved elder runes, crossguard breakdown, and game-ready orthographic views.',
-    pipelineKey: 'sketch4',
-    genre: 'Mythic & Ancient',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
-    lore: 'Artifacts of the First Age',
-    phases: [
-      {
-        name: 'Orthographic Asset & Material Sheet',
-        img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85',
-        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85',
-        pipelineKey: 'sketch4',
-        subcategory: 'Hero Weapon / Centerpiece Relic',
-        desc: 'Material specification callouts for bronze, etched steel, leather wraps, and crystal socketing.',
-        socials: { telegram: true },
-        socialCaptions: {}
-      }
-    ]
-  },
-  {
-    id: 106,
-    tag: 'comic',
-    category: 'comic',
-    shortSlug: 'Extopia Chapter 1',
-    title: 'Chronicles of Extopia • Manga Line-Art Episode',
-    desc: 'High-contrast inked sequential manga pages with authentic Japanese screentone shading, dynamic speed lines, and sound effect typography.',
-    pipelineKey: 'sketch5',
-    genre: 'Anime & Stylized',
-    image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=1200&q=85',
-    colorSpace: 'Master 4K / 16-Bit ProPhoto RGB',
-    lore: 'Extopia Comic Chronicles • Vol. 1',
-    phases: [
-      {
-        name: 'Storyboard & Inked Manga Master Sheet',
-        img: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=1200&q=85',
-        image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=1200&q=85',
-        pipelineKey: 'sketch5',
-        subcategory: 'Japanese Screentoned Manga Page',
-        desc: 'Clean 600DPI vector ink line-art with modular speech balloon placement guides.',
-        socials: { telegram: true },
-        socialCaptions: {}
-      }
-    ]
-  }
-];
+// Studio fallback concepts (تمام آثار آزمایشی و نمونه‌های اولیه Unsplash به کل حذف شدند)
+const DEFAULT_STUDIO_ARTWORKS = [];
 
 var storedArtworks = [];
 try {
@@ -287,13 +136,15 @@ try {
 } catch(e) {
   storedArtworks = [];
 }
-var showcaseArtworks = storedArtworks.filter(a => a && typeof a === 'object' && Number(a.id) > 8);
-if (showcaseArtworks.length === 0) {
-  showcaseArtworks = JSON.parse(JSON.stringify(DEFAULT_STUDIO_ARTWORKS));
-  try {
-    localStorage.setItem(KEYS.ARTWORKS, JSON.stringify(showcaseArtworks));
-  } catch(e) {}
-}
+// فیلتر کامل آثار فیک/نمونه اولیه (شناسه‌های 101 تا 106 یا تصاویر Unsplash)
+var showcaseArtworks = storedArtworks.filter(a => {
+  if (!a || typeof a !== 'object') return false;
+  const id = Number(a.id);
+  if (id <= 8 || (id >= 101 && id <= 106)) return false;
+  if (typeof a.image === 'string' && a.image.includes('images.unsplash.com')) return false;
+  if (typeof a.title === 'string' && (a.title.includes('Obsidian Vanguard') || a.title.includes('Abyssal Leviathan') || a.title.includes('Neo-Tirann') || a.title.includes('Eclipse Sovereign') || a.title.includes('Runeforged Vorpal') || a.title.includes('Chronicles of Extopia'))) return false;
+  return true;
+});
 window.showcaseArtworks = showcaseArtworks;
 
 // Studio bespoke production pipelines
