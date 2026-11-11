@@ -815,8 +815,8 @@ function renderStagingPhasesHtml() {
           </div>
         `}
 
-        <!-- Unified Category & Pipeline, Specialized Subcategory, and Universe Genre -->
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+        <!-- Sheet Production Metadata: Pipeline, Subcategory, Rendering Stage, Complexity -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
           <div>
             <label style="font-size:11px; color:var(--gold); font-weight:800; display:block; margin-bottom:3px;">📂 Sheet Category & Pipeline:</label>
             <select onchange="handlePhaseUnifiedCategoryChange(${idx}, this.value)" style="font-size:11.5px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#080c14; border:1px solid rgba(250,204,21,0.35); border-radius:8px; color:#fff; outline:none;">
@@ -842,18 +842,29 @@ function renderStagingPhasesHtml() {
               })()}
             </select>
           </div>
+
           <div>
             <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">📐 Specialized Subcategory:</label>
-            <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
+            <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:8px; color:#fff;">
               ${subcats.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('')}
             </select>
           </div>
+
           <div>
-            <label style="font-size:10.5px; color:var(--emerald, #10b981); font-weight:700; display:block; margin-bottom:2px;">🌌 Universe Genre:</label>
-            <select onchange="stagingProjectPhases[${idx}].genre = this.value" style="font-size:11px; padding:6px 8px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:6px; color:#fff;">
-              ${(typeof studioGenres !== 'undefined' ? studioGenres : ['Dark Fantasy', 'Cyberpunk', 'Sci-Fi', 'Mythic & Ancient', 'Post-Apocalyptic', 'Horror & Eldritch']).map(g => `
-                <option value="${g}" ${(p.genre === g || (!p.genre && g === 'Dark Fantasy')) ? 'selected' : ''}>${g}</option>
-              `).join('')}
+            <label style="font-size:10.5px; color:#f43f5e; font-weight:800; display:block; margin-bottom:2px;">🎨 مرحله پرداخت (Rendering Stage):</label>
+            <select onchange="stagingProjectPhases[${idx}].stage = this.value" style="font-size:11px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid rgba(244,63,94,0.35); border-radius:8px; color:#fff;">
+              <option value="sketch" ${p.stage === 'sketch' ? 'selected' : ''}>✏️ اسکچ و اتود اولیه (Sketch)</option>
+              <option value="lineart_value" ${p.stage === 'lineart_value' ? 'selected' : ''}>✒️ لاین‌آرت و سایه‌زنی ولیو (Line-art & Values)</option>
+              <option value="render" ${(p.stage === 'render' || (!p.stage && isCover)) ? 'selected' : ''}>👑 رندر نهایی و کامل (Master Render)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:10.5px; color:#a855f7; font-weight:800; display:block; margin-bottom:2px;">⚡ درجه پیچیدگی (Complexity):</label>
+            <select onchange="stagingProjectPhases[${idx}].complexity = this.value" style="font-size:11px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid rgba(168,85,247,0.35); border-radius:8px; color:#fff;">
+              <option value="minimal" ${p.complexity === 'minimal' ? 'selected' : ''}>🟢 ساده / مینیمال (Minimal / Clean)</option>
+              <option value="moderate" ${(p.complexity === 'moderate' || !p.complexity) ? 'selected' : ''}>🟡 متوسط / استاندارد (Moderate / Detailed)</option>
+              <option value="complex" ${p.complexity === 'complex' ? 'selected' : ''}>🔴 پیچیده / جزئیات سنگین (Complex / High-Fidelity)</option>
             </select>
           </div>
         </div>
@@ -1038,7 +1049,11 @@ window.confirmSaveArtwork = async function() {
       'sketch4': 'props',
       'sketch5': 'comic'
     };
-    assembledPhases.forEach(p => {
+    assembledPhases.forEach((p, pIdx) => {
+      if (!p.pipelineKey) p.pipelineKey = pipe;
+      if (!p.category) p.category = pipeCatMap[p.pipelineKey] || 'character';
+      if (!p.stage) p.stage = (pIdx === 0 ? 'render' : 'sketch');
+      if (!p.complexity) p.complexity = 'moderate';
       if (!p.pipelineKey) p.pipelineKey = pipe;
       if (!p.category) p.category = pipeCatMap[p.pipelineKey] || 'character';
     });
