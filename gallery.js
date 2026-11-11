@@ -467,7 +467,11 @@ window.renderShowcaseGrid = function() {
       slug = art.tag ? art.tag.toUpperCase() : 'CONCEPT';
     }
 
-    let tileImg = defaultImg;
+    let tileImg = (defaultImg || '').trim();
+    if (tileImg.startsWith('http://')) tileImg = tileImg.replace('http://', 'https://');
+    if (typeof getOptimizedImageUrl === 'function' && tileImg && !tileImg.startsWith('data:')) {
+      tileImg = getOptimizedImageUrl(tileImg, 900);
+    }
     let targetPhaseIdx = 0;
     let displayTitle = art.title || "Untitled Concept";
     let displaySlug = slug;
@@ -548,7 +552,7 @@ window.renderShowcaseGrid = function() {
           <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:38px;"></span>
           <span class="tile-sub font-mono" style="font-size:11.5px; font-weight:700; opacity:0.95; color:#f1f5f9; letter-spacing:0.04em;">${hoverGenreLabel}</span>
         </div>
-        <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" />
+        <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" onerror="this.onerror=null; this.style.minHeight='180px'; this.parentElement.classList.add('loaded');" />
       </div>
     `;
   }).join('');
