@@ -983,9 +983,14 @@
                   <h4 style="font-size:16px; font-weight:800; color:#fff; margin:0 0 4px;">Home Showcase Gallery Curation</h4>
                   <span style="font-size:12px; color:var(--text-muted);">Click the + card to upload a new artwork, or click any card to edit. Real-time Cloud DB synchronization active.</span>
                 </div>
-                <button type="button" onclick="forceResyncGalleryFromCloud()" class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric);" title="Fetch latest artworks from cloud database and purge ghost cache">
-                  🔄 Sync & Purge Ghost Cache
-                </button>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <button type="button" onclick="exportAndDownloadDataJs()" class="btn-gold" style="font-size:12px; padding:7px 16px; background:var(--gold); color:#000; font-weight:800; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="دانلود مستقیم فایل دیتای رسمی (data.js) برای آپلود در گیت‌هاب بدون نیاز به سوپابیس">
+                    📥 دانلود دیتای گالری (data.js)
+                  </button>
+                  <button type="button" onclick="forceResyncGalleryFromCloud()" class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:var(--cyan-electric); color:var(--cyan-electric); cursor:pointer;" title="Fetch latest artworks from cloud database">
+                    🔄 Cloud Sync
+                  </button>
+                </div>
               </div>
               <div class="admin-art-mosaic-grid" id="adminMosaicTilesContainer"></div>
             </div>
@@ -2603,12 +2608,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
     </div>
   </footer>
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
-  <script src="data.js?v=25.5.0"></script>
-  <script src="core.js?v=25.5.0"></script>
-  <script src="gallery.js?v=25.5.0"></script>
-  <script src="portal.js?v=25.5.0"></script>
-  <script src="admin.js?v=25.5.0"></script>
-  <script src="translate.js?v=25.5.0"></script>
+  <script src="data.js?v=25.6.0"></script>
+  <script src="core.js?v=25.6.0"></script>
+  <script src="gallery.js?v=25.6.0"></script>
+  <script src="portal.js?v=25.6.0"></script>
+  <script src="admin.js?v=25.6.0"></script>
+  <script src="translate.js?v=25.6.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
