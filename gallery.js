@@ -569,16 +569,15 @@ window.handleImageAutoDetect = function(imgEl, artId) {
   const w = imgEl.naturalWidth;
   const h = imgEl.naturalHeight;
   const r = parseFloat((w / h).toFixed(2));
-  artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
-  const art = showcaseArtworks.find(a => a.id == artId);
-  if (art && (!art.aspectRatio || Math.abs(art.aspectRatio - r) > 0.08)) {
+  if (typeof artDimensionCache !== 'undefined') {
+    artDimensionCache[imgEl.src] = { width: w, height: h, ratio: r };
+  }
+  // از تغییر مکرر کلاس تایل و لگ زدن مرورگر جلوگیری می‌شود
+  const art = (typeof showcaseArtworks !== 'undefined') ? showcaseArtworks.find(a => a.id == artId) : null;
+  if (art && !art.aspectRatio) {
     art.width = w;
     art.height = h;
     art.aspectRatio = r;
-    const tile = document.getElementById(`galleryTile_${art.id}`);
-    if (tile) {
-      tile.className = `mosaic-tile ${getAutoSpanClass(art)}`;
-    }
   }
 };
 // لایت‌باکس مطالعه موردی چندمرحله‌ای (Case-Study Interactive Engine)

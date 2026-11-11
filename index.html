@@ -25,9 +25,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=24.0.0">
+  <link rel="stylesheet" href="style.css?v=26.4.3">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
+  <script>
+    window.addEventListener('load', function() {
+      try {
+        var s = document.createElement('script');
+        s.src = 'https://telegram.org/js/telegram-web-app.js';
+        s.async = true;
+        s.onerror = function() { console.warn('Telegram WebApp script not reachable on current network (bypassed).'); };
+        document.body.appendChild(s);
+      } catch(e) {}
+    });
+  </script>
   <!-- اتصال رسمی آنالیتیکس سبک و بدون کوکی کلادفلر (Cloudflare Web Analytics) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c76a19f07a524a87b5a19808d4b38d38"}'></script>
 </head>
@@ -324,7 +335,7 @@
           <div class="studio-side-tabs" id="atelierServiceCards">
             <!-- ۱. کاراکتر -->
             <div onclick="selectPipeline('sketch1', this)" class="service-nav-card active" data-pipeline="sketch1">
-              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="Character Design" />
+              <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="Character Design" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">01.</span>
@@ -335,7 +346,7 @@
 
             <!-- ۲. هیولا و موجودات -->
             <div onclick="selectPipeline('sketch_creature', this)" class="service-nav-card" data-pipeline="sketch_creature">
-              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="Creatures & Bosses" />
+              <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" alt="Creatures & Bosses" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">02.</span>
@@ -346,7 +357,7 @@
 
             <!-- ۳. محیط و لنداسکیپ -->
             <div onclick="selectPipeline('sketch2', this)" class="service-nav-card" data-pipeline="sketch2">
-              <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80" alt="Environment & Worlds" />
+              <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80" alt="Environment & Worlds" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">03.</span>
@@ -357,7 +368,7 @@
 
             <!-- ۴. کاور و کی‌فریم -->
             <div onclick="selectPipeline('sketch3', this)" class="service-nav-card" data-pipeline="sketch3">
-              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="Keyframes & Covers" />
+              <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80" alt="Keyframes & Covers" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">04.</span>
@@ -368,7 +379,7 @@
 
             <!-- ۵. پراپ و رابط کاربری -->
             <div onclick="selectPipeline('sketch4', this)" class="service-nav-card" data-pipeline="sketch4">
-              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Props & Weapons" />
+              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Props & Weapons" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">05.</span>
@@ -379,7 +390,7 @@
 
                         <!-- ۷. مسکات و هویت برند -->
             <div onclick="selectPipeline('sketch_mascot', this)" class="service-nav-card" data-pipeline="sketch_mascot">
-              <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80" alt="Mascot & Crest" />
+              <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80" alt="Mascot & Crest" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">07.</span>
@@ -390,7 +401,7 @@
 
             <!-- ۶. کمیک و استوری‌بورد -->
             <div onclick="selectPipeline('sketch5', this)" class="service-nav-card" data-pipeline="sketch5">
-              <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80" alt="Graphic Lore & Comics" />
+              <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80" alt="Graphic Lore & Comics" loading="lazy" decoding="async" />
               <div class="service-nav-overlay">
                 <div class="service-nav-title">
                   <span class="font-mono" style="color:var(--gold);">06.</span>
@@ -2601,12 +2612,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
     </div>
   </footer>
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
-  <script src="data.js?v=26.4.2"></script>
-  <script src="core.js?v=26.4.2"></script>
-  <script src="gallery.js?v=26.4.2"></script>
-  <script src="portal.js?v=26.4.2"></script>
-  <script src="admin.js?v=26.4.2"></script>
-  <script src="translate.js?v=26.4.2"></script>
+  <script src="data.js?v=26.4.3"></script>
+  <script src="core.js?v=26.4.3"></script>
+  <script src="gallery.js?v=26.4.3"></script>
+  <script src="portal.js?v=26.4.3"></script>
+  <script src="admin.js?v=26.4.3"></script>
+  <script src="translate.js?v=26.4.3"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   <div id="mobileBottomNav">
@@ -2655,7 +2666,21 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
       }
     };
   </script>
-  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <!-- Google Translate Script Loaded Asynchronously After Idle -->
+  <script type="text/javascript">
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        try {
+          var s = document.createElement('script');
+          s.type = 'text/javascript';
+          s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+          s.async = true;
+          s.onerror = function() { console.warn('Google Translate blocked on network, silently bypassed.'); };
+          document.body.appendChild(s);
+        } catch(e) {}
+      }, 1500);
+    });
+  </script>
 
   
 </body>

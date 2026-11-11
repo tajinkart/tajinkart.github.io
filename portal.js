@@ -120,7 +120,10 @@ window.syncAtelierWithGalleryArtworks = function() {
     if (imgEl && validImages.length > 0) {
       // اگر تصویر فعلی پیش‌فرض Unsplash است یا در لیست معتبر نیست، اولین اثر واقعی را ست کن
       if (!imgEl.src || imgEl.src.includes('images.unsplash.com') || !validImages.includes(imgEl.src)) {
-        imgEl.src = validImages[0];
+        const optSrc = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(validImages[0], 480) : validImages[0];
+        imgEl.src = optSrc;
+        imgEl.loading = 'lazy';
+        imgEl.decoding = 'async';
       }
     }
 
@@ -134,7 +137,8 @@ window.syncAtelierWithGalleryArtworks = function() {
         if (targetImg) {
           targetImg.style.opacity = '0.15';
           setTimeout(() => {
-            targetImg.src = this._dynamicArtworkImages[this._currentImgIdx];
+            const rawSrc = this._dynamicArtworkImages[this._currentImgIdx];
+            targetImg.src = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(rawSrc, 480) : rawSrc;
             targetImg.style.opacity = '';
           }, 180);
         }
@@ -155,7 +159,8 @@ window.syncAtelierWithGalleryArtworks = function() {
           if (img) {
             img.style.opacity = '0.15';
             setTimeout(() => {
-              img.src = imgs[card._currentImgIdx];
+              const rawSrc = imgs[card._currentImgIdx];
+              img.src = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(rawSrc, 480) : rawSrc;
               img.style.opacity = '';
             }, 250);
           }
@@ -310,12 +315,13 @@ window.selectPipeline = function(key, cardEl, userClicked) {
         }
       }
 
+      const optTileImg = (typeof getOptimizedImageUrl === 'function' && tileImg && !tileImg.startsWith('data:')) ? getOptimizedImageUrl(tileImg, 720) : tileImg;
       const escapedTitle = (tileTitle || '').replace(/'/g, "\\'");
       const escapedDesc = (tileDesc || '').replace(/'/g, "\\'");
 
       return `
-        <div class="pipeline-tile ${tile.span}" style="--tile-accent:${catColor};" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${tileImg}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
-          <img src="${tileImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" />
+        <div class="pipeline-tile ${tile.span}" style="--tile-accent:${catColor};" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${optTileImg}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
+          <img src="${optTileImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" decoding="async" />
           <div class="pipeline-tile-overlay">
             <h4 class="pipeline-tile-title">${tile.title}</h4>
             <p class="pipeline-tile-desc">${tile.desc}</p>
