@@ -371,21 +371,24 @@ async function initSupabaseAuthSession() {
 // تابع کمکی برای ذخیره‌سازی ایمن در LocalStorage (جلوگیری از خطای پر شدن ۵ مگابایتی)
 
 // موتور بهینه‌سازی و تسریع لود تصاویر کلودیناری (کاهش حجم از ۵ مگابایت به ۵۰ کیلوبایت با حفظ کیفیت)
-function getOptimizedImageUrl(url, width = 800) {
+function getOptimizedImageUrl(url, width = 640) {
   if (!url || typeof url !== 'string') return '';
   if (url.startsWith('data:image/')) return url;
 
-  // بهینه‌سازی خودکار در Cloudinary با فرمت نسل جدید WebP/AVIF و کیفیت تطبیقی
+  // بهینه‌سازی قطعی و فوق‌سریع ابری با حذف هرگونه تبدیل سنگین قبلی
   if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-    if (!url.includes('/upload/f_auto') && !url.includes('/upload/q_auto')) {
-      return url.replace('/upload/', `/upload/f_auto,q_auto:good,w_${width},c_limit/`);
-    }
+    const parts = url.split('/upload/');
+    const prefix = parts[0] + '/upload/';
+    const suffix = parts[1];
+    // حذف هرگونه فلگ قدیمی و جایگزینی با فرمت نسل جدید و حجم پروانه‌ای
+    const cleanSuffix = suffix.replace(/^(?:(?:[a-zA-Z0-9_]+:[a-zA-Z0-9_]+|[a-zA-Z0-9_]+),?)+(?=\/v\d+\/)/, '');
+    return prefix + 'f_auto,q_auto:eco,w_' + width + ',c_limit/' + cleanSuffix.replace(/^\//, '');
   }
 
   // بهینه‌سازی Unsplash
   if (url.includes('images.unsplash.com')) {
     if (!url.includes('auto=format')) {
-      return url + (url.includes('?') ? '&' : '?') + `auto=format&fit=crop&w=${width}&q=80`;
+      return url + (url.includes('?') ? '&' : '?') + 'auto=format&fit=crop&w=' + width + '&q=75';
     }
   }
 

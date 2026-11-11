@@ -477,7 +477,7 @@ window.renderShowcaseGrid = function() {
     let tileImg = (defaultImg || '').trim();
     if (tileImg.startsWith('http://')) tileImg = tileImg.replace('http://', 'https://');
     if (typeof getOptimizedImageUrl === 'function' && tileImg && !tileImg.startsWith('data:')) {
-      tileImg = getOptimizedImageUrl(tileImg, 900);
+      tileImg = getOptimizedImageUrl(tileImg, 640);
     }
     let targetPhaseIdx = 0;
     let displayTitle = art.title || "Untitled Concept";
@@ -1229,13 +1229,19 @@ window.syncArtworksFromSupabase = async function() {
           return b.id - a.id;
         });
 
+      const currentList = window.showcaseArtworks || [];
+      const isIdentical = (currentList.length === freshArtworks.length && currentList.length > 0 && freshArtworks.every((a, idx) => a.id === currentList[idx]?.id && a.image === currentList[idx]?.image));
+
       showcaseArtworks = freshArtworks;
       window.showcaseArtworks = freshArtworks;
       const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
       safeSetStorage(artKey, JSON.stringify(freshArtworks));
       
-      if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
-      if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+      // فقط در صورتی که دیتابیس داده جدیدی دارد یا گالری هنوز خالی است رندر مجدد انجام شود تا صفحه فلیکر و معطلی نداشته باشد
+      if (!isIdentical || currentList.length === 0) {
+        if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+        if (typeof renderAdminSketch2 === 'function') renderAdminSketch2();
+      }
       console.log('Direct cloud sync complete. True artworks count:', freshArtworks.length);
     }
   } catch (err) {
