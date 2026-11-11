@@ -1,4 +1,11 @@
 
+function generateSafeArtworkId() {
+  const arts = (typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks)) ? showcaseArtworks : (window.showcaseArtworks || []);
+  const existingIds = arts.map(a => Number(a.id)).filter(n => !isNaN(n) && n > 0 && n < 2000000000);
+  return existingIds.length > 0 ? Math.max(...existingIds) + 1 : 201;
+}
+
+
 // ==============================================================================
 // موتور آپلود ابری تصاویر CLOUDINARY با تشخیص خودکار پریست و کلود نیم
 // ==============================================================================
@@ -329,7 +336,7 @@ window.openCreateArtworkModal = function() {
   isCreatingNewArt = true;
   currentSelectedArtIdx = -1;
   stagingNewArt = {
-    id: Date.now(),
+    id: generateSafeArtworkId(),
     tag: 'character',
     shortSlug: '',
     title: '',
@@ -952,7 +959,7 @@ window.confirmSaveArtwork = async function() {
 
     if (isCreatingNewArt) {
       const newArtRecord = {
-        id: (stagingNewArt && stagingNewArt.id) ? stagingNewArt.id : Date.now(),
+        id: (stagingNewArt && stagingNewArt.id && Number(stagingNewArt.id) < 2000000000) ? stagingNewArt.id : generateSafeArtworkId(),
         tag: cat,
         category: cat,
         shortSlug: slug || (stagingNewArt && stagingNewArt.shortSlug) || title || 'New Concept',
@@ -992,7 +999,7 @@ window.confirmSaveArtwork = async function() {
 
       // ثبت پس‌زمینه در Supabase بدون ایجاد ارور در فرانت
       if (window.supabaseClient) {
-        window.supabaseClient.from('artworks').insert([{
+        window.supabaseClient.from('artworks').upsert([{
           id: newArtRecord.id,
           tag: newArtRecord.tag,
           short_slug: newArtRecord.shortSlug,
@@ -1003,7 +1010,7 @@ window.confirmSaveArtwork = async function() {
           image: newArtRecord.image,
           color_space: newArtRecord.colorSpace,
           phases: newArtRecord.phases
-        }]).then(({ error }) => {
+        }], { onConflict: 'id' }).then(({ error }) => {
           if (error) console.warn('Supabase insert note:', error);
           else showToast('Artwork synced with cloud database. ✓', 'info', 2500);
         }).catch(err => {
