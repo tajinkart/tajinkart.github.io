@@ -31,11 +31,13 @@ window.handleAcademyClick = function() {
 // همگام‌سازی خودکار و داینامیک آثار بارگذاری‌شده در گالری با پایپ‌لاین‌های آتلیه و چرخش تصاویر
 // ==============================================================================
 
+// ==============================================================================
+// TAJINKART EXCLUSIVE ATELIER PIPELINE MATCHER (v26.5.2)
+// هر شیت و فاز منحصراً و فقط در پایپ‌لاین اختصاصی خود نمایش داده می‌شود
+// ==============================================================================
+
 window.getArtworksForPipeline = function(pipeKey) {
-  const allArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks) && window.showcaseArtworks.length > 0)
-    ? window.showcaseArtworks
-    : ((typeof showcaseArtworks !== 'undefined' && Array.isArray(showcaseArtworks)) ? showcaseArtworks : []);
-  
+  const allArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks)) ? window.showcaseArtworks : [];
   if (!allArts || allArts.length === 0) return [];
 
   const pipeMap = {
@@ -51,72 +53,87 @@ window.getArtworksForPipeline = function(pipeKey) {
   const targetCatId = (pipeMap[pipeKey] || pipeKey || '').toLowerCase().trim();
   const pipeLower = (pipeKey || '').toLowerCase().trim();
 
-  return allArts.filter(a => {
-    if (!a || !a.image) return false;
-    const aCat = (a.category || a.tag || '').toLowerCase().trim();
-    const aPipe = (a.pipelineKey || a.pipe || '').toLowerCase().trim();
-    const aTitle = (a.title || '').toLowerCase().trim();
+  const matchingItems = [];
 
-    // ۱. تطبیق مستقیم با شناسه پایپلاین یا دسته در ریشه اثر
-    if (aCat === targetCatId || aCat === pipeLower) return true;
-    if (aPipe === pipeLower || aPipe === targetCatId) return true;
+  allArts.forEach(art => {
+    if (!art) return;
+    const aCat = (art.category || art.tag || '').toLowerCase().trim();
+    const aPipe = (art.pipelineKey || art.pipe || '').toLowerCase().trim();
+    const aTitle = (art.title || '').toLowerCase().trim();
 
-    // ۲. تطبیق هوشمند کلیدواژه‌ها (سینماتیک، کاراکتر، هیولا و...)
-    if (targetCatId === 'keyframe' && (
-      aCat.includes('keyframe') || aPipe.includes('keyframe') || aPipe.includes('sketch3') || 
-      aCat.includes('cinematic') || aPipe.includes('cinematic') || aCat.includes('کاور') || aCat.includes('کی‌فریم') || aCat.includes('سینماتیک') ||
-      aTitle.includes('keyframe') || aTitle.includes('cinematic') || aTitle.includes('سینماتیک')
-    )) return true;
+    // بررسی تطابق شیت ۱ (کاور اصلی) با این پایپ‌لاین
+    const rootMatches = (
+      aCat === targetCatId || aCat === pipeLower ||
+      aPipe === pipeLower || aPipe === targetCatId ||
+      (targetCatId === 'keyframe' && (aCat.includes('keyframe') || aPipe.includes('keyframe') || aPipe.includes('sketch3') || aCat.includes('cinematic') || aPipe.includes('cinematic') || aTitle.includes('cinematic') || aTitle.includes('کی‌فریم') || aTitle.includes('سینماتیک'))) ||
+      (targetCatId === 'character' && (aCat.includes('character') || aPipe.includes('sketch1') || aCat.includes('کاراکتر'))) ||
+      (targetCatId === 'creature' && (aCat.includes('creature') || aPipe.includes('sketch_creature') || aCat.includes('monster') || aCat.includes('هیولا'))) ||
+      (targetCatId === 'environment' && (aCat.includes('env') || aPipe.includes('sketch2') || aCat.includes('world') || aCat.includes('محیط'))) ||
+      (targetCatId === 'props' && (aCat.includes('prop') || aPipe.includes('sketch4') || aCat.includes('weapon') || aCat.includes('سلاح'))) ||
+      (targetCatId === 'comic' && (aCat.includes('comic') || aPipe.includes('sketch5') || aCat.includes('manga') || aCat.includes('کمیک'))) ||
+      (targetCatId === 'mascot' && (aCat.includes('mascot') || aPipe.includes('mascot') || aPipe.includes('sketch_mascot')))
+    );
 
-    if (targetCatId === 'character' && (
-      aCat.includes('character') || aPipe.includes('sketch1') || aCat.includes('کاراکتر') ||
-      aTitle.includes('character') || aTitle.includes('کاراکتر')
-    )) return true;
+    // اگر شیت کاور متعلق به این پایپ‌لاین است، آن را اضافه کن
+    if (rootMatches && art.image) {
+      matchingItems.push({
+        id: art.id,
+        title: art.title,
+        desc: art.desc,
+        image: art.image,
+        pipelineKey: pipeLower,
+        category: targetCatId,
+        stage: art.stage || 'render',
+        complexity: art.complexity || 'moderate',
+        phases: art.phases || []
+      });
+    }
 
-    if (targetCatId === 'creature' && (
-      aCat.includes('creature') || aPipe.includes('sketch_creature') || aCat.includes('monster') || aCat.includes('هیولا')
-    )) return true;
+    // اکنون شیت‌های تکمیلی (فازهای ۲، ۳ و...) را منحصراً بررسی کن
+    if (Array.isArray(art.phases) && art.phases.length > 0) {
+      art.phases.forEach((p, pIdx) => {
+        // اگر شیت اول است و به عنوان ریشه اضافه شده، تکراری اضافه نکن
+        if (pIdx === 0 && rootMatches) return;
+        const pImg = p.image || p.img;
+        if (!pImg) return;
 
-    if (targetCatId === 'environment' && (
-      aCat.includes('env') || aPipe.includes('sketch2') || aCat.includes('world') || aCat.includes('محیط')
-    )) return true;
-
-    if (targetCatId === 'props' && (
-      aCat.includes('prop') || aPipe.includes('sketch4') || aCat.includes('weapon') || aCat.includes('سلاح')
-    )) return true;
-
-    if (targetCatId === 'mascot' && (
-      aCat.includes('mascot') || aPipe.includes('mascot') || aPipe.includes('sketch_mascot') || aCat.includes('مسکات') || aCat.includes('برند') ||
-      aTitle.includes('mascot') || aTitle.includes('مسکات')
-    )) return true;
-
-    if (targetCatId === 'comic' && (
-      aCat.includes('comic') || aPipe.includes('sketch5') || aCat.includes('manga') || aCat.includes('کمیک')
-    )) return true;
-
-    // ۳. بررسی تمام فازها و شیت‌های پروژه (اگر کاراکتری فاز کی‌فریم یا اسلحه دارد)
-    if (Array.isArray(a.phases) && a.phases.length > 0) {
-      const matchInPhases = a.phases.some(p => {
-        if (!p) return false;
         const pPipe = (p.pipelineKey || '').toLowerCase().trim();
         const pCat = (p.category || pipeMap[pPipe] || '').toLowerCase().trim();
         const pName = (p.name || '').toLowerCase().trim();
-        if (pCat === targetCatId || pCat === pipeLower) return true;
-        if (pPipe === pipeLower || pPipe === targetCatId) return true;
-        if (targetCatId === 'keyframe' && (pCat.includes('keyframe') || pPipe.includes('keyframe') || pPipe.includes('sketch3') || pCat.includes('cinematic') || pPipe.includes('cinematic') || pName.includes('cinematic') || pName.includes('کی‌فریم'))) return true;
-        if (targetCatId === 'character' && (pCat.includes('character') || pPipe.includes('sketch1'))) return true;
-        if (targetCatId === 'creature' && (pCat.includes('creature') || pPipe.includes('creature'))) return true;
-        if (targetCatId === 'environment' && (pCat.includes('env') || pPipe.includes('sketch2'))) return true;
-        if (targetCatId === 'props' && (pCat.includes('prop') || pPipe.includes('sketch4'))) return true;
-        if (targetCatId === 'mascot' && (pCat.includes('mascot') || pPipe.includes('mascot') || pPipe.includes('sketch_mascot'))) return true;
-        if (targetCatId === 'comic' && (pCat.includes('comic') || pPipe.includes('sketch5'))) return true;
-        return false;
-      });
-      if (matchInPhases) return true;
-    }
 
-    return false;
+        // تطابق انحصاری این شیت با این پایپ‌لاین
+        const phaseMatches = (
+          pCat === targetCatId || pCat === pipeLower ||
+          pPipe === pipeLower || pPipe === targetCatId ||
+          (targetCatId === 'keyframe' && (pCat.includes('keyframe') || pPipe.includes('keyframe') || pPipe.includes('sketch3') || pCat.includes('cinematic') || pPipe.includes('cinematic') || pName.includes('cinematic') || pName.includes('کی‌فریم') || pName.includes('سینماتیک'))) ||
+          (targetCatId === 'character' && (pCat.includes('character') || pPipe.includes('sketch1') || pCat.includes('کاراکتر'))) ||
+          (targetCatId === 'creature' && (pCat.includes('creature') || pPipe.includes('sketch_creature') || pCat.includes('monster') || pCat.includes('هیولا'))) ||
+          (targetCatId === 'environment' && (pCat.includes('env') || pPipe.includes('sketch2') || pCat.includes('world') || pCat.includes('محیط'))) ||
+          (targetCatId === 'props' && (pCat.includes('prop') || pPipe.includes('sketch4') || pCat.includes('weapon') || pCat.includes('سلاح'))) ||
+          (targetCatId === 'comic' && (pCat.includes('comic') || pPipe.includes('sketch5') || pCat.includes('manga') || pCat.includes('کمیک'))) ||
+          (targetCatId === 'mascot' && (pCat.includes('mascot') || pPipe.includes('mascot') || pPipe.includes('sketch_mascot')))
+        );
+
+        if (phaseMatches) {
+          matchingItems.push({
+            id: art.id + '_' + pIdx,
+            parentArtId: art.id,
+            title: p.name || art.title,
+            desc: p.desc || art.desc,
+            image: pImg,
+            pipelineKey: pipeLower,
+            category: targetCatId,
+            subcategory: p.subcategory || '',
+            stage: p.stage || 'lineart_value',
+            complexity: p.complexity || 'moderate',
+            phases: [p]
+          });
+        }
+      });
+    }
   });
+
+  return matchingItems;
 };
 
 let atelierRotationTimer = null;
@@ -129,20 +146,14 @@ window.syncAtelierWithGalleryArtworks = function() {
     const pipe = card.getAttribute('data-pipeline');
     if (!pipe) return;
 
-    const matchingArts = window.getArtworksForPipeline(pipe);
+    // واکشی تصاویر ۱۰۰٪ انحصاری همین پایپ‌لاین
+    const matchingItems = window.getArtworksForPipeline(pipe);
     const validImages = [];
 
-    matchingArts.forEach(art => {
-      if (art.image && !validImages.includes(art.image)) {
-        validImages.push(art.image);
-      }
-      if (Array.isArray(art.phases)) {
-        art.phases.forEach(p => {
-          const pImg = p.image || p.img;
-          if (pImg && !validImages.includes(pImg)) {
-            validImages.push(pImg);
-          }
-        });
+    matchingItems.forEach(item => {
+      const img = item.image;
+      if (img && !validImages.includes(img)) {
+        validImages.push(img);
       }
     });
 
@@ -151,13 +162,10 @@ window.syncAtelierWithGalleryArtworks = function() {
 
     const imgEl = card.querySelector('img');
     if (imgEl && validImages.length > 0) {
-      // اگر تصویر فعلی پیش‌فرض Unsplash است یا در لیست معتبر نیست، اولین اثر واقعی را ست کن
-      if (!imgEl.src || imgEl.src.includes('images.unsplash.com') || !validImages.includes(imgEl.src)) {
-        const optSrc = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(validImages[0], 480) : validImages[0];
-        imgEl.src = optSrc;
-        imgEl.loading = 'lazy';
-        imgEl.decoding = 'async';
-      }
+      const optSrc = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(validImages[0], 480) : validImages[0];
+      imgEl.src = optSrc;
+      imgEl.loading = 'lazy';
+      imgEl.decoding = 'async';
     }
 
     // چرخش سریع‌تر با هاور موس
@@ -168,7 +176,7 @@ window.syncAtelierWithGalleryArtworks = function() {
         this._currentImgIdx = (this._currentImgIdx + 1) % this._dynamicArtworkImages.length;
         const targetImg = this.querySelector('img');
         if (targetImg) {
-          targetImg.style.opacity = '0.15';
+          targetImg.style.opacity = '0.2';
           setTimeout(() => {
             const rawSrc = this._dynamicArtworkImages[this._currentImgIdx];
             targetImg.src = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(rawSrc, 480) : rawSrc;
@@ -184,13 +192,13 @@ window.syncAtelierWithGalleryArtworks = function() {
     atelierRotationTimer = setInterval(() => {
       const allCards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
       allCards.forEach(card => {
-        if (card.matches(':hover')) return; // در صورت قرارگیری ماوس، مزاحم کاربر نشو
+        if (card.matches(':hover')) return;
         const imgs = card._dynamicArtworkImages;
         if (Array.isArray(imgs) && imgs.length > 1) {
           card._currentImgIdx = (card._currentImgIdx + 1) % imgs.length;
           const img = card.querySelector('img');
           if (img) {
-            img.style.opacity = '0.15';
+            img.style.opacity = '0.2';
             setTimeout(() => {
               const rawSrc = imgs[card._currentImgIdx];
               img.src = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(rawSrc, 480) : rawSrc;
@@ -202,7 +210,6 @@ window.syncAtelierWithGalleryArtworks = function() {
     }, 5500);
   }
 };
-
 
 window.applyCategoryColorsToServiceCards = function() {
   const cards = document.querySelectorAll('#atelierServiceCards .service-nav-card');
