@@ -38,49 +38,76 @@ window.getArtworksForPipeline = function(pipeKey) {
   
   if (!allArts || allArts.length === 0) return [];
 
-  const pipeMap = (typeof PIPELINE_TO_CATEGORY_MAP !== 'undefined') ? PIPELINE_TO_CATEGORY_MAP : {
+  const pipeMap = {
     'sketch1': 'character',
     'sketch_creature': 'creature',
     'sketch2': 'environment',
     'sketch3': 'keyframe',
     'sketch4': 'props',
-    'sketch5': 'comic',
-    'sketch_mascot': 'character'
+    'sketch_mascot': 'mascot',
+    'sketch5': 'comic'
   };
 
   const targetCatId = (pipeMap[pipeKey] || pipeKey || '').toLowerCase().trim();
   const pipeLower = (pipeKey || '').toLowerCase().trim();
 
-  let catTitle = '';
-  let catTitleEN = '';
-  if (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) {
-    const found = galleryCategories.find(c => 
-      (c.id && c.id.toLowerCase() === targetCatId) || 
-      (c.pipeKey && c.pipeKey.toLowerCase() === pipeLower)
-    );
-    if (found) {
-      catTitle = (found.title || '').toLowerCase().trim();
-      catTitleEN = (found.titleEN || '').toLowerCase().trim();
-    }
-  }
-
   return allArts.filter(a => {
     if (!a || !a.image) return false;
-    const aCat = (a.category || '').toLowerCase().trim();
+    const aCat = (a.category || a.tag || '').toLowerCase().trim();
     const aPipe = (a.pipelineKey || a.pipe || '').toLowerCase().trim();
+    const aTitle = (a.title || '').toLowerCase().trim();
 
-    if (aCat && (aCat === targetCatId || aCat === pipeLower)) return true;
-    if (aPipe && (aPipe === pipeLower || aPipe === targetCatId)) return true;
-    if (catTitle && aCat === catTitle) return true;
-    if (catTitleEN && aCat === catTitleEN) return true;
+    // ۱. تطبیق مستقیم با شناسه پایپلاین یا دسته در ریشه اثر
+    if (aCat === targetCatId || aCat === pipeLower) return true;
+    if (aPipe === pipeLower || aPipe === targetCatId) return true;
 
-    // تطبیق نام‌ها و کلیدواژه‌های اصلی برای انعطاف حداکثری
-    if (targetCatId === 'character' && (aCat.includes('character') || aCat.includes('کاراکتر'))) return true;
-    if (targetCatId === 'creature' && (aCat.includes('creature') || aCat.includes('monster') || aCat.includes('هیولا'))) return true;
-    if (targetCatId === 'environment' && (aCat.includes('environment') || aCat.includes('world') || aCat.includes('محیط'))) return true;
-    if (targetCatId === 'keyframe' && (aCat.includes('keyframe') || aCat.includes('cinematic') || aCat.includes('کاور'))) return true;
-    if (targetCatId === 'props' && (aCat.includes('prop') || aCat.includes('weapon') || aCat.includes('سلاح'))) return true;
-    if (targetCatId === 'comic' && (aCat.includes('comic') || aCat.includes('manga') || aCat.includes('کمیک'))) return true;
+    // ۲. تطبیق هوشمند کلیدواژه‌ها (سینماتیک، کاراکتر، هیولا و...)
+    if (targetCatId === 'keyframe' && (
+      aCat.includes('keyframe') || aPipe.includes('keyframe') || aPipe.includes('sketch3') || 
+      aCat.includes('cinematic') || aPipe.includes('cinematic') || aCat.includes('کاور') || aCat.includes('کی‌فریم') || aCat.includes('سینماتیک') ||
+      aTitle.includes('keyframe') || aTitle.includes('cinematic') || aTitle.includes('سینماتیک')
+    )) return true;
+
+    if (targetCatId === 'character' && (
+      aCat.includes('character') || aPipe.includes('sketch1') || aCat.includes('کاراکتر') ||
+      aTitle.includes('character') || aTitle.includes('کاراکتر')
+    )) return true;
+
+    if (targetCatId === 'creature' && (
+      aCat.includes('creature') || aPipe.includes('sketch_creature') || aCat.includes('monster') || aCat.includes('هیولا')
+    )) return true;
+
+    if (targetCatId === 'environment' && (
+      aCat.includes('env') || aPipe.includes('sketch2') || aCat.includes('world') || aCat.includes('محیط')
+    )) return true;
+
+    if (targetCatId === 'props' && (
+      aCat.includes('prop') || aPipe.includes('sketch4') || aCat.includes('weapon') || aCat.includes('سلاح')
+    )) return true;
+
+    if (targetCatId === 'comic' && (
+      aCat.includes('comic') || aPipe.includes('sketch5') || aCat.includes('manga') || aCat.includes('کمیک')
+    )) return true;
+
+    // ۳. بررسی تمام فازها و شیت‌های پروژه (اگر کاراکتری فاز کی‌فریم یا اسلحه دارد)
+    if (Array.isArray(a.phases) && a.phases.length > 0) {
+      const matchInPhases = a.phases.some(p => {
+        if (!p) return false;
+        const pPipe = (p.pipelineKey || '').toLowerCase().trim();
+        const pCat = (p.category || pipeMap[pPipe] || '').toLowerCase().trim();
+        const pName = (p.name || '').toLowerCase().trim();
+        if (pCat === targetCatId || pCat === pipeLower) return true;
+        if (pPipe === pipeLower || pPipe === targetCatId) return true;
+        if (targetCatId === 'keyframe' && (pCat.includes('keyframe') || pPipe.includes('keyframe') || pPipe.includes('sketch3') || pCat.includes('cinematic') || pPipe.includes('cinematic') || pName.includes('cinematic') || pName.includes('کی‌فریم'))) return true;
+        if (targetCatId === 'character' && (pCat.includes('character') || pPipe.includes('sketch1'))) return true;
+        if (targetCatId === 'creature' && (pCat.includes('creature') || pPipe.includes('creature'))) return true;
+        if (targetCatId === 'environment' && (pCat.includes('env') || pPipe.includes('sketch2'))) return true;
+        if (targetCatId === 'props' && (pCat.includes('prop') || pPipe.includes('sketch4'))) return true;
+        if (targetCatId === 'comic' && (pCat.includes('comic') || pPipe.includes('sketch5'))) return true;
+        return false;
+      });
+      if (matchInPhases) return true;
+    }
 
     return false;
   });

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.4.5">
+  <link rel="stylesheet" href="style.css?v=26.5.0">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -164,82 +164,45 @@
   <section id="view-showcase" class="view-section">
     <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
     <div id="topCenterBrandBar">
-      <!-- دکمه برند / خانه -->
-      <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
-        <span class="top-dot"></span>
-        <span>TAJINKART</span>
+      <!-- تک دکمه لوکس و فشرده برند و فیلترها (متقارن با دکمه سه‌خط سمت راست) -->
+      <button id="brandFilterMasterTrigger" type="button" onclick="toggleBrandFilterDropdown(event)" class="top-center-pill brand-master-pill" title="Filter Showcase by Genre & Category">
+        <span class="brand-crest-icon">✦</span>
+        <span class="brand-name-text">TAJINKART</span>
+        <span class="brand-filter-indicator" id="brandFilterIndicator" style="display:none;"></span>
+        <span class="brand-chevron-icon" id="brandChevronIcon">▾</span>
       </button>
 
-      <!-- ۲. فهرست شناور ژانرهای استودیو (All Genres) زیر نشان برند -->
-      <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
-        <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
-          <span id="currentGenrePillLabel">All Genres</span>
-          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-        </button>
-
-        <div id="genreFilterDropdown" class="floating-cat-dropdown hidden">
-          <div class="cat-dropdown-item active" onclick="filterGalleryByGenre('all')">
-            <span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span>
-            <span class="cat-item-text">All Genres</span>
+      <!-- پنجره بازشوی یکپارچه و ارگونومیک انتخاب ژانر و دسته‌بندی -->
+      <div id="brandFilterUnifiedDropdown" class="brand-unified-dropdown hidden" onclick="event.stopPropagation()">
+        
+        <!-- ۱. ژانرها -->
+        <div class="dropdown-filter-section">
+          <div class="dropdown-filter-header">
+            <span style="color:var(--cyan-electric); font-size:11px; font-weight:800; letter-spacing:0.05em; font-family:'JetBrains Mono', monospace;">🌌 UNIVERSE GENRE</span>
           </div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Dark Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Dark Fantasy</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Cyberpunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Cyberpunk</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Sci-Fi')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Sci-Fi</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mythic & Ancient')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mythic & Ancient</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Post-Apocalyptic')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Post-Apocalyptic</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Horror & Eldritch')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Horror & Eldritch</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('High Fantasy')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">High Fantasy</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Steampunk')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Steampunk</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Mecha & Industrial')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Mecha & Industrial</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Anime & Stylized')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Anime & Stylized</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByGenre('Historical & Military')"><span class="cat-item-dot" style="background:var(--cyan-electric); box-shadow:0 0 8px var(--cyan-electric);"></span><span class="cat-item-text">Historical & Military</span></div>
+          <div class="dropdown-pill-grid" id="unifiedGenrePillsContainer"></div>
         </div>
-      </div>
 
-      <!-- ۳. فهرست شناور دسته‌بندی آثار (All Artworks) زیر آل ژانر -->
-      <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-        <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
-          <span id="currentCategoryPillLabel">All Artworks</span>
-          <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-        </button>
+        <div class="dropdown-filter-divider"></div>
 
-        <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden">
-          <div class="cat-dropdown-item active" onclick="filterGalleryByCategory('all', 'All Artworks')">
-            <span class="cat-item-dot" style="background:var(--gold); box-shadow:0 0 8px var(--gold);"></span>
-            <span class="cat-item-text">All Artworks</span>
+        <!-- ۲. دسته‌بندی‌ها و پایپ‌لاین‌ها -->
+        <div class="dropdown-filter-section">
+          <div class="dropdown-filter-header">
+            <span style="color:var(--gold); font-size:11px; font-weight:800; letter-spacing:0.05em; font-family:'JetBrains Mono', monospace;">📂 ATELIER CATEGORY</span>
           </div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('character', 'Character Design & Heroes')"><span class="cat-item-dot" style="background:#facc15; box-shadow:0 0 8px #facc15;"></span><span class="cat-item-text">Character Design & Heroes</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('creature', 'Creatures, Titans & Monsters')"><span class="cat-item-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span><span class="cat-item-text">Creatures, Titans & Monsters</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('environment', 'Environment, Worlds & Architecture')"><span class="cat-item-dot" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span><span class="cat-item-text">Environment, Worlds & Architecture</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('keyframe', 'Cinematic Keyframes & Covers')"><span class="cat-item-dot" style="background:#f43f5e; box-shadow:0 0 8px #f43f5e;"></span><span class="cat-item-text">Cinematic Keyframes & Covers</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('props', 'Props, Weapons & Artifacts')"><span class="cat-item-dot" style="background:#a855f7; box-shadow:0 0 8px #a855f7;"></span><span class="cat-item-text">Props, Weapons & Artifacts</span></div>
-          <div class="cat-dropdown-item" onclick="filterGalleryByCategory('comic', 'Comics, Manga & Sequential Art')"><span class="cat-item-dot" style="background:#fb923c; box-shadow:0 0 8px #fb923c;"></span><span class="cat-item-text">Comics, Manga & Sequential Art</span></div>
+          <div class="dropdown-pill-grid" id="unifiedCategoryPillsContainer"></div>
+        </div>
+
+        <div class="dropdown-filter-footer">
+          <button type="button" onclick="resetGalleryFilters(); closeBrandFilterDropdown();" class="btn-reset-unified-filters">
+            <span>🔄</span>
+            <span>Reset All Filters</span>
+          </button>
         </div>
       </div>
     </div>
 
-
-
-        <div id="stickyBrandHero">
-      <div id="brandCrestContainer" class="brand-crest-wrapper" style="display:none;">
-        <img id="brandCrestImg" src="" alt="TAJINKART Master Crest" class="brand-crest-img" />
-      </div>
-      <h1 class="brand-giant-title brand-morph-title" id="brandMorphTitle">TAJINKART</h1>
-
-      <!-- شعار چرخشی برند با انیمیشن محو و ظاهر شدن -->
-      <div class="brand-slogan-bar font-mono brand-morph-sub" id="brandMorphSub">DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN</div>
-      
-      
-
-      
-
-      <div id="studioLiveStatusBadge" class="hero-badge studio-status-badge status-online" style="margin-top:4px;" title="Studio Availability & Brief Acceptance">
-        <span class="status-pulse-dot"></span>
-        <span id="studioLiveStatusText">Studio Online • Accepting Briefs & Concept Commissions</span>
-      </div>
-    </div>
-
-<div id="artworkCurtain">
+    <div id="artworkCurtain">
       <div id="showcaseGrid"></div>
     </div>
 
@@ -2613,36 +2576,15 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.4.5"></script>
-  <script src="core.js?v=26.4.5"></script>
-  <script src="gallery.js?v=26.4.5"></script>
-  <script src="portal.js?v=26.4.5"></script>
-  <script src="admin.js?v=26.4.5"></script>
-  <script src="translate.js?v=26.4.5"></script>
+  <script src="data.js?v=26.5.0"></script>
+  <script src="core.js?v=26.5.0"></script>
+  <script src="gallery.js?v=26.5.0"></script>
+  <script src="portal.js?v=26.5.0"></script>
+  <script src="admin.js?v=26.5.0"></script>
+  <script src="translate.js?v=26.5.0"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
-  <div id="mobileBottomNav">
-    <button onclick="switchView('showcase')" data-view-target="showcase" class="mob-nav-btn active">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-      <span>Showcase</span>
-    </button>
-    <button onclick="switchView('store')" data-view-target="store" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
-      <span>Atelier</span>
-    </button>
-    <button onclick="switchView('genesis')" data-view-target="genesis" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
-      <span>Genesis</span>
-    </button>
-    <button onclick="switchView('academy')" data-view-target="academy" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342"/></svg>
-      <span>Academy</span>
-    </button>
-    <button onclick="handleMembersIconClick()" data-view-target="member-dashboard" class="mob-nav-btn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-      <span>Portal</span>
-    </button>
-  </div>
+  
 
 
 

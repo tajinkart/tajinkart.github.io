@@ -1,3 +1,117 @@
+
+// ==============================================================================
+// UNIFIED BRAND PILL & SINGLE-TRIGGER DROPDOWN (v26.5.0)
+// ==============================================================================
+
+window.toggleBrandFilterDropdown = function(e) {
+  if (e) e.stopPropagation();
+  const dropdown = document.getElementById('brandFilterUnifiedDropdown');
+  const trigger = document.getElementById('brandFilterMasterTrigger');
+  if (!dropdown) return;
+
+  const willOpen = dropdown.classList.contains('hidden');
+  if (willOpen) {
+    window.renderUnifiedFilterPills();
+    dropdown.classList.remove('hidden');
+    if (trigger) trigger.classList.add('active');
+  } else {
+    dropdown.classList.add('hidden');
+    if (trigger) trigger.classList.remove('active');
+  }
+};
+
+window.closeBrandFilterDropdown = function() {
+  const dropdown = document.getElementById('brandFilterUnifiedDropdown');
+  const trigger = document.getElementById('brandFilterMasterTrigger');
+  if (dropdown) dropdown.classList.add('hidden');
+  if (trigger) trigger.classList.remove('active');
+};
+
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('brandFilterUnifiedDropdown');
+  const trigger = document.getElementById('brandFilterMasterTrigger');
+  if (dropdown && !dropdown.classList.contains('hidden')) {
+    if (!dropdown.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
+      window.closeBrandFilterDropdown();
+    }
+  }
+});
+
+window.renderUnifiedFilterPills = function() {
+  // ۱. رندر پیل‌های ژانر
+  const genreContainer = document.getElementById('unifiedGenrePillsContainer');
+  if (genreContainer) {
+    const isAll = (currentGalleryGenreFilter === 'all');
+    let gHtml = `
+      <button type="button" class="unified-filter-pill ${isAll ? 'active' : ''}" onclick="applyUnifiedGenreFilter('all', this)">
+        <span>All Genres</span>
+      </button>
+    `;
+    const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0) ? studioGenres : DEFAULT_STUDIO_GENRES;
+    genres.forEach(g => {
+      const isActive = (currentGalleryGenreFilter === g);
+      gHtml += `
+        <button type="button" class="unified-filter-pill ${isActive ? 'active' : ''}" onclick="applyUnifiedGenreFilter('${g}', this)">
+          <span>${g}</span>
+        </button>
+      `;
+    });
+    genreContainer.innerHTML = gHtml;
+  }
+
+  // ۲. رندر پیل‌های دسته‌بندی با رنگ نئون اختصاصی
+  const catContainer = document.getElementById('unifiedCategoryPillsContainer');
+  if (catContainer) {
+    const isAllCat = (currentGalleryFilter === 'all');
+    let cHtml = `
+      <button type="button" class="unified-filter-pill ${isAllCat ? 'active' : ''}" onclick="applyUnifiedCategoryFilter('all', this)">
+        <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
+        <span>All Artworks</span>
+      </button>
+    `;
+
+    const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+      ? galleryCategories
+      : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+
+    cats.forEach(c => {
+      const isActive = (currentGalleryFilter === c.id);
+      const color = c.color || '#38bdf8';
+      const title = c.titleEN || c.title || c.id;
+      cHtml += `
+        <button type="button" class="unified-filter-pill ${isActive ? 'active' : ''}" onclick="applyUnifiedCategoryFilter('${c.id}', this)" style="${isActive ? `border-color:${color}; background:${color}33;` : ''}">
+          <span style="width:6px; height:6px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color};"></span>
+          <span>${title}</span>
+        </button>
+      `;
+    });
+    catContainer.innerHTML = cHtml;
+  }
+
+  // نشانگر فعال بودن فیلتر روی دکمه برند
+  const indicator = document.getElementById('brandFilterIndicator');
+  if (indicator) {
+    const hasFilter = (currentGalleryGenreFilter !== 'all' || currentGalleryFilter !== 'all');
+    indicator.style.display = hasFilter ? 'inline-block' : 'none';
+  }
+};
+
+window.applyUnifiedGenreFilter = function(genre, btn) {
+  filterGalleryByGenre(genre);
+  window.renderUnifiedFilterPills();
+};
+
+window.applyUnifiedCategoryFilter = function(catId, btn) {
+  const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+    ? galleryCategories
+    : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+  const found = cats.find(c => c.id === catId);
+  const title = found ? (found.titleEN || found.title || found.id) : (catId === 'all' ? 'All Artworks' : catId);
+  filterGalleryByCategory(catId, title);
+  window.renderUnifiedFilterPills();
+};
+
+
 // ==============================================================================
 // TAJINKART STUDIO — GALLERY & SHOWCASE MODULE (gallery.js)
 // Showcase Grid, Categories & Genres Filters, Case Study Lightbox, Zoom
@@ -1207,7 +1321,13 @@ window.syncArtworksFromSupabase = async function() {
         .map(row => {
           const pipe = row.pipeline_key || 'sketch1';
           const mappedCat = row.category || row.tag || pipeMap[pipe] || 'character';
+          const phases = Array.isArray(row.phases) ? row.phases : [];
+          const primaryP = phases[0] || {};
+          const stage = row.stage || primaryP.stage || 'render';
+          const complexity = row.complexity || primaryP.complexity || 'moderate';
           return {
+            stage: stage,
+            complexity: complexity,
             id: Number(row.id),
             orderIndex: (row.order_index !== undefined && row.order_index !== null) ? Number(row.order_index) : undefined,
             tag: mappedCat,
