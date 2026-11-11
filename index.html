@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.5.4">
+  <link rel="stylesheet" href="style.css?v=26.5.5">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -164,41 +164,46 @@
   <section id="view-showcase" class="view-section">
     <!-- ۱. نشان شناور برند در بالا-چپ: تاجین‌کارت | آل ژانر | آل آرت‌ورک (منحصراً در صفحه اول گالری) -->
     <div id="topCenterBrandBar">
-      <!-- تک دکمه لوکس و فشرده برند و فیلترها (متقارن با دکمه سه‌خط سمت راست) -->
-      <button id="brandFilterMasterTrigger" type="button" onclick="toggleBrandFilterDropdown(event)" class="top-center-pill brand-master-pill" title="Filter Showcase by Genre & Category">
+      <!-- ۱. دکمه اصلی برند تاجین‌کارت (Trigger) -->
+      <button id="brandFilterMasterTrigger" type="button" onclick="toggleBrandFilterToolbar(event)" class="top-center-pill brand-master-pill" title="Open Studio Filters">
         <span class="brand-crest-icon">✦</span>
         <span class="brand-name-text">TAJINKART</span>
         <span class="brand-filter-indicator" id="brandFilterIndicator" style="display:none;"></span>
         <span class="brand-chevron-icon" id="brandChevronIcon">▾</span>
       </button>
 
-      <!-- پنجره بازشوی یکپارچه و ارگونومیک انتخاب ژانر و دسته‌بندی -->
-      <div id="brandFilterUnifiedDropdown" class="brand-unified-dropdown hidden" onclick="event.stopPropagation()">
+      <!-- ۲. نوار دو دکمه جداگانه که با زدن تاجین‌کارت باز می‌شود -->
+      <div id="brandFilterSubToolbar" class="brand-sub-toolbar hidden" onclick="event.stopPropagation()">
         
-        <!-- ۱. ژانرها -->
-        <div class="dropdown-filter-section">
-          <div class="dropdown-filter-header">
-            <span style="color:var(--cyan-electric); font-size:11px; font-weight:800; letter-spacing:0.05em; font-family:'JetBrains Mono', monospace;">🌌 UNIVERSE GENRE</span>
-          </div>
-          <div class="dropdown-pill-grid" id="unifiedGenrePillsContainer"></div>
-        </div>
-
-        <div class="dropdown-filter-divider"></div>
-
-        <!-- ۲. دسته‌بندی‌ها و پایپ‌لاین‌ها -->
-        <div class="dropdown-filter-section">
-          <div class="dropdown-filter-header">
-            <span style="color:var(--gold); font-size:11px; font-weight:800; letter-spacing:0.05em; font-family:'JetBrains Mono', monospace;">📂 ATELIER CATEGORY</span>
-          </div>
-          <div class="dropdown-pill-grid" id="unifiedCategoryPillsContainer"></div>
-        </div>
-
-        <div class="dropdown-filter-footer">
-          <button type="button" onclick="resetGalleryFilters(); closeBrandFilterDropdown();" class="btn-reset-unified-filters">
-            <span>🔄</span>
-            <span>Reset All Filters</span>
+        <!-- دکمه ۱: یونیورس و ژانر -->
+        <div class="filter-pill-menu-wrapper">
+          <button id="btnFilterGenreTrigger" type="button" onclick="toggleIndividualFilterDropdown('genre', event)" class="brand-sub-pill" title="Filter Universe Genre">
+            <span style="font-size:12px;">🌌</span>
+            <span id="brandGenrePillLabel">All Genres</span>
+            <span class="sub-pill-arrow" id="genreSubArrow">▾</span>
           </button>
+          <div id="dropdownMenuGenre" class="individual-filter-dropdown hidden" onclick="event.stopPropagation()">
+            <!-- Generated Genre Items -->
+          </div>
         </div>
+
+        <!-- دکمه ۲: کتگوری و پایپ‌لاین -->
+        <div class="filter-pill-menu-wrapper">
+          <button id="btnFilterCategoryTrigger" type="button" onclick="toggleIndividualFilterDropdown('category', event)" class="brand-sub-pill" title="Filter Atelier Category">
+            <span id="brandCatPillDot" style="width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
+            <span id="brandCategoryPillLabel">All Artworks</span>
+            <span class="sub-pill-arrow" id="catSubArrow">▾</span>
+          </button>
+          <div id="dropdownMenuCategory" class="individual-filter-dropdown hidden" onclick="event.stopPropagation()">
+            <!-- Generated Category Items -->
+          </div>
+        </div>
+
+        <!-- دکمه ریست سریع -->
+        <button id="btnResetFiltersInline" type="button" onclick="resetGalleryFilters();" class="brand-sub-pill reset-pill" title="Reset All Filters">
+          <span>✕</span>
+        </button>
+
       </div>
     </div>
 
@@ -2576,12 +2581,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.5.4"></script>
-  <script src="core.js?v=26.5.4"></script>
-  <script src="gallery.js?v=26.5.4"></script>
-  <script src="portal.js?v=26.5.4"></script>
-  <script src="admin.js?v=26.5.4"></script>
-  <script src="translate.js?v=26.5.4"></script>
+  <script src="data.js?v=26.5.5"></script>
+  <script src="core.js?v=26.5.5"></script>
+  <script src="gallery.js?v=26.5.5"></script>
+  <script src="portal.js?v=26.5.5"></script>
+  <script src="admin.js?v=26.5.5"></script>
+  <script src="translate.js?v=26.5.5"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   
