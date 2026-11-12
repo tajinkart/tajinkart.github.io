@@ -1,5 +1,108 @@
 
 // ==============================================================================
+// DESKTOP 2-IN-1 UNIFIED DROPDOWN LOGIC (v26.6.2)
+// ==============================================================================
+window.toggleDesktopUnifiedDropdown = function(e) {
+  if (e) e.stopPropagation();
+  const dropdown = document.getElementById('desktopBrandUnifiedDropdown');
+  const trigger = document.getElementById('desktopBrandMasterTrigger');
+  if (!dropdown) return;
+
+  const willOpen = dropdown.classList.contains('hidden');
+  if (willOpen) {
+    window.renderDesktopUnifiedPills();
+    dropdown.classList.remove('hidden');
+    if (trigger) trigger.classList.add('active');
+  } else {
+    dropdown.classList.add('hidden');
+    if (trigger) trigger.classList.remove('active');
+  }
+};
+
+window.closeDesktopUnifiedDropdown = function() {
+  const dropdown = document.getElementById('desktopBrandUnifiedDropdown');
+  const trigger = document.getElementById('desktopBrandMasterTrigger');
+  if (dropdown) dropdown.classList.add('hidden');
+  if (trigger) trigger.classList.remove('active');
+};
+
+document.addEventListener('click', function(e) {
+  const desktopBar = document.querySelector('.desktop-unified-brand-bar');
+  if (desktopBar && !desktopBar.contains(e.target)) {
+    window.closeDesktopUnifiedDropdown();
+  }
+});
+
+window.renderDesktopUnifiedPills = function() {
+  const genreBox = document.getElementById('desktopUnifiedGenrePills');
+  if (genreBox) {
+    const isAll = (currentGalleryGenreFilter === 'all');
+    let gHtml = `
+      <button type="button" class="unified-filter-pill ${isAll ? 'active' : ''}" onclick="applyDesktopUnifiedGenre('all', event)">
+        <span>All Genres</span>
+      </button>
+    `;
+    const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0) ? studioGenres : DEFAULT_STUDIO_GENRES;
+    genres.forEach(g => {
+      const isActive = (currentGalleryGenreFilter === g);
+      gHtml += `
+        <button type="button" class="unified-filter-pill ${isActive ? 'active' : ''}" onclick="applyDesktopUnifiedGenre('${g}', event)">
+          <span>${g}</span>
+        </button>
+      `;
+    });
+    genreBox.innerHTML = gHtml;
+  }
+
+  const catBox = document.getElementById('desktopUnifiedCategoryPills');
+  if (catBox) {
+    const isAllCat = (currentGalleryFilter === 'all');
+    let cHtml = `
+      <button type="button" class="unified-filter-pill ${isAllCat ? 'active' : ''}" onclick="applyDesktopUnifiedCategory('all', 'All Artworks', event)">
+        <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
+        <span>All Artworks</span>
+      </button>
+    `;
+    const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+      ? galleryCategories
+      : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+
+    cats.forEach(c => {
+      const isActive = (currentGalleryFilter === c.id);
+      const color = c.color || '#38bdf8';
+      const title = c.titleEN || c.title || c.id;
+      cHtml += `
+        <button type="button" class="unified-filter-pill ${isActive ? 'active' : ''}" onclick="applyDesktopUnifiedCategory('${c.id}', '${title}', event)" style="${isActive ? `border-color:${color}; background:${color}33;` : ''}">
+          <span style="width:6px; height:6px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color};"></span>
+          <span>${title}</span>
+        </button>
+      `;
+    });
+    catBox.innerHTML = cHtml;
+  }
+
+  const ind = document.getElementById('desktopBrandFilterIndicator');
+  if (ind) {
+    const hasFilter = (currentGalleryGenreFilter !== 'all' || currentGalleryFilter !== 'all');
+    ind.style.display = hasFilter ? 'inline-block' : 'none';
+  }
+};
+
+window.applyDesktopUnifiedGenre = function(g, e) {
+  if (e) e.stopPropagation();
+  filterGalleryByGenre(g);
+  window.renderDesktopUnifiedPills();
+};
+
+window.applyDesktopUnifiedCategory = function(catId, title, e) {
+  if (e) e.stopPropagation();
+  filterGalleryByCategory(catId, title);
+  window.renderDesktopUnifiedPills();
+};
+
+
+
+// ==============================================================================
 // MOBILE VERTICAL BRAND & FILTER CONTROLLER (v26.6.0)
 // رفتار هوشمند: در صفحات دیگر دکمه خانه است، در صفحه اول منوی عمودی باز می‌کند
 // ==============================================================================
@@ -153,12 +256,24 @@ window.renderMobileFilterDrawers = function() {
 window.selectMobileGenre = function(g, e) {
   if (e) e.stopPropagation();
   filterGalleryByGenre(g);
+  const txt = document.getElementById('mobileGenrePillText');
+  if (txt) txt.textContent = (g === 'all') ? 'All Genres' : g;
   window.closeMobileFilterDrawers();
 };
 
 window.selectMobileCategory = function(catId, title, e) {
   if (e) e.stopPropagation();
   filterGalleryByCategory(catId, title);
+  const txt = document.getElementById('mobileCategoryPillText');
+  if (txt) txt.textContent = title;
+  const dot = document.getElementById('mobileCatPillDot');
+  if (dot) {
+    const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) ? galleryCategories : [];
+    const found = cats.find(c => c.id === catId);
+    const col = found ? (found.color || '#facc15') : '#facc15';
+    dot.style.background = col;
+    dot.style.boxShadow = '0 0 6px ' + col;
+  }
   window.closeMobileFilterDrawers();
 };
 

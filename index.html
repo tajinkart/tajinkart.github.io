@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.1">
+  <link rel="stylesheet" href="style.css?v=26.6.2">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -163,46 +163,58 @@
   <!-- بخش ۰: صفحه اول با ترنزیشن نرم سبک ZEN -->
   <div id="topCenterBrandBar">
       
-      <!-- حالت دسکتاپ: فرمت شیک و گسترده قبلی بدون دستکاری -->
-      <div class="desktop-brand-pill-bar">
-        <button onclick="switchView('showcase')" class="top-center-pill" title="Home / Showcase">
+      <!-- ۱. نسخه دسکتاپ: تک دکمه لوکس برند با پنجره یکپارچه و یکدست فیلترها -->
+      <div class="desktop-unified-brand-bar">
+        <button id="desktopBrandMasterTrigger" type="button" onclick="toggleDesktopUnifiedDropdown(event)" class="top-center-pill brand-master-pill" title="Filter Showcase by Genre & Category">
           <span class="brand-crest-icon">✦</span>
-          <span>TAJINKART</span>
+          <span class="brand-name-text">TAJINKART</span>
+          <span class="brand-filter-indicator" id="desktopBrandFilterIndicator" style="display:none;"></span>
+          <span class="brand-chevron-icon" id="desktopBrandChevron">▾</span>
         </button>
 
-        <!-- فهرست ژانرها در دسکتاپ -->
-        <div id="floatingGalleryGenreMenu" class="floating-cat-menu-wrapper">
-          <button type="button" onclick="toggleGenreFilterMenu(event)" class="floating-cat-pill" id="currentGenrePillBtn" title="Filter Artworks by Genre">
-            <span id="currentGenrePillLabel">All Genres</span>
-            <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-          </button>
-          <div id="genreFilterDropdown" class="floating-cat-dropdown hidden"></div>
-        </div>
+        <div id="desktopBrandUnifiedDropdown" class="brand-unified-dropdown hidden" onclick="event.stopPropagation()">
+          <div class="dropdown-filter-section">
+            <div class="dropdown-filter-header">
+              <span style="color:var(--cyan-electric); font-size:11px; font-weight:800; letter-spacing:0.05em; font-family:'JetBrains Mono', monospace;">🌌 UNIVERSE GENRE</span>
+            </div>
+            <div class="dropdown-pill-grid" id="desktopUnifiedGenrePills"></div>
+          </div>
 
-        <!-- فهرست دسته‌بندی‌ها در دسکتاپ -->
-        <div id="floatingGalleryCategoryMenu" class="floating-cat-menu-wrapper">
-          <button type="button" onclick="toggleCategoryFilterMenu(event)" class="floating-cat-pill" id="currentCategoryPillBtn" title="Filter Artworks by Category">
-            <span id="currentCategoryPillLabel">All Artworks</span>
-            <span style="font-size:8px; opacity:0.75; margin-left:4px;">▼</span>
-          </button>
-          <div id="categoryFilterDropdown" class="floating-cat-dropdown hidden"></div>
+          <div class="dropdown-filter-divider"></div>
+
+          <div class="dropdown-filter-section">
+            <div class="dropdown-filter-header">
+              <span style="color:var(--gold); font-size:11px; font-weight:800; letter-spacing:0.05em; font-family:'JetBrains Mono', monospace;">📂 ATELIER CATEGORY</span>
+            </div>
+            <div class="dropdown-pill-grid" id="desktopUnifiedCategoryPills"></div>
+          </div>
+
+          <div class="dropdown-filter-footer">
+            <button type="button" onclick="resetGalleryFilters(); closeDesktopUnifiedDropdown();" class="btn-reset-unified-filters">
+              <span>🔄</span>
+              <span>Reset All Filters</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- حالت موبایل: تک‌آیکون ظریف و ارگونومیک ۳۶px با بازشدن عمودی زیرشاخه ها -->
+      <!-- ۲. نسخه موبایل: تک دکمه متنی+ستاره ✦ TAJINKART که در صفحه اول عمودی باز می‌شود و در بقیه صفحات دکمه خانه است -->
       <div class="mobile-vertical-brand-controller">
-        <!-- آیکون ۱ (بالا): نشان برند تاجین‌کارت (۳۶px) -->
-        <button id="mobileMasterBrandIconBtn" type="button" onclick="handleMobileBrandMasterClick(event)" class="mobile-brand-icon-btn" title="TAJINKART • Home & Filters">
-          <span class="mobile-icon-glyph">✦</span>
+        <button id="mobileMasterBrandIconBtn" type="button" onclick="handleMobileBrandMasterClick(event)" class="top-center-pill mobile-brand-text-pill" title="TAJINKART • Home & Filters">
+          <span class="brand-crest-icon">✦</span>
+          <span class="brand-name-text">TAJINKART</span>
+          <span class="brand-chevron-icon mobile-only-chevron" id="mobileMasterChevron">▾</span>
         </button>
 
-        <!-- دو آیکون عمودی زیر دکمه اصلی (فقط در صفحه اول باز می‌شوند) -->
+        <!-- زیرشاخه عمودی فقط در صفحه اول گالری -->
         <div id="mobileVerticalFilterStack" class="mobile-vertical-stack hidden" onclick="event.stopPropagation()">
           
-          <!-- آیکون ۲: یونیورس و ژانرها -->
+          <!-- پیل عمودی اول: ژانر -->
           <div class="mobile-vertical-item-wrap">
-            <button id="mobileBtnGenreIcon" type="button" onclick="toggleMobileSubDropdown('genre', event)" class="mobile-sub-icon-btn" title="Filter Universe Genre">
+            <button id="mobileBtnGenreIcon" type="button" onclick="toggleMobileSubDropdown('genre', event)" class="floating-cat-pill mobile-sub-text-pill">
               <span>🌌</span>
+              <span id="mobileGenrePillText">All Genres</span>
+              <span style="font-size:9px; opacity:0.75;">▾</span>
             </button>
             <div id="mobileGenreDropdownMenu" class="mobile-filter-drawer hidden" onclick="event.stopPropagation()">
               <div class="mobile-drawer-header">🌌 Universe Genre</div>
@@ -210,10 +222,12 @@
             </div>
           </div>
 
-          <!-- آیکون ۳: کتگوری و پایپ‌لاین‌ها -->
+          <!-- پیل عمودی دوم: کتگوری -->
           <div class="mobile-vertical-item-wrap">
-            <button id="mobileBtnCategoryIcon" type="button" onclick="toggleMobileSubDropdown('category', event)" class="mobile-sub-icon-btn" title="Filter Atelier Category">
-              <span>📂</span>
+            <button id="mobileBtnCategoryIcon" type="button" onclick="toggleMobileSubDropdown('category', event)" class="floating-cat-pill mobile-sub-text-pill">
+              <span id="mobileCatPillDot" style="width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
+              <span id="mobileCategoryPillText">All Artworks</span>
+              <span style="font-size:9px; opacity:0.75;">▾</span>
             </button>
             <div id="mobileCategoryDropdownMenu" class="mobile-filter-drawer hidden" onclick="event.stopPropagation()">
               <div class="mobile-drawer-header">📂 Atelier Category</div>
@@ -226,9 +240,6 @@
 
     </div>
 
-    
-  <section id="view-showcase" class="view-section">
-    <!-- ۱. نشان شناور برند و فیلترها (دسکتاپ پیلی افقی، موبایل تک‌آیکون عمودی ۳۶px) -->
     <!-- بنر اصلی هیرو استودیو با تایتل بزرگ متحرک و شعارهای لایو (بازگردانی قطعی) -->
     <div id="stickyBrandHero">
       <div id="brandCrestContainer" class="brand-crest-wrapper" style="display:none;">
@@ -2619,12 +2630,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.1"></script>
-  <script src="core.js?v=26.6.1"></script>
-  <script src="gallery.js?v=26.6.1"></script>
-  <script src="portal.js?v=26.6.1"></script>
-  <script src="admin.js?v=26.6.1"></script>
-  <script src="translate.js?v=26.6.1"></script>
+  <script src="data.js?v=26.6.2"></script>
+  <script src="core.js?v=26.6.2"></script>
+  <script src="gallery.js?v=26.6.2"></script>
+  <script src="portal.js?v=26.6.2"></script>
+  <script src="admin.js?v=26.6.2"></script>
+  <script src="translate.js?v=26.6.2"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   
