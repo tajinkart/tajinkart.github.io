@@ -9024,3 +9024,146 @@ body {
   background: rgba(250, 204, 21, 0.15) !important;
   color: #fff !important;
 }
+
+
+/* ==============================================================================
+   RELEASE v26.6.1: RESTORE VERTICAL DESKTOP STACK & FIX MOBILE SUB-DRAWERS
+   ============================================================================== */
+
+/* ۱. دسکتاپ: چیدمان عمودی و کلاسیک برند و فیلترها (زیر هم، دقیقاً مثل مدل محبوب قبلی) */
+.desktop-brand-pill-bar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+}
+
+#topCenterBrandBar,
+#topCenterBrandBar.visible {
+  overflow: visible !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+/* منوهای کشویی دسکتاپ دقیقاً زیر هر پیل باز شوند */
+#floatingGalleryGenreMenu,
+#floatingGalleryCategoryMenu {
+  position: relative !important;
+  display: block !important;
+  margin: 0 !important;
+}
+
+#genreFilterDropdown,
+#categoryFilterDropdown {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  left: 0 !important;
+  z-index: 10020 !important;
+}
+
+/* ۲. موبایل: بازشدن عمودی آیکون‌ها و نمایش قطعی ساب‌پنل‌ها بدون بریدگی */
+@media (max-width: 768px) {
+  .desktop-brand-pill-bar {
+    display: none !important;
+  }
+
+  /* در موبایل همیشه دکمه خانه/برند در بالا-چپ قابل دسترس و بدون overflow باشد */
+  #topCenterBrandBar,
+  #topCenterBrandBar.visible,
+  body[data-view="showcase"] #topCenterBrandBar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    position: fixed !important;
+    top: 12px !important;
+    left: 12px !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    z-index: 10010 !important;
+  }
+
+  /* در صفحات دیگر به جز گالری، در موبایل هم آیکون ✦ نمایش داده شود تا با کلیک به گالری برگردد */
+  body:not([data-view="showcase"]) #topCenterBrandBar {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .mobile-vertical-brand-controller {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
+  }
+
+  .mobile-vertical-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+    overflow: visible !important;
+  }
+
+  .mobile-vertical-stack.hidden {
+    display: none !important;
+  }
+
+  .mobile-vertical-item-wrap {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  /* تضمین نمایش قطعی ساب‌پنل‌های موبایل کنار آیکون‌های عمودی */
+  .mobile-filter-drawer {
+    position: fixed !important;
+    left: 58px !important;
+    top: 58px !important;
+    width: 235px !important;
+    max-width: calc(100vw - 74px) !important;
+    max-height: 68vh !important;
+    overflow-y: auto !important;
+    background: #05070e !important;
+    border: 1.5px solid rgba(250, 204, 21, 0.45) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.96), 0 0 28px rgba(250, 204, 21, 0.22) !important;
+    padding: 10px !important;
+    z-index: 10050 !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .mobile-filter-drawer.hidden {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  #mobileCategoryDropdownMenu.mobile-filter-drawer {
+    top: 102px !important;
+  }
+}
+
+
+/* در صفحات غیر از گالری: دسکتاپ پنهان بماند، ولی در موبایل آیکون ✦ برای بازگشت سریع به گالری فعال باشد */
+@media (min-width: 769px) {
+  body:not([data-view="showcase"]) #topCenterBrandBar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body:not([data-view="showcase"]) #mobileVerticalFilterStack {
+    display: none !important;
+  }
+}
