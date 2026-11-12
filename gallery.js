@@ -830,33 +830,24 @@ window.renderShowcaseGrid = function() {
 
   // چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی
   const workCount = filteredArtworks.length;
-    if (window.innerWidth > 1024) {
-    // کامپیوتر: ۵ ستون متوازن و عریض
-    if (workCount === 1) {
-      grid.style.setProperty('column-count', '1', 'important');
-      grid.style.setProperty('max-width', '720px', 'important');
-    } else if (workCount === 2) {
-      grid.style.setProperty('column-count', '2', 'important');
-      grid.style.setProperty('max-width', '980px', 'important');
-    } else if (workCount === 3) {
-      grid.style.setProperty('column-count', '3', 'important');
-      grid.style.setProperty('max-width', '1240px', 'important');
-    } else if (workCount === 4) {
-      grid.style.setProperty('column-count', '4', 'important');
-      grid.style.setProperty('max-width', '1520px', 'important');
-    } else {
-      grid.style.setProperty('column-count', '5', 'important');
-      grid.style.setProperty('max-width', '1780px', 'important');
-    }
+    // تعیین تعداد ستون‌های افقی دقیق بر اساس عرض صفحه (کامپیوتر ۵، تبلت ۳، گوشی ۲)
+  let numCols = 5;
+  if (window.innerWidth > 1024) {
+    numCols = Math.min(5, Math.max(1, workCount));
+    grid.style.setProperty('max-width', workCount === 1 ? '680px' : (workCount === 2 ? '960px' : (workCount === 3 ? '1240px' : (workCount === 4 ? '1520px' : '1780px'))), 'important');
   } else if (window.innerWidth > 768) {
-    // تبلت: ۳ ستون
-    grid.style.setProperty('column-count', Math.min(3, Math.max(1, workCount)), 'important');
+    numCols = Math.min(3, Math.max(1, workCount));
     grid.style.setProperty('max-width', '1100px', 'important');
   } else {
-    // گوشی: ۲ ستون متقارن
-    grid.style.setProperty('column-count', workCount === 1 ? '1' : '2', 'important');
+    numCols = workCount === 1 ? 1 : 2;
     grid.style.setProperty('max-width', '100%', 'important');
   }
+
+  // تبدیل شبکه به ستون‌های فلکس برای چیدمان افقی سطر-به-سطر (#1, #2, #3... از چپ به راست)
+  grid.style.setProperty('display', 'flex', 'important');
+  grid.style.setProperty('align-items', 'flex-start', 'important');
+  grid.style.setProperty('gap', window.innerWidth <= 768 ? '6px' : '10px', 'important');
+  grid.style.setProperty('column-count', 'unset', 'important');
 
   function hexToRgbaStr(hex, alpha) {
     if (!hex) return `rgba(250, 204, 21, ${alpha})`;
@@ -868,7 +859,9 @@ window.renderShowcaseGrid = function() {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-  grid.innerHTML = filteredArtworks.map((art) => {
+  const columnsHtml = Array.from({ length: numCols }, () => []);
+  filteredArtworks.forEach((art, artIdx) => {
+    const tileHtml = (function(art) {
     const spanClass = getAutoSpanClass(art);
     const richAlt = `${art.title} — Concept Art & Worldbuilding by TAJINKART Studio`;
     const defaultImg = art.image || art.img || '';
@@ -967,7 +960,14 @@ window.renderShowcaseGrid = function() {
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" onerror="this.onerror=null; this.style.minHeight='180px'; this.parentElement.classList.add('loaded');" />
       </div>
     `;
-  }).join('');
+
+    })(art);
+    columnsHtml[artIdx % numCols].push(tileHtml);
+  });
+
+  grid.innerHTML = columnsHtml.map(colItems => 
+    `<div class="masonry-flex-col" style="flex:1; min-width:0; display:flex; flex-direction:column; gap:${window.innerWidth <= 768 ? '6px' : '10px'};">${colItems.join('')}</div>`
+  ).join('');
 
   try {
     if (typeof window.syncAtelierWithGalleryArtworks === 'function') {
@@ -1635,8 +1635,12 @@ window.syncArtworksFromSupabase = async function() {
           };
         })
         .sort((a, b) => {
-          if (a.orderIndex !== undefined && b.orderIndex !== undefined) return a.orderIndex - b.orderIndex;
-          return b.id - a.id;
+          const hasA = (a.orderIndex !== undefined && a.orderIndex !== null);
+          const hasB = (b.orderIndex !== undefined && b.orderIndex !== null);
+          if (hasA && hasB) return Number(a.orderIndex) - Number(b.orderIndex);
+          if (hasA && !hasB) return 1; // آثار جدید بدون ایندکس در صدر قرار گیرند
+          if (!hasA && hasB) return -1;
+          return Number(b.id) - Number(a.id);
         });
 
       const currentList = window.showcaseArtworks || [];
@@ -1681,3 +1685,13 @@ if (document.readyState === 'loading') {
   if (typeof renderFloatingGenreDropdown === 'function') renderFloatingGenreDropdown();
   if (typeof renderFloatingCategoryDropdown === 'function') renderFloatingCategoryDropdown();
 }
+
+
+let lastMasonryCols = (window.innerWidth > 1024) ? 5 : (window.innerWidth > 768 ? 3 : 2);
+window.addEventListener('resize', () => {
+  const curCols = (window.innerWidth > 1024) ? 5 : (window.innerWidth > 768 ? 3 : 2);
+  if (curCols !== lastMasonryCols) {
+    lastMasonryCols = curCols;
+    if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
+  }
+}, { passive: true });

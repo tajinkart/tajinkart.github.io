@@ -9329,3 +9329,18 @@ body {
     pointer-events: auto !important;
   }
 }
+
+
+/* ==============================================================================
+   RELEASE v26.6.4: TRUE HORIZONTAL-FIRST MASONRY COLUMNS (SYNCED WITH ADMIN ORDER)
+   ============================================================================== */
+#showcaseGrid {
+  display: flex !important;
+  align-items: flex-start !important;
+  column-count: unset !important;
+}
+
+.masonry-flex-col .mosaic-tile {
+  margin-bottom: 0 !important;
+  width: 100% !important;
+}

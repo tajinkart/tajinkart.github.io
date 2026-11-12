@@ -1099,7 +1099,9 @@ window.confirmSaveArtwork = async function() {
 
       if (!Array.isArray(showcaseArtworks)) showcaseArtworks = [];
       showcaseArtworks.unshift(newArtRecord);
+      showcaseArtworks.forEach((a, i) => { a.orderIndex = i; });
       window.showcaseArtworks = showcaseArtworks;
+      if (typeof syncArtworkOrderToSupabase === 'function') syncArtworkOrderToSupabase();
 
       try {
         const artKey = (typeof KEYS !== 'undefined' && KEYS.ARTWORKS) ? KEYS.ARTWORKS : 'tajinkart_artworks_fa_v2';
