@@ -3,126 +3,73 @@
 // UNIFIED BRAND PILL & SINGLE-TRIGGER DROPDOWN (v26.5.0)
 // ==============================================================================
 
-
-// ==============================================================================
-// TAJINKART BRAND PILL WITH SEPARATE UNFOLDING SUB-PILLS (v26.5.5)
-// کلیک روی برند، دو دکمه مجزا برای ژانر و کتگوری باز می‌کند و هر کدام منوی اختصاصی دارد
-// ==============================================================================
-
-window.toggleBrandFilterToolbar = function(e) {
+window.toggleBrandFilterDropdown = function(e) {
   if (e) e.stopPropagation();
-  const toolbar = document.getElementById('brandFilterSubToolbar');
+  const dropdown = document.getElementById('brandFilterUnifiedDropdown');
   const trigger = document.getElementById('brandFilterMasterTrigger');
-  if (!toolbar) return;
+  if (!dropdown) return;
 
-  const willOpen = toolbar.classList.contains('hidden');
+  const willOpen = dropdown.classList.contains('hidden');
   if (willOpen) {
-    toolbar.classList.remove('hidden');
+    window.renderUnifiedFilterPills();
+    dropdown.classList.remove('hidden');
     if (trigger) trigger.classList.add('active');
-    window.renderIndividualFilterDropdowns();
   } else {
-    toolbar.classList.add('hidden');
+    dropdown.classList.add('hidden');
     if (trigger) trigger.classList.remove('active');
-    window.closeAllIndividualDropdowns();
   }
 };
 
-window.closeBrandFilterToolbar = function() {
-  const toolbar = document.getElementById('brandFilterSubToolbar');
+window.closeBrandFilterDropdown = function() {
+  const dropdown = document.getElementById('brandFilterUnifiedDropdown');
   const trigger = document.getElementById('brandFilterMasterTrigger');
-  if (toolbar) toolbar.classList.add('hidden');
+  if (dropdown) dropdown.classList.add('hidden');
   if (trigger) trigger.classList.remove('active');
-  window.closeAllIndividualDropdowns();
-};
-
-window.toggleIndividualFilterDropdown = function(type, e) {
-  if (e) e.stopPropagation();
-  const genreMenu = document.getElementById('dropdownMenuGenre');
-  const catMenu = document.getElementById('dropdownMenuCategory');
-  const genreBtn = document.getElementById('btnFilterGenreTrigger');
-  const catBtn = document.getElementById('btnFilterCategoryTrigger');
-
-  window.renderIndividualFilterDropdowns();
-
-  if (type === 'genre') {
-    if (catMenu) catMenu.classList.add('hidden');
-    if (catBtn) catBtn.classList.remove('active');
-    if (genreMenu) {
-      const isHidden = genreMenu.classList.contains('hidden');
-      genreMenu.classList.toggle('hidden', !isHidden);
-      if (genreBtn) genreBtn.classList.toggle('active', isHidden);
-    }
-  } else if (type === 'category') {
-    if (genreMenu) genreMenu.classList.add('hidden');
-    if (genreBtn) genreBtn.classList.remove('active');
-    if (catMenu) {
-      const isHidden = catMenu.classList.contains('hidden');
-      catMenu.classList.toggle('hidden', !isHidden);
-      if (catBtn) catBtn.classList.toggle('active', isHidden);
-    }
-  }
-};
-
-window.closeAllIndividualDropdowns = function() {
-  const genreMenu = document.getElementById('dropdownMenuGenre');
-  const catMenu = document.getElementById('dropdownMenuCategory');
-  const genreBtn = document.getElementById('btnFilterGenreTrigger');
-  const catBtn = document.getElementById('btnFilterCategoryTrigger');
-  if (genreMenu) genreMenu.classList.add('hidden');
-  if (catMenu) catMenu.classList.add('hidden');
-  if (genreBtn) genreBtn.classList.remove('active');
-  if (catBtn) catBtn.classList.remove('active');
 };
 
 document.addEventListener('click', function(e) {
-  const bar = document.getElementById('topCenterBrandBar');
-  if (bar && !bar.contains(e.target)) {
-    window.closeAllIndividualDropdowns();
+  const dropdown = document.getElementById('brandFilterUnifiedDropdown');
+  const trigger = document.getElementById('brandFilterMasterTrigger');
+  if (dropdown && !dropdown.classList.contains('hidden')) {
+    if (!dropdown.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
+      window.closeBrandFilterDropdown();
+    }
   }
 });
 
-// تاچ سریع روی موبایل بدون تاخیر
-document.addEventListener('touchstart', function(e) {
-  const bar = document.getElementById('topCenterBrandBar');
-  if (bar && !bar.contains(e.target)) {
-    window.closeAllIndividualDropdowns();
-  }
-}, { passive: true });
-
-window.renderIndividualFilterDropdowns = function() {
-  // ۱. رندر دراپ‌داون ژانر
-  const genreMenu = document.getElementById('dropdownMenuGenre');
-  if (genreMenu) {
+window.renderUnifiedFilterPills = function() {
+  // ۱. رندر پیل‌های ژانر
+  const genreContainer = document.getElementById('unifiedGenrePillsContainer');
+  if (genreContainer) {
     const isAll = (currentGalleryGenreFilter === 'all');
     let gHtml = `
-      <div class="indiv-dropdown-item ${isAll ? 'active' : ''}" onclick="selectIndividualGenre('all', 'All Genres', event)">
-        <span style="font-size:11px;">🌌</span>
+      <button type="button" class="unified-filter-pill ${isAll ? 'active' : ''}" onclick="applyUnifiedGenreFilter('all', this)">
         <span>All Genres</span>
-      </div>
+      </button>
     `;
     const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0) ? studioGenres : DEFAULT_STUDIO_GENRES;
     genres.forEach(g => {
       const isActive = (currentGalleryGenreFilter === g);
       gHtml += `
-        <div class="indiv-dropdown-item ${isActive ? 'active' : ''}" onclick="selectIndividualGenre('${g}', '${g}', event)">
-          <span style="width:6px; height:6px; border-radius:50%; background:var(--cyan-electric); box-shadow:0 0 6px var(--cyan-electric);"></span>
+        <button type="button" class="unified-filter-pill ${isActive ? 'active' : ''}" onclick="applyUnifiedGenreFilter('${g}', this)">
           <span>${g}</span>
-        </div>
+        </button>
       `;
     });
-    genreMenu.innerHTML = gHtml;
+    genreContainer.innerHTML = gHtml;
   }
 
-  // ۲. رندر دراپ‌داون دسته‌بندی
-  const catMenu = document.getElementById('dropdownMenuCategory');
-  if (catMenu) {
+  // ۲. رندر پیل‌های دسته‌بندی با رنگ نئون اختصاصی
+  const catContainer = document.getElementById('unifiedCategoryPillsContainer');
+  if (catContainer) {
     const isAllCat = (currentGalleryFilter === 'all');
     let cHtml = `
-      <div class="indiv-dropdown-item ${isAllCat ? 'active' : ''}" onclick="selectIndividualCategory('all', 'All Artworks', event)">
+      <button type="button" class="unified-filter-pill ${isAllCat ? 'active' : ''}" onclick="applyUnifiedCategoryFilter('all', this)">
         <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
         <span>All Artworks</span>
-      </div>
+      </button>
     `;
+
     const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
       ? galleryCategories
       : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
@@ -132,16 +79,16 @@ window.renderIndividualFilterDropdowns = function() {
       const color = c.color || '#38bdf8';
       const title = c.titleEN || c.title || c.id;
       cHtml += `
-        <div class="indiv-dropdown-item ${isActive ? 'active' : ''}" onclick="selectIndividualCategory('${c.id}', '${title}', event)">
-          <span style="width:7px; height:7px; border-radius:50%; background:${color}; box-shadow:0 0 8px ${color};"></span>
+        <button type="button" class="unified-filter-pill ${isActive ? 'active' : ''}" onclick="applyUnifiedCategoryFilter('${c.id}', this)" style="${isActive ? `border-color:${color}; background:${color}33;` : ''}">
+          <span style="width:6px; height:6px; border-radius:50%; background:${color}; box-shadow:0 0 6px ${color};"></span>
           <span>${title}</span>
-        </div>
+        </button>
       `;
     });
-    catMenu.innerHTML = cHtml;
+    catContainer.innerHTML = cHtml;
   }
 
-  // نشانگر روی تریگر برند
+  // نشانگر فعال بودن فیلتر روی دکمه برند
   const indicator = document.getElementById('brandFilterIndicator');
   if (indicator) {
     const hasFilter = (currentGalleryGenreFilter !== 'all' || currentGalleryFilter !== 'all');
@@ -149,29 +96,79 @@ window.renderIndividualFilterDropdowns = function() {
   }
 };
 
-window.selectIndividualGenre = function(genre, title, e) {
-  if (e) e.stopPropagation();
+window.applyUnifiedGenreFilter = function(genre, btn) {
   filterGalleryByGenre(genre);
-  const label = document.getElementById('brandGenrePillLabel');
-  if (label) label.textContent = genre === 'all' ? 'All Genres' : genre;
-  window.closeAllIndividualDropdowns();
+  window.renderUnifiedFilterPills();
 };
 
-window.selectIndividualCategory = function(catId, title, e) {
-  if (e) e.stopPropagation();
+window.applyUnifiedCategoryFilter = function(catId, btn) {
+  const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+    ? galleryCategories
+    : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+  const found = cats.find(c => c.id === catId);
+  const title = found ? (found.titleEN || found.title || found.id) : (catId === 'all' ? 'All Artworks' : catId);
   filterGalleryByCategory(catId, title);
-  const label = document.getElementById('brandCategoryPillLabel');
-  if (label) label.textContent = title;
-  const dot = document.getElementById('brandCatPillDot');
-  if (dot) {
-    const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories)) ? galleryCategories : [];
-    const found = cats.find(c => c.id === catId);
-    dot.style.background = found ? (found.color || 'var(--gold)') : 'var(--gold)';
-    dot.style.boxShadow = `0 0 6px ${dot.style.background}`;
-  }
-  window.closeAllIndividualDropdowns();
+  window.renderUnifiedFilterPills();
 };
 
+
+// ==============================================================================
+// TAJINKART STUDIO — GALLERY & SHOWCASE MODULE (gallery.js)
+// Showcase Grid, Categories & Genres Filters, Case Study Lightbox, Zoom
+// ==============================================================================
+
+var DEFAULT_STUDIO_GENRES = window.DEFAULT_STUDIO_GENRES || [
+  'Dark Fantasy',
+  'Cyberpunk',
+  'Sci-Fi',
+  'Mythic & Ancient',
+  'Post-Apocalyptic',
+  'Horror & Eldritch',
+  'High Fantasy',
+  'Steampunk',
+  'Mecha & Industrial',
+  'Anime & Stylized',
+  'Historical & Military'
+];
+
+var studioGenres = window.studioGenres || [];
+try {
+  studioGenres = JSON.parse(localStorage.getItem('tajinkart_studio_genres_v1')) || DEFAULT_STUDIO_GENRES;
+  if (!Array.isArray(studioGenres) || studioGenres.length === 0) studioGenres = DEFAULT_STUDIO_GENRES;
+} catch(e) {
+  studioGenres = DEFAULT_STUDIO_GENRES;
+}
+window.studioGenres = studioGenres;
+
+var SIX_PIPELINE_CATEGORIES = window.SIX_PIPELINE_CATEGORIES || [
+  { id: 'character', title: 'Character Design & Heroes', titleEN: 'Character Design & Heroes', color: '#facc15', pipeKey: 'sketch1' },
+  { id: 'creature', title: 'Creatures, Titans & Monsters', titleEN: 'Creatures, Titans & Monsters', color: '#10b981', pipeKey: 'sketch_creature' },
+  { id: 'environment', title: 'Environment, Worlds & Architecture', titleEN: 'Environment, Worlds & Architecture', color: '#38bdf8', pipeKey: 'sketch2' },
+  { id: 'keyframe', title: 'Cinematic Keyframes & Covers', titleEN: 'Cinematic Keyframes & Covers', color: '#f43f5e', pipeKey: 'sketch3' },
+  { id: 'props', title: 'Props, Weapons & Artifacts', titleEN: 'Props, Weapons & Artifacts', color: '#a855f7', pipeKey: 'sketch4' },
+  { id: 'comic', title: 'Comics, Manga & Sequential Art', titleEN: 'Comics, Manga & Sequential Art', color: '#fb923c', pipeKey: 'sketch5' }
+];
+
+var galleryCategories = window.galleryCategories || SIX_PIPELINE_CATEGORIES;
+try {
+  localStorage.setItem('tajinkart_gallery_categories_v1', JSON.stringify(SIX_PIPELINE_CATEGORIES));
+} catch(e) {}
+window.galleryCategories = SIX_PIPELINE_CATEGORIES;
+window.DEFAULT_GALLERY_CATEGORIES = SIX_PIPELINE_CATEGORIES;
+
+var PIPELINE_TO_CATEGORY_MAP = window.PIPELINE_TO_CATEGORY_MAP || {
+  'sketch1': 'character',
+  'sketch_creature': 'creature',
+  'sketch2': 'environment',
+  'sketch3': 'keyframe',
+  'sketch4': 'props',
+  'sketch5': 'comic'
+};
+window.PIPELINE_TO_CATEGORY_MAP = PIPELINE_TO_CATEGORY_MAP;
+
+let currentGalleryFilter = 'all';
+let currentGalleryGenreFilter = 'all';
+let currentGallerySearchQuery = '';
 
 window.renderFloatingGenreDropdown = function() {
   const dropdown = document.getElementById('genreFilterDropdown');
@@ -553,8 +550,7 @@ window.renderShowcaseGrid = function() {
 
   // چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی
   const workCount = filteredArtworks.length;
-  if (window.innerWidth > 1024) {
-    // کامپیوتر: ۵ ستون متوازن و عریض
+  if (window.innerWidth > 768) {
     if (workCount === 1) {
       grid.style.setProperty('column-count', '1', 'important');
       grid.style.setProperty('max-width', '720px', 'important');
@@ -564,21 +560,12 @@ window.renderShowcaseGrid = function() {
     } else if (workCount === 3) {
       grid.style.setProperty('column-count', '3', 'important');
       grid.style.setProperty('max-width', '1240px', 'important');
-    } else if (workCount === 4) {
-      grid.style.setProperty('column-count', '4', 'important');
-      grid.style.setProperty('max-width', '1520px', 'important');
     } else {
-      grid.style.setProperty('column-count', '5', 'important');
-      grid.style.setProperty('max-width', '1780px', 'important');
+      grid.style.setProperty('column-count', '4', 'important');
+      grid.style.setProperty('max-width', '1480px', 'important');
     }
-  } else if (window.innerWidth > 768) {
-    // تبلت: ۳ ستون
-    grid.style.setProperty('column-count', Math.min(3, Math.max(1, workCount)), 'important');
-    grid.style.setProperty('max-width', '1100px', 'important');
   } else {
-    // گوشی: ۲ ستون متقارن
     grid.style.setProperty('column-count', workCount === 1 ? '1' : '2', 'important');
-    grid.style.setProperty('max-width', '100%', 'important');
   }
 
   function hexToRgbaStr(hex, alpha) {
