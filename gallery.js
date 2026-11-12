@@ -1,5 +1,170 @@
 
 // ==============================================================================
+// MOBILE VERTICAL BRAND & FILTER CONTROLLER (v26.6.0)
+// رفتار هوشمند: در صفحات دیگر دکمه خانه است، در صفحه اول منوی عمودی باز می‌کند
+// ==============================================================================
+
+window.handleMobileBrandMasterClick = function(e) {
+  if (e) e.stopPropagation();
+  
+  // ۱. اگر در صفحه‌ای غیر از گالری هستیم، مستقیماً به صفحه اول بازگرد
+  if (typeof currentView !== 'undefined' && currentView !== 'showcase') {
+    if (typeof switchView === 'function') switchView('showcase');
+    window.closeMobileFilterDrawers();
+    const stack = document.getElementById('mobileVerticalFilterStack');
+    if (stack) stack.classList.add('hidden');
+    const btn = document.getElementById('mobileMasterBrandIconBtn');
+    if (btn) btn.classList.remove('active');
+    return;
+  }
+
+  // ۲. اگر در صفحه اول هستیم، باز و بسته شدن عمودی زیرشاخه‌ها
+  const stack = document.getElementById('mobileVerticalFilterStack');
+  const btn = document.getElementById('mobileMasterBrandIconBtn');
+  if (!stack) return;
+
+  const isHidden = stack.classList.contains('hidden');
+  if (isHidden) {
+    stack.classList.remove('hidden');
+    if (btn) btn.classList.add('active');
+    window.renderMobileFilterDrawers();
+  } else {
+    stack.classList.add('hidden');
+    if (btn) btn.classList.remove('active');
+    window.closeMobileFilterDrawers();
+  }
+};
+
+window.toggleMobileSubDropdown = function(type, e) {
+  if (e) e.stopPropagation();
+  const genreDrawer = document.getElementById('mobileGenreDropdownMenu');
+  const catDrawer = document.getElementById('mobileCategoryDropdownMenu');
+  const btnGenre = document.getElementById('mobileBtnGenreIcon');
+  const btnCat = document.getElementById('mobileBtnCategoryIcon');
+
+  window.renderMobileFilterDrawers();
+
+  if (type === 'genre') {
+    if (catDrawer) catDrawer.classList.add('hidden');
+    if (btnCat) btnCat.classList.remove('active');
+    if (genreDrawer) {
+      const isClosed = genreDrawer.classList.contains('hidden');
+      genreDrawer.classList.toggle('hidden', !isClosed);
+      if (btnGenre) btnGenre.classList.toggle('active', isClosed);
+    }
+  } else if (type === 'category') {
+    if (genreDrawer) genreDrawer.classList.add('hidden');
+    if (btnGenre) btnGenre.classList.remove('active');
+    if (catDrawer) {
+      const isClosed = catDrawer.classList.contains('hidden');
+      catDrawer.classList.toggle('hidden', !isClosed);
+      if (btnCat) btnCat.classList.toggle('active', isClosed);
+    }
+  }
+};
+
+window.closeMobileFilterDrawers = function() {
+  const genreDrawer = document.getElementById('mobileGenreDropdownMenu');
+  const catDrawer = document.getElementById('mobileCategoryDropdownMenu');
+  const btnGenre = document.getElementById('mobileBtnGenreIcon');
+  const btnCat = document.getElementById('mobileBtnCategoryIcon');
+  if (genreDrawer) genreDrawer.classList.add('hidden');
+  if (catDrawer) catDrawer.classList.add('hidden');
+  if (btnGenre) btnGenre.classList.remove('active');
+  if (btnCat) btnCat.classList.remove('active');
+};
+
+// بستن با تاچ یا کلیک خارج از منو
+document.addEventListener('click', function(e) {
+  const bar = document.getElementById('topCenterBrandBar');
+  if (bar && !bar.contains(e.target)) {
+    const stack = document.getElementById('mobileVerticalFilterStack');
+    const btn = document.getElementById('mobileMasterBrandIconBtn');
+    if (stack) stack.classList.add('hidden');
+    if (btn) btn.classList.remove('active');
+    window.closeMobileFilterDrawers();
+  }
+});
+
+document.addEventListener('touchstart', function(e) {
+  const bar = document.getElementById('topCenterBrandBar');
+  if (bar && !bar.contains(e.target)) {
+    const stack = document.getElementById('mobileVerticalFilterStack');
+    const btn = document.getElementById('mobileMasterBrandIconBtn');
+    if (stack) stack.classList.add('hidden');
+    if (btn) btn.classList.remove('active');
+    window.closeMobileFilterDrawers();
+  }
+}, { passive: true });
+
+window.renderMobileFilterDrawers = function() {
+  // ۱. رندر لیست ژانرها در موبایل
+  const genreList = document.getElementById('mobileGenreItemsList');
+  if (genreList) {
+    const isAll = (currentGalleryGenreFilter === 'all');
+    let gHtml = `
+      <div class="mobile-drawer-item ${isAll ? 'active' : ''}" onclick="selectMobileGenre('all', event)">
+        <span style="font-size:12px;">🌌</span>
+        <span>All Genres</span>
+      </div>
+    `;
+    const genres = (typeof studioGenres !== 'undefined' && Array.isArray(studioGenres) && studioGenres.length > 0) ? studioGenres : DEFAULT_STUDIO_GENRES;
+    genres.forEach(g => {
+      const isActive = (currentGalleryGenreFilter === g);
+      gHtml += `
+        <div class="mobile-drawer-item ${isActive ? 'active' : ''}" onclick="selectMobileGenre('${g}', event)">
+          <span style="width:6px; height:6px; border-radius:50%; background:var(--cyan-electric); box-shadow:0 0 6px var(--cyan-electric);"></span>
+          <span>${g}</span>
+        </div>
+      `;
+    });
+    genreList.innerHTML = gHtml;
+  }
+
+  // ۲. رندر لیست دسته‌بندی‌ها در موبایل
+  const catList = document.getElementById('mobileCategoryItemsList');
+  if (catList) {
+    const isAllCat = (currentGalleryFilter === 'all');
+    let cHtml = `
+      <div class="mobile-drawer-item ${isAllCat ? 'active' : ''}" onclick="selectMobileCategory('all', 'All Artworks', event)">
+        <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold);"></span>
+        <span>All Artworks</span>
+      </div>
+    `;
+    const cats = (typeof galleryCategories !== 'undefined' && Array.isArray(galleryCategories) && galleryCategories.length > 0)
+      ? galleryCategories
+      : (typeof SIX_PIPELINE_CATEGORIES !== 'undefined' ? SIX_PIPELINE_CATEGORIES : []);
+
+    cats.forEach(c => {
+      const isActive = (currentGalleryFilter === c.id);
+      const color = c.color || '#38bdf8';
+      const title = c.titleEN || c.title || c.id;
+      cHtml += `
+        <div class="mobile-drawer-item ${isActive ? 'active' : ''}" onclick="selectMobileCategory('${c.id}', '${title}', event)">
+          <span style="width:7px; height:7px; border-radius:50%; background:${color}; box-shadow:0 0 8px ${color};"></span>
+          <span>${title}</span>
+        </div>
+      `;
+    });
+    catList.innerHTML = cHtml;
+  }
+};
+
+window.selectMobileGenre = function(g, e) {
+  if (e) e.stopPropagation();
+  filterGalleryByGenre(g);
+  window.closeMobileFilterDrawers();
+};
+
+window.selectMobileCategory = function(catId, title, e) {
+  if (e) e.stopPropagation();
+  filterGalleryByCategory(catId, title);
+  window.closeMobileFilterDrawers();
+};
+
+
+
+// ==============================================================================
 // UNIFIED BRAND PILL & SINGLE-TRIGGER DROPDOWN (v26.5.0)
 // ==============================================================================
 
@@ -550,7 +715,8 @@ window.renderShowcaseGrid = function() {
 
   // چیدمان گالری نسبت به تعداد کارهای شاخه انتخابی
   const workCount = filteredArtworks.length;
-  if (window.innerWidth > 768) {
+    if (window.innerWidth > 1024) {
+    // کامپیوتر: ۵ ستون متوازن و عریض
     if (workCount === 1) {
       grid.style.setProperty('column-count', '1', 'important');
       grid.style.setProperty('max-width', '720px', 'important');
@@ -560,12 +726,21 @@ window.renderShowcaseGrid = function() {
     } else if (workCount === 3) {
       grid.style.setProperty('column-count', '3', 'important');
       grid.style.setProperty('max-width', '1240px', 'important');
-    } else {
+    } else if (workCount === 4) {
       grid.style.setProperty('column-count', '4', 'important');
-      grid.style.setProperty('max-width', '1480px', 'important');
+      grid.style.setProperty('max-width', '1520px', 'important');
+    } else {
+      grid.style.setProperty('column-count', '5', 'important');
+      grid.style.setProperty('max-width', '1780px', 'important');
     }
+  } else if (window.innerWidth > 768) {
+    // تبلت: ۳ ستون
+    grid.style.setProperty('column-count', Math.min(3, Math.max(1, workCount)), 'important');
+    grid.style.setProperty('max-width', '1100px', 'important');
   } else {
+    // گوشی: ۲ ستون متقارن
     grid.style.setProperty('column-count', workCount === 1 ? '1' : '2', 'important');
+    grid.style.setProperty('max-width', '100%', 'important');
   }
 
   function hexToRgbaStr(hex, alpha) {
