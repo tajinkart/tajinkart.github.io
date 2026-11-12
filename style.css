@@ -9298,3 +9298,34 @@ body {
     left: 0 !important;
   }
 }
+
+
+/* ==============================================================================
+   RELEASE v26.6.3: GUARANTEE DESKTOP BRAND BAR VISIBILITY ON SHOWCASE
+   ============================================================================== */
+@media (min-width: 769px) {
+  body[data-view="showcase"] #topCenterBrandBar,
+  body[data-view="showcase"] #topCenterBrandBar.visible {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    position: fixed !important;
+    top: 18px !important;
+    left: 20px !important;
+    right: auto !important;
+    bottom: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+    z-index: 10010 !important;
+  }
+
+  .desktop-unified-brand-bar {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
