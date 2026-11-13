@@ -114,7 +114,7 @@
       </div>
 
       <!-- ۴. Genesis Lore -->
-      <button id="dockGenesisBtn" onclick="handleGenesisClick(event)" class="right-exp-btn crimson-theme hidden" style="display:none !important;" title="Genesis Lore (Admin Only)">
+      <button onclick="handleGenesisClick(event)" class="right-exp-btn crimson-theme" title="Genesis Lore (Coming Soon)">
         <span class="right-exp-icon">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
@@ -130,7 +130,7 @@
       </button>
 
       <!-- ۵. Academy -->
-      <button id="dockAcademyBtn" onclick="handleAcademyClick(event)" class="right-exp-btn purple-theme hidden" style="display:none !important;" title="Academy (Admin Only)">
+      <button onclick="handleAcademyClick(event)" class="right-exp-btn purple-theme" title="Academy (Coming Soon)">
         <span class="right-exp-icon">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
@@ -908,7 +908,7 @@
   <!-- بخش ۶: پنل مدیریت ادمین کامل فارسی -->
   <section id="view-admin" class="view-section hidden" dir="ltr" lang="en">
     <div class="container">
-      <div id="adminLoginGate" style="max-width:440px; margin:50px auto; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.35); border-radius:20px; padding:30px 24px; text-align:center; box-shadow:0 15px 45px rgba(0,0,0,0.75);">
+      <div id="adminLoginGate" class="hidden" style="max-width:440px; margin:50px auto; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.35); border-radius:20px; padding:30px 24px; text-align:center; box-shadow:0 15px 45px rgba(0,0,0,0.75);">
         <div style="width:48px; height:48px; border-radius:14px; background:rgba(250,204,21,0.12); border:1px solid rgba(250,204,21,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">👑</div>
         <h2 style="font-size:18px; font-weight:900; color:var(--gold); margin-bottom:8px;">Studio Director Secure Access</h2>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px; line-height:1.7;">
@@ -920,14 +920,12 @@
         </button>
       </div>
 
-      <div id="adminWorkspace" class="hidden">
+      <div id="adminWorkspace">
         <div class="section-head" style="margin-bottom:20px;">
           <div>
             <h2 class="view-hero-title" style="margin:0;">Studio Command Console & Control Center</h2>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <button type="button" onclick="openDirectorSection('genesis')" class="btn-secondary" style="color:#fda4af; border-color:rgba(244,63,94,0.35); padding:8px 14px; cursor:pointer;" title="Open & Edit Genesis Lore (Director Only)">📖 Genesis Lore</button>
-            <button type="button" onclick="openDirectorSection('academy')" class="btn-secondary" style="color:#d8b4fe; border-color:rgba(168,85,247,0.35); padding:8px 14px; cursor:pointer;" title="Open & Edit Academy (Director Only)">🎓 Academy</button>
             <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="Lock Console & Sign Out">Lock Console</button>
           </div>
         </div>

@@ -8,14 +8,6 @@ window.isStudioDirectorAuthenticated = function() {
   return false;
 };
 
-window.openDirectorSection = function(vKey) {
-  if (!window.isStudioDirectorAuthenticated()) {
-    showToast('Restricted to Studio Director access from Admin Console.', 'error', 4000);
-    return;
-  }
-  if (typeof switchView === 'function') switchView(vKey);
-};
-
 window.isRecoveryFlowActive = false;
 // ==============================================================================
 // TAJINKART STUDIO — CORE ENGINE MODULE (core.js)
@@ -506,7 +498,7 @@ window.switchView = function(vKey) {
       dock.classList.remove('dock-collapsed');
     }
   } else {
-    // در تمام صفحات عمومی دیگر (فروشگاه، سوسایتی، داشبورد، جنسیس، آکادمی) آیکون تاجینکارت به عنوان دکمه هوم بدون زیرشاخه نمایش داده می‌شود
+    // در صفحات دیگر (فروشگاه، سوسایتی، داشبورد، جنسیس، آکادمی) آیکون تاجینکارت به عنوان دکمه هوم بدون زیرشاخه نمایش داده می‌شود (فقط در ادمین مخفی)
     if (topBar) {
       if (vKey === 'admin') {
         topBar.style.display = 'none';
