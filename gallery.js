@@ -4,6 +4,12 @@
 // ==============================================================================
 window.toggleDesktopUnifiedDropdown = function(e) {
   if (e) e.stopPropagation();
+  const activeView = document.body.getAttribute('data-view') || (typeof currentView !== 'undefined' ? currentView : 'showcase');
+  if (activeView !== 'showcase') {
+    window.closeDesktopUnifiedDropdown();
+    if (typeof switchView === 'function') switchView('showcase');
+    return;
+  }
   const dropdown = document.getElementById('desktopBrandUnifiedDropdown');
   const trigger = document.getElementById('desktopBrandMasterTrigger');
   if (!dropdown) return;
@@ -111,7 +117,8 @@ window.handleMobileBrandMasterClick = function(e) {
   if (e) e.stopPropagation();
   
   // ۱. اگر در صفحه‌ای غیر از گالری هستیم، مستقیماً به صفحه اول بازگرد
-  if (typeof currentView !== 'undefined' && currentView !== 'showcase') {
+  const activeView = document.body.getAttribute('data-view') || (typeof currentView !== 'undefined' ? currentView : 'showcase');
+  if (activeView !== 'showcase') {
     if (typeof switchView === 'function') switchView('showcase');
     window.closeMobileFilterDrawers();
     const stack = document.getElementById('mobileVerticalFilterStack');

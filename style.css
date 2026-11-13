@@ -9344,3 +9344,31 @@ body {
   margin-bottom: 0 !important;
   width: 100% !important;
 }
+
+
+/* ==============================================================================
+   HOME BUTTON OVERRIDE: Keep TAJINKART pill visible on Store, Society, Portal, etc.
+   acting purely as a Home button without submenus/chevrons (hidden only in Admin)
+   ============================================================================== */
+body:not([data-view="admin"]) #topCenterBrandBar,
+body:not([data-view="admin"]) #topCenterBrandBar.visible {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+body[data-view="admin"] #topCenterBrandBar {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body:not([data-view="showcase"]) #desktopBrandUnifiedDropdown,
+body:not([data-view="showcase"]) #desktopBrandChevron,
+body:not([data-view="showcase"]) #desktopBrandFilterIndicator,
+body:not([data-view="showcase"]) #mobileVerticalFilterStack,
+body:not([data-view="showcase"]) #mobileMasterChevron {
+  display: none !important;
+}

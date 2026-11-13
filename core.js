@@ -1,14 +1,19 @@
 
 window.isStudioDirectorAuthenticated = function() {
-  const adminWorkspace = document.getElementById('adminWorkspace');
-  if (adminWorkspace && !adminWorkspace.classList.contains('hidden')) return true;
-  if (document.body.getAttribute('data-view') === 'admin' || window.currentView === 'admin') return true;
   if (typeof currentMember !== 'undefined' && currentMember && currentMember.email) {
     if (typeof window.isDirectorEmail === 'function' && window.isDirectorEmail(currentMember.email)) return true;
+    if (currentMember.isDirector === true) return true;
   }
-  if (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn) return true;
-  if (sessionStorage.getItem('tajinkart_admin_unlocked') === 'true' || localStorage.getItem('tajinkart_admin_unlocked') === 'true') return true;
-  return true; // برای دسترسی کامل و راحت مدیر استودیو
+  if (typeof isDirectorLoggedIn !== 'undefined' && isDirectorLoggedIn === true) return true;
+  return false;
+};
+
+window.openDirectorSection = function(vKey) {
+  if (!window.isStudioDirectorAuthenticated()) {
+    showToast('Restricted to Studio Director access from Admin Console.', 'error', 4000);
+    return;
+  }
+  if (typeof switchView === 'function') switchView(vKey);
 };
 
 window.isRecoveryFlowActive = false;
@@ -501,11 +506,20 @@ window.switchView = function(vKey) {
       dock.classList.remove('dock-collapsed');
     }
   } else {
-    // در تمام صفحات دیگر (ادمین، فروشگاه، جنسیس، آکادمی، اعضا) هدر کاملاً مخفی می‌شود
+    // در تمام صفحات عمومی دیگر (فروشگاه، سوسایتی، داشبورد، جنسیس، آکادمی) آیکون تاجینکارت به عنوان دکمه هوم بدون زیرشاخه نمایش داده می‌شود
     if (topBar) {
-      topBar.style.display = 'none';
-      topBar.classList.remove('visible');
+      if (vKey === 'admin') {
+        topBar.style.display = 'none';
+        topBar.classList.remove('visible');
+      } else {
+        topBar.style.display = 'flex';
+        topBar.classList.add('visible');
+      }
     }
+    if (typeof window.closeDesktopUnifiedDropdown === 'function') window.closeDesktopUnifiedDropdown();
+    if (typeof window.closeMobileFilterDrawers === 'function') window.closeMobileFilterDrawers();
+    const mStack = document.getElementById('mobileVerticalFilterStack');
+    if (mStack) mStack.classList.add('hidden');
     const catMenu = document.getElementById('floatingGalleryCategoryMenu');
     if (catMenu) catMenu.style.display = 'none';
     const genreMenu = document.getElementById('floatingGalleryGenreMenu');
@@ -555,13 +569,14 @@ function handleOptimizedScroll() {
   const topBar = document.getElementById('topCenterBrandBar');
   const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
 
-  // ۲. پدیدار شدن نشان برند و دسته‌بندی با اسکرول در گالری
+  // ۲. نمایش نشان برند در گالری و صفحات عمومی به عنوان دکمه هوم (مخفی فقط در ادمین)
   if (topBar) {
-    if (cView === 'showcase') {
+    if (cView === 'admin') {
+      topBar.style.display = 'none';
+      topBar.classList.remove('visible');
+    } else {
       topBar.style.display = 'flex';
       topBar.classList.add('visible');
-    } else {
-      topBar.classList.remove('visible');
     }
   }
 
@@ -590,14 +605,14 @@ function initDockState() {
   const scrolled = window.scrollY || window.pageYOffset || 0;
   const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
 
-  // وضعیت اولیه نشان برند در بالا-چپ (در بالای صفحه بسته، با اسکرول باز)
+  // وضعیت اولیه نشان برند در بالا-چپ (فعال در همه صفحات عمومی، مخفی فقط در ادمین)
   if (topBar) {
-    if (cView === 'showcase') {
-      topBar.style.display = 'flex';
-      topBar.classList.add('visible');
-    } else {
+    if (cView === 'admin') {
       topBar.style.display = 'none';
       topBar.classList.remove('visible');
+    } else {
+      topBar.style.display = 'flex';
+      topBar.classList.add('visible');
     }
   }
 
