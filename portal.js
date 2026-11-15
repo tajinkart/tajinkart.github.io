@@ -2454,6 +2454,7 @@ window.STUDIO_CRYPTO_META = {
   usdt_trc20: { label: 'USDT (TRC-20)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://tronscan.org/#/transaction/' },
   sol:        { label: 'Solana (SOL)', symbol: 'SOL', cgId: 'solana', ccSym: 'SOL', explorer: 'https://solscan.io/tx/' },
   ton:        { label: 'TON (Toncoin)', symbol: 'TON', cgId: 'the-open-network', ccSym: 'TON', explorer: 'https://tonviewer.com/transaction/' },
+  usdt_ton:   { label: 'USDT (TON Network)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://tonviewer.com/transaction/' },
   btc:        { label: 'Bitcoin (BTC)', symbol: 'BTC', cgId: 'bitcoin', ccSym: 'BTC', explorer: 'https://mempool.space/tx/' }
 };
 
@@ -2509,7 +2510,7 @@ window.getConfiguredWalletsMap = function() {
   if (w.eth) { out.eth = w.eth; out.usdt_bep20 = w.eth; }
   if (w.usdt_trc20) out.usdt_trc20 = w.usdt_trc20;
   if (w.sol) out.sol = w.sol;
-  if (w.ton) out.ton = w.ton;
+  if (w.ton) { out.ton = w.ton; out.usdt_ton = w.ton; }
   if (w.btc) out.btc = w.btc;
   return out;
 };
@@ -2639,9 +2640,13 @@ window.refreshCryptoPayModalCalc = async function() {
     qrImg.style.display = addr ? 'block' : 'none';
   }
   if (hintEl) {
-    hintEl.textContent = netKey === 'xtz'
-      ? 'Tezos transactions are verified automatically on-chain via TzKT in seconds.'
-      : 'After sending, paste your Transaction Hash (TXID) for studio verification.';
+    if (netKey === 'xtz') {
+      hintEl.textContent = 'Tezos transactions are verified automatically on-chain via TzKT in seconds.';
+    } else if (netKey === 'ton' || netKey === 'usdt_ton') {
+      hintEl.textContent = 'TON & USDT (TON) transactions are verified automatically on-chain via TonAPI in seconds.';
+    } else {
+      hintEl.textContent = 'After sending, paste your Transaction Hash (TXID) for studio verification.';
+    }
   }
 
   const order = window._activeCryptoPayOrderId ? ordersList.find(x => x.id === window._activeCryptoPayOrderId) : null;
@@ -2729,6 +2734,32 @@ window.submitCryptoTransaction = async function() {
         }
       }
     } catch(e) {}
+  } else if (netKey === 'ton' || netKey === 'usdt_ton') {
+    try {
+      let rawTarget = '';
+      if (targetAddr) {
+        const accRes = await fetch(`https://tonapi.io/v2/accounts/${encodeURIComponent(targetAddr)}`);
+        if (accRes.ok) {
+          const accData = await accRes.json();
+          if (accData && accData.address) rawTarget = String(accData.address).toLowerCase();
+        }
+      }
+      const evRes = await fetch(`https://tonapi.io/v2/events/${encodeURIComponent(txid)}`);
+      if (evRes.ok) {
+        const ev = await evRes.json();
+        const actions = Array.isArray(ev && ev.actions) ? ev.actions : [];
+        const match = actions.find(act => {
+          if (act.status && act.status !== 'ok') return false;
+          const rec = (act.TonTransfer && act.TonTransfer.recipient && act.TonTransfer.recipient.address)
+            || (act.JettonTransfer && act.JettonTransfer.recipient && act.JettonTransfer.recipient.address)
+            || '';
+          if (!rec) return false;
+          if (!rawTarget) return true;
+          return String(rec).toLowerCase() === rawTarget || String(rec) === targetAddr;
+        });
+        if (match) verifiedOnChain = true;
+      }
+    } catch(e) {}
   }
 
   const order = window._activeCryptoPayOrderId ? ordersList.find(x => x.id === window._activeCryptoPayOrderId) : null;
@@ -2748,9 +2779,12 @@ window.submitCryptoTransaction = async function() {
   if (btn) { btn.disabled = false; btn.textContent = '✓ Submit & Verify Transaction'; }
 
   if (verifiedOnChain) {
-    showToast('Tezos transaction verified on-chain via TzKT! ✓', 'success', 5500);
+    const netName = (netKey === 'ton' || netKey === 'usdt_ton') ? 'TON transaction verified on-chain via TonAPI! ✓' : 'Tezos transaction verified on-chain via TzKT! ✓';
+    showToast(netName, 'success', 5500);
   } else if (netKey === 'xtz') {
     showToast('TXID saved! TzKT could not confirm it yet (may take 30s or target mismatch).', 'info', 5500);
+  } else if (netKey === 'ton' || netKey === 'usdt_ton') {
+    showToast('TXID saved! TonAPI could not confirm it yet (may take 30s or target mismatch).', 'info', 5500);
   } else {
     showToast('TXID submitted! Studio Director will verify & approve shortly.', 'success', 5000);
   }
