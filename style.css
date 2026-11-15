@@ -9451,3 +9451,138 @@ body:not([data-view="showcase"]) #mobileMasterChevron {
   opacity: 0.25 !important;
   transform: perspective(900px) rotateY(-12deg) scale(1.03) !important;
 }
+
+
+/* ==============================================================================
+   SITE-WIDE TYPOGRAPHY HARMONY & CLICKABLE STUDIO STORE CTA (v26.6.9)
+   - OptimusPrinceps: Display Titles, Section Headers, Brand, Primary Buttons
+   - Plus Jakarta Sans: All Body Copy, Card Descriptions, Subtitles, Forms, Modals
+   - JetBrains Mono: Prices, Timelines, Slugs, Technical Badges
+   ============================================================================== */
+body:not([data-view="admin"]) {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Readable editorial sans-serif for ALL body copy, descriptions, subtitles & forms */
+body:not([data-view="admin"]) p,
+body:not([data-view="admin"]) li,
+body:not([data-view="admin"]) label,
+body:not([data-view="admin"]) input,
+body:not([data-view="admin"]) textarea,
+body:not([data-view="admin"]) select,
+.pipeline-tile-desc,
+.store-subtitle,
+#sketchHeaderSub,
+.service-nav-sub,
+.right-exp-sub,
+.asset-card-desc,
+#showcaseStudioAboutSection p,
+#showcaseStudioAboutSection li,
+.about-studio-grid p,
+#view-society p,
+.society-card p,
+.artstation-sidebar p,
+.stream-phase-note p,
+.project-header-lore,
+.pack-desc,
+#memberModal p,
+#memberModal label,
+#memberModal input,
+#termsModal p,
+#termsModal li,
+#zoomModal p,
+#zoomModal label,
+#zoomModal input,
+#zoomModal select,
+#zoomModal textarea,
+.codex-card-desc,
+.atelier-member-sub,
+#studioLiveStatusText {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.6 !important;
+}
+
+.service-nav-sub,
+.right-exp-sub {
+  font-size: 11.5px !important;
+  color: rgba(203, 213, 225, 0.78) !important;
+}
+
+#showcaseStudioAboutSection p,
+.society-card p,
+.stream-phase-note p,
+.project-header-lore {
+  font-size: 13.5px !important;
+  color: rgba(226, 232, 240, 0.86) !important;
+}
+
+/* Keep OptimusPrinceps crisp & authoritative for titles, headers, and primary CTAs */
+body:not([data-view="admin"]) h1,
+body:not([data-view="admin"]) h2,
+body:not([data-view="admin"]) h3,
+body:not([data-view="admin"]) h4,
+.brand-giant-title,
+.view-hero-title,
+.top-center-pill .brand-name-text,
+.right-exp-title,
+.service-nav-title,
+.sketch-banner-title,
+.pipeline-tile-title,
+.pack-title,
+.project-header-title,
+.tile-center-title .tile-slug,
+.store-dual-btn,
+.btn-gold,
+.btn-atelier-gold,
+.btn-atelier-accent {
+  font-family: 'OptimusPrinceps', serif !important;
+}
+
+/* Keep JetBrains Mono for technical specs, prices, and sheet badges */
+.font-mono,
+.tile-sheets-badge,
+.pipeline-tile-price,
+.pipeline-tile-timeline {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Clickable Studio Status -> Direct Store CTA */
+#studioLiveStatusBadge.studio-cta-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 6px 14px !important;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease !important;
+}
+
+#studioLiveStatusBadge.studio-cta-pill:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(250, 204, 21, 0.55) !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.6), 0 0 16px rgba(250, 204, 21, 0.22) !important;
+}
+
+#studioLiveStatusBadge .status-store-cta {
+  font-family: 'OptimusPrinceps', serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  color: var(--gold, #facc15) !important;
+  padding-left: 10px !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.16) !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 768px) {
+  #studioLiveStatusBadge.studio-cta-pill {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+  }
+  #studioLiveStatusBadge .status-store-cta {
+    padding-left: 0 !important;
+    border-left: none !important;
+  }
+}
