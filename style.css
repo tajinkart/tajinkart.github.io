@@ -9777,3 +9777,180 @@ body.lightbox-open #desktopBrandFilterIndicator {
   opacity: 0.35 !important;
   transform: none !important;
 }
+
+
+/* ==============================================================================
+   CLIENT PORTAL REDESIGN (v26.6.14): 2-Column Clean Atelier Layout (UI/UX Pro Max)
+   ============================================================================== */
+.client-portal-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .client-portal-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+.client-profile-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.client-profile-card,
+.client-support-card {
+  background: #090c12;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.client-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.client-identity-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.client-identity-text .atelier-member-name {
+  font-size: 18px !important;
+  margin: 4px 0 0 !important;
+  word-break: break-word;
+}
+
+.client-contact-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 16px;
+  font-size: 11.5px;
+}
+
+.client-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.client-meta-row .meta-lbl {
+  color: #94a3b8;
+}
+
+.client-meta-row strong {
+  color: #f1f5f9;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.client-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.client-sidebar-actions button {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+}
+
+.client-support-title {
+  font-size: 14px !important;
+  color: var(--gold, #facc15) !important;
+  margin: 0 0 6px !important;
+}
+
+.client-support-sub {
+  font-size: 12.5px !important;
+  color: #cbd5e1 !important;
+  margin: 0 0 12px !important;
+}
+
+.client-workspace-main {
+  min-width: 0;
+}
+
+.client-empty-state {
+  background: #090c12;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.empty-state-head h4 {
+  font-size: 17px !important;
+  color: #ffffff !important;
+  margin: 0 0 6px !important;
+}
+
+.empty-state-head p {
+  font-size: 13px !important;
+  color: #cbd5e1 !important;
+  margin: 0 !important;
+}
+
+.workflow-preview-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.workflow-step-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.workflow-step-pill .wf-num {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(250, 204, 21, 0.14);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #facc15;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workflow-step-pill strong {
+  display: block;
+  font-size: 12px;
+  color: #f8fafc;
+  margin-bottom: 2px;
+}
+
+.workflow-step-pill span {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}

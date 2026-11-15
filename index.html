@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.13">
+  <link rel="stylesheet" href="style.css?v=26.6.14">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -697,216 +697,140 @@
     <!-- بخش ۵: کنسول فرمان آتلیه و داشبورد اعضا (Genesis Codex / Atelier Workstation Console) -->
   <section id="view-member-dashboard" class="view-section hidden">
     <div class="container member-console-container">
-      
-      <!-- 1. Atelier Dossier & Clearance Header -->
-      <div class="atelier-dossier-card">
-        <div class="atelier-dossier-profile">
-          <div class="atelier-avatar-halo" id="dashAvatarHalo">
-            <div class="atelier-avatar-glyph" id="dashAvatarGlyph">⚔️</div>
-            <span class="atelier-pulse-ring"></span>
-          </div>
-          <div class="atelier-identity-meta">
-            <div class="atelier-rank-badge" id="dashClearanceBadge">
-              <span class="rank-dot"></span>
-              <span id="dashClearanceRank">Clearance Level: Active Atelier</span>
-            </div>
-            <h2 class="atelier-member-name" id="dashMemberName">Valued Client</h2>
-            <div class="atelier-meta-coords font-mono">
-              <span>Identity CID: <strong id="dashMemberEmail">user@tajinkart.space</strong></span>
-              <span class="coord-divider">•</span>
-              <span>Comm Channel: <strong id="dashMemberContact">Direct Studio Comm</strong></span>
-              <span class="coord-divider">•</span>
-              <span class="atelier-protocol-badge">Protocol: GENESIS v21.4</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="atelier-quick-actions">
-          <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-atelier-gold hidden" title="Enter Studio Command Console">
-            👑 Studio Command Console
-          </button>
-          <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-atelier-cipher" title="Update Account Cipher Key">
-            🔑 Security Matrix & Cipher Key
-          </button>
-          <button onclick="switchView('store')" class="btn-atelier-accent" title="Submit a New Concept Brief">
-            + New Commission Brief
-          </button>
-          <button onclick="logoutMemberAccount()" class="btn-atelier-disconnect" title="Disconnect Workstation Session">
-            Disconnect Session
-          </button>
-        </div>
-      </div>
+      <div class="client-portal-grid">
 
-      <!-- 2. Interactive Multi-Layer Artifact Inspector -->
-      <div class="atelier-stage-module">
-        <div class="atelier-stage-header">
-          <div class="stage-title-wrap">
-            <span class="stage-terminal-tag">STATION // PRODUCTION CANVAS</span>
-            <h3 class="stage-heading">Multi-Layer Concept Art & Live Production Stage</h3>
-          </div>
-          
-          <!-- Layer Switch Controls -->
-          <div class="atelier-layer-controls" role="group" aria-label="Production Layer Selection">
-            <button type="button" class="layer-pill-btn active" id="btnLayerSilhouette" onclick="setAtelierProductionLayer('silhouette')">
-              <span class="layer-num">L1</span>
-              <span>Silhouette & Linework</span>
-            </button>
-            <button type="button" class="layer-pill-btn" id="btnLayerValue" onclick="setAtelierProductionLayer('value')">
-              <span class="layer-num">L2</span>
-              <span>Value & Lighting</span>
-            </button>
-            <button type="button" class="layer-pill-btn" id="btnLayerMaster" onclick="setAtelierProductionLayer('master')">
-              <span class="layer-num">L3</span>
-              <span>300DPI Master Render</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="atelier-canvas-viewport" id="atelierCanvasViewport">
-          <div class="atelier-canvas-wrapper" id="atelierCanvasWrapper">
-            <img id="atelierStageArtworkImg" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=85" alt="Active Production Concept Art" class="atelier-stage-img layer-mode-silhouette">
-            <div class="canvas-grid-overlay" id="canvasGridOverlay"></div>
-            
-            <!-- Pinpoint Revision Hotspots -->
-            <div class="atelier-pin-hotspot pin-1" id="atelierPin1" style="top: 28%; left: 34%;" onclick="openAtelierPinNote(1, event)" title="View Feedback Pin #1">
-              <span class="pin-beacon"></span>
-              <span class="pin-core">1</span>
-              <div class="pin-hover-card">
-                <strong>Pin 1: Armor Specular Highlight</strong>
-                <p>Tempered steel reflections calibrated and locked to 480nm cyan palette.</p>
+        <!-- Left Sidebar: Clean Client Profile & Quick Actions -->
+        <aside class="client-profile-sidebar">
+          <div class="client-profile-card">
+            <div class="client-profile-top">
+              <div class="atelier-avatar-halo" id="dashAvatarHalo">
+                <div class="atelier-avatar-glyph" id="dashAvatarGlyph">⚔️</div>
+              </div>
+              <div class="client-identity-text">
+                <div class="atelier-rank-badge" id="dashClearanceBadge">
+                  <span class="rank-dot"></span>
+                  <span id="dashClearanceRank">Client Account</span>
+                </div>
+                <h2 class="atelier-member-name" id="dashMemberName">Valued Client</h2>
               </div>
             </div>
 
-            <div class="atelier-pin-hotspot pin-2" id="atelierPin2" style="top: 62%; left: 68%;" onclick="openAtelierPinNote(2, event)" title="View Feedback Pin #2">
-              <span class="pin-beacon"></span>
-              <span class="pin-core">2</span>
-              <div class="pin-hover-card">
-                <strong>Pin 2: Biomechanical Blade Core</strong>
-                <p>Blade contour and energy core illumination approved during linework phase.</p>
+            <div class="client-contact-meta font-mono">
+              <div class="client-meta-row">
+                <span class="meta-lbl">Email</span>
+                <strong id="dashMemberEmail">user@tajinkart.space</strong>
+              </div>
+              <div class="client-meta-row">
+                <span class="meta-lbl">Contact</span>
+                <strong id="dashMemberContact">Direct Studio Comm</strong>
               </div>
             </div>
 
-            <div class="atelier-pin-hotspot pin-3" id="atelierPin3" style="top: 45%; left: 52%;" onclick="openAtelierPinNote(3, event)" title="View Feedback Pin #3">
-              <span class="pin-beacon"></span>
-              <span class="pin-core">3</span>
-              <div class="pin-hover-card">
-                <strong>Pin 3: Weathered Cloak Fabric</strong>
-                <p>Heavy canvas fraying and distress added for Extopia climate compatibility.</p>
-              </div>
-            </div>
-
-            <span class="canvas-bracket bracket-tl">[+]</span>
-            <span class="canvas-bracket bracket-tr">[+]</span>
-            <span class="canvas-bracket bracket-bl">REC // 4K</span>
-            <span class="canvas-bracket bracket-br">DCI-P3 16-BIT</span>
-          </div>
-
-          <!-- Canvas Telemetry -->
-          <div class="atelier-canvas-telemetry font-mono">
-            <div class="telemetry-items">
-              <span class="telemetry-chip active-layer" id="telemetryActiveLayer">Active Layer: L1 • Silhouette & Form Exploration</span>
-              <span class="telemetry-chip">Resolution: 3840×2160 (4K UHD)</span>
-              <span class="telemetry-chip">Color Depth: 16-Bit ProPhoto RGB</span>
-              <span class="telemetry-chip">Master Standard: 300DPI Layered Master PSD</span>
-            </div>
-            <div class="telemetry-actions">
-              <button type="button" class="btn-telemetry-action" onclick="toggleAtelierPinDropper()">
-                📍 Drop Pinpoint Note on Canvas
+            <div class="client-sidebar-actions">
+              <button id="dashAdminPanelBtn" onclick="switchView('admin')" class="btn-atelier-gold hidden" title="Enter Studio Command Console">
+                👑 Studio Command Console
               </button>
-              <button type="button" class="btn-telemetry-action" onclick="window.open(document.getElementById('atelierStageArtworkImg').src, '_blank')">
-                🔍 Fullscreen Zoom
+              <button onclick="switchView('store')" class="btn-atelier-accent" title="Submit a New Concept Brief">
+                + New Commission Brief
+              </button>
+              <button id="dashChangePassBtn" onclick="openChangePasswordModal()" class="btn-atelier-cipher" title="Update Account Password">
+                🔑 Security & Password
+              </button>
+              <button onclick="logoutMemberAccount()" class="btn-atelier-disconnect" title="Sign Out of Account">
+                Sign Out
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 3. Console Sub-Nav Tabs -->
-      <div class="atelier-tabs-wrapper">
-        <div class="atelier-tab-nav" role="tablist">
-          <button type="button" class="atelier-tab-btn active" id="tabBtnPipelines" onclick="switchAtelierConsoleTab('pipelines')">
-            <span class="tab-icon">⚡</span>
-            <span>Active Commission Pipelines</span>
-            <span class="tab-count-badge" id="dashPipelineCount">1</span>
-          </button>
-          <button type="button" class="atelier-tab-btn" id="tabBtnCodex" onclick="switchAtelierConsoleTab('codex')">
-            <span class="tab-icon">💎</span>
-            <span>Digital Artifacts & Vault Downloads</span>
-            <span class="tab-count-badge" id="dashCodexCount">4</span>
-          </button>
-          <button type="button" class="atelier-tab-btn" id="tabBtnSecurity" onclick="switchAtelierConsoleTab('security')">
-            <span class="tab-icon">🛡️</span>
-            <span>Security Matrix & Protocols</span>
-          </button>
-        </div>
-
-        <!-- Tab 1: Pipelines -->
-        <div class="atelier-tab-pane active" id="panePipelines">
-          <div class="pane-head-bar">
-            <div>
-              <h4 class="pane-heading">Active Production Pipelines & 5-Step Progress Stepper</h4>
-              <p class="pane-sub">Real-time status tracking for bespoke briefs, creative stages, and deliverables.</p>
-            </div>
-            <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-atelier-invoice">
-              📄 Download Official Studio Invoice Specimen
-            </button>
-          </div>
-          <div id="memberOrdersContainer" class="atelier-orders-stream"></div>
-        </div>
-
-        <!-- Tab 2: Digital Vault -->
-        <div class="atelier-tab-pane" id="paneCodex">
-          <div class="pane-head-bar">
-            <div>
-              <h4 class="pane-heading">Unlocked Digital Assets, Masterclasses & Lore Files</h4>
-              <p class="pane-sub">Curated video masterclasses, studio brush engines, and Genesis universe manuscripts.</p>
+          <div class="client-support-card">
+            <h4 class="client-support-title">Direct Studio Desk</h4>
+            <p class="client-support-sub">Questions about an active brief, revisions, or source files? Reach the studio director directly:</p>
+            <div class="sec-contact-display font-mono">
+              <span>Email: <strong>studio@tajincart.space</strong></span>
+              <span>Telegram: <strong>@tajinkart</strong></span>
             </div>
           </div>
-          <div id="memberCoursesContainer" class="atelier-codex-grid"></div>
-        </div>
+        </aside>
 
-        <!-- Tab 3: Security Matrix -->
-        <div class="atelier-tab-pane" id="paneSecurity">
-          <div class="pane-head-bar">
-            <div>
-              <h4 class="pane-heading">Security Protocols, Authentication & Cipher Settings</h4>
-              <p class="pane-sub">Direct studio communication channels and encrypted access credentials.</p>
+        <!-- Right Main Workspace: Commissions, Deliverables, Account -->
+        <main class="client-workspace-main">
+          <div class="atelier-tabs-wrapper">
+            <div class="atelier-tab-nav" role="tablist">
+              <button type="button" class="atelier-tab-btn active" id="tabBtnPipelines" onclick="switchAtelierConsoleTab('pipelines')">
+                <span class="tab-icon">⚡</span>
+                <span>My Commissions</span>
+                <span class="tab-count-badge" id="dashPipelineCount">0</span>
+              </button>
+              <button type="button" class="atelier-tab-btn" id="tabBtnCodex" onclick="switchAtelierConsoleTab('codex')">
+                <span class="tab-icon">💎</span>
+                <span>Deliverables & Vault</span>
+                <span class="tab-count-badge" id="dashCodexCount">0</span>
+              </button>
+              <button type="button" class="atelier-tab-btn" id="tabBtnSecurity" onclick="switchAtelierConsoleTab('security')">
+                <span class="tab-icon">🛡️</span>
+                <span>Account & Security</span>
+              </button>
             </div>
-          </div>
-          <div class="atelier-security-grid">
-            <div class="security-card">
-              <h5 class="sec-card-title">🔐 Account Password & Encryption</h5>
-              <p class="sec-card-desc">Protect your confidential production briefs and IP documentation using strong salted passwords.</p>
-              <div class="sec-actions">
-                <button type="button" onclick="openChangePasswordModal()" class="btn-atelier-accent" style="width:100%;">
-                  🔑 Update or Create Password
+
+            <!-- Tab 1: Commissions -->
+            <div class="atelier-tab-pane active" id="panePipelines">
+              <div class="pane-head-bar">
+                <div>
+                  <h4 class="pane-heading">Active Commissions & Production Stages</h4>
+                  <p class="pane-sub">Track every milestone from initial brief to final layered 300DPI PSD handover.</p>
+                </div>
+                <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-atelier-invoice">
+                  📄 Specimen Invoice
                 </button>
               </div>
+              <div id="memberOrdersContainer" class="atelier-orders-stream"></div>
             </div>
-            <div class="security-card">
-              <h5 class="sec-card-title">🌐 Google OAuth Verification</h5>
-              <p class="sec-card-desc">Your account is connected via official Google security standards for instant passwordless sign-in.</p>
-              <div id="secGoogleStatusBadge" class="sec-status-pill verified">
-                ✓ Account Verified via Google Security
+
+            <!-- Tab 2: Deliverables -->
+            <div class="atelier-tab-pane" id="paneCodex">
+              <div class="pane-head-bar">
+                <div>
+                  <h4 class="pane-heading">Unlocked Deliverables & Digital Packs</h4>
+                  <p class="pane-sub">Your purchased assets, high-res masters, and downloadable studio packs.</p>
+                </div>
               </div>
+              <div id="memberCoursesContainer" class="atelier-codex-grid"></div>
             </div>
-            <div class="security-card">
-              <h5 class="sec-card-title">📡 Studio Direct Communication</h5>
-              <p class="sec-card-desc">Official channels for high-volume file transfer and real-time revision reviews with the studio director.</p>
-              <div class="sec-contact-display font-mono">
-                <span>Email: <strong>tajinkart@gmail.com</strong></span>
-                <span>Telegram: <strong>@tajinkart</strong></span>
+
+            <!-- Tab 3: Account & Security -->
+            <div class="atelier-tab-pane" id="paneSecurity">
+              <div class="pane-head-bar">
+                <div>
+                  <h4 class="pane-heading">Account Security & Verification</h4>
+                  <p class="pane-sub">Manage your login credentials and Google sign-in protection.</p>
+                </div>
+              </div>
+              <div class="atelier-security-grid">
+                <div class="security-card">
+                  <h5 class="sec-card-title">🔐 Password & Access</h5>
+                  <p class="sec-card-desc">Protect your commission briefs and private deliverables with a strong password.</p>
+                  <div class="sec-actions">
+                    <button type="button" onclick="openChangePasswordModal()" class="btn-atelier-accent" style="width:100%;">
+                      🔑 Update or Create Password
+                    </button>
+                  </div>
+                </div>
+                <div class="security-card">
+                  <h5 class="sec-card-title">🌐 Google Authentication</h5>
+                  <p class="sec-card-desc">Instant passwordless sign-in backed by Google OAuth 2.0 security.</p>
+                  <div id="secGoogleStatusBadge" class="sec-status-pill verified">
+                    ✓ Google Account Connected
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </main>
 
       </div>
-
     </div>
   </section>
 
-  <!-- بخش ۶: پنل مدیریت ادمین کامل فارسی -->
   <section id="view-admin" class="view-section hidden" dir="ltr" lang="en">
     <div class="container">
       <div id="adminLoginGate" class="hidden" style="max-width:440px; margin:50px auto; background:var(--bg-panel); border:1px solid rgba(250,204,21,0.35); border-radius:20px; padding:30px 24px; text-align:center; box-shadow:0 15px 45px rgba(0,0,0,0.75);">
@@ -2629,12 +2553,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.13"></script>
-  <script src="core.js?v=26.6.13"></script>
-  <script src="gallery.js?v=26.6.13"></script>
-  <script src="portal.js?v=26.6.13"></script>
-  <script src="admin.js?v=26.6.13"></script>
-  <script src="translate.js?v=26.6.13"></script>
+  <script src="data.js?v=26.6.14"></script>
+  <script src="core.js?v=26.6.14"></script>
+  <script src="gallery.js?v=26.6.14"></script>
+  <script src="portal.js?v=26.6.14"></script>
+  <script src="admin.js?v=26.6.14"></script>
+  <script src="translate.js?v=26.6.14"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   

@@ -1055,65 +1055,38 @@ function renderMemberDashboard() {
     }).join('');
   }
 
-  // ۲. رندر دارایی‌های دیجیتال و دوره‌ها در زبانه ۲
+  // ۲. رندر دارایی‌های دیجیتال و فایل‌های خریداری‌شده در زبانه ۲
   const cBox = document.getElementById('memberCoursesContainer');
-  if (cBox) {
-    const VAULT_ITEMS = [
-      {
-        id: 1,
-        title: 'Masterclass: Advanced Fantasy Character Design & Armor Rendering',
-        desc: '14 comprehensive master sessions covering silhouette thumbnails to photorealistic metal and cloth rendering in Photoshop.',
-        format: 'VIDEO + PSD',
-        size: '4.8 GB',
-        license: 'Standard Atelier License',
-        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=700&q=80'
-      },
-      {
-        id: 2,
-        title: '64-Piece Master Brush Engine, Rust Textures & Monster Alphas',
-        desc: 'Proprietary studio brushes for hard surface rendering, reptilian scales, weathered textures, and seamless alphas.',
-        format: '.ABR + PNG',
-        size: '340 MB',
-        license: 'Commercial Production License',
-        img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80'
-      },
-      {
-        id: 3,
-        title: 'Genesis Lore Codex & Extopia Digital Artbook',
-        desc: 'Complete worldbuilding manuscripts, historical timelines, and 60 pages of print-ready concept art.',
-        format: 'PDF 300DPI',
-        size: '185 MB',
-        license: 'Collector Special Edition',
-        img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80'
-      },
-      {
-        id: 4,
-        title: 'Dark Fantasy Prop Kit & RPG UI Interface Icons (120 Icons)',
-        desc: 'Spell skill icons, shields, and runic insignias with separated layers for Unity and Godot game engines.',
-        format: 'PNG + SVG',
-        size: '95 MB',
-        license: 'Commercial Game Ready',
-        img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=700&q=80'
-      }
-    ];
+  const boughtAssets = (currentMember && Array.isArray(currentMember.assetsBought)) ? currentMember.assetsBought : [];
+  const cCountEl = document.getElementById('dashCodexCount');
+  if (cCountEl) cCountEl.textContent = String(boughtAssets.length);
 
-    cBox.innerHTML = VAULT_ITEMS.map(v => `
-      <div class="codex-vault-card">
-        <div class="codex-card-thumb">
-          <img src="${v.img}" alt="${v.title}" loading="lazy">
-          <span class="codex-card-format">${v.format}</span>
+  if (cBox) {
+    if (boughtAssets.length === 0) {
+      cBox.innerHTML = `
+        <div class="client-empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-state-head">
+            <h4>No Deliverables Unlocked Yet</h4>
+            <p>Final 300DPI PSD files, VTT tokens, and digital packs you purchase or receive from completed commissions will be stored here for instant access.</p>
+          </div>
+          <button type="button" onclick="switchView('store'); if(typeof switchStoreTab==='function') switchStoreTab('products');" class="btn-atelier-cipher" style="align-self:flex-start; padding:11px 20px;">
+            Browse Digital Assets →
+          </button>
         </div>
-        <h5 class="codex-card-title">${v.title}</h5>
-        <p class="codex-card-desc">${v.desc}</p>
-        <div class="codex-card-meta">
-          <span>File Size: <strong class="font-mono" style="color:#fff;">${v.size}</strong></span>
-          <span>License: <strong style="color:var(--emerald);">${v.license}</strong></span>
+      `;
+    } else {
+      cBox.innerHTML = boughtAssets.map((item, idx) => `
+        <div class="codex-vault-card">
+          <h5 class="codex-card-title">${typeof item === 'string' ? item : (item.title || 'Studio Deliverable #' + (idx + 1))}</h5>
+          <p class="codex-card-desc">${typeof item === 'object' && item.desc ? item.desc : 'Licensed TAJINKART production deliverable ready for download.'}</p>
+          <div class="codex-card-actions">
+            <button type="button" onclick="showToast('Preparing secure download link...', 'info')" class="btn-codex-download">
+              ⬇ Access Deliverable
+            </button>
+          </div>
         </div>
-        <button type="button" class="btn-codex-download" onclick="triggerVaultAssetDownload('${v.title}', '${v.format}')">
-          ⚡ Download Digital Asset
-        </button>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
 }
 
