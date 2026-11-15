@@ -663,11 +663,20 @@ document.addEventListener('click', (e) => {
 // پویایی بصری عنوان استودیو و شعار رسمی در بالای صفحه (Brand Signature Morphing)
 // ==============================================================================
 let brandMorphInterval = null;
-var BRAND_SIGNATURE_PAIRS = [
-  { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' },
-  { title: 'TAJINKART', sub: 'CONCEPT ART & VISUAL DEVELOPMENT ATELIER' },
-  { title: 'FROM INK TO UNIVERSE', sub: 'ORIGINAL DARK FANTASY & SCI-FI WORLDS' }
-];
+var BRAND_SIGNATURE_PAIRS = (() => {
+  try {
+    const saved = localStorage.getItem('tajinkart_brand_pairs');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return [
+    { title: 'TAJINKART', sub: 'DARK FANTASY • SCI-FI • ENTERTAINMENT DESIGN' },
+    { title: 'TAJINKART', sub: 'CONCEPT ART & VISUAL DEVELOPMENT ATELIER' },
+    { title: 'FROM INK TO UNIVERSE', sub: 'ORIGINAL DARK FANTASY & SCI-FI WORLDS' }
+  ];
+})();
 let currentBrandPairIdx = 0;
 
 window.initDynamicBrandHeader = function() {
@@ -1017,6 +1026,15 @@ window.syncStudioSettingsFromCloud = async function() {
     if (data && data.value) {
       siteSettings = Object.assign(siteSettings || {}, data.value);
       safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+      if (Array.isArray(data.value.brandPairs) && data.value.brandPairs.length > 0) {
+        BRAND_SIGNATURE_PAIRS = data.value.brandPairs;
+        window.BRAND_SIGNATURE_PAIRS = data.value.brandPairs;
+        safeSetStorage('tajinkart_brand_pairs', JSON.stringify(data.value.brandPairs));
+        if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
+        if (typeof window.renderAdminSloganPairs === 'function') window.renderAdminSloganPairs();
+      }
+      if (data.value.brandTitle) safeSetStorage('tajinkart_brand_title', data.value.brandTitle);
+      if (data.value.brandGenre) safeSetStorage('tajinkart_brand_genre', data.value.brandGenre);
       if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
       if (typeof window.updateStudioLiveStatus === 'function') window.updateStudioLiveStatus();
       console.log('[Cloud Settings] Restored studio settings from Supabase.');

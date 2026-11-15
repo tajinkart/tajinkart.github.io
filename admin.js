@@ -3936,9 +3936,14 @@ window.addAdminSloganPairRow = function() {
   BRAND_SIGNATURE_PAIRS.push({ title: 'TAJINKART', sub: 'CONCEPT ART & WORLDBUILDING' });
   window.BRAND_SIGNATURE_PAIRS = BRAND_SIGNATURE_PAIRS;
   safeSetStorage('tajinkart_brand_pairs', JSON.stringify(BRAND_SIGNATURE_PAIRS));
+  if (typeof siteSettings !== 'undefined' && siteSettings) {
+    siteSettings.brandPairs = BRAND_SIGNATURE_PAIRS;
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+    if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
+  }
   renderAdminSloganPairs();
   if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
-  showToast('New tagline row added. Click save to persist.', 'info');
+  showToast('New tagline row added & synced.', 'info');
 };
 
 window.removeAdminSloganPairRow = function(idx) {
@@ -3949,9 +3954,14 @@ window.removeAdminSloganPairRow = function(idx) {
   BRAND_SIGNATURE_PAIRS.splice(idx, 1);
   window.BRAND_SIGNATURE_PAIRS = BRAND_SIGNATURE_PAIRS;
   safeSetStorage('tajinkart_brand_pairs', JSON.stringify(BRAND_SIGNATURE_PAIRS));
+  if (typeof siteSettings !== 'undefined' && siteSettings) {
+    siteSettings.brandPairs = BRAND_SIGNATURE_PAIRS;
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+    if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
+  }
   renderAdminSloganPairs();
   if (typeof initDynamicBrandHeader === 'function') initDynamicBrandHeader();
-  showToast('Tagline removed and changes saved. ✓', 'success', 3000);
+  showToast('Tagline removed & synced to cloud. ✓', 'success', 3000);
 };
 
 window.saveAdminSlogansSettings = function() {
@@ -3959,15 +3969,19 @@ window.saveAdminSlogansSettings = function() {
   const genreInput = document.getElementById('adminGenreSubtitleInput');
   
   if (titleInput && titleInput.value.trim()) {
-    safeSetStorage('tajinkart_brand_title', titleInput.value.trim());
+    const bt = titleInput.value.trim();
+    safeSetStorage('tajinkart_brand_title', bt);
+    if (typeof siteSettings !== 'undefined' && siteSettings) siteSettings.brandTitle = bt;
     const titleEl = document.getElementById('brandMorphTitle');
-    if (titleEl) titleEl.textContent = titleInput.value.trim();
+    if (titleEl) titleEl.textContent = bt;
   }
   
   if (genreInput && genreInput.value.trim()) {
-    safeSetStorage('tajinkart_brand_genre', genreInput.value.trim());
+    const bg = genreInput.value.trim();
+    safeSetStorage('tajinkart_brand_genre', bg);
+    if (typeof siteSettings !== 'undefined' && siteSettings) siteSettings.brandGenre = bg;
     const genreEl = document.getElementById('brandGenreBar');
-    if (genreEl) genreEl.textContent = genreInput.value.trim();
+    if (genreEl) genreEl.textContent = bg;
   }
 
   // ذخیره جفت‌های شعار
@@ -3987,13 +4001,19 @@ window.saveAdminSlogansSettings = function() {
     BRAND_SIGNATURE_PAIRS = updatedPairs;
     window.BRAND_SIGNATURE_PAIRS = updatedPairs;
     safeSetStorage('tajinkart_brand_pairs', JSON.stringify(updatedPairs));
+    if (typeof siteSettings !== 'undefined' && siteSettings) siteSettings.brandPairs = updatedPairs;
+  }
+
+  if (typeof siteSettings !== 'undefined' && siteSettings) {
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+    if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
   }
 
   if (typeof initDynamicBrandHeader === 'function') {
     initDynamicBrandHeader();
   }
 
-  showToast('Header brand titles and rotating slogans saved successfully! ✓', 'success', 4000);
+  showToast('Header brand titles and rotating slogans saved & synced to cloud! ✓', 'success', 4000);
 };
 
 // انتخاب و پیش‌نمایش کارت وضعیت آتلیه
