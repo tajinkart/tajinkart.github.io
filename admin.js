@@ -1328,7 +1328,7 @@ window.renderAdminSettingsTab = function() {
 
     // سوئیچ پیش‌فرض به ساب‌تب اول
     if (typeof window.switchSettingsSubTab === 'function') {
-      window.switchSettingsSubTab('identity');
+      window.switchSettingsSubTab('operations');
     }
   } catch(e) {
     console.warn('renderAdminSettingsTab error:', e);
@@ -2824,22 +2824,20 @@ document.addEventListener('touchend', () => {
 // ==============================================================================
 
 window.switchSettingsSubTab = function(subTabId) {
-  const identityBtn = document.getElementById('adminSettingsSubTabBtn-identity');
-  const socialBtn = document.getElementById('adminSettingsSubTabBtn-social');
-  const identitySec = document.getElementById('adminSettingsSubTab-identity');
-  const socialSec = document.getElementById('adminSettingsSubTab-social');
-
-  if (subTabId === 'identity') {
-    if (identityBtn) identityBtn.classList.add('active');
-    if (socialBtn) socialBtn.classList.remove('active');
-    if (identitySec) identitySec.style.display = 'grid';
-    if (socialSec) socialSec.style.display = 'none';
-  } else {
-    if (socialBtn) socialBtn.classList.add('active');
-    if (identityBtn) identityBtn.classList.remove('active');
-    if (identitySec) identitySec.style.display = 'none';
-    if (socialSec) socialSec.style.display = 'flex';
-  }
+  const target = (subTabId === 'identity') ? 'operations' : (subTabId || 'operations');
+  const tabs = [
+    { id: 'operations', display: 'flex' },
+    { id: 'social', display: 'flex' },
+    { id: 'brand', display: 'grid' },
+    { id: 'cloud', display: 'flex' }
+  ];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`adminSettingsSubTabBtn-${t.id}`);
+    const sec = document.getElementById(`adminSettingsSubTab-${t.id}`);
+    const isActive = t.id === target;
+    if (btn) btn.classList.toggle('active', isActive);
+    if (sec) sec.style.display = isActive ? t.display : 'none';
+  });
 };
 
 window.updateStudioLogoDisplay = function() {

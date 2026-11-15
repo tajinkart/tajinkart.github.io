@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.22">
+  <link rel="stylesheet" href="style.css?v=26.6.23">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -1385,21 +1385,166 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                 </div>
               </div>
 
-              <!-- زیربرگه‌ها (۲ ساب‌تب مجزا) -->
+              <!-- زیربرگه‌ها (۴ ساب‌تب مجزا بر اساس کاربرد) -->
               <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
-                <button type="button" id="adminSettingsSubTabBtn-identity" onclick="switchSettingsSubTab('identity')" class="settings-subtab-btn active" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                  <span>🏛️ Studio Identity, Content & Cloud Databases</span>
+                <button type="button" id="adminSettingsSubTabBtn-operations" onclick="switchSettingsSubTab('operations')" class="settings-subtab-btn active" style="padding:9px 18px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:7px;">
+                  <span>🟢 Operations &amp; Treasury</span>
                 </button>
-                <button type="button" id="adminSettingsSubTabBtn-social" onclick="switchSettingsSubTab('social')" class="settings-subtab-btn" style="padding:9px 20px; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                  <span>📡 Telegram Bot & Omnichannel Dispatches</span>
+                <button type="button" id="adminSettingsSubTabBtn-social" onclick="switchSettingsSubTab('social')" class="settings-subtab-btn" style="padding:9px 18px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:7px;">
+                  <span>📡 Telegram &amp; Social</span>
+                </button>
+                <button type="button" id="adminSettingsSubTabBtn-brand" onclick="switchSettingsSubTab('brand')" class="settings-subtab-btn" style="padding:9px 18px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:7px;">
+                  <span>🎨 Brand Identity</span>
+                </button>
+                <button type="button" id="adminSettingsSubTabBtn-cloud" onclick="switchSettingsSubTab('cloud')" class="settings-subtab-btn" style="padding:9px 18px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:7px;">
+                  <span>⚙️ Cloud &amp; Health</span>
                 </button>
               </div>
 
               <form id="adminSettingsForm" onsubmit="event.preventDefault();">
-                
-                <!-- ساب‌تب ۱: هویت، محتوا و برندینگ -->
-                <div id="adminSettingsSubTab-identity" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
-                  
+
+                <!-- ساب‌تب ۱ (پیش‌فرض): عملیات روزمره و خزانه کریپتو -->
+                <div id="adminSettingsSubTab-operations" style="display:flex; flex-direction:column; gap:20px;">
+                  <!-- کارت یکپارچه: کنترل وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
+                      <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <span style="font-size:16px;">🟢</span>
+                          <span style="font-size:15px; font-weight:900; color:var(--gold);">Unified Studio Availability & Brief Acceptance Controls</span>
+                        </div>
+                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Set live status indicator with customizable messages and one-click activation.</span>
+                      </div>
+                      <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 Live Preview</span>
+                    </div>
+
+                    <!-- شبکه گزینه‌های وضعیت استودیو همراه با فیلد متنی اختصاصی و دکمه مربعی ذخیره در پایین سمت چپ -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+                      
+                      <!-- گزینه ۱: خودکار هوشمند -->
+                      <div class="studio-status-option-card" id="cardModeAuto" onclick="selectStudioStatusCard('auto', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin:0;" checked />
+                            <strong style="color:#fff; font-size:12.5px;">🔄 Smart Auto (24h Activity)</strong>
+                          </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Auto Status Message:</label>
+                          <input type="text" id="statusMsg_auto" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="Auto status message..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('auto', event)" class="btn-save-square-gold" title="Save & Activate Auto Status">
+                            💾
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- گزینه ۲: آنلاین و پذیرش فعال -->
+                      <div class="studio-status-option-card" id="cardModeOnline" onclick="selectStudioStatusCard('online', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin:0;" />
+                            <strong style="color:#10b981; font-size:12.5px;">🟢 Online & Accepting Briefs</strong>
+                          </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Online Status Message:</label>
+                          <input type="text" id="statusMsg_online" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="Online status message..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('online', event)" class="btn-save-square-gold" title="Save & Activate Online Status">
+                            💾
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- گزینه ۳: در حال بررسی با تاخیر (Away) -->
+                      <div class="studio-status-option-card" id="cardModeAway" onclick="selectStudioStatusCard('away', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin:0;" />
+                            <strong style="color:#fbbf24; font-size:12.5px;">🟡 Away / High Demand (Queued)</strong>
+                          </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Away Status Message:</label>
+                          <input type="text" id="statusMsg_away" class="font-mono status-mode-input" value="High Demand • Reviewing Inquiries (24-48h)" placeholder="Queued status message..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('away', event)" class="btn-save-square-gold" title="Save & Activate Away Status">
+                            💾
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- گزینه ۴: حالت مرخصی و سفر استودیو -->
+                      <div class="studio-status-option-card" id="cardModeVacation" onclick="selectStudioStatusCard('vacation', event)">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                            <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin:0;" />
+                            <strong style="color:#ef4444; font-size:12.5px;">🔴 Studio Expedition (Briefs Paused)</strong>
+                          </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Expedition Status Message:</label>
+                          <input type="text" id="statusMsg_vacation" class="font-mono status-mode-input" value="Studio on Worldbuilding Expedition • Inquiries Paused" placeholder="Expedition status message..." onclick="event.stopPropagation()" />
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                          <button type="button" onclick="saveStudioModeDirect('vacation', event)" class="btn-save-square-gold" title="Save & Activate Expedition Status">
+                            💾
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <!-- کارت ۱-ه: خزانه و آدرس‌های ولت کریپتو (Studio Treasury & Wallets) -->
+                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; grid-column: 1 / -1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                      <div>
+                        <span style="font-size:13.5px; font-weight:800; color:var(--gold);">💎 Studio Treasury &amp; Crypto Wallet Addresses</span>
+                        <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:2px;">Only networks with a saved address appear in the Client Portal payment modal (live CoinGecko/CryptoCompare USD rates).</span>
+                      </div>
+                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">MULTI-CHAIN + TZKT AUTO-VERIFY</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:10px;">
+                      <div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Tezos (XTZ) — Temple Wallet (Auto-Verify)</label>
+                        <input type="text" id="setWalletXtz" class="font-mono" placeholder="tz1..." style="width:100%; font-size:11.5px; direction:ltr;" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Ethereum / EVM (ETH &amp; USDT ERC-20/BEP-20)</label>
+                        <input type="text" id="setWalletEth" class="font-mono" placeholder="0x..." style="width:100%; font-size:11.5px; direction:ltr;" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">USDT (TRC-20 / Tron)</label>
+                        <input type="text" id="setWalletUsdtTrc20" class="font-mono" placeholder="T..." style="width:100%; font-size:11.5px; direction:ltr;" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Solana (SOL)</label>
+                        <input type="text" id="setWalletSol" class="font-mono" placeholder="Solana address..." style="width:100%; font-size:11.5px; direction:ltr;" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">TON (Toncoin)</label>
+                        <input type="text" id="setWalletTon" class="font-mono" placeholder="UQ... / EQ..." style="width:100%; font-size:11.5px; direction:ltr;" />
+                      </div>
+                      <div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Bitcoin (BTC)</label>
+                        <input type="text" id="setWalletBtc" class="font-mono" placeholder="bc1..." style="width:100%; font-size:11.5px; direction:ltr;" />
+                      </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+                      <button type="button" onclick="saveStudioWalletsSettings()" class="btn-gold" style="padding:9px 18px; font-size:12px;">
+                        ✓ Save Studio Wallet Addresses
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ساب‌تب ۳: هویت بصری و شعارهای ثابت (یک‌باره) -->
+                <div id="adminSettingsSubTab-brand" style="display:none; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
                   <!-- کارت ۱-الف: نشان و آیکون رسمی هدر استودیو (کاملاً مستقل) -->
                   <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1565,101 +1710,10 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                       ✓ Save & Update About Studio Section
                     </button>
                   </div>
-                  <!-- کارت یکپارچه: کنترل وضعیت حضور، پاسخگویی و پذیرش سفارشات آتلیه -->
-                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
-                      <div>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                          <span style="font-size:16px;">🟢</span>
-                          <span style="font-size:15px; font-weight:900; color:var(--gold);">Unified Studio Availability & Brief Acceptance Controls</span>
-                        </div>
-                        <span style="font-size:11.5px; color:var(--text-muted); margin-top:3px; display:block;">Set live status indicator with customizable messages and one-click activation.</span>
-                      </div>
-                      <span id="currentStudioModeBadgePreview" class="hero-badge studio-status-badge status-online font-mono" style="font-size:11px; padding:4px 12px;">🟢 Live Preview</span>
-                    </div>
+                </div>
 
-                    <!-- شبکه گزینه‌های وضعیت استودیو همراه با فیلد متنی اختصاصی و دکمه مربعی ذخیره در پایین سمت چپ -->
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
-                      
-                      <!-- گزینه ۱: خودکار هوشمند -->
-                      <div class="studio-status-option-card" id="cardModeAuto" onclick="selectStudioStatusCard('auto', event)">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
-                            <input type="radio" name="studioAvailabilityChoice" value="auto" id="studioModeAuto" onchange="previewStudioStatusSelection()" style="margin:0;" checked />
-                            <strong style="color:#fff; font-size:12.5px;">🔄 Smart Auto (24h Activity)</strong>
-                          </label>
-                        </div>
-                        <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Auto Status Message:</label>
-                          <input type="text" id="statusMsg_auto" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="Auto status message..." onclick="event.stopPropagation()" />
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('auto', event)" class="btn-save-square-gold" title="Save & Activate Auto Status">
-                            💾
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- گزینه ۲: آنلاین و پذیرش فعال -->
-                      <div class="studio-status-option-card" id="cardModeOnline" onclick="selectStudioStatusCard('online', event)">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
-                            <input type="radio" name="studioAvailabilityChoice" value="online" id="studioModeOnline" onchange="previewStudioStatusSelection()" style="margin:0;" />
-                            <strong style="color:#10b981; font-size:12.5px;">🟢 Online & Accepting Briefs</strong>
-                          </label>
-                        </div>
-                        <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Online Status Message:</label>
-                          <input type="text" id="statusMsg_online" class="font-mono status-mode-input" value="Studio Online • Accepting Briefs & Concept Commissions" placeholder="Online status message..." onclick="event.stopPropagation()" />
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('online', event)" class="btn-save-square-gold" title="Save & Activate Online Status">
-                            💾
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- گزینه ۳: در حال بررسی با تاخیر (Away) -->
-                      <div class="studio-status-option-card" id="cardModeAway" onclick="selectStudioStatusCard('away', event)">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
-                            <input type="radio" name="studioAvailabilityChoice" value="away" id="studioModeAway" onchange="previewStudioStatusSelection()" style="margin:0;" />
-                            <strong style="color:#fbbf24; font-size:12.5px;">🟡 Away / High Demand (Queued)</strong>
-                          </label>
-                        </div>
-                        <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Away Status Message:</label>
-                          <input type="text" id="statusMsg_away" class="font-mono status-mode-input" value="High Demand • Reviewing Inquiries (24-48h)" placeholder="Queued status message..." onclick="event.stopPropagation()" />
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('away', event)" class="btn-save-square-gold" title="Save & Activate Away Status">
-                            💾
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- گزینه ۴: حالت مرخصی و سفر استودیو -->
-                      <div class="studio-status-option-card" id="cardModeVacation" onclick="selectStudioStatusCard('vacation', event)">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
-                            <input type="radio" name="studioAvailabilityChoice" value="vacation" id="studioModeVacation" onchange="previewStudioStatusSelection()" style="margin:0;" />
-                            <strong style="color:#ef4444; font-size:12.5px;">🔴 Studio Expedition (Briefs Paused)</strong>
-                          </label>
-                        </div>
-                        <div style="margin-top:8px;">
-                          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:3px;">Expedition Status Message:</label>
-                          <input type="text" id="statusMsg_vacation" class="font-mono status-mode-input" value="Studio on Worldbuilding Expedition • Inquiries Paused" placeholder="Expedition status message..." onclick="event.stopPropagation()" />
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                          <button type="button" onclick="saveStudioModeDirect('vacation', event)" class="btn-save-square-gold" title="Save & Activate Expedition Status">
-                            💾
-                          </button>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
+                <!-- ساب‌تب ۴: زیرساخت کلادیناری و تست سلامت سرورها -->
+                <div id="adminSettingsSubTab-cloud" style="display:none; flex-direction:column; gap:20px;">
                   <!-- مرکز جامع مانیتورینگ زنده و زیرساخت اتصالات ابری استودیو TAJINKART -->
                   <div style="background:#06080d; border:1.5px solid rgba(16,185,129,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; grid-column:1 / -1; box-shadow:0 10px 35px rgba(0,0,0,0.7);">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
@@ -1767,49 +1821,6 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                       </div>
                     </div>
                   </div>
-
-                  <!-- کارت ۱-ه: خزانه و آدرس‌های ولت کریپتو (Studio Treasury & Wallets) -->
-                  <div style="background:#06080d; border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; grid-column: 1 / -1;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                      <div>
-                        <span style="font-size:13.5px; font-weight:800; color:var(--gold);">💎 Studio Treasury &amp; Crypto Wallet Addresses</span>
-                        <span style="display:block; font-size:11px; color:var(--text-muted); margin-top:2px;">Only networks with a saved address appear in the Client Portal payment modal (live CoinGecko/CryptoCompare USD rates).</span>
-                      </div>
-                      <span class="font-mono" style="font-size:10px; color:var(--cyan-electric); padding:2px 8px; border-radius:4px; background:rgba(0,240,255,0.1);">MULTI-CHAIN + TZKT AUTO-VERIFY</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:10px;">
-                      <div>
-                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Tezos (XTZ) — Temple Wallet (Auto-Verify)</label>
-                        <input type="text" id="setWalletXtz" class="font-mono" placeholder="tz1..." style="width:100%; font-size:11.5px; direction:ltr;" />
-                      </div>
-                      <div>
-                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Ethereum / EVM (ETH &amp; USDT ERC-20/BEP-20)</label>
-                        <input type="text" id="setWalletEth" class="font-mono" placeholder="0x..." style="width:100%; font-size:11.5px; direction:ltr;" />
-                      </div>
-                      <div>
-                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">USDT (TRC-20 / Tron)</label>
-                        <input type="text" id="setWalletUsdtTrc20" class="font-mono" placeholder="T..." style="width:100%; font-size:11.5px; direction:ltr;" />
-                      </div>
-                      <div>
-                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Solana (SOL)</label>
-                        <input type="text" id="setWalletSol" class="font-mono" placeholder="Solana address..." style="width:100%; font-size:11.5px; direction:ltr;" />
-                      </div>
-                      <div>
-                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">TON (Toncoin)</label>
-                        <input type="text" id="setWalletTon" class="font-mono" placeholder="UQ... / EQ..." style="width:100%; font-size:11.5px; direction:ltr;" />
-                      </div>
-                      <div>
-                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px; font-weight:700;">Bitcoin (BTC)</label>
-                        <input type="text" id="setWalletBtc" class="font-mono" placeholder="bc1..." style="width:100%; font-size:11.5px; direction:ltr;" />
-                      </div>
-                    </div>
-                    <div style="display:flex; justify-content:flex-end; margin-top:4px;">
-                      <button type="button" onclick="saveStudioWalletsSettings()" class="btn-gold" style="padding:9px 18px; font-size:12px;">
-                        ✓ Save Studio Wallet Addresses
-                      </button>
-                    </div>
-                  </div>
-
                 </div>
 
                 <!-- ساب‌تب ۲: شبکه‌های اجتماعی، ربات تلگرام و اتصالات (در ابتدا مخفی) -->
@@ -2629,12 +2640,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.22"></script>
-  <script src="core.js?v=26.6.22"></script>
-  <script src="gallery.js?v=26.6.22"></script>
-  <script src="portal.js?v=26.6.22"></script>
-  <script src="admin.js?v=26.6.22"></script>
-  <script src="translate.js?v=26.6.22"></script>
+  <script src="data.js?v=26.6.23"></script>
+  <script src="core.js?v=26.6.23"></script>
+  <script src="gallery.js?v=26.6.23"></script>
+  <script src="portal.js?v=26.6.23"></script>
+  <script src="admin.js?v=26.6.23"></script>
+  <script src="translate.js?v=26.6.23"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   
