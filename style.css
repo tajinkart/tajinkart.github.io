@@ -9762,3 +9762,18 @@ body.lightbox-open #desktopBrandFilterIndicator {
 #studioLiveStatusBadge:hover .studio-cta-arrow {
   transform: translate(2px, -2px) !important;
 }
+
+
+/* ==============================================================================
+   CALM SINGLE-CARD CENTER-VIEWPORT CROSSFADE (v26.6.13)
+   Removes jarring 3D rotateY tilt; uses a soft 0.65s editorial cross-dissolve
+   ============================================================================== */
+.mosaic-tile.tile-is-flipping img {
+  transform: none !important;
+  transition: opacity 0.65s ease, filter 0.3s ease !important;
+}
+
+.mosaic-tile.tile-is-flipping img.sheet-turning {
+  opacity: 0.35 !important;
+  transform: none !important;
+}

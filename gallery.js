@@ -1740,34 +1740,28 @@ window.addEventListener('resize', () => {
 }, { passive: true });
 
 // ==============================================================================
-// AUTOMATIC VIEWPORT-AWARE LIVING GRIMOIRE SHEET-FLIP ENGINE
-// Automatically turns pages on multi-sheet artworks while visible in viewport
+// CALM CENTER-VIEWPORT SINGLE-CARD SEQUENTIAL SHEET CROSSFADE
+// Only 1 card near the center of the user's viewport gently crossfades every ~4.2s
 // ==============================================================================
-window._autoFlipObserver = window._autoFlipObserver || null;
-window._autoFlipRegistry = window._autoFlipRegistry || {};
+window._calmFlipMasterTimer = window._calmFlipMasterTimer || null;
+window._calmFlipState = window._calmFlipState || {};
 
 window.clearAllAutoTileFlips = function() {
-  if (window._autoFlipObserver) {
-    window._autoFlipObserver.disconnect();
-    window._autoFlipObserver = null;
+  if (window._calmFlipMasterTimer) {
+    clearInterval(window._calmFlipMasterTimer);
+    window._calmFlipMasterTimer = null;
   }
-  Object.keys(window._autoFlipRegistry).forEach(k => {
-    const item = window._autoFlipRegistry[k];
-    if (item.startTimer) clearTimeout(item.startTimer);
-    if (item.interval) clearInterval(item.interval);
-  });
-  window._autoFlipRegistry = {};
+  window._calmFlipState = {};
 };
 
 window.initAutoTileSheetFlipping = function() {
   window.clearAllAutoTileFlips();
-  const tiles = document.querySelectorAll('#showcaseGrid .mosaic-tile[data-multi-sheet="true"]');
+  const tiles = Array.from(document.querySelectorAll('#showcaseGrid .mosaic-tile[data-multi-sheet="true"]'));
   if (!tiles.length) return;
 
-  const startFlipForTile = (tileEl, staggerIdx) => {
+  // Build URL list per multi-sheet tile
+  tiles.forEach(tileEl => {
     const artId = tileEl.getAttribute('data-art-id');
-    if (!artId || window._autoFlipRegistry[artId]) return;
-
     const art = (typeof showcaseArtworks !== 'undefined') ? showcaseArtworks.find(a => a.id == artId) : null;
     if (!art || !Array.isArray(art.phases) || art.phases.length < 2) return;
 
@@ -1780,64 +1774,67 @@ window.initAutoTileSheetFlipping = function() {
       const opt = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(u, 640) : u;
       if (!urls.includes(opt)) urls.push(opt);
     });
-    if (urls.length < 2) return;
+    if (urls.length >= 2) {
+      window._calmFlipState[artId] = { idx: 0, urls, preloaded: false };
+    }
+  });
 
-    // Quietly preload sheets
-    urls.slice(1).forEach(u => { const pre = new Image(); pre.src = u; });
+  let turnCursor = 0;
 
-    const imgEl = tileEl.querySelector('img');
-    const badgeEl = tileEl.querySelector('.tile-sheets-badge');
+  const tickCalmCenterFlip = () => {
+    if (document.body.classList.contains('lightbox-open')) return;
+    const cView = document.body.getAttribute('data-view') || window.currentView || 'showcase';
+    if (cView !== 'showcase') return;
+
+    const vh = window.innerHeight || 800;
+    const centerY = vh * 0.48;
+
+    // Pick multi-sheet tiles currently near the center band of the viewport
+    const candidates = tiles
+      .map(el => {
+        const artId = el.getAttribute('data-art-id');
+        if (!window._calmFlipState[artId]) return null;
+        if (el.matches(':hover')) return null;
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < vh * 0.12 || rect.top > vh * 0.88) return null;
+        const tileMid = rect.top + rect.height / 2;
+        return { el, artId, dist: Math.abs(tileMid - centerY) };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, 3); // focus on top 3 closest to center of sight
+
+    if (!candidates.length) return;
+
+    const chosen = candidates[turnCursor % candidates.length];
+    turnCursor++;
+
+    const state = window._calmFlipState[chosen.artId];
+    if (!state.preloaded) {
+      state.urls.slice(1).forEach(u => { const pre = new Image(); pre.src = u; });
+      state.preloaded = true;
+    }
+
+    const imgEl = chosen.el.querySelector('img');
+    const badgeEl = chosen.el.querySelector('.tile-sheets-badge');
     if (!imgEl) return;
 
-    const entry = { idx: 0, startTimer: null, interval: null };
-    window._autoFlipRegistry[artId] = entry;
+    if (!chosen.el.style.height && chosen.el.offsetHeight > 40) {
+      chosen.el.style.height = chosen.el.offsetHeight + 'px';
+    }
+    chosen.el.classList.add('tile-is-flipping');
 
-    const stepFlip = () => {
-      if (!document.body.contains(tileEl) || document.body.classList.contains('lightbox-open')) return;
-      if (tileEl.matches(':hover')) return; // pause gently while reading title on hover
-      if (!tileEl.style.height && tileEl.offsetHeight > 40) {
-        tileEl.style.height = tileEl.offsetHeight + 'px';
-      }
-      tileEl.classList.add('tile-is-flipping');
-      entry.idx = (entry.idx + 1) % urls.length;
-      imgEl.classList.add('sheet-turning');
-      setTimeout(() => {
-        if (!document.body.contains(tileEl)) return;
-        imgEl.src = urls[entry.idx];
-        if (badgeEl) badgeEl.textContent = `❐ ${entry.idx + 1}/${urls.length}`;
-        requestAnimationFrame(() => imgEl.classList.remove('sheet-turning'));
-      }, 180);
-    };
+    state.idx = (state.idx + 1) % state.urls.length;
+    imgEl.classList.add('sheet-turning');
 
-    const initialDelay = 900 + ((staggerIdx % 5) * 450);
-    entry.startTimer = setTimeout(() => {
-      stepFlip();
-      entry.interval = setInterval(stepFlip, 2600);
-    }, initialDelay);
+    setTimeout(() => {
+      if (!document.body.contains(chosen.el)) return;
+      imgEl.src = state.urls[state.idx];
+      if (badgeEl) badgeEl.textContent = `❐ ${state.idx + 1}/${state.urls.length}`;
+      requestAnimationFrame(() => imgEl.classList.remove('sheet-turning'));
+    }, 340);
   };
 
-  const stopFlipForTile = (tileEl) => {
-    const artId = tileEl.getAttribute('data-art-id');
-    const entry = artId && window._autoFlipRegistry[artId];
-    if (!entry) return;
-    if (entry.startTimer) clearTimeout(entry.startTimer);
-    if (entry.interval) clearInterval(entry.interval);
-    delete window._autoFlipRegistry[artId];
-  };
-
-  if ('IntersectionObserver' in window) {
-    let seenCount = 0;
-    window._autoFlipObserver = new IntersectionObserver((entries) => {
-      entries.forEach(en => {
-        if (en.isIntersecting) {
-          startFlipForTile(en.target, seenCount++);
-        } else {
-          stopFlipForTile(en.target);
-        }
-      });
-    }, { threshold: 0.25 });
-    tiles.forEach(t => window._autoFlipObserver.observe(t));
-  } else {
-    tiles.forEach((t, i) => startFlipForTile(t, i));
-  }
+  // Gentle 4.2-second single-card cadence
+  window._calmFlipMasterTimer = setInterval(tickCalmCenterFlip, 4200);
 };
