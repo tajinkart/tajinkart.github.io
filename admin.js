@@ -1990,13 +1990,27 @@ function renderAdminSketch3(filterText = '') {
     );
   }
 
+  if (typeof window._isAllOrdersSelected === 'undefined') {
+    window._isAllOrdersSelected = true;
+  }
+  const allCount = (ordersList || []).length;
   if (filtered.length === 0) {
-    listEl.innerHTML = `<div style="font-size:11px; color:var(--text-muted); padding:14px; text-align:center;">No members found.</div>`;
-    renderAdminMemberDetail(null);
+    listEl.innerHTML = `
+      <div class="member-list-item active" onclick="selectAdminAllOrders()" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, rgba(0,240,255,0.12), #04060a); border:1px solid var(--cyan-electric); display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:15px;">📦</span>
+          <div>
+            <div style="font-size:12px; font-weight:900; color:var(--cyan-electric);">All Incoming Orders</div>
+            <div style="font-size:10px; color:#94a3b8;">Includes guest &amp; member briefs</div>
+          </div>
+        </div>
+        <span class="font-mono" style="font-size:11px; font-weight:800; color:#000; background:var(--cyan-electric); padding:2px 8px; border-radius:999px;">${allCount}</span>
+      </div>
+      <div style="font-size:11px; color:var(--text-muted); padding:12px; text-align:center;">No registered members match filter.</div>
+    `;
+    renderAdminAllOrdersDetail();
     return;
   }
-
-  const allCount = (ordersList || []).length;
   let membersHtml = `
     <div class="member-list-item ${window._isAllOrdersSelected ? 'active' : ''}" onclick="selectAdminAllOrders()" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, rgba(0,240,255,0.1), #04060a); border:1px solid ${window._isAllOrdersSelected ? 'var(--cyan-electric)' : 'rgba(0,240,255,0.35)'}; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <div style="display:flex; align-items:center; gap:8px;">

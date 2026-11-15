@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.24">
+  <link rel="stylesheet" href="style.css?v=26.6.25">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -873,6 +873,7 @@
             <h2 class="view-hero-title" style="margin:0;">Studio Command Console & Control Center</h2>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <button type="button" onclick="if(typeof renderMemberDashboard==='function') renderMemberDashboard(); switchView('member-dashboard');" class="btn-secondary" style="color:var(--cyan-electric); border-color:rgba(0,240,255,0.35); padding:8px 14px; cursor:pointer;" title="Open Client Portal as Director">👁️ Client Portal</button>
             <button type="button" onclick="logoutAdmin()" class="btn-secondary" style="color:#fda4af; padding:8px 16px; cursor:pointer;" title="Lock Console & Sign Out">Lock Console</button>
           </div>
         </div>
@@ -2640,12 +2641,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.24"></script>
-  <script src="core.js?v=26.6.24"></script>
-  <script src="gallery.js?v=26.6.24"></script>
-  <script src="portal.js?v=26.6.24"></script>
-  <script src="admin.js?v=26.6.24"></script>
-  <script src="translate.js?v=26.6.24"></script>
+  <script src="data.js?v=26.6.25"></script>
+  <script src="core.js?v=26.6.25"></script>
+  <script src="gallery.js?v=26.6.25"></script>
+  <script src="portal.js?v=26.6.25"></script>
+  <script src="admin.js?v=26.6.25"></script>
+  <script src="translate.js?v=26.6.25"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   
