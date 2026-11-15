@@ -969,9 +969,10 @@ function renderMemberDashboard() {
   // ۱. رندر پایپلاین‌های سفارش‌ها در زبانه ۱
   const oBox = document.getElementById('memberOrdersContainer');
   const userOrders = currentMember ? ordersList.filter(o => 
+    (o.clientEmail && o.clientEmail.toLowerCase() === currentMember.email.toLowerCase()) ||
     (o.client && o.client.toLowerCase() === currentMember.name.toLowerCase()) || 
-    o.contact === currentMember.email || 
-    o.contact === currentMember.contact
+    (o.contact && o.contact.toLowerCase() === currentMember.email.toLowerCase()) || 
+    (currentMember.contact && o.contact === currentMember.contact)
   ) : [];
 
   const STAGES = [
@@ -1056,9 +1057,23 @@ function renderMemberDashboard() {
             </div>
           </div>
 
+          ${o.specs ? `
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:8px; padding:12px; border-radius:10px; background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.2); font-size:11.5px;">
+              <div><span style="color:#94a3b8; display:block; font-size:10px;">SCOPE & ARCHETYPE</span><strong style="color:#f8fafc;">${o.specs.scope || '-'}</strong></div>
+              <div><span style="color:#94a3b8; display:block; font-size:10px;">FRAMING & VIEW</span><strong style="color:#f8fafc;">${o.specs.framing || '-'}</strong></div>
+              <div><span style="color:#94a3b8; display:block; font-size:10px;">COMPLEXITY</span><strong style="color:#f8fafc;">${o.specs.complexity || '-'}</strong></div>
+              <div><span style="color:#94a3b8; display:block; font-size:10px;">RENDERING FIDELITY</span><strong style="color:#f8fafc;">${o.specs.fidelity || o.phase || '-'}</strong></div>
+              ${o.specs.addons && o.specs.addons.length ? `<div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06);"><span style="color:#94a3b8; font-size:10px; display:block; margin-bottom:3px;">INCLUDED ADD-ONS & DELIVERABLES</span><strong style="color:var(--emerald);">${o.specs.addons.join(' • ')}</strong></div>` : ''}
+              <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${o.specs.retainerUsd || '--'}</strong></span>
+                <span>50% Final on PSD Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${o.specs.balanceUsd || '--'}</strong></span>
+              </div>
+            </div>
+          ` : ''}
+
           <div style="color:#cbd5e1; font-size:12px; line-height:1.8; background:rgba(255,255,255,0.02); padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
-            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Brief Summary & Scope Specifications:</strong>
-            ${o.brief || 'Bespoke concept art and visual development executed to international industry standards by TAJINKART Studio.'}
+            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Client Creative Brief:</strong>
+            ${String(o.brief || 'Bespoke concept art and visual development executed to international industry standards by TAJINKART Studio.').replace(/\n/g, '<br>')}
           </div>
 
           ${o.txid ? `
@@ -1074,7 +1089,7 @@ function renderMemberDashboard() {
               <button type="button" onclick="openCryptoPayModal(${o.id})" class="btn-gold" style="font-size:11px; padding:6px 12px;">
                 💳 ${o.paymentVerified ? 'Settle Balance' : (o.txid ? 'Update TXID' : 'Pay 50% Retainer')}
               </button>
-              <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--gold); color:var(--gold);">
+              <button type="button" onclick="downloadOfficialStudioInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--gold); color:var(--gold);">
                 📄 Invoice
               </button>
             </div>
@@ -1337,19 +1352,52 @@ document.addEventListener('DOMContentLoaded', () => {
       const client = document.getElementById('orderClientName').value.trim();
       const contact = document.getElementById('orderClientContact').value.trim();
       const refLink = document.getElementById('orderClientRefLink')?.value.trim() || 'None provided (Full visual exploration by studio)';
-      const phase = document.getElementById('orderPhaseSelect').value;
+      const phaseEl = document.getElementById('orderPhaseSelect');
+      const phase = phaseEl ? phaseEl.value : '';
+      const fidelityText = (phaseEl && phaseEl.selectedOptions[0]) ? phaseEl.selectedOptions[0].text.trim() : phase;
+      const scopeEl = document.getElementById('wizCharacterScope');
+      const scopeText = (scopeEl && scopeEl.selectedOptions[0]) ? scopeEl.selectedOptions[0].text.trim() : 'Standard Single Subject';
+      const framingEl = document.getElementById('wizFraming');
+      const framingText = (framingEl && framingEl.selectedOptions[0]) ? framingEl.selectedOptions[0].text.trim() : 'Standard Framing';
+      const compEl = document.getElementById('wizComplexity');
+      const complexityText = (compEl && compEl.selectedOptions[0]) ? compEl.selectedOptions[0].text.trim() : 'Production Standard';
+
+      const addons = [];
+      if (document.getElementById('wizHeroWeapon')?.checked) addons.push('Hero Weapon Design (+$35)');
+      if (document.getElementById('wizExpressions')?.checked) addons.push('Facial Expressions Sheet (+$30)');
+      if (document.getElementById('wizColorPalette')?.checked) addons.push('Color Variations (+$20)');
+      if (document.getElementById('wizCommercial')?.checked) addons.push('Commercial AAA License (+$45)');
+      if (document.getElementById('wizPSD')?.checked) addons.push('Master Layered 300DPI PSD (Included)');
+
       const brief = document.getElementById('orderClientBrief').value.trim();
       const priceText = document.getElementById('modalPrice').textContent;
+      const totalUsd = parseFloat(String(priceText).replace(/[^0-9.]/g, '')) || 0;
+      const retainerUsd = (totalUsd * 0.5).toFixed(2).replace(/\.00$/, '');
+      const clientEmail = (window.currentMember && window.currentMember.email) ? window.currentMember.email : (contact.includes('@') ? contact : '');
+
+      const specs = {
+        scope: scopeText,
+        framing: framingText,
+        complexity: complexityText,
+        fidelity: fidelityText,
+        addons: addons,
+        totalUsd: totalUsd,
+        retainerUsd: retainerUsd,
+        balanceUsd: retainerUsd,
+        createdAt: new Date().toISOString()
+      };
 
       const newOrder = {
         id: Date.now(),
         client: client,
         contact: contact,
+        clientEmail: clientEmail,
         refLink: refLink,
         pkg: activeModalItem.title,
         price: priceText,
         timeline: activeModalItem.timeline,
-        phase: phase,
+        phase: fidelityText,
+        specs: specs,
         brief: brief,
         status: 'Brief Received'
       };
@@ -1375,7 +1423,7 @@ document.addEventListener('DOMContentLoaded', () => {
             price_text: newOrder.price,
             timeline: newOrder.timeline,
             phase: newOrder.phase,
-            brief_text: newOrder.brief,
+            brief_text: `${newOrder.brief}\n\n[CONTRACT SPECS]\n• Scope: ${scopeText}\n• Framing: ${framingText}\n• Complexity: ${complexityText}\n• Fidelity: ${fidelityText}\n• Add-ons: ${addons.join(', ') || 'None'}\n• 50% Retainer: $${retainerUsd}`, 
             status: newOrder.status,
             created_at: new Date().toISOString()
           }])
@@ -2279,9 +2327,7 @@ window.openProductDetailModal = function(idx) {
   }
 };
 
-window.downloadOfficialStudioInvoice = function(orderId) {
-  showToast(`Generating official PDF invoice for order #${orderId}...`, 'info');
-};
+// Official Contractual Invoice generator defined below
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -2559,3 +2605,144 @@ window.submitCryptoTransaction = async function() {
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
 };
+
+// ==============================================================================
+// OFFICIAL CONTRACTUAL PROFORMA INVOICE & SUPABASE ORDERS SYNC
+// ==============================================================================
+window.downloadOfficialStudioInvoice = function(orderId) {
+  const o = orderId ? ordersList.find(x => x.id === orderId) : (ordersList && ordersList[0]);
+  if (!o) {
+    showToast('No active order found to generate an invoice.', 'info');
+    return;
+  }
+  const sp = o.specs || {};
+  const totalNum = sp.totalUsd || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+  const halfNum = (totalNum * 0.5).toFixed(2).replace(/\.00$/, '');
+  const dateStr = sp.createdAt ? new Date(sp.createdAt).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : new Date().toLocaleDateString('en-US');
+
+  const htmlDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>TAJINKART Contractual Invoice #${o.id}</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; background:#090c12; color:#e2e8f0; margin:0; padding:32px; }
+  .sheet { max-width:820px; margin:0 auto; background:#0f141f; border:1px solid rgba(250,204,21,0.35); border-radius:16px; padding:32px; }
+  .head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:18px; margin-bottom:22px; }
+  h1 { margin:0; font-size:24px; color:#facc15; letter-spacing:0.08em; }
+  .muted { color:#94a3b8; font-size:12.5px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+  .box { background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; font-size:13px; }
+  .box strong { color:#fff; display:block; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:13px; }
+  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  th { color:#facc15; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
+  .terms { background:#06080d; border-left:3px solid #facc15; padding:14px 16px; border-radius:8px; font-size:12px; line-height:1.7; color:#cbd5e1; margin-top:20px; }
+  .print-btn { margin-top:20px; padding:10px 20px; border-radius:8px; border:none; background:#facc15; color:#000; font-weight:800; cursor:pointer; }
+  @media print { body { background:#fff; color:#111; } .sheet { border:1px solid #ccc; background:#fff; } .box, .terms { background:#f8fafc; color:#111; border-color:#ddd; } .print-btn { display:none; } }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="head">
+      <div>
+        <h1>TAJINKART STUDIO</h1>
+        <div class="muted">Concept Art &amp; Visual Development Atelier • Directed by Seyed Soroush Taj</div>
+        <div class="muted">https://tajinkart.space • studio@tajincart.space</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:12px; color:#00f0ff; font-weight:700;">CONTRACTUAL PROFORMA INVOICE</div>
+        <div style="font-size:16px; font-weight:800; margin-top:4px;">#TJK-${o.id}</div>
+        <div class="muted">Issued: ${dateStr} • Status: ${o.status || 'Brief Received'}</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="box"><span class="muted">Client / Studio</span><strong>${o.client || 'Valued Client'}</strong><span class="muted">${o.contact || ''}</span></div>
+      <div class="box"><span class="muted">Commission Package &amp; Timeline</span><strong>${o.pkg || 'Custom Concept Art'}</strong><span class="muted">Estimated Delivery: ${o.timeline || 'Per Schedule'}</span></div>
+    </div>
+
+    <table>
+      <thead><tr><th>Production Specification</th><th>Selected Scope &amp; Deliverables</th></tr></thead>
+      <tbody>
+        <tr><td>Scope &amp; Archetype</td><td>${sp.scope || 'Custom Scope'}</td></tr>
+        <tr><td>Framing &amp; View</td><td>${sp.framing || 'Standard View'}</td></tr>
+        <tr><td>Design Complexity</td><td>${sp.complexity || 'Production Standard'}</td></tr>
+        <tr><td>Rendering Fidelity</td><td>${sp.fidelity || o.phase || '300DPI Master Render'}</td></tr>
+        <tr><td>Included Add-ons</td><td>${(sp.addons && sp.addons.length) ? sp.addons.join(', ') : 'Master Layered 300DPI PSD'}</td></tr>
+        <tr><td>Creative Brief</td><td>${String(o.brief || '').replace(/\n/g, '<br>')}</td></tr>
+        <tr><td>Reference Link</td><td>${o.refLink || 'None'}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid">
+      <div class="box"><span class="muted">50% Non-Refundable Retainer (To Start)</span><strong style="color:#facc15; font-size:18px;">$${halfNum} USD</strong></div>
+      <div class="box"><span class="muted">50% Final Balance (Prior to PSD Handover)</span><strong style="color:#00f0ff; font-size:18px;">$${halfNum} USD</strong></div>
+    </div>
+
+    <div class="terms">
+      <strong style="color:#facc15; display:block; margin-bottom:6px;">Binding Studio Commission Agreement Summary:</strong>
+      1. <strong>Retainer &amp; Scheduling:</strong> Production begins strictly upon settlement of the 50% non-refundable retainer.<br/>
+      2. <strong>Checkpoints &amp; Revisions:</strong> Up to 2 structured revision rounds are included at Silhouette/Linework and Color/Value checkpoints.<br/>
+      3. <strong>Final Handover:</strong> High-resolution 300DPI master files and layered PSDs are released upon settlement of the remaining 50% balance.<br/>
+      4. <strong>Abandonment &amp; Anti-AI:</strong> Client silence exceeding 30 calendar days closes the commission. All studio works are protected against unauthorized AI training.
+    </div>
+
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `TAJINKART-Contract-${o.id}.html`;
+    a.click();
+  }
+  showToast(`Contractual Invoice #TJK-${o.id} generated!`, 'success', 3500);
+};
+
+window.syncOrdersFromSupabase = async function() {
+  if (!window.supabaseClient) return;
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const localMap = {};
+      (ordersList || []).forEach(o => { localMap[String(o.id)] = o; });
+      data.forEach(row => {
+        const existing = localMap[String(row.id)];
+        if (!existing) {
+          ordersList.push({
+            id: row.id,
+            client: row.client_name || 'Client',
+            contact: row.contact || row.client_email || '',
+            clientEmail: row.client_email || '',
+            refLink: row.ref_link || '',
+            pkg: row.package_name || 'Commission',
+            price: row.price_text || '$0',
+            timeline: row.timeline || '',
+            phase: row.phase || '',
+            brief: row.brief_text || '',
+            status: row.status || 'Brief Received'
+          });
+        } else {
+          if (row.status) existing.status = row.status;
+        }
+      });
+      safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+      if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+      if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+    }
+  } catch(e) { console.warn('[Supabase Orders Sync]', e); }
+};
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(() => window.syncOrdersFromSupabase(), 900));
+} else {
+  setTimeout(() => window.syncOrdersFromSupabase(), 900);
+}

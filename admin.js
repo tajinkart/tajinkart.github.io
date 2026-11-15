@@ -1992,7 +1992,19 @@ function renderAdminSketch3(filterText = '') {
     return;
   }
 
-  let membersHtml = filtered.map((m, idx) => `
+  const allCount = (ordersList || []).length;
+  let membersHtml = `
+    <div class="member-list-item ${window._isAllOrdersSelected ? 'active' : ''}" onclick="selectAdminAllOrders()" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, rgba(0,240,255,0.1), #04060a); border:1px solid ${window._isAllOrdersSelected ? 'var(--cyan-electric)' : 'rgba(0,240,255,0.35)'}; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:15px;">📦</span>
+        <div>
+          <div style="font-size:12px; font-weight:900; color:var(--cyan-electric);">All Incoming Orders</div>
+          <div style="font-size:10px; color:#94a3b8;">Includes guest &amp; member briefs</div>
+        </div>
+      </div>
+      <span class="font-mono" style="font-size:11px; font-weight:800; color:#000; background:var(--cyan-electric); padding:2px 8px; border-radius:999px;">${allCount}</span>
+    </div>
+  ` + filtered.map((m, idx) => `
     <div class="member-list-item ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'active' : ''}" onclick="selectAdminMember(${idx})" style="padding:10px 12px; border-radius:10px; cursor:pointer; background:#04060a; border:1px solid ${(!isCreatorSelected && idx === selectedMemberIdx) ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.08)'}; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
       <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
         <div style="width:28px; height:28px; border-radius:50%; background:rgba(0,240,255,0.12); border:1px solid rgba(0,240,255,0.3); color:var(--cyan-electric); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
@@ -2026,15 +2038,44 @@ function renderAdminSketch3(filterText = '') {
 
   listEl.innerHTML = membersHtml;
 
-  renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0]);
+  if (window._isAllOrdersSelected) {
+    renderAdminAllOrdersDetail();
+  } else {
+    renderAdminMemberDetail(filtered[selectedMemberIdx] || filtered[0]);
+  }
 }
 
+window.selectAdminAllOrders = function() {
+  window._isAllOrdersSelected = true;
+  isCreatorSelected = false;
+  renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '');
+};
+
+window.renderAdminAllOrdersDetail = function() {
+  const col = document.getElementById('adminMemberDetailContent');
+  if (!col) return;
+  const list = ordersList || [];
+  col.innerHTML = `
+    <div style="padding:14px; background:#040609; border-radius:12px; border:1px solid rgba(0,240,255,0.35); margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h3 style="font-size:16px; font-weight:900; color:var(--cyan-electric); margin:0;">All Studio Commission Orders (${list.length})</h3>
+        <div style="font-size:11.5px; color:#94a3b8; margin-top:3px;">Every brief submitted by members or guests, with full wizard specs &amp; TXID verification.</div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      ${list.length === 0 ? '<div style="font-size:12px; color:var(--text-muted); padding:20px; text-align:center; background:#04060a; border-radius:10px;">No commission orders submitted yet.</div>' : list.map(o => renderOrderAdminSnippet(o)).join('')}
+    </div>
+  `;
+};
+
 window.selectAdminCreator = function() {
+  window._isAllOrdersSelected = false;
   isCreatorSelected = true;
   renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
 };
 
 window.selectAdminMember = function(idx) {
+  window._isAllOrdersSelected = false;
   isCreatorSelected = false;
   selectedMemberIdx = idx;
   renderAdminSketch3(document.getElementById('adminMemberSearchInput')?.value || '', currentMemberTierFilter);
@@ -2182,9 +2223,18 @@ function renderOrderAdminSnippet(o) {
         </select>
       </div>
 
+      ${o.specs ? `
+        <div style="font-size:11px; padding:8px 10px; border-radius:6px; background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.2); color:#e2e8f0; display:grid; grid-template-columns:1fr 1fr; gap:4px 10px;">
+          <div><span style="color:#94a3b8;">Scope:</span> ${o.specs.scope || '-'}</div>
+          <div><span style="color:#94a3b8;">Framing:</span> ${o.specs.framing || '-'}</div>
+          <div><span style="color:#94a3b8;">Complexity:</span> ${o.specs.complexity || '-'}</div>
+          <div><span style="color:#94a3b8;">Fidelity:</span> ${o.specs.fidelity || o.phase || '-'}</div>
+          ${o.specs.addons && o.specs.addons.length ? `<div style="grid-column:1/-1; color:var(--emerald);">Add-ons: ${o.specs.addons.join(' • ')}</div>` : ''}
+        </div>
+      ` : ''}
       <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:6px;">
-        <span style="color:var(--text-muted); font-size:10.5px; display:block; margin-bottom:2px;">Brief & Agreed Scope:</span>
-        ${o.brief || 'Bespoke concept art specifications'}
+        <span style="color:var(--text-muted); font-size:10.5px; display:block; margin-bottom:2px;">Client: ${o.client || 'Guest'} (${o.contact || '-'}) • Brief:</span>
+        ${String(o.brief || 'Bespoke concept art specifications').replace(/\n/g, '<br>')}
       </div>
 
       ${o.txid ? `
