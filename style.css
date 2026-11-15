@@ -9720,3 +9720,45 @@ body.lightbox-open #ambientParticleCanvas {
 .mosaic-tile .tile-center-title .tile-sub {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.92), 0 0 20px rgba(0, 0, 0, 0.75) !important;
 }
+
+
+/* ==============================================================================
+   UI POLISH ROUND 3 (v26.6.12):
+   1. Particles strictly BEHIND lightbox cards/images (never on top of artworks)
+   2. Hide TAJINKART chevron & remove Lightbox X button
+   3. Crisp visible gold arrow on Studio Online -> Commissions CTA
+   ============================================================================== */
+body.lightbox-open #ambientParticleCanvas {
+  z-index: 9505 !important;
+}
+
+.art-detail-modal {
+  z-index: 9510 !important;
+  background: rgba(4, 5, 8, 0.78) !important;
+}
+
+.artstation-close-btn {
+  display: none !important;
+}
+
+body.lightbox-open #desktopBrandChevron,
+body.lightbox-open #mobileMasterChevron,
+body.lightbox-open #desktopBrandFilterIndicator {
+  display: none !important;
+}
+
+#studioLiveStatusBadge .studio-cta-arrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #facc15 !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  margin-left: 2px !important;
+  transition: transform 0.2s ease !important;
+}
+
+#studioLiveStatusBadge:hover .studio-cta-arrow {
+  transform: translate(2px, -2px) !important;
+}

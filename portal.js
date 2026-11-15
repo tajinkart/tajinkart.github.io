@@ -2118,21 +2118,21 @@ window.updateStudioLiveStatus = function() {
   const customMsg = (siteSettings.studioCustomStatusMessage || '').trim();
 
   if (mode === 'vacation') {
-    badge.className = 'hero-badge studio-status-badge status-vacation';
+    badge.className = 'hero-badge studio-status-badge status-vacation studio-cta-pill';
     textEl.textContent = customMsg || 'Studio Away / Capacity Full • Inquiries Reviewed Shortly';
     badge.title = 'The studio is currently on expedition / at full capacity.';
     return;
   }
 
   if (mode === 'online') {
-    badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = customMsg || 'Studio Online • Accepting Briefs & Concept Commissions';
+    badge.className = 'hero-badge studio-status-badge status-online studio-cta-pill';
+    textEl.textContent = customMsg || 'Studio Online • Commissions Open';
     badge.title = 'Real-time brief acceptance and project consultations active.';
     return;
   }
 
   if (mode === 'away') {
-    badge.className = 'hero-badge studio-status-badge status-pending';
+    badge.className = 'hero-badge studio-status-badge status-pending studio-cta-pill';
     textEl.textContent = customMsg || 'Inquiries Active • Review within 24-48 Hours';
     badge.title = 'Accepting project briefs with queued review response.';
     return;
@@ -2143,11 +2143,11 @@ window.updateStudioLiveStatus = function() {
   const diffHours = (Date.now() - lastActive) / (1000 * 60 * 60);
 
   if (diffHours <= 24) {
-    badge.className = 'hero-badge studio-status-badge status-online';
-    textEl.textContent = customMsg || 'Studio Online • Accepting Briefs & Concept Commissions';
+    badge.className = 'hero-badge studio-status-badge status-online studio-cta-pill';
+    textEl.textContent = customMsg || 'Studio Online • Commissions Open';
     badge.title = 'Real-time brief acceptance and project consultations active.';
   } else {
-    badge.className = 'hero-badge studio-status-badge status-pending';
+    badge.className = 'hero-badge studio-status-badge status-pending studio-cta-pill';
     textEl.textContent = customMsg || 'Inquiries Active • Review within 24-48 Hours';
     badge.title = 'Accepting project briefs with queued review response.';
   }

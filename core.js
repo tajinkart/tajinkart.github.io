@@ -574,6 +574,12 @@ function handleOptimizedScroll() {
     }
   }
 
+  // اگر لایت‌باکس اثر باز است، داک سمت راست همیشه جمع بماند
+  if (document.body.classList.contains('lightbox-open')) {
+    if (dock && !dock.classList.contains('dock-open')) dock.classList.add('dock-collapsed');
+    return;
+  }
+
   // ۳. مدیریت داک در موبایل: همیشه بسته می‌ماند
   if (window.innerWidth <= 768) {
     if (dock) dock.classList.add('dock-collapsed');

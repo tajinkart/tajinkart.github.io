@@ -976,10 +976,10 @@ window.renderShowcaseGrid = function() {
 
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
+           data-art-id="${art.id}"
+           data-multi-sheet="${totalSheets > 1 ? 'true' : 'false'}"
            data-cover-src="${tileImg}"
            style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
-           onmouseenter="window.startTileSheetFlip(${art.id}, this)"
-           onmouseleave="window.stopTileSheetFlip(${art.id}, this)"
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
         ${sheetsBadgeHtml}
         <div class="tile-center-title">
@@ -1000,6 +1000,9 @@ window.renderShowcaseGrid = function() {
   ).join('');
 
   try {
+    if (typeof window.initAutoTileSheetFlipping === 'function') {
+      window.initAutoTileSheetFlipping();
+    }
     if (typeof window.syncAtelierWithGalleryArtworks === 'function') {
       window.syncAtelierWithGalleryArtworks();
     }
@@ -1039,6 +1042,11 @@ window.closeAllFloatingDrawersAndMenus = function() {
 
 window.openArtModalWithPhase = function(id, targetPhaseIdx = 0) {
   document.body.classList.add('lightbox-open');
+  const dock = document.getElementById('rightVerticalNav');
+  if (dock) {
+    dock.classList.add('dock-collapsed');
+    dock.classList.remove('dock-open');
+  }
   closeAllFloatingDrawersAndMenus();
   let idx = showcaseArtworks.findIndex(a => String(a.id) === String(id) || a.id == id);
   if (idx === -1 && typeof id === 'number') idx = id;
@@ -1098,6 +1106,9 @@ window.openArtModal = function(id) {
 
 window.closeArtModalDirect = function(updateHistory = true) {
   document.body.classList.remove('lightbox-open');
+  if (typeof initDockState === 'function') {
+    setTimeout(initDockState, 30);
+  }
   const modal = document.getElementById('artDetailModal');
   if (modal) {
     modal.classList.remove('active');
@@ -1729,88 +1740,104 @@ window.addEventListener('resize', () => {
 }, { passive: true });
 
 // ==============================================================================
-// LIVING GRIMOIRE HOVER SHEET-FLIP ENGINE (Harry Potter Moving Portrait Style)
+// AUTOMATIC VIEWPORT-AWARE LIVING GRIMOIRE SHEET-FLIP ENGINE
+// Automatically turns pages on multi-sheet artworks while visible in viewport
 // ==============================================================================
-window._tileFlipTimers = window._tileFlipTimers || {};
+window._autoFlipObserver = window._autoFlipObserver || null;
+window._autoFlipRegistry = window._autoFlipRegistry || {};
 
-window.startTileSheetFlip = function(artId, tileEl) {
-  if (!tileEl) return;
-  if (window.matchMedia && !window.matchMedia('(hover: hover)').matches) return;
-  window.stopTileSheetFlip(artId, tileEl, true);
-
-  const art = (typeof showcaseArtworks !== 'undefined') ? showcaseArtworks.find(a => a.id == artId) : null;
-  if (!art || !Array.isArray(art.phases) || art.phases.length < 2) return;
-
-  const coverSrc = tileEl.getAttribute('data-cover-src') || '';
-  const rawUrls = [];
-  if (coverSrc) rawUrls.push(coverSrc);
-  art.phases.forEach(p => {
-    const u = p && (p.image || p.img);
-    if (!u) return;
-    const opt = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(u, 640) : u;
-    if (!rawUrls.includes(opt)) rawUrls.push(opt);
+window.clearAllAutoTileFlips = function() {
+  if (window._autoFlipObserver) {
+    window._autoFlipObserver.disconnect();
+    window._autoFlipObserver = null;
+  }
+  Object.keys(window._autoFlipRegistry).forEach(k => {
+    const item = window._autoFlipRegistry[k];
+    if (item.startTimer) clearTimeout(item.startTimer);
+    if (item.interval) clearInterval(item.interval);
   });
-
-  if (rawUrls.length < 2) return;
-
-  // Preload subsequent sheets quietly while user reads title
-  rawUrls.slice(1).forEach(u => { const pre = new Image(); pre.src = u; });
-
-  const imgEl = tileEl.querySelector('img');
-  const badgeEl = tileEl.querySelector('.tile-sheets-badge');
-  if (!imgEl) return;
-
-  const state = { idx: 0, delayTimer: null, intervalTimer: null };
-  window._tileFlipTimers[artId] = state;
-
-  state.delayTimer = setTimeout(() => {
-    if (!tileEl.matches(':hover')) return;
-    // Lock height so masonry column never shifts during sheet flip
-    if (tileEl.offsetHeight > 40) {
-      tileEl.style.height = tileEl.offsetHeight + 'px';
-    }
-    tileEl.classList.add('tile-is-flipping');
-
-    const advanceSheet = () => {
-      if (!tileEl.matches(':hover')) {
-        window.stopTileSheetFlip(artId, tileEl);
-        return;
-      }
-      state.idx = (state.idx + 1) % rawUrls.length;
-      imgEl.classList.add('sheet-turning');
-      setTimeout(() => {
-        if (!tileEl.matches(':hover')) return;
-        imgEl.src = rawUrls[state.idx];
-        if (badgeEl) badgeEl.textContent = `${state.idx + 1} / ${rawUrls.length}`;
-        requestAnimationFrame(() => imgEl.classList.remove('sheet-turning'));
-      }, 170);
-    };
-
-    advanceSheet();
-    state.intervalTimer = setInterval(advanceSheet, 1300);
-  }, 650);
+  window._autoFlipRegistry = {};
 };
 
-window.stopTileSheetFlip = function(artId, tileEl, skipReset = false) {
-  const state = window._tileFlipTimers && window._tileFlipTimers[artId];
-  if (state) {
-    if (state.delayTimer) clearTimeout(state.delayTimer);
-    if (state.intervalTimer) clearInterval(state.intervalTimer);
-    delete window._tileFlipTimers[artId];
-  }
-  if (!tileEl || skipReset) return;
+window.initAutoTileSheetFlipping = function() {
+  window.clearAllAutoTileFlips();
+  const tiles = document.querySelectorAll('#showcaseGrid .mosaic-tile[data-multi-sheet="true"]');
+  if (!tiles.length) return;
 
-  tileEl.classList.remove('tile-is-flipping');
-  tileEl.style.height = '';
-  const imgEl = tileEl.querySelector('img');
-  const coverSrc = tileEl.getAttribute('data-cover-src');
-  if (imgEl) {
-    imgEl.classList.remove('sheet-turning');
-    if (coverSrc && imgEl.src !== coverSrc) imgEl.src = coverSrc;
-  }
-  const badgeEl = tileEl.querySelector('.tile-sheets-badge');
-  if (badgeEl) {
-    const total = badgeEl.getAttribute('data-total') || '';
-    if (total) badgeEl.textContent = `❐ ${total}`;
+  const startFlipForTile = (tileEl, staggerIdx) => {
+    const artId = tileEl.getAttribute('data-art-id');
+    if (!artId || window._autoFlipRegistry[artId]) return;
+
+    const art = (typeof showcaseArtworks !== 'undefined') ? showcaseArtworks.find(a => a.id == artId) : null;
+    if (!art || !Array.isArray(art.phases) || art.phases.length < 2) return;
+
+    const coverSrc = tileEl.getAttribute('data-cover-src') || '';
+    const urls = [];
+    if (coverSrc) urls.push(coverSrc);
+    art.phases.forEach(p => {
+      const u = p && (p.image || p.img);
+      if (!u) return;
+      const opt = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(u, 640) : u;
+      if (!urls.includes(opt)) urls.push(opt);
+    });
+    if (urls.length < 2) return;
+
+    // Quietly preload sheets
+    urls.slice(1).forEach(u => { const pre = new Image(); pre.src = u; });
+
+    const imgEl = tileEl.querySelector('img');
+    const badgeEl = tileEl.querySelector('.tile-sheets-badge');
+    if (!imgEl) return;
+
+    const entry = { idx: 0, startTimer: null, interval: null };
+    window._autoFlipRegistry[artId] = entry;
+
+    const stepFlip = () => {
+      if (!document.body.contains(tileEl) || document.body.classList.contains('lightbox-open')) return;
+      if (tileEl.matches(':hover')) return; // pause gently while reading title on hover
+      if (!tileEl.style.height && tileEl.offsetHeight > 40) {
+        tileEl.style.height = tileEl.offsetHeight + 'px';
+      }
+      tileEl.classList.add('tile-is-flipping');
+      entry.idx = (entry.idx + 1) % urls.length;
+      imgEl.classList.add('sheet-turning');
+      setTimeout(() => {
+        if (!document.body.contains(tileEl)) return;
+        imgEl.src = urls[entry.idx];
+        if (badgeEl) badgeEl.textContent = `❐ ${entry.idx + 1}/${urls.length}`;
+        requestAnimationFrame(() => imgEl.classList.remove('sheet-turning'));
+      }, 180);
+    };
+
+    const initialDelay = 900 + ((staggerIdx % 5) * 450);
+    entry.startTimer = setTimeout(() => {
+      stepFlip();
+      entry.interval = setInterval(stepFlip, 2600);
+    }, initialDelay);
+  };
+
+  const stopFlipForTile = (tileEl) => {
+    const artId = tileEl.getAttribute('data-art-id');
+    const entry = artId && window._autoFlipRegistry[artId];
+    if (!entry) return;
+    if (entry.startTimer) clearTimeout(entry.startTimer);
+    if (entry.interval) clearInterval(entry.interval);
+    delete window._autoFlipRegistry[artId];
+  };
+
+  if ('IntersectionObserver' in window) {
+    let seenCount = 0;
+    window._autoFlipObserver = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          startFlipForTile(en.target, seenCount++);
+        } else {
+          stopFlipForTile(en.target);
+        }
+      });
+    }, { threshold: 0.25 });
+    tiles.forEach(t => window._autoFlipObserver.observe(t));
+  } else {
+    tiles.forEach((t, i) => startFlipForTile(t, i));
   }
 };
