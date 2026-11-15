@@ -982,18 +982,37 @@ function renderMemberDashboard() {
     { id: 5, label: 'Final PSD Source', hint: 'Full Layered 4K Handover' }
   ];
 
-  const ordersToRender = userOrders.length > 0 ? userOrders : [{
-    id: 701,
-    pkg: 'Cyberpunk Character Concept & Expression Sheet (Active Project)',
-    price: '$180 (50% Retainer Settled)',
-    status: 'Phase 3: Initial Silhouette & Linework in Progress',
-    phase: 'Phase 3 • Linework & Turnaround Sheet',
-    timeline: '5 to 7 business days',
-    brief: 'Full-body rogue cyberpunk character design with dark cloak and biomechanical armor elements. Silhouette thumbnails approved, orthographic turnaround linework underway.'
-  }];
+  const pCountEl = document.getElementById('dashPipelineCount');
+  if (pCountEl) pCountEl.textContent = String(userOrders.length);
 
-  if (oBox) {
-    oBox.innerHTML = ordersToRender.map(o => {
+  if (oBox && userOrders.length === 0) {
+    oBox.innerHTML = `
+      <div class="client-empty-state">
+        <div class="empty-state-head">
+          <h4>No Active Commissions Yet</h4>
+          <p>When you submit a commission brief, your live 5-stage progress tracker and crypto/invoice settlement options will appear right here.</p>
+        </div>
+        <div class="workflow-preview-strip">
+          ${STAGES.map(s => `
+            <div class="workflow-step-pill">
+              <span class="wf-num">${s.id}</span>
+              <div>
+                <strong>${s.label}</strong>
+                <span>${s.hint}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" onclick="switchView('store')" class="btn-atelier-accent" style="padding:12px 22px;">
+            Start Your First Commission →
+          </button>
+          ${isDirector ? `<button type="button" onclick="openCryptoPayModal(null)" class="btn-atelier-gold" style="padding:12px 18px;">🧪 Test Wallet Payment (0.01 XTZ)</button>` : ''}
+        </div>
+      </div>
+    `;
+  } else if (oBox) {
+    oBox.innerHTML = userOrders.map(o => {
       let currentStageNum = 1;
       const stLower = (o.status || '').toLowerCase();
       if (stLower.includes('retainer') || stLower.includes('deposit') || stLower.includes('ودیعه')) currentStageNum = 2;
@@ -1042,12 +1061,23 @@ function renderMemberDashboard() {
             ${o.brief || 'Bespoke concept art and visual development executed to international industry standards by TAJINKART Studio.'}
           </div>
 
+          ${o.txid ? `
+            <div class="font-mono" style="font-size:11px; padding:8px 12px; border-radius:8px; background:rgba(0,240,255,0.06); border:1px solid ${o.paymentVerified ? 'rgba(16,185,129,0.4)' : 'rgba(250,204,21,0.35)'}; color:${o.paymentVerified ? 'var(--emerald)' : 'var(--gold)'}; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+              <span>${o.paymentVerified ? '✓ Payment Verified' : '⏳ TXID Pending Review'} (${(o.paymentNetwork || '').toUpperCase()} ${o.paymentAmountCrypto || ''})</span>
+              <span style="color:#94a3b8;">${String(o.txid).slice(0, 14)}...</span>
+            </div>
+          ` : ''}
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
             <span>Current Phase: <strong style="color:#fff;">${o.phase || 'Standard 300DPI'}</strong></span>
             <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'Per Project Schedule'}</strong></span>
-            <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-secondary" style="font-size:10.5px; padding:3px 10px; border-color:var(--gold); color:var(--gold);">
-              📄 Download Invoice
-            </button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" onclick="openCryptoPayModal(${o.id})" class="btn-gold" style="font-size:11px; padding:6px 12px;">
+                💳 ${o.paymentVerified ? 'Settle Balance' : (o.txid ? 'Update TXID' : 'Pay 50% Retainer')}
+              </button>
+              <button type="button" onclick="downloadOfficialStudioInvoice()" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--gold); color:var(--gold);">
+                📄 Invoice
+              </button>
+            </div>
           </div>
 
         </div>
@@ -2260,3 +2290,272 @@ if (document.readyState === 'loading') {
 } else {
   if (typeof applyCategoryColorsToServiceCards === 'function') applyCategoryColorsToServiceCards();
 }
+
+// ==============================================================================
+// MULTI-CHAIN CRYPTO SETTLEMENT, LIVE RATES & TEZOS TZKT AUTO-VERIFY ENGINE
+// ==============================================================================
+window.STUDIO_CRYPTO_META = {
+  xtz:        { label: 'Tezos (XTZ) • Temple', symbol: 'XTZ', cgId: 'tezos', ccSym: 'XTZ', explorer: 'https://tzkt.io/' },
+  eth:        { label: 'Ethereum (ETH)', symbol: 'ETH', cgId: 'ethereum', ccSym: 'ETH', explorer: 'https://etherscan.io/tx/' },
+  usdt_bep20: { label: 'USDT (ERC-20 / BEP-20)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://bscscan.com/tx/' },
+  usdt_trc20: { label: 'USDT (TRC-20)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://tronscan.org/#/transaction/' },
+  sol:        { label: 'Solana (SOL)', symbol: 'SOL', cgId: 'solana', ccSym: 'SOL', explorer: 'https://solscan.io/tx/' },
+  ton:        { label: 'TON (Toncoin)', symbol: 'TON', cgId: 'the-open-network', ccSym: 'TON', explorer: 'https://tonviewer.com/transaction/' },
+  btc:        { label: 'Bitcoin (BTC)', symbol: 'BTC', cgId: 'bitcoin', ccSym: 'BTC', explorer: 'https://mempool.space/tx/' }
+};
+
+window.getCryptoExplorerUrl = function(netKey, txid) {
+  const m = window.STUDIO_CRYPTO_META[netKey];
+  if (!m || !txid) return '#';
+  return m.explorer + encodeURIComponent(txid.trim());
+};
+
+window._cachedCryptoRates = window._cachedCryptoRates || { ts: 0, rates: { tezos: 1.0, ethereum: 3100, tether: 1.0, solana: 200, 'the-open-network': 5.2, bitcoin: 90000 } };
+
+window.fetchLiveCryptoRates = async function() {
+  const now = Date.now();
+  if (now - window._cachedCryptoRates.ts < 60000 && window._cachedCryptoRates.live) {
+    return window._cachedCryptoRates.rates;
+  }
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tezos,ethereum,tether,solana,the-open-network,bitcoin&vs_currencies=usd');
+    if (res.ok) {
+      const data = await res.json();
+      const r = { ...window._cachedCryptoRates.rates };
+      Object.keys(data).forEach(k => { if (data[k] && data[k].usd) r[k] = data[k].usd; });
+      window._cachedCryptoRates = { ts: now, rates: r, live: true };
+      return r;
+    }
+  } catch(e) {}
+  try {
+    const res2 = await fetch('https://min-api.cryptocompare.com/data/pricemulti?fsyms=XTZ,ETH,USDT,SOL,TON,BTC&tsyms=USD');
+    if (res2.ok) {
+      const d2 = await res2.json();
+      const r = { ...window._cachedCryptoRates.rates };
+      if (d2.XTZ?.USD) r.tezos = d2.XTZ.USD;
+      if (d2.ETH?.USD) r.ethereum = d2.ETH.USD;
+      if (d2.USDT?.USD) r.tether = d2.USDT.USD;
+      if (d2.SOL?.USD) r.solana = d2.SOL.USD;
+      if (d2.TON?.USD) r['the-open-network'] = d2.TON.USD;
+      if (d2.BTC?.USD) r.bitcoin = d2.BTC.USD;
+      window._cachedCryptoRates = { ts: now, rates: r, live: true };
+      return r;
+    }
+  } catch(e) {}
+  return window._cachedCryptoRates.rates;
+};
+
+window._activeCryptoPayOrderId = null;
+window._activeCryptoNetKey = 'xtz';
+window._activeCryptoTier = 0.5;
+
+window.getConfiguredWalletsMap = function() {
+  const w = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.cryptoWallets) ? siteSettings.cryptoWallets : {};
+  const out = {};
+  if (w.xtz) out.xtz = w.xtz;
+  if (w.eth) { out.eth = w.eth; out.usdt_bep20 = w.eth; }
+  if (w.usdt_trc20) out.usdt_trc20 = w.usdt_trc20;
+  if (w.sol) out.sol = w.sol;
+  if (w.ton) out.ton = w.ton;
+  if (w.btc) out.btc = w.btc;
+  return out;
+};
+
+window.openCryptoPayModal = async function(orderId) {
+  window._activeCryptoPayOrderId = orderId;
+  const order = orderId ? ordersList.find(x => x.id === orderId) : null;
+  const titleEl = document.getElementById('cryptoPayOrderTitle');
+  if (titleEl) {
+    titleEl.textContent = order ? `Settle: ${order.pkg || ('Order #' + order.id)}` : 'Director Wallet Test Transfer (0.01 XTZ)';
+  }
+
+  const isDir = typeof window.isStudioDirectorAuthenticated === 'function' && window.isStudioDirectorAuthenticated();
+  const testBtn = document.getElementById('payTierTestBtn');
+  if (testBtn) testBtn.classList.toggle('hidden', !isDir);
+
+  window._activeCryptoTier = order ? 0.5 : 'test';
+  const txInput = document.getElementById('cryptoTxidInput');
+  if (txInput) txInput.value = (order && order.txid) ? order.txid : '';
+
+  const configured = window.getConfiguredWalletsMap();
+  const keys = Object.keys(configured);
+  const pillsBox = document.getElementById('cryptoNetworkPills');
+
+  if (keys.length === 0) {
+    if (pillsBox) pillsBox.innerHTML = '<div style="font-size:12px; color:#fda4af; padding:10px; background:rgba(244,63,94,0.1); border-radius:8px;">No studio wallet addresses saved yet. Add your wallet address in Admin Panel → Settings.</div>';
+    window._activeCryptoNetKey = null;
+  } else {
+    window._activeCryptoNetKey = keys[0];
+    if (pillsBox) {
+      pillsBox.innerHTML = keys.map(k => `
+        <button type="button" class="crypto-net-pill ${k === window._activeCryptoNetKey ? 'active' : ''}" data-net="${k}" onclick="selectCryptoPayNetwork('${k}')">
+          ${window.STUDIO_CRYPTO_META[k].label}
+        </button>
+      `).join('');
+    }
+  }
+
+  const modal = document.getElementById('cryptoPayModal');
+  if (modal) modal.classList.add('active');
+  await window.refreshCryptoPayModalCalc();
+};
+
+window.closeCryptoPayModal = function() {
+  const modal = document.getElementById('cryptoPayModal');
+  if (modal) modal.classList.remove('active');
+};
+
+window.selectCryptoPayNetwork = function(netKey) {
+  window._activeCryptoNetKey = netKey;
+  document.querySelectorAll('#cryptoNetworkPills .crypto-net-pill').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-net') === netKey);
+  });
+  window.refreshCryptoPayModalCalc();
+};
+
+window.setCryptoPayTier = function(tierVal) {
+  window._activeCryptoTier = tierVal;
+  document.getElementById('payTier50Btn')?.classList.toggle('active', tierVal === 0.5);
+  document.getElementById('payTier100Btn')?.classList.toggle('active', tierVal === 1.0);
+  document.getElementById('payTierTestBtn')?.classList.toggle('active', tierVal === 'test');
+  window.refreshCryptoPayModalCalc();
+};
+
+window.refreshCryptoPayModalCalc = async function() {
+  const netKey = window._activeCryptoNetKey;
+  const configured = window.getConfiguredWalletsMap();
+  const addr = (netKey && configured[netKey]) ? configured[netKey] : '';
+  const meta = netKey ? window.STUDIO_CRYPTO_META[netKey] : null;
+
+  const addrEl = document.getElementById('cryptoWalletAddressDisplay');
+  const netLbl = document.getElementById('cryptoSelectedNetLabel');
+  const qrImg = document.getElementById('cryptoWalletQrImg');
+  const hintEl = document.getElementById('cryptoAutoVerifyHint');
+
+  if (addrEl) addrEl.textContent = addr || 'Not configured';
+  if (netLbl) netLbl.textContent = meta ? meta.label : 'Select a network';
+  if (qrImg) {
+    qrImg.src = addr ? `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(addr)}` : '';
+    qrImg.style.display = addr ? 'block' : 'none';
+  }
+  if (hintEl) {
+    hintEl.textContent = netKey === 'xtz'
+      ? 'Tezos transactions are verified automatically on-chain via TzKT in seconds.'
+      : 'After sending, paste your Transaction Hash (TXID) for studio verification.';
+  }
+
+  const order = window._activeCryptoPayOrderId ? ordersList.find(x => x.id === window._activeCryptoPayOrderId) : null;
+  const rawPrice = order ? parseFloat(String(order.price || '180').replace(/[^0-9.]/g, '')) || 180 : 180;
+
+  const rates = await window.fetchLiveCryptoRates();
+  const usdRate = (meta && rates[meta.cgId]) ? rates[meta.cgId] : 1;
+
+  let usdToPay = 0;
+  let exactCrypto = '0';
+
+  if (window._activeCryptoTier === 'test') {
+    exactCrypto = '0.01';
+    usdToPay = (0.01 * usdRate);
+  } else {
+    usdToPay = rawPrice * (Number(window._activeCryptoTier) || 0.5);
+    const decimals = (meta && (meta.symbol === 'BTC' || meta.symbol === 'ETH')) ? 5 : 2;
+    exactCrypto = (usdToPay / usdRate).toFixed(decimals);
+  }
+
+  const usdEl = document.getElementById('cryptoPayUsdVal');
+  const rateEl = document.getElementById('cryptoLiveRateText');
+  const exactEl = document.getElementById('cryptoExactAmount');
+
+  if (usdEl) usdEl.textContent = '$' + usdToPay.toFixed(2);
+  if (rateEl && meta) rateEl.textContent = `1 ${meta.symbol} ≈ $${usdRate.toLocaleString()}`;
+  if (exactEl && meta) exactEl.textContent = `${exactCrypto} ${meta.symbol}`;
+};
+
+window.copyCryptoWalletAddress = function() {
+  const addr = document.getElementById('cryptoWalletAddressDisplay')?.textContent || '';
+  if (!addr || addr === 'Not configured' || addr === 'No address configured') return;
+  navigator.clipboard?.writeText(addr).then(() => {
+    showToast('Wallet address copied to clipboard!', 'success', 2500);
+  });
+};
+
+window.syncOrderPaymentToCloud = async function(order) {
+  if (!window.supabaseClient || !order) return;
+  try {
+    const { data } = await window.supabaseClient
+      .from('studio_settings')
+      .select('value')
+      .eq('key', 'order_payments_ledger')
+      .single();
+    const ledger = (data && data.value) ? data.value : {};
+    ledger[String(order.id)] = {
+      txid: order.txid || '',
+      paymentNetwork: order.paymentNetwork || '',
+      paymentAmountCrypto: order.paymentAmountCrypto || '',
+      paymentVerified: !!order.paymentVerified,
+      status: order.status || '',
+      updatedAt: new Date().toISOString()
+    };
+    await window.supabaseClient.from('studio_settings').upsert([{
+      key: 'order_payments_ledger',
+      value: ledger,
+      updated_at: new Date().toISOString()
+    }], { onConflict: 'key' });
+  } catch(e) { console.warn('[Order Payment Cloud Sync]', e); }
+};
+
+window.submitCryptoTransaction = async function() {
+  const txid = (document.getElementById('cryptoTxidInput')?.value || '').trim();
+  const netKey = window._activeCryptoNetKey;
+  if (!netKey) { showToast('Please configure a studio wallet address first.', 'error'); return; }
+  if (!txid || txid.length < 12) { showToast('Please enter a valid Transaction Hash / TXID.', 'error'); return; }
+
+  const configured = window.getConfiguredWalletsMap();
+  const targetAddr = configured[netKey] || '';
+  const exactText = document.getElementById('cryptoExactAmount')?.textContent || '';
+  const btn = document.getElementById('cryptoSubmitTxBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying...'; }
+
+  let verifiedOnChain = false;
+
+  if (netKey === 'xtz') {
+    try {
+      const res = await fetch(`https://api.tzkt.io/v1/operations/transactions/${encodeURIComponent(txid)}`);
+      if (res.ok) {
+        const ops = await res.json();
+        const match = Array.isArray(ops) && ops.find(op => op.status === 'applied' && (!targetAddr || (op.target && op.target.address === targetAddr)));
+        if (match) {
+          verifiedOnChain = true;
+        }
+      }
+    } catch(e) {}
+  }
+
+  const order = window._activeCryptoPayOrderId ? ordersList.find(x => x.id === window._activeCryptoPayOrderId) : null;
+  if (order) {
+    order.txid = txid;
+    order.paymentNetwork = netKey;
+    order.paymentAmountCrypto = exactText;
+    order.paymentVerified = verifiedOnChain;
+    if (verifiedOnChain) order.status = '50% Retainer Settled';
+    safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+    await window.syncOrderPaymentToCloud(order);
+    if (window.supabaseClient) {
+      window.supabaseClient.from('orders').update({ status: order.status }).eq('id', order.id).then(() => {});
+    }
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = '✓ Submit & Verify Transaction'; }
+
+  if (verifiedOnChain) {
+    showToast('Tezos transaction verified on-chain via TzKT! ✓', 'success', 5500);
+  } else if (netKey === 'xtz') {
+    showToast('TXID saved! TzKT could not confirm it yet (may take 30s or target mismatch).', 'info', 5500);
+  } else {
+    showToast('TXID submitted! Studio Director will verify & approve shortly.', 'success', 5000);
+  }
+
+  window.closeCryptoPayModal();
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+};

@@ -1017,7 +1017,34 @@ window.syncStudioSettingsFromCloud = async function() {
     if (data && data.value) {
       siteSettings = Object.assign(siteSettings || {}, data.value);
       safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+      if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
+      if (typeof window.updateStudioLiveStatus === 'function') window.updateStudioLiveStatus();
       console.log('[Cloud Settings] Restored studio settings from Supabase.');
+    }
+    // Restore crypto payment ledger & merge with ordersList
+    const { data: payData } = await window.supabaseClient
+      .from('studio_settings')
+      .select('value')
+      .eq('key', 'order_payments_ledger')
+      .single();
+    if (payData && payData.value && typeof ordersList !== 'undefined' && Array.isArray(ordersList)) {
+      const ledger = payData.value;
+      let changed = false;
+      ordersList.forEach(o => {
+        const rec = ledger[String(o.id)];
+        if (rec) {
+          o.txid = rec.txid || '';
+          o.paymentNetwork = rec.paymentNetwork || '';
+          o.paymentAmountCrypto = rec.paymentAmountCrypto || '';
+          o.paymentVerified = !!rec.paymentVerified;
+          if (rec.status) o.status = rec.status;
+          changed = true;
+        }
+      });
+      if (changed) {
+        safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+        if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+      }
     }
   } catch(e) {}
 };

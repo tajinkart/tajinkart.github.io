@@ -1280,6 +1280,19 @@ window.renderAdminSettingsTab = function() {
     if (typeof window.renderAdminTgChannelsList === 'function') window.renderAdminTgChannelsList();
     if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
     if (typeof window.renderAdminSloganPairs === 'function') window.renderAdminSloganPairs();
+    const w = (s && s.cryptoWallets) ? s.cryptoWallets : {};
+    const wMap = {
+      setWalletXtz: w.xtz || '',
+      setWalletEth: w.eth || '',
+      setWalletUsdtTrc20: w.usdt_trc20 || '',
+      setWalletSol: w.sol || '',
+      setWalletTon: w.ton || '',
+      setWalletBtc: w.btc || ''
+    };
+    Object.keys(wMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = wMap[id];
+    });
     
     // پر کردن خودکار فیلدهای شبکه‌های اجتماعی از دیتای ذخیره‌شده
     const soc = (s && s.socials) ? s.socials : {};
@@ -2174,6 +2187,31 @@ function renderOrderAdminSnippet(o) {
         ${o.brief || 'Bespoke concept art specifications'}
       </div>
 
+      ${o.txid ? `
+        <div style="padding:10px 12px; border-radius:8px; background:rgba(0,240,255,0.05); border:1px solid ${o.paymentVerified ? 'rgba(16,185,129,0.45)' : 'rgba(250,204,21,0.35)'}; font-size:11px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <strong style="color:${o.paymentVerified ? 'var(--emerald)' : 'var(--gold)'};">
+              ${o.paymentVerified ? '✓ Crypto Payment Verified' : '⏳ Crypto TXID Submitted'} (${(o.paymentNetwork || 'CRYPTO').toUpperCase()})
+            </strong>
+            <span class="font-mono" style="color:#e2e8f0;">${o.paymentAmountCrypto || ''}</span>
+          </div>
+          <div class="font-mono" style="font-size:10.5px; color:#94a3b8; word-break:break-all;">TXID: ${o.txid}</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+            <a href="${window.getCryptoExplorerUrl ? window.getCryptoExplorerUrl(o.paymentNetwork, o.txid) : '#'}" target="_blank" rel="noopener" class="btn-secondary" style="font-size:10.5px; padding:3px 9px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35); text-decoration:none;">
+              🔍 Inspect TX
+            </a>
+            ${!o.paymentVerified ? `
+              <button type="button" onclick="adminVerifyOrderCrypto(${o.id}, true)" class="btn-secondary" style="font-size:10.5px; padding:3px 9px; color:var(--emerald); border-color:rgba(16,185,129,0.45);">
+                ✓ Approve Payment
+              </button>
+              <button type="button" onclick="adminVerifyOrderCrypto(${o.id}, false)" class="btn-secondary" style="font-size:10.5px; padding:3px 9px; color:var(--crimson); border-color:rgba(244,63,94,0.4);">
+                ✕ Reject
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      ` : ''}
+
       ${o.refLink && o.refLink.startsWith('http') ? `
         <div style="font-size:11px;">
           <a href="${o.refLink}" target="_blank" rel="noopener" style="color:var(--cyan-electric); text-decoration:underline;">
@@ -2891,14 +2929,16 @@ function previewAndStageStudioLogo(file) {
 window.saveStudioLogoSetting = function() {
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Studio master crest saved successfully! ✓', 'success', 4000);
+  if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
+  showToast('Studio master crest saved & synced to cloud! ✓', 'success', 4000);
 };
 
 window.removeStudioLogo = function() {
   siteSettings.studioLogoUrl = '';
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Studio crest removed.', 'info', 3000);
+  if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
+  showToast('Studio crest removed & synced to cloud.', 'info', 3000);
 };
 
 window.handleAdminFaviconUpload = function(inputEl) {
@@ -2920,11 +2960,13 @@ window.saveStudioFaviconSetting = function() {
   }
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
-  showToast('Browser tab favicon saved successfully! ✓', 'success', 4000);
+  if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
+  showToast('Browser tab favicon saved & synced to cloud! ✓', 'success', 4000);
 };
 
 window.removeStudioFavicon = function() {
   siteSettings.faviconUrl = '';
+  setTimeout(() => { if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud(); }, 50);
   safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   window.updateStudioLogoDisplay();
   showToast('Browser favicon removed.', 'info', 3000);
@@ -3938,3 +3980,45 @@ window.saveStudioModeDirect = function(mode, event) {
   showToast(`Studio status set to ${mode.toUpperCase()} and saved! ✓`, 'success', 3500);
 };
 
+// ==============================================================================
+// STUDIO TREASURY & CRYPTO WALLET ADMIN HANDLERS
+// ==============================================================================
+window.saveStudioWalletsSettings = async function() {
+  if (typeof siteSettings === 'undefined') return;
+  siteSettings.cryptoWallets = {
+    xtz: (document.getElementById('setWalletXtz')?.value || '').trim(),
+    eth: (document.getElementById('setWalletEth')?.value || '').trim(),
+    usdt_trc20: (document.getElementById('setWalletUsdtTrc20')?.value || '').trim(),
+    sol: (document.getElementById('setWalletSol')?.value || '').trim(),
+    ton: (document.getElementById('setWalletTon')?.value || '').trim(),
+    btc: (document.getElementById('setWalletBtc')?.value || '').trim()
+  };
+  if (typeof safeSetStorage === 'function' && typeof KEYS !== 'undefined') {
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  }
+  if (typeof window.syncStudioSettingsToCloud === 'function') {
+    await window.syncStudioSettingsToCloud();
+  }
+  showToast('Studio crypto wallet addresses saved & synced!', 'success', 4000);
+};
+
+window.adminVerifyOrderCrypto = function(orderId, approve) {
+  const o = ordersList.find(x => x.id === orderId);
+  if (!o) return;
+  if (approve) {
+    o.paymentVerified = true;
+    o.status = '50% Retainer Settled';
+    showToast(`Order #${orderId} payment approved!`, 'success');
+  } else {
+    o.paymentVerified = false;
+    o.txid = '';
+    showToast(`Order #${orderId} TXID rejected/cleared.`, 'info');
+  }
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (window.syncOrderPaymentToCloud) window.syncOrderPaymentToCloud(o);
+  if (window.supabaseClient) {
+    window.supabaseClient.from('orders').update({ status: o.status }).eq('id', orderId).then(() => {});
+  }
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+};
