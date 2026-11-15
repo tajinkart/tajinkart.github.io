@@ -711,19 +711,6 @@ function renderAdminArtModalForm(art, isNew) {
           <input type="checkbox" id="editArtShowInShopCards" ${(!(siteSettings?.atelierHiddenArtIds || []).includes(art.id) && art.showInShopCards !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--cyan-electric); cursor:pointer;" />
           Show in Atelier / Shop Side Category Cards (Rotating Feed)
         </label>
-        <div style="padding-top:6px; border-top:1px solid rgba(255,255,255,0.08);">
-          <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Wizard Option Match Tags (feeds #zoomModal preview when client picks options):</span>
-          <div style="display:flex; flex-wrap:wrap; gap:6px;">
-            ${['Portrait', 'Half-Body', 'Full-Body', 'Sketch', 'Lineart', 'Render', 'Turnaround', 'Environment'].map(tag => {
-              const savedTags = (art.atelierTags && art.atelierTags.length) ? art.atelierTags : ((siteSettings?.atelierArtTags && siteSettings.atelierArtTags[String(art.id)]) || []);
-              const isChk = savedTags.includes(tag);
-              return `<label style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#e2e8f0; background:#04060a; border:1px solid rgba(255,255,255,0.14); padding:4px 9px; border-radius:999px; cursor:pointer;">
-                <input type="checkbox" name="editArtAtelierTags" value="${tag}" ${isChk ? 'checked' : ''} style="accent-color:var(--cyan-electric);" />
-                <span>${tag}</span>
-              </label>`;
-            }).join('')}
-          </div>
-        </div>
       </div>
 
       <!-- Action buttons -->
@@ -1058,7 +1045,6 @@ window.confirmSaveArtwork = async function() {
   const desc = document.getElementById('editArtDescInput')?.value.trim() || '';
   const isPack = document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true;
   const showInShopCards = document.getElementById('editArtShowInShopCards') ? document.getElementById('editArtShowInShopCards').checked : true;
-  const atelierTags = Array.from(document.querySelectorAll('input[name="editArtAtelierTags"]:checked')).map(cb => cb.value);
 
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
     showToast('Please add at least one image to this project.', 'error');
@@ -1108,7 +1094,6 @@ window.confirmSaveArtwork = async function() {
         desc: desc,
         isProductionPack: isPack,
         showInShopCards: showInShopCards,
-        atelierTags: atelierTags,
         isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
         pipelineKey: pipe,
         genre: genre,
@@ -1180,7 +1165,6 @@ window.confirmSaveArtwork = async function() {
       art.desc = desc;
       art.isProductionPack = isPack;
       art.showInShopCards = showInShopCards;
-      art.atelierTags = atelierTags;
       if (typeof siteSettings !== 'undefined' && siteSettings) {
         if (!Array.isArray(siteSettings.atelierHiddenArtIds)) siteSettings.atelierHiddenArtIds = [];
         if (!showInShopCards) {

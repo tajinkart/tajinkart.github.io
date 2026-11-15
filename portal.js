@@ -484,9 +484,11 @@ window.recalcWizardPrice = function() {
 
   // آپدیت هوشمند تصویر پیش‌نمایش ویزارد بر اساس گزینه‌های انتخابی و آثار آتلیه
   if (typeof window.updateWizardDynamicPreview === 'function' && activeModalItem) {
+    const sTxt = scopeEl ? scopeEl.options[scopeEl.selectedIndex].text : '';
     const fTxt = framingEl ? framingEl.options[framingEl.selectedIndex].text : '';
+    const cTxt = compEl ? compEl.options[compEl.selectedIndex].text : '';
     const pTxt = phaseEl ? phaseEl.options[phaseEl.selectedIndex].text : '';
-    window.updateWizardDynamicPreview(activeModalItem.pipeKey, fTxt, pTxt);
+    window.updateWizardDynamicPreview(activeModalItem.pipeKey, fTxt, pTxt, sTxt, cTxt);
   }
 
   // آپدیت آنی و زنده قیمت روی صفحه
@@ -3131,3 +3133,60 @@ if (!window._unpaidCountdownInterval) {
     }
   }, 1000);
 }
+
+// ==============================================================================
+// DYNAMIC WIZARD IMAGE MATCHER (Reads Sheet Pipeline, Subcategory, Stage & Complexity)
+// ==============================================================================
+window.updateWizardDynamicPreview = function(pipeKey, framingTxt, fidelityTxt, scopeTxt, compTxt) {
+  const imgEl = document.getElementById('modalMediaImg');
+  if (!imgEl || !pipeKey || typeof window.getArtworksForPipeline !== 'function') return;
+  const candidates = window.getArtworksForPipeline(pipeKey, false);
+  if (!candidates || candidates.length === 0) return;
+
+  const normalizeWords = (str) => String(str || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(' ').filter(w => w.length >= 3);
+  const queryWords = new Set([
+    ...normalizeWords(framingTxt),
+    ...normalizeWords(fidelityTxt),
+    ...normalizeWords(scopeTxt),
+    ...normalizeWords(compTxt)
+  ]);
+
+  let bestItem = null;
+  let bestScore = 0;
+
+  candidates.forEach(item => {
+    const subStr = (item.subcategory || '').toLowerCase();
+    const stgStr = (item.stage || '').toLowerCase();
+    const cmpStr = (item.complexity || '').toLowerCase();
+    const txtStr = ((item.title || '') + ' ' + (item.desc || '')).toLowerCase();
+
+    let score = 0;
+    queryWords.forEach(w => {
+      if (subStr.includes(w)) score += 4;
+      if (stgStr.includes(w)) score += 4;
+      if (cmpStr.includes(w)) score += 2;
+      if (txtStr.includes(w)) score += 1;
+    });
+
+    const qAll = ((framingTxt || '') + ' ' + (fidelityTxt || '') + ' ' + (scopeTxt || '')).toLowerCase();
+    if ((qAll.includes('half') || qAll.includes('waist')) && (subStr.includes('half') || subStr.includes('waist') || txtStr.includes('half'))) score += 5;
+    if (qAll.includes('portrait') && (subStr.includes('portrait') || subStr.includes('bust') || txtStr.includes('portrait'))) score += 5;
+    if (qAll.includes('full') && (subStr.includes('full') || txtStr.includes('full'))) score += 5;
+    if (qAll.includes('sketch') && (stgStr.includes('sketch') || stgStr.includes('rough') || txtStr.includes('sketch'))) score += 5;
+    if (qAll.includes('line') && (stgStr.includes('line') || txtStr.includes('line'))) score += 5;
+    if ((qAll.includes('render') || qAll.includes('300dpi')) && (stgStr.includes('render') || stgStr.includes('master'))) score += 4;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestItem = item;
+    }
+  });
+
+  if (bestItem && bestItem.image && imgEl.src !== bestItem.image) {
+    imgEl.style.opacity = '0.35';
+    setTimeout(() => {
+      imgEl.src = bestItem.image;
+      imgEl.style.opacity = '1';
+    }, 120);
+  }
+};
