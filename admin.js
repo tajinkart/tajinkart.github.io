@@ -2867,7 +2867,8 @@ window.switchSettingsSubTab = function(subTabId) {
     { id: 'operations', display: 'flex' },
     { id: 'social', display: 'flex' },
     { id: 'brand', display: 'grid' },
-    { id: 'cloud', display: 'flex' }
+    { id: 'cloud', display: 'flex' },
+    { id: 'legal', display: 'flex' }
   ];
   tabs.forEach(t => {
     const btn = document.getElementById(`adminSettingsSubTabBtn-${t.id}`);
@@ -2876,6 +2877,9 @@ window.switchSettingsSubTab = function(subTabId) {
     if (btn) btn.classList.toggle('active', isActive);
     if (sec) sec.style.display = isActive ? t.display : 'none';
   });
+  if (target === 'legal' && typeof window.renderAdminTermsTab === 'function') {
+    window.renderAdminTermsTab();
+  }
 };
 
 window.updateStudioLogoDisplay = function() {

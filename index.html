@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.33">
+  <link rel="stylesheet" href="style.css?v=26.6.34">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -920,21 +920,12 @@
                 </div>
               </button>
 
-              <!-- 5. Studio Legal Charter -->
-              <button type="button" onclick="switchAdminTab('terms', this)" class="admin-nav-item" data-tab="terms">
-                <span class="admin-nav-icon">⚖️</span>
-                <div class="admin-nav-text">
-                  <span class="admin-nav-title">5. Studio Legal Charter</span>
-                  <span class="admin-nav-sub">Terms of Service & EULA</span>
-                </div>
-              </button>
-
-              <!-- 6. Settings & Infrastructure -->
+              <!-- 5. Settings, Legal & Infrastructure -->
               <button type="button" onclick="switchAdminTab('settings', this)" class="admin-nav-item" data-tab="settings">
                 <span class="admin-nav-icon">⚙️</span>
                 <div class="admin-nav-text">
-                  <span class="admin-nav-title">6. Settings & Infrastructure</span>
-                  <span class="admin-nav-sub">Branding, Availability & Cloud Health</span>
+                  <span class="admin-nav-title">5. Settings &amp; Infrastructure</span>
+                  <span class="admin-nav-sub">Treasury, Branding, Legal &amp; Cloud</span>
                 </div>
               </button>
             </nav>
@@ -1292,89 +1283,6 @@
         </div>
       </div><!-- /#adminTabMembers -->
 
-            <!-- ۷. زبانه مدیریت و ویرایشگر منشور قوانین استودیو (Terms & Legal Editor) -->
-        <div id="adminTabTerms" class="hidden">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-            <div>
-              <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">Live Studio Legal Charter & EULA Editor</h3>
-              <p style="font-size:12px; color:var(--text-muted); margin:0;">Modular editing of legal articles, commission SLA, and digital licenses without touching code.</p>
-            </div>
-            <div style="display:flex; gap:10px;">
-              <button type="button" onclick="openTermsModal(event)" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
-                👁️ Preview on Site
-              </button>
-              <button type="button" onclick="saveStudioTerms()" class="btn-gold" style="padding:8px 18px; font-size:12px;">
-                💾 Save & Publish All Articles
-              </button>
-            </div>
-          </div>
-
-          <!-- ساب‌تب‌های ویرایشگر منشور قوانین استودیو -->
-          <div style="display:flex; gap:8px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
-            <button type="button" onclick="switchAdminTermsEditorTab('account', this)" class="terms-tab-btn active">
-              🛡️ General Terms & Anti-AI Policy
-            </button>
-            <button type="button" onclick="switchAdminTermsEditorTab('commission', this)" class="terms-tab-btn">
-              📜 Commission SLA & 50% Retainer
-            </button>
-            <button type="button" onclick="switchAdminTermsEditorTab('assets', this)" class="terms-tab-btn">
-              💎 Digital Assets EULA
-            </button>
-            <button type="button" onclick="switchAdminTermsEditorTab('academy', this)" class="terms-tab-btn">
-              🎓 Academy & Community Guidelines
-            </button>
-          </div>
-
-          <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:18px;">
-            <!-- بخش ۱: شرایط عمومی -->
-            <div id="adminTermsPane-account" class="admin-terms-editor-pane">
-              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--gold);">
-                🛡️ Article 1: General Membership, Account Security & Anti-AI Training Ban:
-              </label>
-              <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">By registering, the client warrants that all credentials are authentic. Protecting passwords is client responsibility.
-
-Strict Anti-AI Ban: Scraping, automated copying, or utilizing TAJINKART Studio concept art and visual assets to train generative AI models is strictly prohibited.</textarea>
-            </div>
-
-            <!-- بخش ۲: قرارداد کمیسیون -->
-            <div id="adminTermsPane-commission" class="admin-terms-editor-pane" style="display:none;">
-              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--cyan-electric);">
-                📜 Article 2: Commission SLA, 50% Retainer Rule, Revision Caps & Abandonment Clause:
-              </label>
-              <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">The 50% Retainer Rule: Creative production begins exclusively upon settlement of a 50% non-refundable retainer. The remaining 50% balance is required prior to high-resolution master PSD delivery.
-
-Revision Policy: Up to 2 iterative revisions are included during thumbnail and silhouette exploration phases. Major proportional redesigns after linework approval incur additional scope fees.
-
-Abandonment Clause: Silence exceeding 30 calendar days deems the project abandoned, forfeiting the retainer.</textarea>
-            </div>
-
-            <!-- بخش ۳: لایسنس دارایی‌ها -->
-            <div id="adminTermsPane-assets" class="admin-terms-editor-pane" style="display:none;">
-              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--emerald);">
-                💎 Article 3: Digital Goods License (EULA) & Cancellation Policy:
-              </label>
-              <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">Digital Assets EULA: Purchasing digital assets grants a non-exclusive license for integration into commercial end-products (games, film). Raw redistribution is strictly prohibited.
-
-Digital Goods Policy: Immediate digital download constitutes final delivery with no refunds.</textarea>
-            </div>
-
-            <!-- بخش ۴: آکادمی و کامیونیتی -->
-            <div id="adminTermsPane-academy" class="admin-terms-editor-pane" style="display:none;">
-              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--violet);">
-                🎓 Article 4: Academy Code of Conduct & Copyright Protections:
-              </label>
-              <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">Academy & Community Code of Conduct: Masterclasses and instructional assets are the exclusive intellectual property of Seyed Soroush Taj. Unauthorized redistribution is subject to legal action.
-
-Studio channels maintain professional artistic standards, zero spam, and mutual respect.</textarea>
-            </div>
-
-            <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <span style="font-size:11.5px; color:var(--text-muted);">💡 Each article is displayed modularly in the client portal and legal modal.</span>
-              <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ Saved successfully</span>
-            </div>
-          </div>
-        </div>
-
         <div id="adminTabSettings" class="hidden">
             <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:18px; padding:24px; width:100%; box-sizing:border-box;">
               
@@ -1399,6 +1307,9 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                 </button>
                 <button type="button" id="adminSettingsSubTabBtn-cloud" onclick="switchSettingsSubTab('cloud')" class="settings-subtab-btn" style="padding:9px 18px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:7px;">
                   <span>⚙️ Cloud &amp; Health</span>
+                </button>
+                <button type="button" id="adminSettingsSubTabBtn-legal" onclick="switchSettingsSubTab('legal')" class="settings-subtab-btn" style="padding:9px 18px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:7px;">
+                  <span>⚖️ Legal Charter</span>
                 </button>
               </div>
 
@@ -1824,6 +1735,89 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                   </div>
                 </div>
 
+                <!-- ساب‌تب ۵: منشور قوانین استودیو -->
+                <div id="adminSettingsSubTab-legal" style="display:none; flex-direction:column; gap:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:17px; font-weight:900; color:var(--gold); margin:0 0 4px;">Live Studio Legal Charter & EULA Editor</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:0;">Modular editing of legal articles, commission SLA, and digital licenses without touching code.</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" onclick="openTermsModal(event)" class="btn-outline" style="padding:8px 14px; font-size:12px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+                👁️ Preview on Site
+              </button>
+              <button type="button" onclick="saveStudioTerms()" class="btn-gold" style="padding:8px 18px; font-size:12px;">
+                💾 Save & Publish All Articles
+              </button>
+            </div>
+          </div>
+
+          <!-- ساب‌تب‌های ویرایشگر منشور قوانین استودیو -->
+          <div style="display:flex; gap:8px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
+            <button type="button" onclick="switchAdminTermsEditorTab('account', this)" class="terms-tab-btn active">
+              🛡️ General Terms & Anti-AI Policy
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('commission', this)" class="terms-tab-btn">
+              📜 Commission SLA & 50% Retainer
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('assets', this)" class="terms-tab-btn">
+              💎 Digital Assets EULA
+            </button>
+            <button type="button" onclick="switchAdminTermsEditorTab('academy', this)" class="terms-tab-btn">
+              🎓 Academy & Community Guidelines
+            </button>
+          </div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:18px;">
+            <!-- بخش ۱: شرایط عمومی -->
+            <div id="adminTermsPane-account" class="admin-terms-editor-pane">
+              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--gold);">
+                🛡️ Article 1: General Membership, Account Security & Anti-AI Training Ban:
+              </label>
+              <textarea id="adminTermsAccountInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">By registering, the client warrants that all credentials are authentic. Protecting passwords is client responsibility.
+
+Strict Anti-AI Ban: Scraping, automated copying, or utilizing TAJINKART Studio concept art and visual assets to train generative AI models is strictly prohibited.</textarea>
+            </div>
+
+            <!-- بخش ۲: قرارداد کمیسیون -->
+            <div id="adminTermsPane-commission" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--cyan-electric);">
+                📜 Article 2: Commission SLA, 50% Retainer Rule, Revision Caps & Abandonment Clause:
+              </label>
+              <textarea id="adminTermsCommissionInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">The 50% Retainer Rule: Creative production begins exclusively upon settlement of a 50% non-refundable retainer. The remaining 50% balance is required prior to high-resolution master PSD delivery.
+
+Revision Policy: Up to 2 iterative revisions are included during thumbnail and silhouette exploration phases. Major proportional redesigns after linework approval incur additional scope fees.
+
+Abandonment Clause: Silence exceeding 30 calendar days deems the project abandoned, forfeiting the retainer.</textarea>
+            </div>
+
+            <!-- بخش ۳: لایسنس دارایی‌ها -->
+            <div id="adminTermsPane-assets" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--emerald);">
+                💎 Article 3: Digital Goods License (EULA) & Cancellation Policy:
+              </label>
+              <textarea id="adminTermsAssetsInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">Digital Assets EULA: Purchasing digital assets grants a non-exclusive license for integration into commercial end-products (games, film). Raw redistribution is strictly prohibited.
+
+Digital Goods Policy: Immediate digital download constitutes final delivery with no refunds.</textarea>
+            </div>
+
+            <!-- بخش ۴: آکادمی و کامیونیتی -->
+            <div id="adminTermsPane-academy" class="admin-terms-editor-pane" style="display:none;">
+              <label style="display:block; font-size:12.5px; font-weight:800; margin-bottom:8px; color:var(--violet);">
+                🎓 Article 4: Academy Code of Conduct & Copyright Protections:
+              </label>
+              <textarea id="adminTermsAcademyInput" style="width:100%; height:320px; font-size:12.5px; line-height:1.9; font-family:inherit; padding:14px; background:#040609; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#f1f5f9; resize:vertical; direction:ltr; text-align:left;">Academy & Community Code of Conduct: Masterclasses and instructional assets are the exclusive intellectual property of Seyed Soroush Taj. Unauthorized redistribution is subject to legal action.
+
+Studio channels maintain professional artistic standards, zero spam, and mutual respect.</textarea>
+            </div>
+
+            <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <span style="font-size:11.5px; color:var(--text-muted);">💡 Each article is displayed modularly in the client portal and legal modal.</span>
+              <span id="termsSaveNotice" style="display:none; color:var(--emerald); font-weight:700;">✓ Saved successfully</span>
+            </div>
+          </div>
+                </div>
+
                 <!-- ساب‌تب ۲: شبکه‌های اجتماعی، ربات تلگرام و اتصالات (در ابتدا مخفی) -->
                 <div id="adminSettingsSubTab-social" style="display:none; flex-direction:column; gap:20px;">
                   
@@ -1936,7 +1930,6 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
 
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
-    <button type="button" onclick="closeArtModalDirect(); event.stopPropagation();" class="modal-corner-close-btn" style="position:fixed; top:18px; left:18px; z-index:9520;" title="Close Artwork">✕</button>
     <!-- کلیدهای ناوبری سریع بین پروژه‌ها به سبک آرت‌استیشن -->
     <!-- دکمه‌های ناوبری با فلش‌های رو به بیرون (Outward SVG Arrows) که هرگز توسط موتور راست‌به‌چپ وارونه نمی‌شوند -->
     <button type="button" class="artstation-nav-btn prev" onclick="navigateCaseStudy(-1, event)" title="Previous Artwork">
@@ -2642,12 +2635,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.33"></script>
-  <script src="core.js?v=26.6.33"></script>
-  <script src="gallery.js?v=26.6.33"></script>
-  <script src="portal.js?v=26.6.33"></script>
-  <script src="admin.js?v=26.6.33"></script>
-  <script src="translate.js?v=26.6.33"></script>
+  <script src="data.js?v=26.6.34"></script>
+  <script src="core.js?v=26.6.34"></script>
+  <script src="gallery.js?v=26.6.34"></script>
+  <script src="portal.js?v=26.6.34"></script>
+  <script src="admin.js?v=26.6.34"></script>
+  <script src="translate.js?v=26.6.34"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   

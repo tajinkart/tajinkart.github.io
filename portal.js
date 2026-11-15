@@ -328,59 +328,43 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   // واکشی کارهای واقعی گالری مربوط به این پایپلاین برای تایل‌های مراحل
   const matchingArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline(key) : [];
 
-  // ۳. رندر تایل‌های مرحله و پکیج‌ها متصل به رنگ زنده دسته‌بندی و تصاویر واقعی گالری
+  // ۳. نمایش کارت واحد دسته‌بندی (بدون ۳ زیرشاخه‌ی پیچیده) + بازشدن مستقیم ویزارد با کلیک
+  const mainTile = (Array.isArray(data.tiles) && data.tiles[0]) ? data.tiles[0] : { title: data.topSub || 'Commission', desc: data.note || '', price: '90', timeline: '5 to 7 business days', usdVal: 90 };
+  const displayPrice = formatPrice(mainTile.price);
+  let heroImg = mainTile.img || '';
+  if (matchingArts.length > 0 && matchingArts[0]) {
+    heroImg = matchingArts[0].image || heroImg;
+  }
+  const optHeroImg = (typeof getOptimizedImageUrl === 'function' && heroImg && !heroImg.startsWith('data:')) ? getOptimizedImageUrl(heroImg, 960) : heroImg;
+  const escapedTitle = (mainTile.title || data.topSub || 'Commission').replace(/'/g, "\\'");
+  const escapedDesc = (data.note || mainTile.desc || '').replace(/'/g, "\\'");
+
   const container = document.getElementById('mosaicStageContainer');
   if (container) {
-    container.innerHTML = data.tiles.map((tile, idx) => {
-      const displayPrice = formatPrice(tile.price);
-
-      // انتخاب تصویر و شیت واقعی از گالری در صورت وجود
-      let tileImg = tile.img;
-      let tileTitle = tile.title;
-      let tileDesc = tile.desc;
-
-      if (matchingArts.length > 0) {
-        const matchedArt = matchingArts[idx % matchingArts.length];
-        if (matchedArt) {
-          if (Array.isArray(matchedArt.phases) && matchedArt.phases.length > 0) {
-            if (idx === 0 && matchedArt.phases[0] && (matchedArt.phases[0].image || matchedArt.phases[0].img)) {
-              tileImg = matchedArt.phases[0].image || matchedArt.phases[0].img;
-            } else if (idx === 1 && matchedArt.phases[1] && (matchedArt.phases[1].image || matchedArt.phases[1].img)) {
-              tileImg = matchedArt.phases[1].image || matchedArt.phases[1].img;
-            } else if (matchedArt.phases[idx] && (matchedArt.phases[idx].image || matchedArt.phases[idx].img)) {
-              tileImg = matchedArt.phases[idx].image || matchedArt.phases[idx].img;
-            } else if (matchedArt.image) {
-              tileImg = matchedArt.image;
-            }
-          } else if (matchedArt.image) {
-            tileImg = matchedArt.image;
-          }
-        }
-      }
-
-      const optTileImg = (typeof getOptimizedImageUrl === 'function' && tileImg && !tileImg.startsWith('data:')) ? getOptimizedImageUrl(tileImg, 720) : tileImg;
-      const escapedTitle = (tileTitle || '').replace(/'/g, "\\'");
-      const escapedDesc = (tileDesc || '').replace(/'/g, "\\'");
-
-      return `
-        <div class="pipeline-tile ${tile.span}" style="--tile-accent:${catColor};" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${optTileImg}', '${tile.timeline}', ${tile.usdVal || 90}, '${key}')">
-          <img src="${optTileImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" decoding="async" />
-          <div class="pipeline-tile-overlay">
-            <h4 class="pipeline-tile-title">${tile.title}</h4>
-            <p class="pipeline-tile-desc">${tile.desc}</p>
-            <div class="pipeline-tile-footer">
-              <div>
-                <span class="font-mono" style="color:${catColor}; font-size:14px; font-weight:800; text-shadow:0 0 10px ${catColor}55;">${displayPrice}</span>
-                <span style="color:var(--cyan-electric); font-size:11px; margin-right:8px;">(${tile.timeline})</span>
-              </div>
-              <span style="font-size:11.5px; color:${catColor}; font-weight:800; display:flex; align-items:center; gap:4px;">
-                Quote & Submit Brief →
-              </span>
+    container.innerHTML = `
+      <div class="pipeline-tile" style="grid-column: 1 / -1; min-height: 290px; --tile-accent:${catColor}; cursor:pointer;" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${optHeroImg}', '${mainTile.timeline || '5 to 7 business days'}', ${mainTile.usdVal || 90}, '${key}')">
+        <img src="${optHeroImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" decoding="async" />
+        <div class="pipeline-tile-overlay" style="justify-content:flex-end; padding:24px;">
+          <span class="font-mono" style="font-size:11px; color:${catColor}; font-weight:800; letter-spacing:0.08em; margin-bottom:6px;">DIRECT COMMISSION WIZARD</span>
+          <h4 class="pipeline-tile-title" style="font-size:20px; margin-bottom:8px;">${data.topSub || mainTile.title}</h4>
+          <p class="pipeline-tile-desc" style="max-width:680px; font-size:13px; margin-bottom:14px;">${data.note || mainTile.desc}</p>
+          <div class="pipeline-tile-footer" style="border-top:1px solid rgba(255,255,255,0.12); padding-top:12px;">
+            <div>
+              <span class="font-mono" style="color:${catColor}; font-size:16px; font-weight:800;">From ${displayPrice}</span>
+              <span style="color:var(--cyan-electric); font-size:11.5px; margin-left:10px;">(${mainTile.timeline || '5 to 7 business days'})</span>
             </div>
+            <span class="btn-gold" style="font-size:12px; padding:8px 18px; border-radius:999px;">
+              ⚡ Configure Scope &amp; Submit Brief →
+            </span>
           </div>
         </div>
-      `;
-    }).join('');
+      </div>
+    `;
+  }
+
+  if (userClicked !== false) {
+    openModal(mainTile.title || data.topSub || 'Commission', data.note || mainTile.desc || '', displayPrice, optHeroImg, mainTile.timeline || '5 to 7 business days', mainTile.usdVal || 90, key);
+    return;
   }
 
   if (userClicked && window.innerWidth <= 1024) {
