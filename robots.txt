@@ -19,3 +19,5 @@ Disallow: /
 
 User-agent: Claude-Web
 Disallow: /
+
+Sitemap: https://tajinkart.space/sitemap.xml
