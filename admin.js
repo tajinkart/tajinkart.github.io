@@ -2259,15 +2259,15 @@ function renderOrderAdminSnippet(o) {
         <div style="padding:10px 12px; border-radius:8px; background:rgba(0,240,255,0.05); border:1px solid ${o.paymentVerified ? 'rgba(16,185,129,0.45)' : 'rgba(250,204,21,0.35)'}; font-size:11px; display:flex; flex-direction:column; gap:6px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
             <strong style="color:${o.paymentVerified ? 'var(--emerald)' : 'var(--gold)'};">
-              ${o.paymentVerified ? '✓ Crypto Payment Verified' : '⏳ Crypto TXID Submitted'} (${(o.paymentNetwork || 'CRYPTO').toUpperCase()})
+              ${o.paymentVerified ? '✓ Payment Verified' : (o.txid === 'FIAT-INVOICE-REQUESTED' ? '💳 Card / PayPal Invoice Requested' : '⏳ Crypto TXID Submitted')} (${(o.paymentNetwork || 'CRYPTO').toUpperCase()})
             </strong>
             <span class="font-mono" style="color:#e2e8f0;">${o.paymentAmountCrypto || ''}</span>
           </div>
-          <div class="font-mono" style="font-size:10.5px; color:#94a3b8; word-break:break-all;">TXID: ${o.txid}</div>
+          <div class="font-mono" style="font-size:10.5px; color:#94a3b8; word-break:break-all;">${o.txid === 'FIAT-INVOICE-REQUESTED' ? 'Client requested fiat/card invoice via studio@tajinkart.space' : 'TXID: ' + o.txid}</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
-            <a href="${window.getCryptoExplorerUrl ? window.getCryptoExplorerUrl(o.paymentNetwork, o.txid) : '#'}" target="_blank" rel="noopener" class="btn-secondary" style="font-size:10.5px; padding:3px 9px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35); text-decoration:none;">
+            ${o.txid !== 'FIAT-INVOICE-REQUESTED' ? `<a href="${window.getCryptoExplorerUrl ? window.getCryptoExplorerUrl(o.paymentNetwork, o.txid) : '#'}" target="_blank" rel="noopener" class="btn-secondary" style="font-size:10.5px; padding:3px 9px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35); text-decoration:none;">
               🔍 Inspect TX
-            </a>
+            </a>` : ''}
             ${!o.paymentVerified ? `
               <button type="button" onclick="adminVerifyOrderCrypto(${o.id}, true)" class="btn-secondary" style="font-size:10.5px; padding:3px 9px; color:var(--emerald); border-color:rgba(16,185,129,0.45);">
                 ✓ Approve Payment

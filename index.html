@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.25">
+  <link rel="stylesheet" href="style.css?v=26.6.27">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -768,7 +768,7 @@
             <h4 class="client-support-title">Direct Studio Desk</h4>
             <p class="client-support-sub">Questions about an active brief, revisions, or source files? Reach the studio director directly:</p>
             <div class="sec-contact-display font-mono">
-              <span>Email: <strong>studio@tajincart.space</strong></span>
+              <span>Email: <strong>studio@tajinkart.space</strong></span>
               <span>Telegram: <strong>@tajinkart</strong></span>
             </div>
           </div>
@@ -2641,12 +2641,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.25"></script>
-  <script src="core.js?v=26.6.25"></script>
-  <script src="gallery.js?v=26.6.25"></script>
-  <script src="portal.js?v=26.6.25"></script>
-  <script src="admin.js?v=26.6.25"></script>
-  <script src="translate.js?v=26.6.25"></script>
+  <script src="data.js?v=26.6.27"></script>
+  <script src="core.js?v=26.6.27"></script>
+  <script src="gallery.js?v=26.6.27"></script>
+  <script src="portal.js?v=26.6.27"></script>
+  <script src="admin.js?v=26.6.27"></script>
+  <script src="translate.js?v=26.6.27"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   
@@ -2748,6 +2748,9 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
             <p id="cryptoAutoVerifyHint" style="font-size:11.5px; color:#94a3b8; margin:6px 0 12px;"></p>
             <button type="button" id="cryptoSubmitTxBtn" onclick="submitCryptoTransaction()" class="btn-gold" style="width:100%; padding:12px; font-size:13px;">
               ✓ Submit &amp; Verify Transaction
+            </button>
+            <button type="button" onclick="requestFiatOrCardInvoice()" class="btn-secondary" style="width:100%; margin-top:8px; padding:10px; font-size:11.5px; border-color:rgba(250,204,21,0.35); color:var(--gold);">
+              💳 No Crypto? Request Card / PayPal Invoice via Email
             </button>
           </div>
         </div>

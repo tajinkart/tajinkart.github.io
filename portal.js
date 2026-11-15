@@ -2467,7 +2467,7 @@ window._cachedCryptoRates = window._cachedCryptoRates || { ts: 0, rates: { tezos
 
 window.fetchLiveCryptoRates = async function() {
   const now = Date.now();
-  if (now - window._cachedCryptoRates.ts < 60000 && window._cachedCryptoRates.live) {
+  if (now - window._cachedCryptoRates.ts < 28000 && window._cachedCryptoRates.live) {
     return window._cachedCryptoRates.rates;
   }
   try {
@@ -2551,11 +2551,58 @@ window.openCryptoPayModal = async function(orderId) {
   const modal = document.getElementById('cryptoPayModal');
   if (modal) modal.classList.add('active');
   await window.refreshCryptoPayModalCalc();
+  if (window._cryptoModalRefreshTimer) clearInterval(window._cryptoModalRefreshTimer);
+  window._cryptoModalRefreshTimer = setInterval(async () => {
+    const m = document.getElementById('cryptoPayModal');
+    if (!m || !m.classList.contains('active')) {
+      clearInterval(window._cryptoModalRefreshTimer);
+      window._cryptoModalRefreshTimer = null;
+      return;
+    }
+    await window.refreshCryptoPayModalCalc();
+  }, 30000);
 };
 
 window.closeCryptoPayModal = function() {
   const modal = document.getElementById('cryptoPayModal');
   if (modal) modal.classList.remove('active');
+  if (window._cryptoModalRefreshTimer) {
+    clearInterval(window._cryptoModalRefreshTimer);
+    window._cryptoModalRefreshTimer = null;
+  }
+};
+
+window.requestFiatOrCardInvoice = function() {
+  const orderId = window._activeCryptoPayOrderId;
+  const o = orderId ? ordersList.find(x => x.id === orderId) : null;
+  const sp = (o && o.specs) ? o.specs : {};
+  const totalNum = sp.totalUsd || (o ? parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) : 0) || 0;
+  const tierMult = (window._activeCryptoTier === 1.0) ? 1.0 : 0.5;
+  const usdDue = (totalNum * tierMult).toFixed(2).replace(/\.00$/, '');
+
+  if (o) {
+    o.paymentNetwork = 'fiat_request';
+    o.txid = 'FIAT-INVOICE-REQUESTED';
+    o.paymentAmountCrypto = `$${usdDue} USD (Card / PayPal)`;
+    o.paymentVerified = false;
+    if (typeof safeSetStorage === 'function') safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+    if (typeof window.syncStudioSettingsToCloud === 'function') window.syncStudioSettingsToCloud();
+    if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+    if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  }
+
+  if (typeof window.sendToTelegramDirect === 'function') {
+    const msg = `💳 <b>Card / PayPal Invoice Requested</b>\nOrder: #${o ? o.id : 'Direct'}\nClient: ${o ? o.client : (currentMember?.name || 'Guest')} (${o ? o.contact : (currentMember?.email || '-')})\nPackage: ${o ? o.pkg : 'Commission'}\nAmount Due: $${usdDue} USD`;
+    try { window.sendToTelegramDirect(msg); } catch(e) {}
+  }
+
+  const subj = encodeURIComponent(`Card / PayPal Invoice Request - Brief #${o ? o.id : 'New'} (TAJINKART)`);
+  const body = encodeURIComponent(
+    `Hello TAJINKART Studio,\n\nI would like to pay my ${tierMult === 1 ? '100% full balance' : '50% retainer'} ($${usdDue} USD) via Card / PayPal invoice instead of crypto.\n\nOrder ID: #${o ? o.id : '-'}\nPackage: ${o ? o.pkg : '-'}\nClient Name: ${o ? o.client : (currentMember?.name || '')}\n\nPlease reply with the payment link/instructions.`
+  );
+  window.closeCryptoPayModal();
+  showToast('Fiat/Card invoice requested! 24h expiry paused — opening email to studio@tajinkart.space.', 'success', 5500);
+  window.location.href = `mailto:studio@tajinkart.space?subject=${subj}&body=${body}`;
 };
 
 window.selectCryptoPayNetwork = function(netKey) {
@@ -2755,7 +2802,7 @@ window.downloadOfficialStudioInvoice = function(orderId) {
       <div>
         <h1>TAJINKART STUDIO</h1>
         <div class="muted">Concept Art &amp; Visual Development Atelier • Directed by Seyed Soroush Taj</div>
-        <div class="muted">https://tajinkart.space • studio@tajincart.space</div>
+        <div class="muted">https://tajinkart.space • studio@tajinkart.space</div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:11px; color:#0369a1; font-weight:800; letter-spacing:0.06em;">CONTRACTUAL PROFORMA INVOICE</div>
