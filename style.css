@@ -9653,3 +9653,70 @@ body:not([data-view="admin"]) h4,
     font-size: 17px !important;
   }
 }
+
+
+/* ==============================================================================
+   UI POLISH ROUND 2 (v26.6.11):
+   1. Rotating crimson hover on Store modal close button
+   2. Top Nav (TAJINKART + 3-line dock) visible over Gallery Lightbox + non-colliding X
+   3. Ambient cosmic particles visible behind Gallery Lightbox
+   4. True translucent frosted glass hover on Gallery Tiles (no black dim)
+   ============================================================================== */
+.wizard-modal-window .modal-corner-close-btn {
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease !important;
+}
+
+.wizard-modal-window .modal-corner-close-btn:hover {
+  background: rgba(225, 29, 72, 0.9) !important;
+  border-color: #fda4af !important;
+  color: #ffffff !important;
+  transform: rotate(90deg) scale(1.06) !important;
+}
+
+/* Lightbox layering: particles behind cards, top nav & close button cleanly accessible */
+.art-detail-modal {
+  z-index: 9500 !important;
+  background: rgba(4, 5, 8, 0.78) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+body.lightbox-open #ambientParticleCanvas {
+  z-index: 9505 !important;
+}
+
+.artstation-project-layout {
+  position: relative !important;
+  z-index: 9510 !important;
+}
+
+.artstation-close-btn {
+  top: 18px !important;
+  right: 78px !important;
+  left: auto !important;
+  z-index: 10020 !important;
+}
+
+@media (max-width: 768px) {
+  .artstation-close-btn {
+    top: 12px !important;
+    right: 66px !important;
+  }
+}
+
+/* True frosted glass hover on gallery tiles (bright, clear, no black wash) */
+.mosaic-tile .tile-center-title {
+  background: rgba(15, 23, 42, 0.16) !important;
+  backdrop-filter: blur(8px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(135%) !important;
+}
+
+.mosaic-tile:hover img {
+  opacity: 0.92 !important;
+  filter: brightness(1.02) contrast(1.04) !important;
+}
+
+.mosaic-tile .tile-center-title .tile-slug,
+.mosaic-tile .tile-center-title .tile-sub {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.92), 0 0 20px rgba(0, 0, 0, 0.75) !important;
+}

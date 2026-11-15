@@ -4,6 +4,13 @@
 // ==============================================================================
 window.toggleDesktopUnifiedDropdown = function(e) {
   if (e) e.stopPropagation();
+  const openArtModal = document.getElementById('artDetailModal');
+  if (openArtModal && openArtModal.classList.contains('active')) {
+    if (typeof closeArtModalDirect === 'function') closeArtModalDirect();
+    window.closeDesktopUnifiedDropdown();
+    if (typeof switchView === 'function') switchView('showcase');
+    return;
+  }
   const activeView = document.body.getAttribute('data-view') || (typeof currentView !== 'undefined' ? currentView : 'showcase');
   if (activeView !== 'showcase') {
     window.closeDesktopUnifiedDropdown();
@@ -115,6 +122,13 @@ window.applyDesktopUnifiedCategory = function(catId, title, e) {
 
 window.handleMobileBrandMasterClick = function(e) {
   if (e) e.stopPropagation();
+  const openArtModal = document.getElementById('artDetailModal');
+  if (openArtModal && openArtModal.classList.contains('active')) {
+    if (typeof closeArtModalDirect === 'function') closeArtModalDirect();
+    window.closeMobileFilterDrawers();
+    if (typeof switchView === 'function') switchView('showcase');
+    return;
+  }
   
   // ۱. اگر در صفحه‌ای غیر از گالری هستیم، مستقیماً به صفحه اول بازگرد
   const activeView = document.body.getAttribute('data-view') || (typeof currentView !== 'undefined' ? currentView : 'showcase');
@@ -1024,6 +1038,7 @@ window.closeAllFloatingDrawersAndMenus = function() {
 };
 
 window.openArtModalWithPhase = function(id, targetPhaseIdx = 0) {
+  document.body.classList.add('lightbox-open');
   closeAllFloatingDrawersAndMenus();
   let idx = showcaseArtworks.findIndex(a => String(a.id) === String(id) || a.id == id);
   if (idx === -1 && typeof id === 'number') idx = id;
@@ -1082,6 +1097,7 @@ window.openArtModal = function(id) {
 };
 
 window.closeArtModalDirect = function(updateHistory = true) {
+  document.body.classList.remove('lightbox-open');
   const modal = document.getElementById('artDetailModal');
   if (modal) {
     modal.classList.remove('active');
