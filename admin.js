@@ -1974,6 +1974,10 @@ let isCreatorSelected = false;
 selectedMemberIdx = 0;
 
 function renderAdminSketch3(filterText = '') {
+  if (typeof window.syncOrdersFromSupabase === 'function' && (!window._lastAdminOrdersSync || Date.now() - window._lastAdminOrdersSync > 3500)) {
+    window._lastAdminOrdersSync = Date.now();
+    window.syncOrdersFromSupabase();
+  }
   const listEl = document.getElementById('adminMembersListContainer');
   if (!listEl) return;
 
@@ -2193,11 +2197,7 @@ function renderAdminMemberDetail(m) {
       </div>
     </div>
 
-    <div style="margin-top:20px; padding-top:14px; border-top:1px solid var(--border-subtle);">
-      <button type="button" onclick="adminDeleteMember(${selectedMemberIdx})" class="btn-secondary" style="width:100%; padding:9px; font-size:11.5px; color:var(--crimson); border-color:rgba(239,68,68,0.35);">
-        🗑️ Delete Member
-      </button>
-    </div>
+
   `;
 }
 

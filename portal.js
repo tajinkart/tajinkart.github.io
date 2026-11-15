@@ -948,7 +948,7 @@ window.purgeExpiredUnpaidOrders = function() {
   return false;
 };
 
-window.clientCancelUnpaidOrder = function(orderId) {
+window.clientCancelUnpaidOrder = async function(orderId) {
   const o = ordersList.find(x => x.id === orderId);
   if (!o) return;
   if (o.paymentVerified || o.txid) {
@@ -958,13 +958,18 @@ window.clientCancelUnpaidOrder = function(orderId) {
   if (!confirm(`Cancel and remove unpaid brief #${orderId}? You can submit a new brief anytime.`)) return;
   ordersList = ordersList.filter(x => x.id !== orderId);
   if (typeof safeSetStorage === 'function') safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  renderMemberDashboard();
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
   if (window.supabaseClient) {
-    window.supabaseClient.from('orders').delete().eq('id', orderId).then(() => {
-      console.log('[Client Portal] Unpaid brief deleted from cloud:', orderId);
-    });
+    const { error } = await window.supabaseClient.from('orders').delete().eq('id', orderId);
+    if (error) {
+      console.warn('[Client Portal] Supabase delete error:', error);
+      showToast('Removed locally, but cloud delete failed: ' + (error.message || 'RLS'), 'error', 4500);
+      return;
+    }
+    console.log('[Client Portal] Unpaid brief deleted from cloud:', orderId);
   }
   showToast(`Unpaid brief #${orderId} cancelled and removed.`, 'info', 3500);
-  renderMemberDashboard();
 };
 
 function renderMemberDashboard() {
@@ -1127,23 +1132,35 @@ function renderMemberDashboard() {
             </div>
           </div>
 
-          ${o.specs ? `
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:8px; padding:12px; border-radius:10px; background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.2); font-size:11.5px;">
-              <div><span style="color:#94a3b8; display:block; font-size:10px;">SCOPE & ARCHETYPE</span><strong style="color:#f8fafc;">${o.specs.scope || '-'}</strong></div>
-              <div><span style="color:#94a3b8; display:block; font-size:10px;">FRAMING & VIEW</span><strong style="color:#f8fafc;">${o.specs.framing || '-'}</strong></div>
-              <div><span style="color:#94a3b8; display:block; font-size:10px;">COMPLEXITY</span><strong style="color:#f8fafc;">${o.specs.complexity || '-'}</strong></div>
-              <div><span style="color:#94a3b8; display:block; font-size:10px;">RENDERING FIDELITY</span><strong style="color:#f8fafc;">${o.specs.fidelity || o.phase || '-'}</strong></div>
-              ${o.specs.addons && o.specs.addons.length ? `<div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06);"><span style="color:#94a3b8; font-size:10px; display:block; margin-bottom:3px;">INCLUDED ADD-ONS & DELIVERABLES</span><strong style="color:var(--emerald);">${o.specs.addons.join(' • ')}</strong></div>` : ''}
-              <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                <span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${o.specs.retainerUsd || '--'}</strong></span>
-                <span>50% Final on PSD Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${o.specs.balanceUsd || '--'}</strong></span>
+          ${(() => {
+            const sp = o.specs || {};
+            const totalNum = sp.totalUsd || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+            const halfNum = sp.retainerUsd || (totalNum ? (totalNum * 0.5).toFixed(2).replace(/\.00$/, '') : '--');
+            const issuedStr = sp.createdAt ? new Date(sp.createdAt).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : (typeof o.id === 'number' && o.id > 1700000000000 ? new Date(o.id).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : 'Recorded');
+            return `
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap:10px; padding:14px; border-radius:10px; background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.22); font-size:11.5px;">
+                <div><span style="color:#94a3b8; display:block; font-size:10px;">CLIENT &amp; CONTACT</span><strong style="color:#f8fafc;">${o.client || 'Valued Client'}</strong><span style="color:#94a3b8; display:block; font-size:10.5px;">${o.contact || '-'}</span></div>
+                <div><span style="color:#94a3b8; display:block; font-size:10px;">ISSUED &amp; TIMELINE</span><strong style="color:#f8fafc;">${issuedStr}</strong><span style="color:#94a3b8; display:block; font-size:10.5px;">Est. Delivery: ${o.timeline || 'Per Schedule'}</span></div>
+                <div><span style="color:#94a3b8; display:block; font-size:10px;">SCOPE &amp; ARCHETYPE</span><strong style="color:#f8fafc;">${sp.scope || o.pkg || 'Custom Scope'}</strong></div>
+                <div><span style="color:#94a3b8; display:block; font-size:10px;">FRAMING &amp; VIEW</span><strong style="color:#f8fafc;">${sp.framing || 'Standard View'}</strong></div>
+                <div><span style="color:#94a3b8; display:block; font-size:10px;">COMPLEXITY</span><strong style="color:#f8fafc;">${sp.complexity || 'Production Standard'}</strong></div>
+                <div><span style="color:#94a3b8; display:block; font-size:10px;">RENDERING FIDELITY</span><strong style="color:#f8fafc;">${sp.fidelity || o.phase || '300DPI Master Render'}</strong></div>
+                <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06);">
+                  <span style="color:#94a3b8; font-size:10px; display:block; margin-bottom:3px;">INCLUDED ADD-ONS &amp; DELIVERABLES</span>
+                  <strong style="color:var(--emerald);">${(sp.addons && sp.addons.length) ? sp.addons.join(' • ') : 'Master Layered 300DPI PSD'}</strong>
+                </div>
+                <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                  <span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${halfNum} USD</strong></span>
+                  <span>50% Final on PSD Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${sp.balanceUsd || halfNum} USD</strong></span>
+                </div>
               </div>
-            </div>
-          ` : ''}
+            `;
+          })()}
 
           <div style="color:#cbd5e1; font-size:12px; line-height:1.8; background:rgba(255,255,255,0.02); padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
-            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Client Creative Brief:</strong>
+            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Official Creative Brief &amp; Contractual Scope:</strong>
             ${String(o.brief || 'Bespoke concept art and visual development executed to international industry standards by TAJINKART Studio.').replace(/\n/g, '<br>')}
+            ${o.refLink && o.refLink.startsWith('http') ? `<div style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);"><a href="${o.refLink}" target="_blank" rel="noopener" style="color:var(--cyan-electric); text-decoration:underline; font-size:11.5px;">🔗 Reference / Moodboard Link</a></div>` : ''}
           </div>
 
           ${o.txid ? `
@@ -1155,11 +1172,12 @@ function renderMemberDashboard() {
           ${(!o.paymentVerified && !o.txid && (!o.status || o.status === 'Brief Received')) ? (() => {
             const cMs = (o.specs && o.specs.createdAt) ? Date.parse(o.specs.createdAt) : (typeof o.id === 'number' && o.id > 1700000000000 ? o.id : Date.now());
             const remMs = Math.max(0, (24 * 60 * 60 * 1000) - (Date.now() - cMs));
-            const remH = Math.floor(remMs / 3600000);
-            const remM = Math.floor((remMs % 3600000) / 60000);
-            return `<div style="font-size:11px; padding:7px 12px; border-radius:8px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.28); color:#fbbf24; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-              <span>⏳ Unpaid Brief Hold: <strong>${remH}h ${remM}m remaining</strong></span>
-              <span style="color:#cbd5e1;">Auto-expires after 24h if retainer is unpaid (you may re-submit anytime).</span>
+            const remH = String(Math.floor(remMs / 3600000)).padStart(2, '0');
+            const remM = String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0');
+            const remS = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
+            return `<div style="font-size:11.5px; padding:9px 14px; border-radius:8px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.35); color:#fbbf24; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <span>⏳ 24h Unpaid Brief Hold: <strong class="font-mono unpaid-countdown-timer" data-created-ms="${cMs}" style="font-size:13px; color:#fff; background:rgba(0,0,0,0.35); padding:2px 8px; border-radius:6px; border:1px solid rgba(245,158,11,0.4);">${remH}:${remM}:${remS}</strong></span>
+              <span style="color:#e2e8f0; font-size:11px;">Auto-deletes when timer hits 00:00:00 if 50% retainer is unpaid.</span>
             </div>`;
           })() : ''}
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
@@ -2816,13 +2834,19 @@ window.syncOrdersFromSupabase = async function() {
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false });
-    if (!error && Array.isArray(data) && data.length > 0) {
+    if (!error && Array.isArray(data)) {
       const localMap = {};
       (ordersList || []).forEach(o => { localMap[String(o.id)] = o; });
+      const cloudIds = new Set(data.map(r => String(r.id)));
+      const nowMs = Date.now();
+      const nextList = [];
       data.forEach(row => {
         const existing = localMap[String(row.id)];
-        if (!existing) {
-          ordersList.push({
+        if (existing) {
+          if (row.status) existing.status = row.status;
+          nextList.push(existing);
+        } else {
+          nextList.push({
             id: row.id,
             client: row.client_name || 'Client',
             contact: row.contact || row.client_email || '',
@@ -2835,10 +2859,14 @@ window.syncOrdersFromSupabase = async function() {
             brief: row.brief_text || '',
             status: row.status || 'Brief Received'
           });
-        } else {
-          if (row.status) existing.status = row.status;
         }
       });
+      (ordersList || []).forEach(o => {
+        if (!cloudIds.has(String(o.id)) && typeof o.id === 'number' && (nowMs - o.id) < 15000) {
+          nextList.unshift(o);
+        }
+      });
+      ordersList = nextList;
       safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
       if (typeof window.purgeExpiredUnpaidOrders === 'function') window.purgeExpiredUnpaidOrders();
       if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
@@ -2973,3 +3001,35 @@ window.populateDynamicWizardForCategory = function(pipeKey) {
     ).join('');
   }
 };
+
+// ==============================================================================
+// LIVE 24H UNPAID BRIEF COUNTDOWN TICKER (HH:MM:SS)
+// ==============================================================================
+if (!window._unpaidCountdownInterval) {
+  window._unpaidCountdownInterval = setInterval(() => {
+    const els = document.querySelectorAll('.unpaid-countdown-timer[data-created-ms]');
+    if (!els.length) return;
+    let expiredFound = false;
+    const now = Date.now();
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    els.forEach(el => {
+      const cMs = Number(el.getAttribute('data-created-ms'));
+      if (!cMs || Number.isNaN(cMs)) return;
+      const remMs = Math.max(0, DAY_MS - (now - cMs));
+      if (remMs === 0) {
+        expiredFound = true;
+        el.textContent = '00:00:00';
+        return;
+      }
+      const h = String(Math.floor(remMs / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
+      el.textContent = `${h}:${m}:${s}`;
+    });
+    if (expiredFound && typeof window.purgeExpiredUnpaidOrders === 'function') {
+      if (window.purgeExpiredUnpaidOrders() && typeof renderMemberDashboard === 'function') {
+        renderMemberDashboard();
+      }
+    }
+  }, 1000);
+}
