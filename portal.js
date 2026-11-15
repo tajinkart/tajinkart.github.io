@@ -2450,9 +2450,11 @@ if (document.readyState === 'loading') {
 window.STUDIO_CRYPTO_META = {
   xtz:        { label: 'Tezos (XTZ) • Temple', symbol: 'XTZ', cgId: 'tezos', ccSym: 'XTZ', explorer: 'https://tzkt.io/' },
   eth:        { label: 'Ethereum (ETH)', symbol: 'ETH', cgId: 'ethereum', ccSym: 'ETH', explorer: 'https://etherscan.io/tx/' },
+  usdc_evm:   { label: 'USDC (Base / Polygon / EVM)', symbol: 'USDC', cgId: 'usd-coin', ccSym: 'USDC', explorer: 'https://basescan.org/tx/' },
   usdt_bep20: { label: 'USDT (ERC-20 / BEP-20)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://bscscan.com/tx/' },
   usdt_trc20: { label: 'USDT (TRC-20)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://tronscan.org/#/transaction/' },
   sol:        { label: 'Solana (SOL)', symbol: 'SOL', cgId: 'solana', ccSym: 'SOL', explorer: 'https://solscan.io/tx/' },
+  usdc_sol:   { label: 'USDC (Solana SPL)', symbol: 'USDC', cgId: 'usd-coin', ccSym: 'USDC', explorer: 'https://solscan.io/tx/' },
   ton:        { label: 'TON (Toncoin)', symbol: 'TON', cgId: 'the-open-network', ccSym: 'TON', explorer: 'https://tonviewer.com/transaction/' },
   usdt_ton:   { label: 'USDT (TON Network)', symbol: 'USDT', cgId: 'tether', ccSym: 'USDT', explorer: 'https://tonviewer.com/transaction/' },
   btc:        { label: 'Bitcoin (BTC)', symbol: 'BTC', cgId: 'bitcoin', ccSym: 'BTC', explorer: 'https://mempool.space/tx/' }
@@ -2464,7 +2466,7 @@ window.getCryptoExplorerUrl = function(netKey, txid) {
   return m.explorer + encodeURIComponent(txid.trim());
 };
 
-window._cachedCryptoRates = window._cachedCryptoRates || { ts: 0, rates: { tezos: 1.0, ethereum: 3100, tether: 1.0, solana: 200, 'the-open-network': 5.2, bitcoin: 90000 } };
+window._cachedCryptoRates = window._cachedCryptoRates || { ts: 0, rates: { tezos: 1.0, ethereum: 3100, tether: 1.0, 'usd-coin': 1.0, solana: 200, 'the-open-network': 5.2, bitcoin: 90000 } };
 
 window.fetchLiveCryptoRates = async function() {
   const now = Date.now();
@@ -2472,7 +2474,7 @@ window.fetchLiveCryptoRates = async function() {
     return window._cachedCryptoRates.rates;
   }
   try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tezos,ethereum,tether,solana,the-open-network,bitcoin&vs_currencies=usd');
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tezos,ethereum,tether,usd-coin,solana,the-open-network,bitcoin&vs_currencies=usd');
     if (res.ok) {
       const data = await res.json();
       const r = { ...window._cachedCryptoRates.rates };
@@ -2482,13 +2484,14 @@ window.fetchLiveCryptoRates = async function() {
     }
   } catch(e) {}
   try {
-    const res2 = await fetch('https://min-api.cryptocompare.com/data/pricemulti?fsyms=XTZ,ETH,USDT,SOL,TON,BTC&tsyms=USD');
+    const res2 = await fetch('https://min-api.cryptocompare.com/data/pricemulti?fsyms=XTZ,ETH,USDT,USDC,SOL,TON,BTC&tsyms=USD');
     if (res2.ok) {
       const d2 = await res2.json();
       const r = { ...window._cachedCryptoRates.rates };
       if (d2.XTZ?.USD) r.tezos = d2.XTZ.USD;
       if (d2.ETH?.USD) r.ethereum = d2.ETH.USD;
       if (d2.USDT?.USD) r.tether = d2.USDT.USD;
+      if (d2.USDC?.USD) r['usd-coin'] = d2.USDC.USD;
       if (d2.SOL?.USD) r.solana = d2.SOL.USD;
       if (d2.TON?.USD) r['the-open-network'] = d2.TON.USD;
       if (d2.BTC?.USD) r.bitcoin = d2.BTC.USD;
@@ -2507,9 +2510,9 @@ window.getConfiguredWalletsMap = function() {
   const w = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.cryptoWallets) ? siteSettings.cryptoWallets : {};
   const out = {};
   if (w.xtz) out.xtz = w.xtz;
-  if (w.eth) { out.eth = w.eth; out.usdt_bep20 = w.eth; }
+  if (w.eth) { out.eth = w.eth; out.usdc_evm = w.eth; out.usdt_bep20 = w.eth; }
   if (w.usdt_trc20) out.usdt_trc20 = w.usdt_trc20;
-  if (w.sol) out.sol = w.sol;
+  if (w.sol) { out.sol = w.sol; out.usdc_sol = w.sol; }
   if (w.ton) { out.ton = w.ton; out.usdt_ton = w.ton; }
   if (w.btc) out.btc = w.btc;
   return out;
