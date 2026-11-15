@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.18">
+  <link rel="stylesheet" href="style.css?v=26.6.19">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -2026,7 +2026,7 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
             </div>
             <div class="wizard-step-body">
               <div>
-                <label style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">Scope & Archetype:</label>
+                <label id="wizScopeLabel" style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">Scope &amp; Archetype:</label>
                 <select id="wizCharacterScope" onchange="recalcWizardPrice()" style="width:100%; font-size:12px; margin-bottom:10px;">
                   <option value="single" data-usd="0" selected>👤 Single Hero / Character Concept (Base)</option>
                   <option value="timeline" data-usd="60">⏳ Age Progression Timeline (Youth ➔ Prime ➔ Elder) (+$60)</option>
@@ -2072,7 +2072,7 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                 </select>
               </div>
               <div style="margin-top:6px; margin-bottom:8px;">
-                <span style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 Character Add-ons:</span>
+                <span id="wizAddonsLabel" style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 Add-ons &amp; Cross-Category Modules:</span>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
                     <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
@@ -2089,6 +2089,14 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
                     <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
                     <span>Commercial AAA License (+$45)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCrossEnv" data-usd="55" data-days="2" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>+ Environment Backdrop (+$55 • +2d)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCrossChar" data-usd="40" data-days="1" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>+ Character / Scale Figure (+$40 • +1d)</span>
                   </label>
                   <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
                     <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
@@ -2131,7 +2139,11 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
           </div>
         </div>
 
-        <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:14px; width:100%;">
+        <label style="display:flex; align-items:flex-start; gap:8px; font-size:11px; color:#cbd5e1; margin-top:10px; padding:8px 10px; border-radius:8px; background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.22); cursor:pointer;">
+          <input type="checkbox" id="orderTermsAgree" required style="width:auto; margin-top:2px;" />
+          <span>I agree to the TAJINKART Commission Agreement (50% non-refundable retainer, 2 revision rounds per milestone &amp; 300DPI delivery schedule).</span>
+        </label>
+        <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:10px; width:100%;">
           Submit Project Brief & Send Direct Inquiry to Studio Director →
         </button>
       </form>
@@ -2617,12 +2629,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.18"></script>
-  <script src="core.js?v=26.6.18"></script>
-  <script src="gallery.js?v=26.6.18"></script>
-  <script src="portal.js?v=26.6.18"></script>
-  <script src="admin.js?v=26.6.18"></script>
-  <script src="translate.js?v=26.6.18"></script>
+  <script src="data.js?v=26.6.19"></script>
+  <script src="core.js?v=26.6.19"></script>
+  <script src="gallery.js?v=26.6.19"></script>
+  <script src="portal.js?v=26.6.19"></script>
+  <script src="admin.js?v=26.6.19"></script>
+  <script src="translate.js?v=26.6.19"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   

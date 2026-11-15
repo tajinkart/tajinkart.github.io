@@ -4072,3 +4072,14 @@ window.adminVerifyOrderCrypto = function(orderId, approve) {
   if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
 };
+
+window.syncPipelinesToCloud = async function() {
+  if (!window.supabaseClient || typeof PIPELINE_DATA === 'undefined') return;
+  try {
+    await window.supabaseClient.from('studio_settings').upsert([{
+      key: 'pipeline_data',
+      value: PIPELINE_DATA,
+      updated_at: new Date().toISOString()
+    }], { onConflict: 'key' });
+  } catch(e) { console.warn('[Pipeline Cloud Sync]', e); }
+};

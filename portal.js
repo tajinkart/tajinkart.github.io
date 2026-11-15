@@ -413,6 +413,9 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
     const pData = PIPELINE_DATA[activeModalItem.pipeKey];
     badgeEl.textContent = pData ? pData.topSub : 'ATELIER PIPELINE';
   }
+  if (typeof window.populateDynamicWizardForCategory === 'function') {
+    window.populateDynamicWizardForCategory(activeModalItem.pipeKey);
+  }
 
   if (currentMember) {
     const nameInput = document.getElementById('orderClientName');
@@ -455,13 +458,26 @@ window.recalcWizardPrice = function() {
   if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
   if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  let extraDays = 0;
   if (weaponEl && weaponEl.checked) extra += 35;
   if (expEl && expEl.checked) extra += 30;
   if (paletteEl && paletteEl.checked) extra += 20;
   if (commEl && commEl.checked) extra += 45;
 
+  const crossEnvEl = document.getElementById('wizCrossEnv');
+  const crossCharEl = document.getElementById('wizCrossChar');
+  if (crossEnvEl && crossEnvEl.checked) { extra += 55; extraDays += 2; }
+  if (crossCharEl && crossCharEl.checked) { extra += 40; extraDays += 1; }
+
   const totalUSD = Math.max(60, baseUSD + extra);
   activeModalItem.calculatedPriceUSD = totalUSD;
+
+  const tlEl = document.getElementById('modalTimeline');
+  if (tlEl && activeModalItem) {
+    tlEl.textContent = extraDays > 0
+      ? `${activeModalItem.timeline} (+${extraDays}d cross-discipline)`
+      : activeModalItem.timeline;
+  }
 
   // آپدیت آنی و زنده قیمت روی صفحه
   const priceEl = document.getElementById('modalPrice');
@@ -1367,6 +1383,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.getElementById('wizExpressions')?.checked) addons.push('Facial Expressions Sheet (+$30)');
       if (document.getElementById('wizColorPalette')?.checked) addons.push('Color Variations (+$20)');
       if (document.getElementById('wizCommercial')?.checked) addons.push('Commercial AAA License (+$45)');
+      if (document.getElementById('wizCrossEnv')?.checked) addons.push('Cross-Module: Environment Backdrop (+$55)');
+      if (document.getElementById('wizCrossChar')?.checked) addons.push('Cross-Module: Character / Scale Figure (+$40)');
       if (document.getElementById('wizPSD')?.checked) addons.push('Master Layered 300DPI PSD (Included)');
 
       const brief = document.getElementById('orderClientBrief').value.trim();
@@ -1384,6 +1402,8 @@ document.addEventListener('DOMContentLoaded', () => {
         totalUsd: totalUsd,
         retainerUsd: retainerUsd,
         balanceUsd: retainerUsd,
+        agreedTerms: !!document.getElementById('orderTermsAgree')?.checked,
+        agreedAt: new Date().toISOString(),
         createdAt: new Date().toISOString()
       };
 
@@ -1395,7 +1415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         refLink: refLink,
         pkg: activeModalItem.title,
         price: priceText,
-        timeline: activeModalItem.timeline,
+        timeline: document.getElementById('modalTimeline')?.textContent || activeModalItem.timeline,
         phase: fidelityText,
         specs: specs,
         brief: brief,
@@ -2626,18 +2646,18 @@ window.downloadOfficialStudioInvoice = function(orderId) {
 <meta charset="UTF-8" />
 <title>TAJINKART Contractual Invoice #${o.id}</title>
 <style>
-  body { font-family: system-ui, -apple-system, sans-serif; background:#090c12; color:#e2e8f0; margin:0; padding:32px; }
-  .sheet { max-width:820px; margin:0 auto; background:#0f141f; border:1px solid rgba(250,204,21,0.35); border-radius:16px; padding:32px; }
+  @page { size: A4; margin: 14mm; } body { font-family: system-ui, -apple-system, sans-serif; background:#f1f5f9; color:#0f172a; margin:0; padding:24px; }
+  .sheet { max-width:794px; margin:0 auto; background:#ffffff; border:1px solid #cbd5e1; border-top:6px solid #090c12; border-radius:10px; padding:32px; box-shadow:0 12px 35px rgba(15,23,42,0.08); }
   .head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:18px; margin-bottom:22px; }
-  h1 { margin:0; font-size:24px; color:#facc15; letter-spacing:0.08em; }
-  .muted { color:#94a3b8; font-size:12.5px; }
+  h1 { margin:0; font-size:22px; color:#090c12; letter-spacing:0.08em; }
+  .muted { color:#475569; font-size:12px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
-  .box { background:#06080d; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; font-size:13px; }
-  .box strong { color:#fff; display:block; margin-top:4px; }
+  .box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:13px; font-size:12.5px; }
+  .box strong { color:#0f172a; display:block; margin-top:4px; }
   table { width:100%; border-collapse:collapse; margin:18px 0; font-size:13px; }
-  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.08); }
-  th { color:#facc15; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
-  .terms { background:#06080d; border-left:3px solid #facc15; padding:14px 16px; border-radius:8px; font-size:12px; line-height:1.7; color:#cbd5e1; margin-top:20px; }
+  th, td { text-align:left; padding:9px 12px; border-bottom:1px solid #e2e8f0; }
+  th { color:#0f172a; background:#f8fafc; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
+  .terms { background:#fffbeb; border-left:4px solid #ca8a04; padding:14px 16px; border-radius:6px; font-size:11.5px; line-height:1.65; color:#1e293b; margin-top:18px; }
   .print-btn { margin-top:20px; padding:10px 20px; border-radius:8px; border:none; background:#facc15; color:#000; font-weight:800; cursor:pointer; }
   @media print { body { background:#fff; color:#111; } .sheet { border:1px solid #ccc; background:#fff; } .box, .terms { background:#f8fafc; color:#111; border-color:#ddd; } .print-btn { display:none; } }
 </style>
@@ -2651,7 +2671,7 @@ window.downloadOfficialStudioInvoice = function(orderId) {
         <div class="muted">https://tajinkart.space • studio@tajincart.space</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:12px; color:#00f0ff; font-weight:700;">CONTRACTUAL PROFORMA INVOICE</div>
+        <div style="font-size:11px; color:#0369a1; font-weight:800; letter-spacing:0.06em;">CONTRACTUAL PROFORMA INVOICE</div>
         <div style="font-size:16px; font-weight:800; margin-top:4px;">#TJK-${o.id}</div>
         <div class="muted">Issued: ${dateStr} • Status: ${o.status || 'Brief Received'}</div>
       </div>
@@ -2676,19 +2696,33 @@ window.downloadOfficialStudioInvoice = function(orderId) {
     </table>
 
     <div class="grid">
-      <div class="box"><span class="muted">50% Non-Refundable Retainer (To Start)</span><strong style="color:#facc15; font-size:18px;">$${halfNum} USD</strong></div>
-      <div class="box"><span class="muted">50% Final Balance (Prior to PSD Handover)</span><strong style="color:#00f0ff; font-size:18px;">$${halfNum} USD</strong></div>
+      <div class="box"><span class="muted">50% Non-Refundable Retainer (To Start)</span><strong style="color:#b45309; font-size:18px;">$${halfNum} USD</strong></div>
+      <div class="box"><span class="muted">50% Final Balance (Prior to PSD Handover)</span><strong style="color:#0369a1; font-size:18px;">$${halfNum} USD</strong></div>
     </div>
 
     <div class="terms">
-      <strong style="color:#facc15; display:block; margin-bottom:6px;">Binding Studio Commission Agreement Summary:</strong>
+      <strong style="color:#92400e; display:block; margin-bottom:6px;">Binding Studio Commission Agreement &amp; Duration:</strong>
       1. <strong>Retainer &amp; Scheduling:</strong> Production begins strictly upon settlement of the 50% non-refundable retainer.<br/>
       2. <strong>Checkpoints &amp; Revisions:</strong> Up to 2 structured revision rounds are included at Silhouette/Linework and Color/Value checkpoints.<br/>
       3. <strong>Final Handover:</strong> High-resolution 300DPI master files and layered PSDs are released upon settlement of the remaining 50% balance.<br/>
       4. <strong>Abandonment &amp; Anti-AI:</strong> Client silence exceeding 30 calendar days closes the commission. All studio works are protected against unauthorized AI training.
     </div>
 
-    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px; padding-top:16px; border-top:1px dashed #cbd5e1; font-size:12px;">
+      <div>
+        <div style="color:#64748b; font-size:10.5px; text-transform:uppercase;">Studio Director Authorized Signature</div>
+        <div style="font-family:Georgia, serif; font-style:italic; font-size:20px; color:#0f172a; margin:6px 0 2px;">Seyed Soroush Taj</div>
+        <div style="color:#475569; font-size:11px;">Founder &amp; Lead Concept Artist • TAJINKART Studio</div>
+      </div>
+      <div>
+        <div style="color:#64748b; font-size:10.5px; text-transform:uppercase;">Client Electronic Acceptance</div>
+        <div style="font-weight:700; color:${o.paymentVerified ? '#047857' : '#0f172a'}; margin:6px 0 2px;">
+          ${o.paymentVerified ? '✓ Executed via 50% Retainer Settlement' : '✓ Brief &amp; Terms Accepted Electronically'}
+        </div>
+        <div style="color:#475569; font-size:11px;">${o.txid ? ('TXID: ' + o.txid) : ('Client: ' + (o.client || 'Confirmed via Portal'))}</div>
+      </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">Save as PDF / Print Official Contract</button>
   </div>
 </body>
 </html>`;
@@ -2746,3 +2780,125 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(() => window.syncOrdersFromSupabase(), 900);
 }
+
+// ==============================================================================
+// DYNAMIC PER-CATEGORY WIZARD PROFILES (Config-Driven Order Form)
+// ==============================================================================
+window.WIZARD_CATEGORY_PROFILES = {
+  sketch1: {
+    scopeLabel: 'Character Scope & Archetype:',
+    framingLabel: 'Framing & View:',
+    scopes: [
+      ['👤 Single Hero / Character Concept (Base)', 0],
+      ['⏳ Age Progression Timeline (Youth ➔ Prime ➔ Elder) (+$60)', 60],
+      ['👥 Ensemble / Faction Bundle (Hero + Companions) (+$85)', 85],
+      ['🔄 Character Redesign & Evolution (+$15)', 15]
+    ],
+    framings: [
+      ['Portrait / Bust (Base)', 0],
+      ['Half Body / Waist Up (+$25)', 25],
+      ['Full Body Dynamic Action (+$40)', 40],
+      ['3-View Orthographic Turnaround (+$55)', 55]
+    ]
+  },
+  sketch2: {
+    scopeLabel: 'Environment Scope & Biome:',
+    framingLabel: 'Camera & Horizon Framing:',
+    scopes: [
+      ['🏞️ Single Establishing Keyframe (Base)', 0],
+      ['🏛️ Modular Architecture Kit & Callouts (+$55)', 55],
+      ['🌦️ Multi-Time / Weather Lighting Variants (+$45)', 45]
+    ],
+    framings: [
+      ['16:9 Cinematic Establishing Shot (Base)', 0],
+      ['21:9 Ultra-Wide Panoramic Vista (+$35)', 35],
+      ['Isometric / Top-Down Level Layout (+$45)', 45]
+    ]
+  },
+  sketch_creature: {
+    scopeLabel: 'Creature Class & Biology:',
+    framingLabel: 'Anatomy & Diagram View:',
+    scopes: [
+      ['🐉 Single Creature / Boss Concept (Base)', 0],
+      ['🦴 Locomotion & Jaw Mechanics Breakdown (+$50)', 50],
+      ['🐺 Pack / Evolution Variants (+$70)', 70]
+    ],
+    framings: [
+      ['Full-Body Profile + Human Scale Ref (Base)', 0],
+      ['Action Habitat Render (+$40)', 40],
+      ['Orthographic 3D-Ready Creature Sheet (+$60)', 60]
+    ]
+  },
+  sketch3: {
+    scopeLabel: 'Illustration / Keyframe Purpose:',
+    framingLabel: 'Aspect Ratio & Print Spec:',
+    scopes: [
+      ['🎬 Narrative Story Keyframe (Base)', 0],
+      ['📖 Book / Album Cover + Typography Space (+$45)', 45],
+      ['🎮 Steam Capsule / Hero Splash Art (+$65)', 65]
+    ],
+    framings: [
+      ['Standard 300DPI Digital Master (Base)', 0],
+      ['Wrap-Around Print Cover (Front + Spine + Back) (+$50)', 50]
+    ]
+  },
+  sketch4: {
+    scopeLabel: 'Prop / UI Pack Quantity:',
+    framingLabel: 'Technical Deliverable Format:',
+    scopes: [
+      ['⚔️ Single Hero Weapon / Relic Sheet (Base)', 0],
+      ['🎒 4-Item Loot / Consumables Bundle (+$45)', 45],
+      ['🛡️ 8-Icon RPG Skill / HUD Kit (+$65)', 65]
+    ],
+    framings: [
+      ['Rendered Concept + Material Callouts (Base)', 0],
+      ['3D-Ready Orthographic Blueprints (+$35)', 35]
+    ]
+  },
+  sketch5: {
+    scopeLabel: 'Sequential Art Format:',
+    framingLabel: 'Finish & Layering:',
+    scopes: [
+      ['📑 Storyboard / Cinematic Decoupage Page (Base)', 0],
+      ['✒️ Inked Manga / Comic Page (+$30)', 30],
+      ['🎨 Full-Color Webtoon / Motion Layers (+$60)', 60]
+    ],
+    framings: [
+      ['Single Page / Episode Strip (Base)', 0],
+      ['Multi-Page Sequence (3+ Pages) (+$90)', 90]
+    ]
+  },
+  sketch_mascot: {
+    scopeLabel: 'Mascot / Crest Scope:',
+    framingLabel: 'Brand Asset Format:',
+    scopes: [
+      ['🦅 Brand Crest & Emblem (Base)', 0],
+      ['🎭 Full Character Mascot + Poses (+$55)', 55]
+    ],
+    framings: [
+      ['High-Res Raster + Transparent PNG (Base)', 0],
+      ['Vector / Scalable Print Master (+$45)', 45]
+    ]
+  }
+};
+
+window.populateDynamicWizardForCategory = function(pipeKey) {
+  const prof = window.WIZARD_CATEGORY_PROFILES[pipeKey] || window.WIZARD_CATEGORY_PROFILES.sketch1;
+  const sLbl = document.getElementById('wizScopeLabel');
+  const fLbl = document.getElementById('wizFramingLabel');
+  if (sLbl) sLbl.textContent = prof.scopeLabel;
+  if (fLbl) fLbl.textContent = prof.framingLabel;
+
+  const sEl = document.getElementById('wizCharacterScope');
+  if (sEl) {
+    sEl.innerHTML = prof.scopes.map((item, idx) =>
+      `<option value="opt_${idx}" data-usd="${item[1]}" ${idx === 0 ? 'selected' : ''}>${item[0]}</option>`
+    ).join('');
+  }
+  const fEl = document.getElementById('wizFraming');
+  if (fEl) {
+    fEl.innerHTML = prof.framings.map((item, idx) =>
+      `<option value="frm_${idx}" data-usd="${item[1]}" ${idx === 0 ? 'selected' : ''}>${item[0]}</option>`
+    ).join('');
+  }
+};

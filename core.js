@@ -1021,6 +1021,18 @@ window.syncStudioSettingsFromCloud = async function() {
       if (typeof window.updateStudioLiveStatus === 'function') window.updateStudioLiveStatus();
       console.log('[Cloud Settings] Restored studio settings from Supabase.');
     }
+    // Restore dynamic PIPELINE_DATA edits from Supabase Cloud
+    const { data: pipeData } = await window.supabaseClient
+      .from('studio_settings')
+      .select('value')
+      .eq('key', 'pipeline_data')
+      .single();
+    if (pipeData && pipeData.value && typeof PIPELINE_DATA !== 'undefined') {
+      Object.assign(PIPELINE_DATA, pipeData.value);
+      if (typeof selectPipeline === 'function' && typeof currentSelectedPipeKey !== 'undefined') {
+        selectPipeline(currentSelectedPipeKey, null, false);
+      }
+    }
     // Restore crypto payment ledger & merge with ordersList
     const { data: payData } = await window.supabaseClient
       .from('studio_settings')
