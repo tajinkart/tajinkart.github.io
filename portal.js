@@ -36,7 +36,7 @@ window.handleAcademyClick = function() {
 // هر شیت و فاز منحصراً و فقط در پایپ‌لاین اختصاصی خود نمایش داده می‌شود
 // ==============================================================================
 
-window.getArtworksForPipeline = function(pipeKey) {
+window.getArtworksForPipeline = function(pipeKey, forShopCards = false) {
   const allArts = (window.showcaseArtworks && Array.isArray(window.showcaseArtworks)) ? window.showcaseArtworks : [];
   if (!allArts || allArts.length === 0) return [];
 
@@ -55,7 +55,10 @@ window.getArtworksForPipeline = function(pipeKey) {
 
   const matchingItems = [];
 
+  const hiddenShopIds = (typeof siteSettings !== 'undefined' && siteSettings && Array.isArray(siteSettings.atelierHiddenArtIds)) ? siteSettings.atelierHiddenArtIds : [];
   allArts.forEach(art => {
+    if (!art) return;
+    if (forShopCards && (art.showInShopCards === false || hiddenShopIds.includes(art.id))) return;
     if (!art) return;
     const aCat = (art.category || art.tag || '').toLowerCase().trim();
     const aPipe = (art.pipelineKey || art.pipe || '').toLowerCase().trim();
@@ -147,7 +150,7 @@ window.syncAtelierWithGalleryArtworks = function() {
     if (!pipe) return;
 
     // واکشی تصاویر ۱۰۰٪ انحصاری همین پایپ‌لاین
-    const matchingItems = window.getArtworksForPipeline(pipe);
+    const matchingItems = window.getArtworksForPipeline(pipe, true);
     const validImages = [];
 
     matchingItems.forEach(item => {
@@ -477,6 +480,13 @@ window.recalcWizardPrice = function() {
     tlEl.textContent = extraDays > 0
       ? `${activeModalItem.timeline} (+${extraDays}d cross-discipline)`
       : activeModalItem.timeline;
+  }
+
+  // آپدیت هوشمند تصویر پیش‌نمایش ویزارد بر اساس گزینه‌های انتخابی و آثار آتلیه
+  if (typeof window.updateWizardDynamicPreview === 'function' && activeModalItem) {
+    const fTxt = framingEl ? framingEl.options[framingEl.selectedIndex].text : '';
+    const pTxt = phaseEl ? phaseEl.options[phaseEl.selectedIndex].text : '';
+    window.updateWizardDynamicPreview(activeModalItem.pipeKey, fTxt, pTxt);
   }
 
   // آپدیت آنی و زنده قیمت روی صفحه

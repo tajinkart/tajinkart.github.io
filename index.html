@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.31">
+  <link rel="stylesheet" href="style.css?v=26.6.32">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -1936,6 +1936,7 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
 
   <!-- مدال مطالعه موردی چندمرحله‌ای آثار (Case-Study Interactive Engine) -->
   <div id="artDetailModal" class="art-detail-modal" onclick="closeArtModal(event)">
+    <button type="button" onclick="closeArtModalDirect(); event.stopPropagation();" class="modal-corner-close-btn" style="position:fixed; top:18px; left:18px; z-index:9520;" title="Close Artwork">✕</button>
     <!-- کلیدهای ناوبری سریع بین پروژه‌ها به سبک آرت‌استیشن -->
     <!-- دکمه‌های ناوبری با فلش‌های رو به بیرون (Outward SVG Arrows) که هرگز توسط موتور راست‌به‌چپ وارونه نمی‌شوند -->
     <button type="button" class="artstation-nav-btn prev" onclick="navigateCaseStudy(-1, event)" title="Previous Artwork">
@@ -2641,12 +2642,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.31"></script>
-  <script src="core.js?v=26.6.31"></script>
-  <script src="gallery.js?v=26.6.31"></script>
-  <script src="portal.js?v=26.6.31"></script>
-  <script src="admin.js?v=26.6.31"></script>
-  <script src="translate.js?v=26.6.31"></script>
+  <script src="data.js?v=26.6.32"></script>
+  <script src="core.js?v=26.6.32"></script>
+  <script src="gallery.js?v=26.6.32"></script>
+  <script src="portal.js?v=26.6.32"></script>
+  <script src="admin.js?v=26.6.32"></script>
+  <script src="translate.js?v=26.6.32"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   

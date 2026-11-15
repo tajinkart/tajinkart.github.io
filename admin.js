@@ -701,12 +701,29 @@ function renderAdminArtModalForm(art, isNew) {
         </div>
       </div>
 
-      <!-- Full production package order settings -->
-      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.28); border-radius:12px; padding:12px 14px;">
+      <!-- Full production package order & Atelier Shop visibility settings -->
+      <div style="background:rgba(250,204,21,0.06); border:1px solid rgba(250,204,21,0.28); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:10px;">
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--gold); font-weight:700;">
           <input type="checkbox" id="editArtIsPackCheckbox" ${(art.isProductionPack !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--gold); cursor:pointer;" />
           Enable 'Order Full Production Case Study' prompt at bottom of artwork
         </label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--cyan-electric); font-weight:700; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+          <input type="checkbox" id="editArtShowInShopCards" ${(!(siteSettings?.atelierHiddenArtIds || []).includes(art.id) && art.showInShopCards !== false) ? 'checked' : ''} style="width:17px; height:17px; accent-color:var(--cyan-electric); cursor:pointer;" />
+          Show in Atelier / Shop Side Category Cards (Rotating Feed)
+        </label>
+        <div style="padding-top:6px; border-top:1px solid rgba(255,255,255,0.08);">
+          <span style="font-size:11px; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Wizard Option Match Tags (feeds #zoomModal preview when client picks options):</span>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            ${['Portrait', 'Half-Body', 'Full-Body', 'Sketch', 'Lineart', 'Render', 'Turnaround', 'Environment'].map(tag => {
+              const savedTags = (art.atelierTags && art.atelierTags.length) ? art.atelierTags : ((siteSettings?.atelierArtTags && siteSettings.atelierArtTags[String(art.id)]) || []);
+              const isChk = savedTags.includes(tag);
+              return `<label style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#e2e8f0; background:#04060a; border:1px solid rgba(255,255,255,0.14); padding:4px 9px; border-radius:999px; cursor:pointer;">
+                <input type="checkbox" name="editArtAtelierTags" value="${tag}" ${isChk ? 'checked' : ''} style="accent-color:var(--cyan-electric);" />
+                <span>${tag}</span>
+              </label>`;
+            }).join('')}
+          </div>
+        </div>
       </div>
 
       <!-- Action buttons -->
@@ -1040,6 +1057,8 @@ window.confirmSaveArtwork = async function() {
   const slug = genre; // اسلاگ خودکار برابر با نام ژانر
   const desc = document.getElementById('editArtDescInput')?.value.trim() || '';
   const isPack = document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true;
+  const showInShopCards = document.getElementById('editArtShowInShopCards') ? document.getElementById('editArtShowInShopCards').checked : true;
+  const atelierTags = Array.from(document.querySelectorAll('input[name="editArtAtelierTags"]:checked')).map(cb => cb.value);
 
   if (!stagingProjectPhases || stagingProjectPhases.length === 0) {
     showToast('Please add at least one image to this project.', 'error');
@@ -1088,6 +1107,8 @@ window.confirmSaveArtwork = async function() {
         title: title || 'New Studio Concept',
         desc: desc,
         isProductionPack: isPack,
+        showInShopCards: showInShopCards,
+        atelierTags: atelierTags,
         isAtelierSample: document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false,
         pipelineKey: pipe,
         genre: genre,
@@ -1158,6 +1179,21 @@ window.confirmSaveArtwork = async function() {
       art.image = img;
       art.desc = desc;
       art.isProductionPack = isPack;
+      art.showInShopCards = showInShopCards;
+      art.atelierTags = atelierTags;
+      if (typeof siteSettings !== 'undefined' && siteSettings) {
+        if (!Array.isArray(siteSettings.atelierHiddenArtIds)) siteSettings.atelierHiddenArtIds = [];
+        if (!showInShopCards) {
+          if (!siteSettings.atelierHiddenArtIds.includes(art.id)) siteSettings.atelierHiddenArtIds.push(art.id);
+        } else {
+          siteSettings.atelierHiddenArtIds = siteSettings.atelierHiddenArtIds.filter(x => x !== art.id);
+        }
+        if (!siteSettings.atelierArtTags || typeof siteSettings.atelierArtTags !== 'object') siteSettings.atelierArtTags = {};
+        siteSettings.atelierArtTags[String(art.id)] = atelierTags;
+        safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+        if (window.syncStudioSettingsToCloud) window.syncStudioSettingsToCloud();
+      }
+      if (typeof window.syncAtelierWithGalleryArtworks === 'function') window.syncAtelierWithGalleryArtworks();
       art.isAtelierSample = document.getElementById("editArtIsAtelierSample") ? document.getElementById("editArtIsAtelierSample").checked : false;
       art.phases = assembledPhases;
 
