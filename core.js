@@ -419,8 +419,10 @@ window.switchView = function(vKey) {
   // قفل دسترسی به جنسیس لور و آکادمی (منحصراً برای مدیر استودیو بدون متن به زودی)
   if (vKey === 'genesis' || vKey === 'academy') {
     if (!window.isStudioDirectorAuthenticated()) {
-      const secName = vKey === 'genesis' ? 'Genesis Lore' : 'Academy';
-      showToast(`${secName} is currently in active production and reserved for Studio Director access.`, 'info', 4000);
+      const lockMsg = vKey === 'genesis'
+        ? 'GENESIS ARCHIVES // SEALED SECTOR — The chronicles of Edon and Extopia are currently being forged behind closed doors. Clearance is restricted to the World Architect until the seasonal unveiling.'
+        : 'TAJINKART ACADEMY // FORGING CURRICULUM — The ink is still wet. Our private mentorships and dark-fantasy production breakdowns are currently in preparation for the next guild intake.';
+      showToast(lockMsg, 'info', 5500);
       return;
     }
   }

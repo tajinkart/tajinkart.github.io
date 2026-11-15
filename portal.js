@@ -5,7 +5,7 @@
 
 window.handleGenesisClick = function() {
   if (!window.isStudioDirectorAuthenticated()) {
-    showToast('Genesis Lore is currently reserved for Studio Director access.', 'info', 4000);
+    showToast('GENESIS ARCHIVES // SEALED SECTOR — The chronicles of Edon and Extopia are currently being forged behind closed doors. Clearance is restricted to the World Architect until the seasonal unveiling.', 'info', 5500);
     return;
   }
   switchView('genesis');
@@ -13,7 +13,7 @@ window.handleGenesisClick = function() {
 
 window.handleAcademyClick = function() {
   if (!window.isStudioDirectorAuthenticated()) {
-    showToast('Academy Masterclasses are currently reserved for Studio Director access.', 'info', 4000);
+    showToast('TAJINKART ACADEMY // FORGING CURRICULUM — The ink is still wet. Our private mentorships and dark-fantasy production breakdowns are currently in preparation for the next guild intake.', 'info', 5500);
     return;
   }
   switchView('academy');

@@ -954,11 +954,20 @@ window.renderShowcaseGrid = function() {
       hoverGenreLabel += ` (${art.phases.length} Sheets)`;
     }
 
+    const sheetCount = (art.phases && Array.isArray(art.phases)) ? art.phases.filter(p => p && (p.image || p.img)).length : 0;
+    const totalSheets = Math.max(sheetCount, 1);
+    const sheetsBadgeHtml = totalSheets > 1
+      ? `<span class="tile-sheets-badge font-mono" data-total="${totalSheets}" aria-hidden="true">❐ ${totalSheets}</span>`
+      : '';
+
     return `
       <div class="mosaic-tile ${spanClass}" id="galleryTile_${art.id}" 
+           data-cover-src="${tileImg}"
            style="--neon-border:${neon.border}; --neon-glow:${neon.glow}; --neon-soft:${neon.soft};" 
+           onmouseenter="window.startTileSheetFlip(${art.id}, this)"
+           onmouseleave="window.stopTileSheetFlip(${art.id}, this)"
            onclick="openArtModalWithPhase(${art.id}, ${targetPhaseIdx})">
-        
+        ${sheetsBadgeHtml}
         <div class="tile-center-title">
           <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 16px ${neon.glow}; font-size:13.5px; font-weight:900;"># ${displayTitle} #</span>
           <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:38px;"></span>
@@ -1702,3 +1711,90 @@ window.addEventListener('resize', () => {
     if (typeof renderShowcaseGrid === 'function') renderShowcaseGrid();
   }
 }, { passive: true });
+
+// ==============================================================================
+// LIVING GRIMOIRE HOVER SHEET-FLIP ENGINE (Harry Potter Moving Portrait Style)
+// ==============================================================================
+window._tileFlipTimers = window._tileFlipTimers || {};
+
+window.startTileSheetFlip = function(artId, tileEl) {
+  if (!tileEl) return;
+  if (window.matchMedia && !window.matchMedia('(hover: hover)').matches) return;
+  window.stopTileSheetFlip(artId, tileEl, true);
+
+  const art = (typeof showcaseArtworks !== 'undefined') ? showcaseArtworks.find(a => a.id == artId) : null;
+  if (!art || !Array.isArray(art.phases) || art.phases.length < 2) return;
+
+  const coverSrc = tileEl.getAttribute('data-cover-src') || '';
+  const rawUrls = [];
+  if (coverSrc) rawUrls.push(coverSrc);
+  art.phases.forEach(p => {
+    const u = p && (p.image || p.img);
+    if (!u) return;
+    const opt = (typeof getOptimizedImageUrl === 'function') ? getOptimizedImageUrl(u, 640) : u;
+    if (!rawUrls.includes(opt)) rawUrls.push(opt);
+  });
+
+  if (rawUrls.length < 2) return;
+
+  // Preload subsequent sheets quietly while user reads title
+  rawUrls.slice(1).forEach(u => { const pre = new Image(); pre.src = u; });
+
+  const imgEl = tileEl.querySelector('img');
+  const badgeEl = tileEl.querySelector('.tile-sheets-badge');
+  if (!imgEl) return;
+
+  const state = { idx: 0, delayTimer: null, intervalTimer: null };
+  window._tileFlipTimers[artId] = state;
+
+  state.delayTimer = setTimeout(() => {
+    if (!tileEl.matches(':hover')) return;
+    // Lock height so masonry column never shifts during sheet flip
+    if (tileEl.offsetHeight > 40) {
+      tileEl.style.height = tileEl.offsetHeight + 'px';
+    }
+    tileEl.classList.add('tile-is-flipping');
+
+    const advanceSheet = () => {
+      if (!tileEl.matches(':hover')) {
+        window.stopTileSheetFlip(artId, tileEl);
+        return;
+      }
+      state.idx = (state.idx + 1) % rawUrls.length;
+      imgEl.classList.add('sheet-turning');
+      setTimeout(() => {
+        if (!tileEl.matches(':hover')) return;
+        imgEl.src = rawUrls[state.idx];
+        if (badgeEl) badgeEl.textContent = `${state.idx + 1} / ${rawUrls.length}`;
+        requestAnimationFrame(() => imgEl.classList.remove('sheet-turning'));
+      }, 170);
+    };
+
+    advanceSheet();
+    state.intervalTimer = setInterval(advanceSheet, 1300);
+  }, 650);
+};
+
+window.stopTileSheetFlip = function(artId, tileEl, skipReset = false) {
+  const state = window._tileFlipTimers && window._tileFlipTimers[artId];
+  if (state) {
+    if (state.delayTimer) clearTimeout(state.delayTimer);
+    if (state.intervalTimer) clearInterval(state.intervalTimer);
+    delete window._tileFlipTimers[artId];
+  }
+  if (!tileEl || skipReset) return;
+
+  tileEl.classList.remove('tile-is-flipping');
+  tileEl.style.height = '';
+  const imgEl = tileEl.querySelector('img');
+  const coverSrc = tileEl.getAttribute('data-cover-src');
+  if (imgEl) {
+    imgEl.classList.remove('sheet-turning');
+    if (coverSrc && imgEl.src !== coverSrc) imgEl.src = coverSrc;
+  }
+  const badgeEl = tileEl.querySelector('.tile-sheets-badge');
+  if (badgeEl) {
+    const total = badgeEl.getAttribute('data-total') || '';
+    if (total) badgeEl.textContent = `❐ ${total}`;
+  }
+};

@@ -9390,3 +9390,64 @@ body:not([data-view="showcase"]) #mobileVerticalFilterStack,
 body:not([data-view="showcase"]) #mobileMasterChevron {
   display: none !important;
 }
+
+
+/* ==============================================================================
+   UI POLISH (v26.6.8):
+   1. Plus Jakarta Sans for readable Atelier/Store card descriptions
+   2. Living Grimoire 3D Sheet-Flip & Multi-Sheet Corner Badge on Gallery Tiles
+   ============================================================================== */
+.pipeline-tile-desc,
+.store-subtitle,
+#sketchHeaderSub,
+.asset-card-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+  color: rgba(226, 232, 240, 0.84) !important;
+}
+
+.mosaic-tile {
+  perspective: 900px;
+}
+
+.mosaic-tile .tile-sheets-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(4, 6, 11, 0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(241, 245, 249, 0.88);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.mosaic-tile:hover .tile-sheets-badge,
+.mosaic-tile.tile-is-flipping .tile-sheets-badge {
+  border-color: var(--neon-border, rgba(250, 204, 21, 0.6));
+  color: #fff;
+  background: rgba(4, 6, 11, 0.85);
+}
+
+.mosaic-tile.tile-is-flipping img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: left center;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease, filter 0.3s ease !important;
+}
+
+.mosaic-tile.tile-is-flipping img.sheet-turning {
+  opacity: 0.25 !important;
+  transform: perspective(900px) rotateY(-12deg) scale(1.03) !important;
+}
