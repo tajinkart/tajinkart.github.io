@@ -973,6 +973,10 @@ window.clientCancelUnpaidOrder = async function(orderId) {
 };
 
 function renderMemberDashboard() {
+  if (typeof window.syncOrdersFromSupabase === 'function' && (!window._lastPortalOrdersSync || Date.now() - window._lastPortalOrdersSync > 3500)) {
+    window._lastPortalOrdersSync = Date.now();
+    window.syncOrdersFromSupabase();
+  }
   window.purgeExpiredUnpaidOrders();
   const isDirector = currentMember && window.isDirectorEmail(currentMember.email);
 

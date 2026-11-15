@@ -2319,18 +2319,22 @@ window.updateOrderStatusFromAdmin = function(orderId, newStatus) {
 };
 
 // حذف سفارش توسط ادمین
-window.adminDeleteOrderById = function(orderId) {
+window.adminDeleteOrderById = async function(orderId) {
   if (!confirm(`Are you sure you want to delete inquiry #${orderId}?`)) return;
   ordersList = ordersList.filter(x => x.id !== orderId);
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   if (window.supabaseClient) {
-    window.supabaseClient.from('orders').delete().eq('id', orderId).then(() => {
-      console.log('[Supabase Orders] Order deleted from cloud.');
-    });
+    const { error } = await window.supabaseClient.from('orders').delete().eq('id', orderId);
+    if (error) {
+      console.warn('[Supabase Orders] Delete error:', error);
+      showToast('Deleted locally, but cloud delete failed: ' + (error.message || 'RLS'), 'error', 4500);
+      return;
+    }
+    console.log('[Supabase Orders] Order deleted from cloud.');
   }
-  showToast('Inquiry deleted successfully.', 'info');
-  const currentMemberObj = isCreatorSelected ? { isCreator: true, name: 'Seyed Soroush Taj', email: 'tajinkart@gmail.com' } : siteMembersData[selectedMemberIdx];
-  renderAdminMemberDetail(currentMemberObj);
+  showToast('Inquiry deleted from admin & client portal.', 'info');
 };
 
 // =========================================================
@@ -3815,55 +3819,7 @@ async function syncMembersFromSupabase(showNotification = false) {
 }
 
 
-window.syncOrdersFromSupabase = async function() {
-  if (!window.supabaseClient) return;
-  try {
-    const { data: cloudOrders, error } = await window.supabaseClient
-      .from('orders')
-      .select('*')
-      .order('id', { ascending: false });
-
-    if (error) {
-      console.warn('[Supabase Orders Sync Error]', error);
-      return;
-    }
-
-    if (cloudOrders && Array.isArray(cloudOrders) && cloudOrders.length > 0) {
-      const existingIds = new Set(ordersList.map(o => Number(o.id)));
-      let updated = false;
-
-      cloudOrders.forEach(co => {
-        const orderId = Number(co.id);
-        if (!existingIds.has(orderId)) {
-          ordersList.unshift({
-            id: orderId,
-            client: co.client_name,
-            contact: co.contact || co.client_email || '',
-            refLink: co.ref_link || '',
-            pkg: co.package_name || 'Commission Inquiry',
-            price: co.price_text || '',
-            timeline: co.timeline || '',
-            phase: co.phase || '',
-            brief: co.brief_text || '',
-            status: co.status || 'Brief Received'
-          });
-          updated = true;
-        }
-      });
-
-      if (updated) {
-        if (typeof safeSetStorage === 'function') {
-          safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
-        }
-        if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
-        if (typeof renderAdminLists === 'function') renderAdminLists();
-        console.log('[Supabase Orders] Synchronized', cloudOrders.length, 'orders from Cloud DB.');
-      }
-    }
-  } catch (err) {
-    console.warn('[Supabase Orders Exception]', err);
-  }
-};
+// syncOrdersFromSupabase unified in portal.js
 
 window.saveMultiCloudIntegrationsDirect = function() {
   const gSheetsInput = document.getElementById('setGoogleSheetsWebhook');

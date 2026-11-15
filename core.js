@@ -1099,7 +1099,7 @@ window.syncProductsFromSupabase = async function() {
       .select('*')
       .order('id', { ascending: false });
 
-    if (!error && Array.isArray(cloudProds) && cloudProds.length > 0) {
+    if (!error && Array.isArray(cloudProds)) {
       digitalStoreProducts = cloudProds.map(row => ({
         id: Number(row.id),
         title: row.title,
