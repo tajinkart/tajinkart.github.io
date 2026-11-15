@@ -794,6 +794,10 @@ window.addEventListener('keyup', (e) => {
 
 // دانلود پیش‌فاکتور اختصاصی برای یک سفارش
 window.downloadOrderInvoiceById = function(orderId) {
+  if (typeof window.downloadOfficialStudioInvoice === 'function') {
+    window.downloadOfficialStudioInvoice(orderId);
+    return;
+  }
   const o = ordersList.find(x => x.id === orderId);
   if (!o) return;
   const invNumber = `TJK-INV-ORDER-${o.id}`;
@@ -914,7 +918,57 @@ window.updateOrderStatus = function(idx, newStatus) {
   showToast('Project status updated.', 'success');
 };
 
+window.purgeExpiredUnpaidOrders = function() {
+  if (!Array.isArray(ordersList) || ordersList.length === 0) return false;
+  const now = Date.now();
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const expiredIds = [];
+  const kept = ordersList.filter(o => {
+    const isUnpaidBrief = (!o.status || o.status === 'Brief Received') && !o.paymentVerified && !o.txid;
+    if (!isUnpaidBrief) return true;
+    const createdMs = (o.specs && o.specs.createdAt) ? Date.parse(o.specs.createdAt) : (typeof o.id === 'number' && o.id > 1700000000000 ? o.id : now);
+    if (!Number.isNaN(createdMs) && (now - createdMs) > DAY_MS) {
+      expiredIds.push(o.id);
+      return false;
+    }
+    return true;
+  });
+  if (expiredIds.length > 0) {
+    ordersList = kept;
+    if (typeof safeSetStorage === 'function') safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+    if (window.supabaseClient) {
+      expiredIds.forEach(eid => {
+        window.supabaseClient.from('orders').delete().eq('id', eid).then(() => {
+          console.log('[Orders Auto-Expiry] Purged unpaid brief >24h:', eid);
+        });
+      });
+    }
+    return true;
+  }
+  return false;
+};
+
+window.clientCancelUnpaidOrder = function(orderId) {
+  const o = ordersList.find(x => x.id === orderId);
+  if (!o) return;
+  if (o.paymentVerified || o.txid) {
+    showToast('Paid or TXID-submitted commissions cannot be self-deleted. Please contact Studio Director.', 'error');
+    return;
+  }
+  if (!confirm(`Cancel and remove unpaid brief #${orderId}? You can submit a new brief anytime.`)) return;
+  ordersList = ordersList.filter(x => x.id !== orderId);
+  if (typeof safeSetStorage === 'function') safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (window.supabaseClient) {
+    window.supabaseClient.from('orders').delete().eq('id', orderId).then(() => {
+      console.log('[Client Portal] Unpaid brief deleted from cloud:', orderId);
+    });
+  }
+  showToast(`Unpaid brief #${orderId} cancelled and removed.`, 'info', 3500);
+  renderMemberDashboard();
+};
+
 function renderMemberDashboard() {
+  window.purgeExpiredUnpaidOrders();
   const isDirector = currentMember && window.isDirectorEmail(currentMember.email);
 
   // هدر پرونده آتلیه
@@ -1098,6 +1152,16 @@ function renderMemberDashboard() {
               <span style="color:#94a3b8;">${String(o.txid).slice(0, 14)}...</span>
             </div>
           ` : ''}
+          ${(!o.paymentVerified && !o.txid && (!o.status || o.status === 'Brief Received')) ? (() => {
+            const cMs = (o.specs && o.specs.createdAt) ? Date.parse(o.specs.createdAt) : (typeof o.id === 'number' && o.id > 1700000000000 ? o.id : Date.now());
+            const remMs = Math.max(0, (24 * 60 * 60 * 1000) - (Date.now() - cMs));
+            const remH = Math.floor(remMs / 3600000);
+            const remM = Math.floor((remMs % 3600000) / 60000);
+            return `<div style="font-size:11px; padding:7px 12px; border-radius:8px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.28); color:#fbbf24; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+              <span>⏳ Unpaid Brief Hold: <strong>${remH}h ${remM}m remaining</strong></span>
+              <span style="color:#cbd5e1;">Auto-expires after 24h if retainer is unpaid (you may re-submit anytime).</span>
+            </div>`;
+          })() : ''}
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
             <span>Current Phase: <strong style="color:#fff;">${o.phase || 'Standard 300DPI'}</strong></span>
             <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'Per Project Schedule'}</strong></span>
@@ -1108,6 +1172,11 @@ function renderMemberDashboard() {
               <button type="button" onclick="downloadOfficialStudioInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--gold); color:var(--gold);">
                 📄 Invoice
               </button>
+              ${(!o.paymentVerified && !o.txid) ? `
+                <button type="button" onclick="clientCancelUnpaidOrder(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:rgba(244,63,94,0.45); color:var(--crimson);">
+                  🗑️ Cancel Brief
+                </button>
+              ` : ''}
             </div>
           </div>
 
@@ -2701,11 +2770,12 @@ window.downloadOfficialStudioInvoice = function(orderId) {
     </div>
 
     <div class="terms">
-      <strong style="color:#92400e; display:block; margin-bottom:6px;">Binding Studio Commission Agreement &amp; Duration:</strong>
-      1. <strong>Retainer &amp; Scheduling:</strong> Production begins strictly upon settlement of the 50% non-refundable retainer.<br/>
-      2. <strong>Checkpoints &amp; Revisions:</strong> Up to 2 structured revision rounds are included at Silhouette/Linework and Color/Value checkpoints.<br/>
-      3. <strong>Final Handover:</strong> High-resolution 300DPI master files and layered PSDs are released upon settlement of the remaining 50% balance.<br/>
-      4. <strong>Abandonment &amp; Anti-AI:</strong> Client silence exceeding 30 calendar days closes the commission. All studio works are protected against unauthorized AI training.
+      <strong style="color:#92400e; display:block; margin-bottom:6px;">Binding Studio Commission Agreement, Duration &amp; Studio Rules:</strong>
+      1. <strong>24-Hour Unpaid Brief Expiry:</strong> Submitted briefs without a 50% retainer settlement or TXID are automatically purged after <strong>24 hours</strong>; clients may submit a new brief anytime.<br/>
+      2. <strong>Retainer &amp; Scheduling:</strong> Production begins strictly upon settlement of the 50% non-refundable retainer, which reserves your slot in the studio production queue.<br/>
+      3. <strong>Checkpoints &amp; Revisions:</strong> Up to 2 structured revision rounds are included at Silhouette/Linework and Color/Value checkpoints. Major scope changes after approval incur additional fees.<br/>
+      4. <strong>Final Handover &amp; Usage:</strong> High-resolution 300DPI master files and layered PSDs are released upon settlement of the remaining 50% balance. Artist credit (TAJINKART) applies unless an NDA/buyout is agreed.<br/>
+      5. <strong>Studio Rules, Conduct &amp; Anti-AI:</strong> Respectful professional communication is required across all studio channels. Client silence exceeding 30 calendar days closes the commission. All TAJINKART works are strictly protected against unauthorized AI training, scraping, or redistribution.
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px; padding-top:16px; border-top:1px dashed #cbd5e1; font-size:12px;">
@@ -2770,6 +2840,7 @@ window.syncOrdersFromSupabase = async function() {
         }
       });
       safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+      if (typeof window.purgeExpiredUnpaidOrders === 'function') window.purgeExpiredUnpaidOrders();
       if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
       if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
     }

@@ -2223,18 +2223,22 @@ function renderOrderAdminSnippet(o) {
         </select>
       </div>
 
-      ${o.specs ? `
-        <div style="font-size:11px; padding:8px 10px; border-radius:6px; background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.2); color:#e2e8f0; display:grid; grid-template-columns:1fr 1fr; gap:4px 10px;">
-          <div><span style="color:#94a3b8;">Scope:</span> ${o.specs.scope || '-'}</div>
-          <div><span style="color:#94a3b8;">Framing:</span> ${o.specs.framing || '-'}</div>
-          <div><span style="color:#94a3b8;">Complexity:</span> ${o.specs.complexity || '-'}</div>
-          <div><span style="color:#94a3b8;">Fidelity:</span> ${o.specs.fidelity || o.phase || '-'}</div>
-          ${o.specs.addons && o.specs.addons.length ? `<div style="grid-column:1/-1; color:var(--emerald);">Add-ons: ${o.specs.addons.join(' • ')}</div>` : ''}
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; align-items:stretch;">
+        <div style="font-size:11px; padding:10px 12px; border-radius:8px; background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.22); color:#e2e8f0; display:flex; flex-direction:column; gap:5px;">
+          <strong style="color:var(--gold); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em;">Specs, Quantities &amp; Timeline</strong>
+          <div><span style="color:#94a3b8;">Scope:</span> <strong>${o.specs?.scope || '-'}</strong></div>
+          <div><span style="color:#94a3b8;">Framing:</span> <strong>${o.specs?.framing || '-'}</strong></div>
+          <div><span style="color:#94a3b8;">Complexity:</span> <strong>${o.specs?.complexity || '-'}</strong></div>
+          <div><span style="color:#94a3b8;">Fidelity:</span> <strong>${o.specs?.fidelity || o.phase || '-'}</strong></div>
+          <div><span style="color:#94a3b8;">Timeline:</span> <strong>${o.timeline || 'Per Schedule'}</strong></div>
+          ${o.specs?.addons && o.specs.addons.length ? `<div style="color:var(--emerald); padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">Add-ons (${o.specs.addons.length}): ${o.specs.addons.join(' • ')}</div>` : ''}
+          ${o.specs?.retainerUsd ? `<div class="font-mono" style="font-size:10.5px; color:#cbd5e1; padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">50% Retainer: <span style="color:var(--gold);">$${o.specs.retainerUsd}</span> • Balance: <span style="color:var(--cyan-electric);">$${o.specs.balanceUsd || o.specs.retainerUsd}</span></div>` : ''}
         </div>
-      ` : ''}
-      <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:6px;">
-        <span style="color:var(--text-muted); font-size:10.5px; display:block; margin-bottom:2px;">Client: ${o.client || 'Guest'} (${o.contact || '-'}) • Brief:</span>
-        ${String(o.brief || 'Bespoke concept art specifications').replace(/\n/g, '<br>')}
+        <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); padding:10px 12px; border-radius:8px;">
+          <span style="color:var(--cyan-electric); font-size:10.5px; font-weight:700; display:block; margin-bottom:4px;">Client: ${o.client || 'Guest'} (${o.contact || '-'})</span>
+          <span style="color:var(--text-muted); font-size:10px; text-transform:uppercase; display:block; margin-bottom:3px;">Full Creative Brief:</span>
+          ${String(o.brief || 'Bespoke concept art specifications').replace(/\n/g, '<br>')}
+        </div>
       </div>
 
       ${o.txid ? `
@@ -2271,7 +2275,7 @@ function renderOrderAdminSnippet(o) {
       ` : ''}
 
       <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05); font-size:11px;">
-        <button type="button" onclick="downloadOrderInvoiceById(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-color:var(--gold); color:var(--gold);">
+        <button type="button" onclick="downloadOfficialStudioInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-color:var(--gold); color:var(--gold);">
           📄 Invoice
         </button>
         <button type="button" onclick="adminDeleteOrderById(${o.id})" style="background:none; border:none; color:var(--crimson); font-size:11px; cursor:pointer;">
