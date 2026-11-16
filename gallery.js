@@ -976,10 +976,12 @@ window.renderShowcaseGrid = function() {
       ? `<span class="tile-sheets-badge" aria-hidden="true" title="Multi-sheet project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>`
       : '';
     const hoverThumbsHtml = totalSheets > 1
-      ? `<div class="tile-hover-thumbs">${validPhaseImgs.slice(0, 4).map(u => {
-          const thumbSrc = (typeof getOptimizedImageUrl === 'function' && u && !u.startsWith('data:')) ? getOptimizedImageUrl(u, 180) : u;
-          return `<img src="${thumbSrc}" class="tile-hover-thumb" alt="" loading="lazy" decoding="async" />`;
-        }).join('')}</div>`
+      ? (() => {
+          const reelUrls = validPhaseImgs.slice(0, 6).map(u => (typeof getOptimizedImageUrl === 'function' && u && !u.startsWith('data:')) ? getOptimizedImageUrl(u, 240) : u);
+          const loopUrls = [...reelUrls, ...reelUrls];
+          const durSec = Math.max(4.5, reelUrls.length * 2.2).toFixed(1);
+          return `<div class="tile-vertical-reel" style="--reel-duration:${durSec}s;"><div class="tile-vertical-reel-track">${loopUrls.map(src => `<img src="${src}" class="tile-vertical-reel-img" alt="" loading="lazy" decoding="async" />`).join('')}</div></div>`;
+        })()
       : '';
 
     return `

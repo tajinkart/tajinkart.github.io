@@ -9444,22 +9444,60 @@ body:not([data-view="showcase"]) #mobileMasterChevron {
     color: rgba(248, 250, 252, 0.72);
   }
 }
-.tile-hover-thumbs {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 8px;
-  flex-wrap: wrap;
+.mosaic-tile .tile-slug,
+.mosaic-tile .tile-divider,
+.mosaic-tile .tile-sub {
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.tile-hover-thumb {
-  width: 34px;
-  height: 34px;
-  border-radius: 7px;
-  object-fit: cover;
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+.tile-vertical-reel {
+  width: 96px;
+  height: 64px;
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
   background: #04060a;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.34s ease 0.16s, transform 0.34s cubic-bezier(0.16, 1, 0.3, 1) 0.16s;
+}
+.mosaic-tile:hover .tile-vertical-reel {
+  opacity: 1;
+  transform: translateY(0);
+}
+.tile-vertical-reel-track {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  will-change: transform;
+  animation: tileVerticalReel var(--reel-duration, 6s) linear infinite;
+  animation-play-state: paused;
+}
+.mosaic-tile:hover .tile-vertical-reel-track {
+  animation-play-state: running;
+}
+.tile-vertical-reel-img {
+  width: 96px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: cover;
+  display: block;
+}
+@keyframes tileVerticalReel {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+@media (max-width: 768px) {
+  .tile-vertical-reel {
+    width: 76px;
+    height: 50px;
+    margin-top: 7px;
+  }
+  .tile-vertical-reel-img {
+    width: 76px;
+    height: 50px;
+  }
 }
 
 .mosaic-tile:hover .tile-sheets-badge,
