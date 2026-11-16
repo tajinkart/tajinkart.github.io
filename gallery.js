@@ -968,10 +968,18 @@ window.renderShowcaseGrid = function() {
       hoverGenreLabel += ` (${art.phases.length} Sheets)`;
     }
 
-    const sheetCount = (art.phases && Array.isArray(art.phases)) ? art.phases.filter(p => p && (p.image || p.img)).length : 0;
-    const totalSheets = Math.max(sheetCount, 1);
+    const validPhaseImgs = (art.phases && Array.isArray(art.phases))
+      ? art.phases.map(p => p && (p.image || p.img)).filter(Boolean)
+      : [];
+    const totalSheets = Math.max(validPhaseImgs.length, 1);
     const sheetsBadgeHtml = totalSheets > 1
-      ? `<span class="tile-sheets-badge font-mono" data-total="${totalSheets}" aria-hidden="true">❐ ${totalSheets}</span>`
+      ? `<span class="tile-sheets-badge" aria-hidden="true" title="Multi-sheet project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>`
+      : '';
+    const hoverThumbsHtml = totalSheets > 1
+      ? `<div class="tile-hover-thumbs">${validPhaseImgs.slice(0, 4).map(u => {
+          const thumbSrc = (typeof getOptimizedImageUrl === 'function' && u && !u.startsWith('data:')) ? getOptimizedImageUrl(u, 180) : u;
+          return `<img src="${thumbSrc}" class="tile-hover-thumb" alt="" loading="lazy" decoding="async" />`;
+        }).join('')}</div>`
       : '';
 
     return `
@@ -986,6 +994,7 @@ window.renderShowcaseGrid = function() {
           <span class="tile-slug" style="color:${neon.border}; text-shadow:0 0 16px ${neon.glow}; font-size:13.5px; font-weight:900;"># ${displayTitle} #</span>
           <span class="tile-divider" style="background:${neon.border}; box-shadow:0 0 14px ${neon.glow}; width:38px;"></span>
           <span class="tile-sub font-mono" style="font-size:11.5px; font-weight:700; opacity:0.95; color:#f1f5f9; letter-spacing:0.04em;">${hoverGenreLabel}</span>
+          ${hoverThumbsHtml}
         </div>
         <img src="${tileImg}" loading="lazy" alt="${richAlt}" onload="handleImageAutoDetect(this, ${art.id}); this.parentElement.classList.add('loaded');" onerror="this.onerror=null; this.style.minHeight='180px'; this.parentElement.classList.add('loaded');" />
       </div>
@@ -1755,6 +1764,8 @@ window.clearAllAutoTileFlips = function() {
 };
 
 window.initAutoTileSheetFlipping = function() {
+  window.clearAllAutoTileFlips();
+  return;
   window.clearAllAutoTileFlips();
   const tiles = Array.from(document.querySelectorAll('#showcaseGrid .mosaic-tile[data-multi-sheet="true"]'));
   if (!tiles.length) return;
