@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.36">
+  <link rel="stylesheet" href="style.css?v=26.6.37">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -461,7 +461,173 @@
               <span id="sketchBadgeSlug" style="display:none;"></span>
             </div>
 
-            <div id="mosaicStageContainer" class="mosaic-pipeline-grid"></div>
+            <div id="inlineWizardWorkbench" class="wizard-modal-window" style="position:relative; width:100%; max-width:100%; max-height:none; margin:0; padding:22px; background:#05070c; border:1px solid rgba(250,204,21,0.22); border-radius:16px; box-shadow:none; overflow:visible;">
+      <!-- ستون چپ: پیش‌نمایش، فاکتور زنده و خلاصه سفارش -->
+      <div style="display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+        <div>
+          <div style="aspect-ratio:16/10; background:#020305; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden;">
+            <img id="modalMediaImg" src="" style="width:100%; height:100%; object-fit:cover;" alt="Pipeline Preview" />
+          </div>
+          <div style="margin-top:12px;">
+            <span class="font-mono" style="font-size:10.5px; color:var(--iris);" id="wizardPipeBadge">ATELIER PIPELINE</span>
+            <h3 id="modalTitle" style="font-size:17px; font-weight:900; color:#fff; margin-top:2px;"></h3>
+            <p id="modalDesc" style="font-size:11.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;"></p>
+          </div>
+        </div>
+
+        <!-- فاکتور داینامیک لحظه‌ای محاسبه‌شده -->
+        <div style="padding:16px; border-radius:14px; background:#06080e; border:1px solid rgba(250,204,21,0.3); display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            <span style="font-size:11.5px; color:var(--text-muted);">Estimated Project Quote:</span>
+            <span id="modalPrice" class="font-mono" style="font-size:22px; font-weight:900; color:var(--gold);">80</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11.5px;">
+            <span style="color:var(--text-muted);">Production Timeline:</span>
+            <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">5 to 7 business days</span>
+          </div>
+          <div style="font-size:10.5px; color:var(--emerald); display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span>✓</span> <span>Standard human scale reference figure included free on final model sheet.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ستون راست: فرم ویزارد آکاردئونی مرحله‌به‌مرحله -->
+      <form id="commissionOrderForm" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div style="padding-left:2px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="font-size:14.5px; font-weight:900; color:#fff;">Project Specifications & Cost Calculator</h4>
+          </div>
+
+          <!-- Step 1: Scope, Archetype & Framing -->
+          <div class="wizard-step-card active" id="wizardStep1">
+            <div class="wizard-step-header" onclick="toggleWizardStep(1)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">1.</span> Scope, Archetype & Framing</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div>
+                <label id="wizScopeLabel" style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">Scope &amp; Archetype:</label>
+                <select id="wizCharacterScope" onchange="recalcWizardPrice()" style="width:100%; font-size:12px; margin-bottom:10px;">
+                  <option value="single" data-usd="0" selected>👤 Single Hero / Character Concept (Base)</option>
+                  <option value="timeline" data-usd="60">⏳ Age Progression Timeline (Youth ➔ Prime ➔ Elder) (+$60)</option>
+                  <option value="party" data-usd="85">👥 Ensemble / Faction Bundle (Hero + Companions) (+$85)</option>
+                  <option value="redesign" data-usd="15">🔄 Character Redesign & Evolution (+$15)</option>
+                </select>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Framing & View</label>
+                  <select id="wizFraming" onchange="recalcWizardPrice()">
+                    <option value="bust" data-usd="0">Portrait / Bust (Base)</option>
+                    <option value="full" data-usd="40" selected>Full Body Dynamic Action (+$40)</option>
+                    <option value="turnaround" data-usd="75">360° Orthographic Turnaround (+$75)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Design Complexity</label>
+                  <select id="wizComplexity" onchange="recalcWizardPrice()">
+                    <option value="simple" data-usd="0">Minimal (Graphic Silhouettes)</option>
+                    <option value="medium" data-usd="30" selected>Production Standard (Armor & Props)</option>
+                    <option value="hard" data-usd="60">Cinematic AAA (Ornate / Biomechanical)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Rendering Fidelity & Add-ons -->
+          <div class="wizard-step-card active" id="wizardStep2">
+            <div class="wizard-step-header" onclick="toggleWizardStep(2)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">2.</span> Rendering Fidelity & Add-ons</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Rendering Fidelity</label>
+                <select id="orderPhaseSelect" onchange="recalcWizardPrice()">
+                  <option value="Phase 1: Initial Silhouette & Form Exploration" data-usd="-40">Phase 1: Initial Silhouette & Form Exploration</option>
+                  <option value="Phase 2: Technical Linework & Model Sheet" data-usd="-20">Phase 2: Technical Linework & Model Sheet</option>
+                  <option value="Phase 3: Value Study & Lighting" data-usd="0">Phase 3: Value Study & Lighting</option>
+                  <option value="Phase 4: Master 300DPI Keyframe Render + Layered PSD" data-usd="50" selected>Phase 4: Master 300DPI Keyframe Render + Layered PSD</option>
+                </select>
+              </div>
+              <div style="margin-top:6px; margin-bottom:8px;">
+                <span id="wizAddonsLabel" style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 Add-ons &amp; Cross-Category Modules:</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Hero Weapon Design (+$35)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Facial Expressions Sheet (+$30)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizColorPalette" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Color Variations (+$20)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Commercial AAA License (+$45)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCrossEnv" data-usd="55" data-days="2" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>+ Environment Backdrop (+$55 • +2d)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
+                    <input type="checkbox" id="wizCrossChar" data-usd="40" data-days="1" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>+ Character / Scale Figure (+$40 • +1d)</span>
+                  </label>
+                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
+                    <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
+                    <span style="color:#10b981; font-weight:700;">✓ Master Layered 300DPI PSD (Included & Guaranteed)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Client Credentials & Project Brief -->
+          <div class="wizard-step-card active" id="wizardStep3">
+            <div class="wizard-step-header" onclick="toggleWizardStep(3)">
+              <span class="wizard-step-title"><span style="color:var(--gold);">3.</span> Client Credentials & Project Brief</span>
+              <span style="font-size:11px; color:var(--text-muted);">▼</span>
+            </div>
+            <div class="wizard-step-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Client / Studio Name</label>
+                  <input type="text" id="orderClientName" required placeholder="Studio Nova / John Doe" />
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Email or Telegram Handle</label>
+                  <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com or @handle" />
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px;">Reference Link (Optional - Pinterest / Drive / ArtStation)</label>
+                <input type="url" id="orderClientRefLink" class="font-mono" placeholder="https://pinterest.com/... or Google Drive link" style="font-size:11.5px;" />
+                <span style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:3px;">
+                  💡 Providing references is optional. The atelier handles full visual exploration and style extraction tailored to your vision.
+                </span>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Project Brief, Lore & Character Details</label>
+                <textarea id="orderClientBrief" rows="3" required placeholder="Archetype, armor details, weaponry, backstory lore, key mood requirements..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <label style="display:flex; align-items:flex-start; gap:8px; font-size:11px; color:#cbd5e1; margin-top:10px; padding:8px 10px; border-radius:8px; background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.22); cursor:pointer;">
+          <input type="checkbox" id="orderTermsAgree" required style="width:auto; margin-top:2px;" />
+          <span>I agree to the TAJINKART Commission Agreement &amp; Studio Rules (unpaid briefs auto-expire after 24h; 50% non-refundable retainer to start, 2 revision rounds per milestone &amp; anti-AI protection).</span>
+        </label>
+        <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:10px; width:100%;">
+          Submit Project Brief & Send Direct Inquiry to Studio Director →
+        </button>
+      </form>
+            </div>
             <!-- توضیحات استاندارد آتلیه دقیقاً هم‌عرض باکس سمت چپ -->
             <div style="margin-top:20px; padding:16px 20px; border-radius:14px; background:#04060b; border:1px solid rgba(250,204,21,0.25); display:flex; align-items:flex-start; gap:12px;">
               <span style="font-size:18px;">⚡</span>
@@ -1983,178 +2149,6 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
     </div>
   </div>
 
-  <!-- مدال محاسبه‌گر لحظه‌ای سفارش و موتور داینامیک قیمت‌گذاری (Interactive Wizard Accordion) -->
-  <div id="zoomModal" class="zoom-modal" onclick="closeModal(event)">
-    <div class="zoom-window wizard-modal-window" onclick="event.stopPropagation()">
-      <button type="button" onclick="closeModalDirect()" class="modal-corner-close-btn" title="Close">✕</button>
-      
-      <!-- ستون چپ: پیش‌نمایش، فاکتور زنده و خلاصه سفارش -->
-      <div style="display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
-        <div>
-          <div style="aspect-ratio:16/10; background:#020305; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden;">
-            <img id="modalMediaImg" src="" style="width:100%; height:100%; object-fit:cover;" alt="Pipeline Preview" />
-          </div>
-          <div style="margin-top:12px;">
-            <span class="font-mono" style="font-size:10.5px; color:var(--iris);" id="wizardPipeBadge">ATELIER PIPELINE</span>
-            <h3 id="modalTitle" style="font-size:17px; font-weight:900; color:#fff; margin-top:2px;"></h3>
-            <p id="modalDesc" style="font-size:11.5px; color:var(--text-muted); margin-top:4px; line-height:1.6;"></p>
-          </div>
-        </div>
-
-        <!-- فاکتور داینامیک لحظه‌ای محاسبه‌شده -->
-        <div style="padding:16px; border-radius:14px; background:#06080e; border:1px solid rgba(250,204,21,0.3); display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
-            <span style="font-size:11.5px; color:var(--text-muted);">Estimated Project Quote:</span>
-            <span id="modalPrice" class="font-mono" style="font-size:22px; font-weight:900; color:var(--gold);">80</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:11.5px;">
-            <span style="color:var(--text-muted);">Production Timeline:</span>
-            <span id="modalTimeline" class="font-mono" style="color:var(--cyan-electric); font-weight:700;">5 to 7 business days</span>
-          </div>
-          <div style="font-size:10.5px; color:var(--emerald); display:flex; align-items:center; gap:4px; margin-top:4px;">
-            <span>✓</span> <span>Standard human scale reference figure included free on final model sheet.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ستون راست: فرم ویزارد آکاردئونی مرحله‌به‌مرحله -->
-      <form id="commissionOrderForm" style="display:flex; flex-direction:column; justify-content:space-between;">
-        <div style="max-height:68vh; overflow-y:auto; padding-left:4px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h4 style="font-size:14.5px; font-weight:900; color:#fff;">Project Specifications & Cost Calculator</h4>
-          </div>
-
-          <!-- Step 1: Scope, Archetype & Framing -->
-          <div class="wizard-step-card active" id="wizardStep1">
-            <div class="wizard-step-header" onclick="toggleWizardStep(1)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">1.</span> Scope, Archetype & Framing</span>
-              <span style="font-size:11px; color:var(--text-muted);">▼</span>
-            </div>
-            <div class="wizard-step-body">
-              <div>
-                <label id="wizScopeLabel" style="font-size:11px; color:var(--gold); display:block; margin-bottom:4px; font-weight:800;">Scope &amp; Archetype:</label>
-                <select id="wizCharacterScope" onchange="recalcWizardPrice()" style="width:100%; font-size:12px; margin-bottom:10px;">
-                  <option value="single" data-usd="0" selected>👤 Single Hero / Character Concept (Base)</option>
-                  <option value="timeline" data-usd="60">⏳ Age Progression Timeline (Youth ➔ Prime ➔ Elder) (+$60)</option>
-                  <option value="party" data-usd="85">👥 Ensemble / Faction Bundle (Hero + Companions) (+$85)</option>
-                  <option value="redesign" data-usd="15">🔄 Character Redesign & Evolution (+$15)</option>
-                </select>
-              </div>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Framing & View</label>
-                  <select id="wizFraming" onchange="recalcWizardPrice()">
-                    <option value="bust" data-usd="0">Portrait / Bust (Base)</option>
-                    <option value="full" data-usd="40" selected>Full Body Dynamic Action (+$40)</option>
-                    <option value="turnaround" data-usd="75">360° Orthographic Turnaround (+$75)</option>
-                  </select>
-                </div>
-                <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Design Complexity</label>
-                  <select id="wizComplexity" onchange="recalcWizardPrice()">
-                    <option value="simple" data-usd="0">Minimal (Graphic Silhouettes)</option>
-                    <option value="medium" data-usd="30" selected>Production Standard (Armor & Props)</option>
-                    <option value="hard" data-usd="60">Cinematic AAA (Ornate / Biomechanical)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 2: Rendering Fidelity & Add-ons -->
-          <div class="wizard-step-card active" id="wizardStep2">
-            <div class="wizard-step-header" onclick="toggleWizardStep(2)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">2.</span> Rendering Fidelity & Add-ons</span>
-              <span style="font-size:11px; color:var(--text-muted);">▼</span>
-            </div>
-            <div class="wizard-step-body">
-              <div>
-                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Rendering Fidelity</label>
-                <select id="orderPhaseSelect" onchange="recalcWizardPrice()">
-                  <option value="Phase 1: Initial Silhouette & Form Exploration" data-usd="-40">Phase 1: Initial Silhouette & Form Exploration</option>
-                  <option value="Phase 2: Technical Linework & Model Sheet" data-usd="-20">Phase 2: Technical Linework & Model Sheet</option>
-                  <option value="Phase 3: Value Study & Lighting" data-usd="0">Phase 3: Value Study & Lighting</option>
-                  <option value="Phase 4: Master 300DPI Keyframe Render + Layered PSD" data-usd="50" selected>Phase 4: Master 300DPI Keyframe Render + Layered PSD</option>
-                </select>
-              </div>
-              <div style="margin-top:6px; margin-bottom:8px;">
-                <span id="wizAddonsLabel" style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 Add-ons &amp; Cross-Category Modules:</span>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Hero Weapon Design (+$35)</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Facial Expressions Sheet (+$30)</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizColorPalette" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Color Variations (+$20)</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Commercial AAA License (+$45)</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizCrossEnv" data-usd="55" data-days="2" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>+ Environment Backdrop (+$55 • +2d)</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizCrossChar" data-usd="40" data-days="1" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>+ Character / Scale Figure (+$40 • +1d)</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
-                    <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
-                    <span style="color:#10b981; font-weight:700;">✓ Master Layered 300DPI PSD (Included & Guaranteed)</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 3: Client Credentials & Project Brief -->
-          <div class="wizard-step-card active" id="wizardStep3">
-            <div class="wizard-step-header" onclick="toggleWizardStep(3)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">3.</span> Client Credentials & Project Brief</span>
-              <span style="font-size:11px; color:var(--text-muted);">▼</span>
-            </div>
-            <div class="wizard-step-body">
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Client / Studio Name</label>
-                  <input type="text" id="orderClientName" required placeholder="Studio Nova / John Doe" />
-                </div>
-                <div>
-                  <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Email or Telegram Handle</label>
-                  <input type="text" id="orderClientContact" required class="font-mono" placeholder="client@studio.com or @handle" />
-                </div>
-              </div>
-              <div>
-                <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px;">Reference Link (Optional - Pinterest / Drive / ArtStation)</label>
-                <input type="url" id="orderClientRefLink" class="font-mono" placeholder="https://pinterest.com/... or Google Drive link" style="font-size:11.5px;" />
-                <span style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:3px;">
-                  💡 Providing references is optional. The atelier handles full visual exploration and style extraction tailored to your vision.
-                </span>
-              </div>
-              <div>
-                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Project Brief, Lore & Character Details</label>
-                <textarea id="orderClientBrief" rows="3" required placeholder="Archetype, armor details, weaponry, backstory lore, key mood requirements..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <label style="display:flex; align-items:flex-start; gap:8px; font-size:11px; color:#cbd5e1; margin-top:10px; padding:8px 10px; border-radius:8px; background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.22); cursor:pointer;">
-          <input type="checkbox" id="orderTermsAgree" required style="width:auto; margin-top:2px;" />
-          <span>I agree to the TAJINKART Commission Agreement &amp; Studio Rules (unpaid briefs auto-expire after 24h; 50% non-refundable retainer to start, 2 revision rounds per milestone &amp; anti-AI protection).</span>
-        </label>
-        <button type="submit" class="btn-gold" style="padding:13px; font-size:12.5px; margin-top:10px; width:100%;">
-          Submit Project Brief & Send Direct Inquiry to Studio Director →
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- پنجره پورتال اعضا (ورود، ثبت‌نام، و Reset Account Password) -->
   <div id="memberModal" onclick="handleMemberModalBackdropClick(event)" style="position:fixed; inset:0; z-index:100; background:rgba(3,4,7,0.92); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:16px;">
@@ -2635,12 +2629,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.36"></script>
-  <script src="core.js?v=26.6.36"></script>
-  <script src="gallery.js?v=26.6.36"></script>
-  <script src="portal.js?v=26.6.36"></script>
-  <script src="admin.js?v=26.6.36"></script>
-  <script src="translate.js?v=26.6.36"></script>
+  <script src="data.js?v=26.6.37"></script>
+  <script src="core.js?v=26.6.37"></script>
+  <script src="gallery.js?v=26.6.37"></script>
+  <script src="portal.js?v=26.6.37"></script>
+  <script src="admin.js?v=26.6.37"></script>
+  <script src="translate.js?v=26.6.37"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   

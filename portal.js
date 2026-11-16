@@ -328,7 +328,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   // واکشی کارهای واقعی گالری مربوط به این پایپلاین برای تایل‌های مراحل
   const matchingArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline(key) : [];
 
-  // ۳. نمایش کارت واحد دسته‌بندی (بدون ۳ زیرشاخه‌ی پیچیده) + بازشدن مستقیم ویزارد با کلیک
+  // ۳. بارگذاری مستقیم فرم سفارش و محاسبه‌گر قیمت درون پنل سمت راست (بدون پاپ‌آپ لایتباکس)
   const mainTile = (Array.isArray(data.tiles) && data.tiles[0]) ? data.tiles[0] : { title: data.topSub || 'Commission', desc: data.note || '', price: '90', timeline: '5 to 7 business days', usdVal: 90 };
   const displayPrice = formatPrice(mainTile.price);
   let heroImg = mainTile.img || '';
@@ -336,35 +336,17 @@ window.selectPipeline = function(key, cardEl, userClicked) {
     heroImg = matchingArts[0].image || heroImg;
   }
   const optHeroImg = (typeof getOptimizedImageUrl === 'function' && heroImg && !heroImg.startsWith('data:')) ? getOptimizedImageUrl(heroImg, 960) : heroImg;
-  const escapedTitle = (mainTile.title || data.topSub || 'Commission').replace(/'/g, "\\'");
-  const escapedDesc = (data.note || mainTile.desc || '').replace(/'/g, "\\'");
 
-  const container = document.getElementById('mosaicStageContainer');
-  if (container) {
-    container.innerHTML = `
-      <div class="pipeline-tile" style="grid-column: 1 / -1; min-height: 290px; --tile-accent:${catColor}; cursor:pointer;" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${optHeroImg}', '${mainTile.timeline || '5 to 7 business days'}', ${mainTile.usdVal || 90}, '${key}')">
-        <img src="${optHeroImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" decoding="async" />
-        <div class="pipeline-tile-overlay" style="justify-content:flex-end; padding:24px;">
-          <span class="font-mono" style="font-size:11px; color:${catColor}; font-weight:800; letter-spacing:0.08em; margin-bottom:6px;">DIRECT COMMISSION WIZARD</span>
-          <h4 class="pipeline-tile-title" style="font-size:20px; margin-bottom:8px;">${data.topSub || mainTile.title}</h4>
-          <p class="pipeline-tile-desc" style="max-width:680px; font-size:13px; margin-bottom:14px;">${data.note || mainTile.desc}</p>
-          <div class="pipeline-tile-footer" style="border-top:1px solid rgba(255,255,255,0.12); padding-top:12px;">
-            <div>
-              <span class="font-mono" style="color:${catColor}; font-size:16px; font-weight:800;">From ${displayPrice}</span>
-              <span style="color:var(--cyan-electric); font-size:11.5px; margin-left:10px;">(${mainTile.timeline || '5 to 7 business days'})</span>
-            </div>
-            <span class="btn-gold" style="font-size:12px; padding:8px 18px; border-radius:999px;">
-              ⚡ Configure Scope &amp; Submit Brief →
-            </span>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  if (userClicked !== false) {
-    openModal(mainTile.title || data.topSub || 'Commission', data.note || mainTile.desc || '', displayPrice, optHeroImg, mainTile.timeline || '5 to 7 business days', mainTile.usdVal || 90, key);
-    return;
+  if (typeof window.populateInlineCommissionWizard === 'function') {
+    window.populateInlineCommissionWizard(
+      mainTile.title || data.topSub || 'Commission',
+      data.note || mainTile.desc || '',
+      displayPrice,
+      optHeroImg,
+      mainTile.timeline || '5 to 7 business days',
+      mainTile.usdVal || 90,
+      key
+    );
   }
 
   if (userClicked && window.innerWidth <= 1024) {
@@ -376,13 +358,13 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   }
 };
 
-// باز کردن مدال و محاسبه‌گر لحظه‌ای با مقدار عددی پایه واقعی
-function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
+// پرکردن مستقیم میزکار سفارش در ستون راست شاپ (بدون لایتباکس)
+window.populateInlineCommissionWizard = function(title, desc, price, img, timeline, usdVal, pipeKey) {
   activeModalItem = {
     title: title,
-      titleFa: document.getElementById("editArtTitleFa") ? document.getElementById("editArtTitleFa").value.trim() : "",
+    titleFa: document.getElementById("editArtTitleFa") ? document.getElementById("editArtTitleFa").value.trim() : "",
     desc: desc,
-      isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
+    isProductionPack: document.getElementById('editArtIsPackCheckbox') ? document.getElementById('editArtIsPackCheckbox').checked : true,
     price: price,
     img: img,
     timeline: timeline || '5 to 7 business days',
@@ -390,10 +372,14 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
     pipeKey: pipeKey || currentSelectedPipeKey
   };
 
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalDesc').textContent = desc;
-  document.getElementById('modalTimeline').textContent = activeModalItem.timeline;
-  document.getElementById('modalMediaImg').src = img;
+  const tEl = document.getElementById('modalTitle');
+  const dEl = document.getElementById('modalDesc');
+  const tlEl = document.getElementById('modalTimeline');
+  const imgEl = document.getElementById('modalMediaImg');
+  if (tEl) tEl.textContent = title;
+  if (dEl) dEl.textContent = desc;
+  if (tlEl) tlEl.textContent = activeModalItem.timeline;
+  if (imgEl && img) imgEl.src = img;
 
   const badgeEl = document.getElementById('wizardPipeBadge');
   if (badgeEl) {
@@ -407,17 +393,27 @@ function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
   if (currentMember) {
     const nameInput = document.getElementById('orderClientName');
     const contactInput = document.getElementById('orderClientContact');
-    if (nameInput) nameInput.value = currentMember.name;
-    if (contactInput) contactInput.value = currentMember.contact || currentMember.email;
+    if (nameInput && !nameInput.value) nameInput.value = currentMember.name;
+    if (contactInput && !contactInput.value) contactInput.value = currentMember.contact || currentMember.email;
   }
 
-  // محاسبه لحظه‌ای اولیه و باز کردن پنجره
   recalcWizardPrice();
-  document.getElementById('zoomModal').classList.add('active');
+};
+
+// هدایت از گالری یا بخش‌های دیگر به میزکار آنلاین سفارش
+function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
+  const targetPipe = pipeKey || currentSelectedPipeKey || 'sketch1';
+  if (typeof switchView === 'function') switchView('store');
+  if (typeof switchStoreTab === 'function') switchStoreTab('commissions');
+  const navCard = document.querySelector(`#atelierServiceCards .service-nav-card[data-pipeline="${targetPipe}"]`);
+  selectPipeline(targetPipe, navCard, false);
+  window.populateInlineCommissionWizard(title, desc, price, img, timeline, usdVal, targetPipe);
+  const wb = document.getElementById('sketchWorkbenchArea');
+  if (wb) wb.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function closeModal(e) { if (e.target.id === 'zoomModal') closeModalDirect(); }
-function closeModalDirect() { document.getElementById('zoomModal').classList.remove('active'); }
+function closeModal(e) {}
+function closeModalDirect() {}
 
 // موتور محاسبه‌گر لحظه‌ای قیمت و اسکوپ سفارش (Live Calculator Engine)
 window.toggleWizardStep = function(stepNum) {
