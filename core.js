@@ -1137,7 +1137,7 @@ if (document.readyState === 'loading') {
 // UNIFIED ATELIER & CHARACTER CATALOG ENGINE (Single Source of Truth -> Supabase)
 // ==============================================================================
 window.DEFAULT_ATELIER_CATALOG = {
-  characterOnlyMode: true,
+  characterOnlyMode: false,
   hourlyRate: 15,
   extraConceptHrs: 1.0,
   extraRevisionHrs: 1.5,
@@ -1269,24 +1269,40 @@ window.applyAtelierCatalogToSite = function() {
   const cat = window.getAtelierCatalog();
   // 1. Update Character Shop Cards
   window.CHARACTER_SHOP_CARDS = cat.serviceCards.filter(c => c.active !== false);
-  // 2. Toggle Character-only vs Multi-pipeline Sidebar
+  // 2. Dynamically render Sidebar Categories from PIPELINE_DATA (supports Add/Delete/Hide!)
   const sideTabs = document.getElementById('atelierServiceCards');
-  if (sideTabs) {
-    sideTabs.querySelectorAll('.service-nav-card').forEach(card => {
-      const pKey = card.getAttribute('data-pipeline');
-      if (cat.characterOnlyMode) {
-        card.style.display = (pKey === 'sketch1') ? '' : 'none';
-      } else {
-        card.style.display = '';
-      }
-    });
+  if (sideTabs && typeof PIPELINE_DATA !== 'undefined') {
+    const keys = Object.keys(PIPELINE_DATA);
+    const visibleKeys = cat.characterOnlyMode ? keys.filter(k => k === 'sketch1') : keys.filter(k => PIPELINE_DATA[k] && PIPELINE_DATA[k].hidden !== true);
+    const activePipe = (typeof currentSelectedPipeKey !== 'undefined' && visibleKeys.includes(currentSelectedPipeKey)) ? currentSelectedPipeKey : (visibleKeys[0] || 'sketch1');
+    sideTabs.innerHTML = visibleKeys.map((k, idx) => {
+      const p = PIPELINE_DATA[k] || {};
+      const num = String(idx + 1).padStart(2, '0');
+      const title = p.topSub || k;
+      const img = p.coverImg || (p.tiles && p.tiles[0] && p.tiles[0].img) || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80';
+      return `
+        <div onclick="selectPipeline('${k}', this)" class="service-nav-card ${k === activePipe ? 'active' : ''}" data-pipeline="${k}">
+          <img src="${img}" alt="${title.replace(/"/g, '&quot;')}" loading="lazy" decoding="async" />
+          <div class="service-nav-overlay">
+            <div class="service-nav-title">
+              <span class="font-mono" style="color:var(--gold);">${num}.</span>
+              <span>${title}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
   // 3. Re-render active Atelier workbench
   if (typeof selectPipeline === 'function') {
     const targetPipe = cat.characterOnlyMode ? 'sketch1' : (typeof currentSelectedPipeKey !== 'undefined' ? currentSelectedPipeKey : 'sketch1');
-    selectPipeline(targetPipe, null, false);
+    if (typeof PIPELINE_DATA !== 'undefined' && PIPELINE_DATA[targetPipe]) {
+      selectPipeline(targetPipe, null, false);
+    } else {
+      selectPipeline('sketch1', null, false);
+    }
   }
-  // 4. Refresh Admin Tab 2 / Tab 1 if open
+  // 4. Refresh Admin Tab 2 if open
   if (typeof window.renderAdminAtelierEngine === 'function' && document.getElementById('adminTabPipelines') && !document.getElementById('adminTabPipelines').classList.contains('hidden')) {
     window.renderAdminAtelierEngine();
   }

@@ -361,8 +361,8 @@ window.selectPipeline = function(key, cardEl, userClicked) {
         }
       }
       const optTileImg = (typeof getOptimizedImageUrl === 'function' && tileImg && !tileImg.startsWith('data:')) ? getOptimizedImageUrl(tileImg, 720) : tileImg;
-      const escapedTitle = (tile.title || '').replace(/'/g, "\\'");
-      const escapedDesc = (tile.desc || '').replace(/'/g, "\\'");
+      const escapedTitle = (tile.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+      const escapedDesc = (tile.desc || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
       const subMode = tile.subMode || '';
 
       return `
@@ -552,10 +552,10 @@ window.recalcWizardPrice = function() {
   const phaseOpt = phaseEl ? phaseEl.options[phaseEl.selectedIndex] : null;
   const fidelityMult = phaseOpt ? (parseFloat(phaseOpt.getAttribute('data-mult') || '1.25') || 1.25) : 1.25;
   const isSketchOnly = fidelityMult <= 0.6;
-  const revRounds = isSketchOnly ? 1 : 2;
-  const revLabel = isSketchOnly ? '1 Round (+1d per revision)' : '2 Rounds (+1–2d per revision)';
+  let revRounds = isSketchOnly ? 1 : 2;
+  let revLabel = isSketchOnly ? '1 Round (+1d per revision)' : '2 Rounds (+1–2d per revision)';
 
-  const extraSketches = isSketchOnly ? (parseInt(document.getElementById('wizExtraSketches')?.value || '0', 10) || 0) : 0;
+  const extraSketches = parseInt(document.getElementById('wizExtraSketches')?.value || '0', 10) || 0;
   const colorVars = !isSketchOnly ? (parseInt(document.getElementById('wizColorVariations')?.value || '0', 10) || 0) : 0;
   const bgOpt = !isSketchOnly ? document.getElementById('wizBackgroundType')?.selectedOptions[0] : null;
   const bgHrs = bgOpt ? (parseFloat(bgOpt.getAttribute('data-hrs') || '0') || 0) : 0;
