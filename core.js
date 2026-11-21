@@ -1151,6 +1151,14 @@ window.DEFAULT_ATELIER_CATALOG = {
       img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
       timeline: '3 to 7 business days',
       baseHours: 3.5,
+      showAges: true,
+      showTurnaround: true,
+      showLineupCount: false,
+      scopes: [
+        { id: 'single', label: '👤 Single Character / Portrait Concept', hrs: 0 },
+        { id: 'redesign', label: '🔄 Existing Character Redesign (Lower Rate)', hrs: -1.5 },
+        { id: 'dnd_pack', label: '🎲 D&D Campaign Pack (+ VTT Token Included)', hrs: 1.5 }
+      ],
       active: true
     },
     {
@@ -1161,6 +1169,13 @@ window.DEFAULT_ATELIER_CATALOG = {
       img: 'https://images.unsplash.com/photo-1560972550-aba3456b5564?auto=format&fit=crop&w=800&q=80',
       timeline: '2 to 8 business days',
       baseHours: 2.5,
+      showAges: false,
+      showTurnaround: false,
+      showLineupCount: true,
+      scopes: [
+        { id: 'existing_lineup', label: '📐 Existing Characters Graphic Lineup (Assembly & Height Chart)', hrs: 2.5 },
+        { id: 'new_party', label: '⚔️ Design New Party Characters From Scratch (Per-Character)', hrs: 5.0 }
+      ],
       active: true
     },
     {
@@ -1171,6 +1186,14 @@ window.DEFAULT_ATELIER_CATALOG = {
       img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80',
       timeline: '3 to 5 business days',
       baseHours: 4.5,
+      showAges: false,
+      showTurnaround: false,
+      showLineupCount: false,
+      scopes: [
+        { id: 'yt_avatar', label: '🎬 Channel Avatar + Transparent PNG', hrs: 1.5 },
+        { id: 'pngtuber', label: '🎙️ Reactive PNGTuber Pack (Mouth/Eye + 2 Emotions)', hrs: 3.0 },
+        { id: 'mascot_brand', label: '🛡️ Full Brand Mascot + Thumbnail Pose Kit', hrs: 3.5 }
+      ],
       active: true
     },
     {
@@ -1181,6 +1204,14 @@ window.DEFAULT_ATELIER_CATALOG = {
       img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
       timeline: '3 to 5 business days',
       baseHours: 3.5,
+      showAges: false,
+      showTurnaround: false,
+      showLineupCount: false,
+      scopes: [
+        { id: 'solo_photo', label: '🧑 Solo Dark Fantasy / Cyberpunk Transformation', hrs: 0 },
+        { id: 'couple_photo', label: '👥 Couple / Duo Fantasy Portrait', hrs: 3.5 },
+        { id: 'pet_photo', label: '🐾 Hero + Real Pet Companion', hrs: 2.0 }
+      ],
       active: true
     }
   ],
@@ -1241,6 +1272,15 @@ window.getAtelierCatalog = function() {
     addons: Object.assign({}, def.addons, saved.addons || {}),
     galleryTags: (Array.isArray(saved.galleryTags) && saved.galleryTags.length > 0) ? saved.galleryTags : def.galleryTags
   };
+  cat.serviceCards = cat.serviceCards.map(sc => {
+    const dCard = def.serviceCards.find(x => x.subMode === sc.subMode || x.id === sc.id) || def.serviceCards[0];
+    return Object.assign({}, {
+      showAges: dCard.showAges !== undefined ? dCard.showAges : true,
+      showTurnaround: dCard.showTurnaround !== undefined ? dCard.showTurnaround : true,
+      showLineupCount: dCard.showLineupCount !== undefined ? dCard.showLineupCount : false,
+      scopes: Array.isArray(sc.scopes) && sc.scopes.length > 0 ? sc.scopes : JSON.parse(JSON.stringify(dCard.scopes || []))
+    }, sc);
+  });
   return cat;
 };
 

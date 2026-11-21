@@ -4198,10 +4198,12 @@ window.saveStudioHourlyRateDirect = async function() {
 
 
 // ==============================================================================
-// REBUILT ADMIN TAB 2: ATELIER CATEGORIES, CHARACTER CARDS & PRICING ENGINE
+// REBUILT ADMIN TAB 2: CLICKABLE CATEGORIES, SUB-CARD SCOPES & IMAGE PREVIEW
 // ==============================================================================
 window._adminAtelierDraft = null;
 window._adminAtelierAutoSaveTimer = null;
+window._adminSelectedPipeKey = 'sketch1';
+window._adminSelectedCharCardIdx = 0;
 
 window.scheduleAdminAtelierAutoSave = function() {
   if (window._adminAtelierAutoSaveTimer) clearTimeout(window._adminAtelierAutoSaveTimer);
@@ -4215,24 +4217,128 @@ window.scheduleAdminAtelierAutoSave = function() {
   }, 900);
 };
 
-window.adminPreviewCharacterCardWizard = function(idx) {
+// Clean Image-Only Preview Lightbox inside Admin (NO Wizard!)
+window.adminOpenImagePreviewModal = function(title, imagesList) {
+  let modal = document.getElementById('adminImgPreviewModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'adminImgPreviewModal';
+    modal.style.cssText = 'position:fixed; inset:0; z-index:99999; background:rgba(2,4,9,0.92); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:24px;';
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.body.appendChild(modal);
+  }
+  const imgs = (Array.isArray(imagesList) ? imagesList : []).filter(Boolean);
+  modal.innerHTML = `
+    <div style="background:#080c16; border:1px solid rgba(0,240,255,0.35); border-radius:16px; max-width:920px; width:100%; max-height:86vh; overflow-y:auto; padding:20px; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+        <div>
+          <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">VISUAL SAMPLE PREVIEW</span>
+          <h3 style="font-size:16px; font-weight:900; color:#fff; margin:2px 0 0;">${title} (${imgs.length} images)</h3>
+        </div>
+        <button type="button" onclick="document.getElementById('adminImgPreviewModal').style.display='none'" style="background:rgba(244,63,94,0.18); color:#fda4af; border:1px solid rgba(244,63,94,0.4); border-radius:8px; padding:6px 12px; font-weight:800; cursor:pointer;">✕ Close</button>
+      </div>
+      ${imgs.length === 0 ? '<p style="color:#94a3b8; text-align:center; padding:30px;">No images found for this category yet.</p>' : `
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px;">
+          ${imgs.map((u, i) => `
+            <div style="background:#03050a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
+              <img src="${u}" style="width:100%; aspect-ratio:16/10; object-fit:cover; display:block;" alt="" />
+              <div style="padding:6px 10px; font-size:10px; color:#94a3b8;" class="font-mono">Sample #${i + 1}</div>
+            </div>
+          `).join('')}
+        </div>
+      `}
+    </div>
+  `;
+  modal.style.display = 'flex';
+};
+
+window.adminPreviewPipelineImages = function(pipeKey) {
+  const p = (typeof PIPELINE_DATA !== 'undefined') ? PIPELINE_DATA[pipeKey] : null;
+  if (!p) return;
+  const imgs = new Set();
+  if (p.coverImg) imgs.add(p.coverImg);
+  if (Array.isArray(p.tiles)) p.tiles.forEach(t => { if (t.img) imgs.add(t.img); });
+  if (typeof window.getArtworksForPipeline === 'function') {
+    window.getArtworksForPipeline(pipeKey, false).forEach(a => {
+      if (a.image) imgs.add(a.image);
+      if (Array.isArray(a.phases)) a.phases.forEach(ph => { if (ph.image || ph.img) imgs.add(ph.image || ph.img); });
+    });
+  }
+  window.adminOpenImagePreviewModal(p.topSub || pipeKey, Array.from(imgs));
+};
+
+window.adminPreviewCharacterCardImages = function(idx) {
   const cat = window._adminAtelierDraft || (typeof window.getAtelierCatalog === 'function' ? window.getAtelierCatalog() : null);
   if (!cat || !cat.serviceCards || !cat.serviceCards[idx]) return;
   const c = cat.serviceCards[idx];
-  const hr = Number(cat.hourlyRate) || 15;
-  const estUsd = Math.round((Number(c.baseHours) || 3.5) * hr);
-  if (typeof openModal === 'function') {
-    openModal(c.title, c.desc, '$' + estUsd, c.img, c.timeline || '3 to 7 business days', estUsd, 'sketch1', c.subMode || 'custom');
+  const imgs = new Set();
+  if (c.img) imgs.add(c.img);
+  if (typeof window.getArtworksForPipeline === 'function') {
+    window.getArtworksForPipeline('sketch1', false).forEach(a => {
+      if (a.image) imgs.add(a.image);
+      if (Array.isArray(a.phases)) a.phases.forEach(ph => { if (ph.image || ph.img) imgs.add(ph.image || ph.img); });
+    });
   }
+  window.adminOpenImagePreviewModal(c.title || 'Character Samples', Array.from(imgs));
 };
 
-window.adminPreviewPipelineWizard = function(pipeKey) {
-  const p = (typeof PIPELINE_DATA !== 'undefined') ? PIPELINE_DATA[pipeKey] : null;
-  if (!p) return;
-  const tile = (p.tiles && p.tiles[0]) || { title: p.topSub, desc: p.note, img: p.coverImg || '', timeline: '3 to 7 business days', usdVal: 90 };
-  if (typeof openModal === 'function') {
-    openModal(tile.title || p.topSub, tile.desc || p.note || '', '$' + (tile.usdVal || 90), tile.img || p.coverImg || '', tile.timeline || '3 to 7 business days', tile.usdVal || 90, pipeKey, '');
+window.adminSelectCategory = function(pipeKey) {
+  window._adminSelectedPipeKey = pipeKey;
+  window.renderAdminAtelierEngine();
+};
+
+window.adminSelectCharSubCard = function(idx) {
+  window._adminSelectedCharCardIdx = idx;
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierAddScopeToCard = function(cardIdx) {
+  const card = window._adminAtelierDraft?.serviceCards?.[cardIdx];
+  if (!card) return;
+  if (!Array.isArray(card.scopes)) card.scopes = [];
+  card.scopes.push({ id: 'sc_' + Date.now().toString(36), label: 'New Scope Option', hrs: 0 });
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierDeleteScopeFromCard = function(cardIdx, scopeIdx) {
+  const card = window._adminAtelierDraft?.serviceCards?.[cardIdx];
+  if (!card || !Array.isArray(card.scopes) || card.scopes.length <= 1) {
+    showToast('At least one scope option is required.', 'error');
+    return;
   }
+  card.scopes.splice(scopeIdx, 1);
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierAddPipelineTile = function(pipeKey) {
+  if (typeof PIPELINE_DATA === 'undefined' || !PIPELINE_DATA[pipeKey]) return;
+  if (!Array.isArray(PIPELINE_DATA[pipeKey].tiles)) PIPELINE_DATA[pipeKey].tiles = [];
+  PIPELINE_DATA[pipeKey].tiles.push({
+    badge: 'Stage ' + (PIPELINE_DATA[pipeKey].tiles.length + 1),
+    title: 'New ' + (PIPELINE_DATA[pipeKey].topSub || 'Pipeline') + ' Tier',
+    desc: 'Custom concept or production stage.',
+    img: PIPELINE_DATA[pipeKey].coverImg || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+    timeline: '3 to 6 business days',
+    usdVal: 90,
+    price: '90',
+    span: 'span-6'
+  });
+  if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierDeletePipelineTile = function(pipeKey, idx) {
+  if (typeof PIPELINE_DATA === 'undefined' || !PIPELINE_DATA[pipeKey] || PIPELINE_DATA[pipeKey].tiles.length <= 1) {
+    showToast('Each category requires at least one sub-card.', 'error');
+    return;
+  }
+  PIPELINE_DATA[pipeKey].tiles.splice(idx, 1);
+  if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
 };
 
 window.adminAtelierAddCategory = function() {
@@ -4256,6 +4362,7 @@ window.adminAtelierAddCategory = function() {
       span: 'span-6'
     }]
   };
+  window._adminSelectedPipeKey = key;
   if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
   window.scheduleAdminAtelierAutoSave();
@@ -4276,6 +4383,7 @@ window.adminAtelierDeleteCategory = function(key) {
   if (key === 'sketch1') { showToast('Character & Heroes is the core studio category and cannot be deleted.', 'error'); return; }
   if (!confirm('Delete category "' + (PIPELINE_DATA[key].topSub || key) + '"?')) return;
   delete PIPELINE_DATA[key];
+  if (window._adminSelectedPipeKey === key) window._adminSelectedPipeKey = 'sketch1';
   if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
   window.scheduleAdminAtelierAutoSave();
@@ -4291,14 +4399,19 @@ window.renderAdminAtelierEngine = function() {
   const cat = window._adminAtelierDraft;
   const hr = Number(cat.hourlyRate) || 15;
   const pipeKeys = (typeof PIPELINE_DATA !== 'undefined') ? Object.keys(PIPELINE_DATA) : [];
+  const selPipe = pipeKeys.includes(window._adminSelectedPipeKey) ? window._adminSelectedPipeKey : (pipeKeys[0] || 'sketch1');
+  window._adminSelectedPipeKey = selPipe;
+
+  const selCardIdx = Math.min(window._adminSelectedCharCardIdx || 0, Math.max(0, cat.serviceCards.length - 1));
+  const activeCharCard = cat.serviceCards[selCardIdx];
 
   root.innerHTML = `
     <!-- Top Sticky Command Bar -->
     <div style="background:#06080d; border:1px solid rgba(250,204,21,0.38); border-radius:14px; padding:16px 20px; display:flex; flex-direction:column; gap:14px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h4 style="font-size:15px; font-weight:900; color:var(--gold); margin:0 0 4px;">🎨 Atelier Categories, Character Wizard &amp; Pricing Engine</h4>
-          <p style="font-size:11.5px; color:#94a3b8; margin:0;">Auto-syncs to Supabase. Add/delete categories, preview any card's live Wizard, and manage all pricing &amp; Gallery tags.</p>
+          <h4 style="font-size:15px; font-weight:900; color:var(--gold); margin:0 0 4px;">🎨 Atelier Categories, Sub-Card Scopes &amp; Pricing Engine</h4>
+          <p style="font-size:11.5px; color:#94a3b8; margin:0;">Click any Category below to inspect/edit its sub-cards. Click any Character sub-card to edit its Scopes, Framing rules &amp; prices.</p>
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
           <button type="button" onclick="window.adminAtelierResetDefault()" class="btn-secondary" style="font-size:11px; padding:8px 12px; color:#cbd5e1;">↺ Reset Defaults</button>
@@ -4330,34 +4443,35 @@ window.renderAdminAtelierEngine = function() {
       </div>
     </div>
 
-    <!-- Section 0: Atelier Categories (Character, Creatures, Environment, Keyframes, Props, Comics, Mascot) -->
+    <!-- Section 0: Clickable Atelier Service Categories -->
     <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div>
-          <h4 style="font-size:14px; font-weight:800; color:var(--gold); margin:0;">📂 Atelier Service Categories (Add / Hide / Delete)</h4>
-          <span style="font-size:11px; color:#94a3b8;">Separate control for Character, Creatures, Environment, Keyframes, Props, Comics &amp; Mascot.</span>
+          <h4 style="font-size:14px; font-weight:800; color:var(--gold); margin:0;">📂 Step 1: Select an Atelier Category (${pipeKeys.length})</h4>
+          <span style="font-size:11px; color:#94a3b8;">Click any category card to manage its sub-cards &amp; options below. Click "👁️ Images" to preview its gallery photos.</span>
         </div>
         <button type="button" onclick="window.adminAtelierAddCategory()" class="btn-gold" style="font-size:11px; padding:7px 14px;">+ Add Category</button>
       </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px;">
         ${pipeKeys.map(k => {
           const p = PIPELINE_DATA[k] || {};
-          const isVisible = p.hidden !== true && (!cat.characterOnlyMode || k === 'sketch1');
+          const isSelected = (k === selPipe);
+          const isVisible = p.hidden !== true;
           const cImg = p.coverImg || (p.tiles && p.tiles[0] && p.tiles[0].img) || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80';
           return `
-            <div style="background:#060911; border:1px solid ${isVisible ? 'rgba(0,240,255,0.28)' : 'rgba(255,255,255,0.08)'}; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; opacity:${isVisible ? '1' : '0.55'};">
+            <div onclick="window.adminSelectCategory('${k}')" style="cursor:pointer; background:${isSelected ? 'rgba(250,204,21,0.09)' : '#060911'}; border:2px solid ${isSelected ? 'var(--gold)' : (isVisible ? 'rgba(0,240,255,0.22)' : 'rgba(255,255,255,0.08)')}; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; opacity:${isVisible ? '1' : '0.6'}; transition:all 0.15s;">
               <div style="display:flex; gap:8px; align-items:center;">
                 <img src="${cImg}" style="width:46px; height:36px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.15); flex-shrink:0;" alt="" />
-                <input type="text" value="${(p.topSub || k).replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${k}'].topSub = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; font-weight:800; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff; width:100%;" />
+                <input type="text" value="${(p.topSub || k).replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" onchange="PIPELINE_DATA['${k}'].topSub = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; font-weight:800; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff; width:100%;" />
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:${p.hidden !== true ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
-                  <input type="checkbox" ${p.hidden !== true ? 'checked' : ''} onchange="window.adminAtelierToggleCategory('${k}', this.checked)" style="width:auto;" />
-                  <span>${p.hidden !== true ? 'Active' : 'Hidden'}</span>
+                <label onclick="event.stopPropagation();" style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:${isVisible ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
+                  <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="window.adminAtelierToggleCategory('${k}', this.checked)" style="width:auto;" />
+                  <span>${isVisible ? 'Active' : 'Hidden'}</span>
                 </label>
                 <div style="display:flex; gap:6px;">
-                  <button type="button" onclick="window.adminPreviewPipelineWizard('${k}')" style="font-size:10.5px; padding:3px 8px; border-radius:5px; background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.3); cursor:pointer;">👁️ Preview</button>
-                  ${k !== 'sketch1' ? `<button type="button" onclick="window.adminAtelierDeleteCategory('${k}')" style="font-size:10.5px; color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:700;">✕</button>` : ''}
+                  <button type="button" onclick="event.stopPropagation(); window.adminPreviewPipelineImages('${k}')" style="font-size:10.5px; padding:3px 8px; border-radius:5px; background:rgba(0,240,255,0.12); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.3); cursor:pointer;">👁️ Images</button>
+                  ${k !== 'sketch1' ? `<button type="button" onclick="event.stopPropagation(); window.adminAtelierDeleteCategory('${k}')" style="font-size:10.5px; color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:700;">✕</button>` : ''}
                 </div>
               </div>
             </div>
@@ -4366,45 +4480,115 @@ window.renderAdminAtelierEngine = function() {
       </div>
     </div>
 
-    <!-- Section 1: Character Atelier Service Cards (with Live Image + Wizard Preview) -->
-    <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-        <div>
-          <h4 style="font-size:14px; font-weight:800; color:#fff; margin:0;">🃏 Character Sub-Cards &amp; Live Wizard Preview</h4>
-          <span style="font-size:11px; color:#94a3b8;">Click "👁️ Preview Wizard" on any of the 4 cards to test its exact wizard right here in Admin.</span>
-        </div>
-        <button type="button" onclick="window.adminAtelierAddServiceCard()" class="btn-gold" style="font-size:11px; padding:7px 14px;">+ Add Character Card</button>
-      </div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
-        ${cat.serviceCards.map((c, idx) => {
-          const usd = Math.round((Number(c.baseHours) || 3) * hr);
-          return `
-          <div style="background:#060911; border:1px solid ${c.active !== false ? 'rgba(250,204,21,0.28)' : 'rgba(255,255,255,0.08)'}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; opacity:${c.active !== false ? '1' : '0.6'};">
-            <div style="position:relative; aspect-ratio:16/8; border-radius:8px; overflow:hidden; background:#020305; border:1px solid rgba(255,255,255,0.1);">
-              <img src="${c.img || ''}" style="width:100%; height:100%; object-fit:cover;" alt="" />
-              <span class="font-mono" style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.82); color:var(--gold); font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid rgba(250,204,21,0.35);">From $${usd}</span>
-              <button type="button" onclick="window.adminPreviewCharacterCardWizard(${idx})" style="position:absolute; bottom:6px; right:6px; background:rgba(0,240,255,0.92); color:#000; font-size:11px; font-weight:900; padding:4px 10px; border-radius:6px; border:none; cursor:pointer;">👁️ Preview Wizard</button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:${c.active !== false ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
-                <input type="checkbox" ${c.active !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${idx}].active = this.checked; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" style="width:auto;" />
-                <span>${c.active !== false ? 'Visible in Shop' : 'Hidden'}</span>
-              </label>
-              <button type="button" onclick="window.adminAtelierDeleteServiceCard(${idx})" style="color:var(--crimson); font-size:11px; font-weight:700; background:none; border:none; cursor:pointer;">✕ Delete</button>
-            </div>
-            <input type="text" value="${(c.title || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Card Title" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-            <textarea rows="2" onchange="window._adminAtelierDraft.serviceCards[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Short description..." style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${c.desc || ''}</textarea>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
-              <div><label style="font-size:9.5px; color:#94a3b8;">Mode Key</label><input type="text" value="${c.subMode || 'custom'}" onchange="window._adminAtelierDraft.serviceCards[${idx}].subMode = this.value; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--cyan-electric);" /></div>
-              <div><label style="font-size:9.5px; color:#94a3b8;">Base Hrs ($${usd})</label><input type="number" step="0.5" value="${c.baseHours || 3}" onchange="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
-              <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(c.timeline || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
-            </div>
-            <input type="url" value="${(c.img || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" placeholder="Cover Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+    <!-- Section 1: Selected Category Sub-Cards -->
+    ${selPipe === 'sketch1' ? `
+      <div style="background:var(--bg-panel); border:1px solid rgba(250,204,21,0.3); border-radius:14px; padding:16px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h4 style="font-size:14px; font-weight:800; color:#fff; margin:0;">🃏 Step 2: Character Sub-Cards (Click any card to edit its Scopes &amp; Rules below)</h4>
+            <span style="font-size:11px; color:#94a3b8;">Selected: <strong style="color:var(--gold);">${activeCharCard ? activeCharCard.title : ''}</strong></span>
           </div>
-        `;
-        }).join('')}
+          <button type="button" onclick="window.adminAtelierAddServiceCard()" class="btn-gold" style="font-size:11px; padding:7px 14px;">+ Add Character Card</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:12px;">
+          ${cat.serviceCards.map((c, idx) => {
+            const usd = Math.round((Number(c.baseHours) || 3) * hr);
+            const isCardSel = (idx === selCardIdx);
+            return `
+            <div onclick="window.adminSelectCharSubCard(${idx})" style="cursor:pointer; background:${isCardSel ? 'rgba(0,240,255,0.07)' : '#060911'}; border:2px solid ${isCardSel ? 'var(--cyan-electric)' : (c.active !== false ? 'rgba(250,204,21,0.22)' : 'rgba(255,255,255,0.08)')}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; opacity:${c.active !== false ? '1' : '0.6'};">
+              <div style="position:relative; aspect-ratio:16/8; border-radius:8px; overflow:hidden; background:#020305; border:1px solid rgba(255,255,255,0.1);">
+                <img src="${c.img || ''}" style="width:100%; height:100%; object-fit:cover;" alt="" />
+                <span class="font-mono" style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.82); color:var(--gold); font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid rgba(250,204,21,0.35);">From $${usd}</span>
+                <button type="button" onclick="event.stopPropagation(); window.adminPreviewCharacterCardImages(${idx})" style="position:absolute; bottom:6px; right:6px; background:rgba(0,240,255,0.92); color:#000; font-size:10.5px; font-weight:900; padding:4px 9px; border-radius:6px; border:none; cursor:pointer;">👁️ Images</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <label onclick="event.stopPropagation();" style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:${c.active !== false ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
+                  <input type="checkbox" ${c.active !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${idx}].active = this.checked; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" style="width:auto;" />
+                  <span>${c.active !== false ? 'Visible' : 'Hidden'}</span>
+                </label>
+                <span style="font-size:10px; color:var(--cyan-electric); font-weight:800;">${isCardSel ? '✓ EDITING SCOPES' : 'Click to Edit Scopes'}</span>
+                <button type="button" onclick="event.stopPropagation(); window.adminAtelierDeleteServiceCard(${idx})" style="color:var(--crimson); font-size:11px; font-weight:700; background:none; border:none; cursor:pointer;">✕</button>
+              </div>
+              <input type="text" value="${(c.title || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" onchange="window._adminAtelierDraft.serviceCards[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Card Title" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+              <textarea rows="2" onclick="event.stopPropagation();" onchange="window._adminAtelierDraft.serviceCards[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Short description..." style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${c.desc || ''}</textarea>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;" onclick="event.stopPropagation();">
+                <div><label style="font-size:9.5px; color:#94a3b8;">Mode Key</label><input type="text" value="${c.subMode || 'custom'}" onchange="window._adminAtelierDraft.serviceCards[${idx}].subMode = this.value; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--cyan-electric);" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Base Hrs ($${usd})</label><input type="number" step="0.5" value="${c.baseHours || 3}" onchange="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(c.timeline || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
+              </div>
+              <input type="url" value="${(c.img || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" onchange="window._adminAtelierDraft.serviceCards[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" placeholder="Cover Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+            </div>
+          `;
+          }).join('')}
+        </div>
+
+        <!-- Step 3 Drill-Down: Selected Character Sub-Card Scopes & Rules -->
+        ${activeCharCard ? `
+          <div style="margin-top:16px; background:#060911; border:1px solid rgba(0,240,255,0.35); border-radius:12px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <div>
+                <h5 style="font-size:13.5px; font-weight:900; color:var(--cyan-electric); margin:0;">🎯 Sub-Card Scopes &amp; Wizard Rules: "${activeCharCard.title}"</h5>
+                <span style="font-size:10.5px; color:#94a3b8;">Use negative hours (e.g. -1.5) for Existing Redesigns so they cost less than brand-new characters!</span>
+              </div>
+              <button type="button" onclick="window.adminAtelierAddScopeToCard(${selCardIdx})" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--cyan-electric);">+ Add Scope Option</button>
+            </div>
+            <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:12px; padding:8px 10px; background:#04060a; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#fff; cursor:pointer;"><input type="checkbox" ${activeCharCard.showAges !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].showAges = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Show Age / Life Stage Checkboxes</span></label>
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#fff; cursor:pointer;"><input type="checkbox" ${activeCharCard.showTurnaround !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].showTurnaround = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Allow 3-View Turnaround Option</span></label>
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#fff; cursor:pointer;"><input type="checkbox" ${activeCharCard.showLineupCount ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].showLineupCount = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Show Lineup Character Counter</span></label>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+              ${(activeCharCard.scopes || []).map((sc, sIdx) => {
+                const deltaUsd = Math.round((Number(sc.hrs) || 0) * hr);
+                const sign = deltaUsd >= 0 ? '+' : '';
+                return `
+                  <div style="display:grid; grid-template-columns:1fr 120px 28px; gap:8px; align-items:center; background:#04060a; padding:7px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                    <input type="text" value="${(sc.label || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#080c16; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+                    <div style="display:flex; align-items:center; gap:5px;">
+                      <input type="number" step="0.5" value="${sc.hrs}" onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:62px; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+                      <span class="font-mono" style="font-size:10.5px; color:${deltaUsd < 0 ? 'var(--emerald)' : '#94a3b8'};">${sign}$${deltaUsd}</span>
+                    </div>
+                    <button type="button" onclick="window.adminAtelierDeleteScopeFromCard(${selCardIdx}, ${sIdx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        ` : ''}
       </div>
-    </div>
+    ` : `
+      <!-- Non-Character Category Sub-Cards / Stages -->
+      <div style="background:var(--bg-panel); border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:16px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h4 style="font-size:14px; font-weight:800; color:#fff; margin:0;">🧩 Sub-Cards for: <span style="color:var(--gold);">${(PIPELINE_DATA[selPipe]?.topSub || selPipe)}</span></h4>
+            <span style="font-size:11px; color:#94a3b8;">Edit sub-cards, prices, timelines, and images for this category.</span>
+          </div>
+          <button type="button" onclick="window.adminAtelierAddPipelineTile('${selPipe}')" class="btn-gold" style="font-size:11px; padding:7px 14px;">+ Add Sub-Card</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+          ${(PIPELINE_DATA[selPipe]?.tiles || []).map((t, idx) => `
+            <div style="background:#060911; border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+              <div style="position:relative; aspect-ratio:16/8; border-radius:8px; overflow:hidden; background:#020305;">
+                <img src="${t.img || ''}" style="width:100%; height:100%; object-fit:cover;" alt="" />
+                <button type="button" onclick="window.adminOpenImagePreviewModal('${(t.title||'').replace(/'/g,"\\'")}', ['${(t.img||'').replace(/'/g,"\\'")}'])" style="position:absolute; bottom:6px; right:6px; background:rgba(0,240,255,0.92); color:#000; font-size:10.5px; font-weight:900; padding:3px 9px; border-radius:6px; border:none; cursor:pointer;">👁️ Image</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="font-mono" style="font-size:10.5px; color:var(--gold);">${t.badge || 'Stage'}</span>
+                <button type="button" onclick="window.adminAtelierDeletePipelineTile('${selPipe}', ${idx})" style="color:var(--crimson); font-size:11px; background:none; border:none; cursor:pointer; font-weight:700;">✕ Delete</button>
+              </div>
+              <input type="text" value="${(t.title || '').replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+              <textarea rows="2" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${t.desc || ''}</textarea>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <div><label style="font-size:9.5px; color:#94a3b8;">Base Price ($USD)</label><input type="number" value="${t.usdVal || 90}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].usdVal = Number(this.value)||90; PIPELINE_DATA['${selPipe}'].tiles[${idx}].price = String(this.value); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(t.timeline || '').replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
+              </div>
+              <input type="url" value="${(t.img || '').replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" placeholder="Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `}
 
     <!-- Section 2: Framing Views & Design Complexities -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
@@ -4417,7 +4601,7 @@ window.renderAdminAtelierEngine = function() {
           ${cat.framings.map((f, idx) => `
             <div style="display:grid; grid-template-columns:1fr 68px 62px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
               <input type="text" value="${(f.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.framings[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-              <input type="number" step="0.5" title="Hours ($${Math.round((f.hrs||0)*hr)})" value="${f.hrs}" onchange="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+              <input type="number" step="0.5" title="Hours" value="${f.hrs}" onchange="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
               <input type="number" step="1" title="Extra Days" value="${f.days || 0}" onchange="window._adminAtelierDraft.framings[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('framings', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
@@ -4496,8 +4680,13 @@ window.adminAtelierAddServiceCard = function() {
     img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
     timeline: '3 to 6 business days',
     baseHours: 4.0,
+    showAges: true,
+    showTurnaround: true,
+    showLineupCount: false,
+    scopes: [{ id: 'single', label: '👤 Standard Concept', hrs: 0 }],
     active: true
   });
+  window._adminSelectedCharCardIdx = window._adminAtelierDraft.serviceCards.length - 1;
   window.scheduleAdminAtelierAutoSave();
   window.renderAdminAtelierEngine();
 };
@@ -4509,6 +4698,7 @@ window.adminAtelierDeleteServiceCard = function(idx) {
     return;
   }
   window._adminAtelierDraft.serviceCards.splice(idx, 1);
+  window._adminSelectedCharCardIdx = Math.max(0, idx - 1);
   window.scheduleAdminAtelierAutoSave();
   window.renderAdminAtelierEngine();
 };

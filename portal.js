@@ -3303,45 +3303,33 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
   const lineupWrap = document.getElementById('wizLineupCountWrap');
 
   const isChar = !pipeKey || pipeKey === 'sketch1';
-  if (nuancesGrid) nuancesGrid.style.display = (isChar && subMode !== 'lineup') ? 'grid' : 'none';
-  if (lineupWrap) lineupWrap.style.display = (subMode === 'lineup') ? 'block' : 'none';
+  const matchedCard = (isChar && cat && Array.isArray(cat.serviceCards))
+    ? (cat.serviceCards.find(sc => sc.subMode === (subMode || 'custom') || sc.id === subMode) || cat.serviceCards[0])
+    : null;
+
+  const showAges = matchedCard ? (matchedCard.showAges !== false) : (isChar && subMode !== 'lineup');
+  const showLineup = matchedCard ? (!!matchedCard.showLineupCount) : (subMode === 'lineup');
+  const showTurnaround = matchedCard ? (matchedCard.showTurnaround !== false) : true;
+
+  if (nuancesGrid) nuancesGrid.style.display = showAges ? 'grid' : 'none';
+  if (lineupWrap) lineupWrap.style.display = showLineup ? 'block' : 'none';
 
   if (sEl) {
-    if (subMode === 'lineup') {
-      if (sLbl) sLbl.textContent = 'Lineup Mode:';
-      sEl.innerHTML = `
-        <option value="existing_lineup" data-hrs="2.5" selected>📐 Existing Characters Graphic Lineup (Assembly &amp; Height Chart — Lower Cost)</option>
-        <option value="new_party" data-hrs="5">⚔️ Design New Party Characters From Scratch (Per-Character Rate)</option>
-      `;
-    } else if (subMode === 'creator') {
-      if (sLbl) sLbl.textContent = 'Creator / Mascot Format:';
-      sEl.innerHTML = `
-        <option value="yt_avatar" data-hrs="1.5" selected>🎬 Channel Avatar + Transparent PNG</option>
-        <option value="pngtuber" data-hrs="3">🎙️ Reactive PNGTuber Pack (Mouth/Eye Open-Closed + 2 Emotions)</option>
-        <option value="mascot_brand" data-hrs="3.5">🛡️ Full Brand Mascot + Thumbnail Pose Kit</option>
-      `;
-    } else if (subMode === 'photo') {
-      if (sLbl) sLbl.textContent = 'Photo Transformation Scope:';
-      sEl.innerHTML = `
-        <option value="solo_photo" data-hrs="1" selected>🧑 Solo Dark Fantasy / Cyberpunk Transformation</option>
-        <option value="couple_photo" data-hrs="4">👥 Couple / Duo Fantasy Portrait</option>
-        <option value="pet_photo" data-hrs="2.5">🐾 Hero + Real Pet Companion</option>
-      `;
-    } else if (isChar) {
-      sEl.innerHTML = `
-        <option value="single" data-hrs="0" selected>👤 Single Character / Portrait Concept</option>
-        <option value="redesign" data-hrs="1">🔄 Existing Character Redesign &amp; Upgrade</option>
-        <option value="dnd_pack" data-hrs="1.5">🎲 D&amp;D Campaign Pack (+ VTT Token Included)</option>
-      `;
-    } else {
+    if (matchedCard && Array.isArray(matchedCard.scopes) && matchedCard.scopes.length > 0) {
+      if (sLbl) sLbl.textContent = matchedCard.title + ' — Scope:';
+      sEl.innerHTML = matchedCard.scopes.map((sc, i) =>
+        `<option value="${sc.id || ('sc_' + i)}" data-hrs="${Number(sc.hrs) || 0}" ${i === 0 ? 'selected' : ''}>${sc.label}</option>`
+      ).join('');
+    } else if (!isChar) {
       sEl.innerHTML = prof.scopes.map((o, i) => `<option value="opt_${i}" data-hrs="${Math.max(0, Math.round((o.usd || 0) / 15))}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
     }
   }
 
   if (fEl) {
     if (isChar && cat && Array.isArray(cat.framings)) {
-      fEl.innerHTML = cat.framings.filter(f => f.active !== false).map((f, idx) =>
-        `<option value="${f.id}" data-hrs="${f.hrs}" data-days="${f.days || 0}" ${(f.id === 'full' || (idx === 0 && !cat.framings.some(x => x.id === 'full'))) ? 'selected' : ''}>${f.label}</option>`
+      const fList = cat.framings.filter(f => f.active !== false && (showTurnaround || f.id !== 'turnaround'));
+      fEl.innerHTML = fList.map((f, idx) =>
+        `<option value="${f.id}" data-hrs="${f.hrs}" data-days="${f.days || 0}" ${(f.id === 'full' || (idx === 0 && !fList.some(x => x.id === 'full'))) ? 'selected' : ''}>${f.label}</option>`
       ).join('');
     } else if (!isChar) {
       fEl.innerHTML = prof.framings.map((o, i) => `<option value="f_${i}" data-hrs="${3 + Math.round((o.usd || 0) / 15)}" data-days="0" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
