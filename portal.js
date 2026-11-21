@@ -396,19 +396,23 @@ window.selectPipeline = function(key, cardEl, userClicked) {
 };
 
 window.getStudioHourlyRate = function() {
+  if (typeof window.getAtelierCatalog === 'function') return window.getAtelierCatalog().hourlyRate;
   const r = (typeof siteSettings !== 'undefined' && siteSettings && Number(siteSettings.studioHourlyRate)) ? Number(siteSettings.studioHourlyRate) : 15;
   return r > 0 ? r : 15;
 };
 window.getStudioEffortConfig = function() {
-  const cfg = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.studioEffortConfig) ? siteSettings.studioEffortConfig : {};
-  return {
-    portrait: Number(cfg.portrait) || 2.5,
-    half: Number(cfg.half) || 4,
-    full: Number(cfg.full) || 6.5,
-    turnaround: Number(cfg.turnaround) || 11,
-    pet: Number(cfg.pet) || 2,
-    subchar: Number(cfg.subchar) || 4.5
-  };
+  const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+  if (cat) {
+    return {
+      portrait: (cat.framings.find(f => f.id === 'portrait')?.hrs) || 2.5,
+      half: (cat.framings.find(f => f.id === 'half')?.hrs) || 4,
+      full: (cat.framings.find(f => f.id === 'full')?.hrs) || 6.5,
+      turnaround: (cat.framings.find(f => f.id === 'turnaround')?.hrs) || 11,
+      pet: cat.addons.simplePetHrs || 2,
+      subchar: cat.addons.subCharHrs || 4.5
+    };
+  }
+  return { portrait: 2.5, half: 4, full: 6.5, turnaround: 11, pet: 2, subchar: 4.5 };
 };
 window.toggleWizardModuleDrawer = function(drawerId, isOpen, disp = 'grid') {
   const el = document.getElementById(drawerId);
@@ -417,12 +421,15 @@ window.toggleWizardModuleDrawer = function(drawerId, isOpen, disp = 'grid') {
 };
 window.handleWizardPhaseChange = function() {
   const pEl = document.getElementById('orderPhaseSelect');
-  const mult = pEl ? (parseFloat(pEl.options[pEl.selectedIndex]?.getAttribute('data-mult') || '1') || 1) : 1;
-  const isSketch = mult <= 0.6;
+  const selOpt = pEl ? pEl.options[pEl.selectedIndex] : null;
+  const allowColorAttr = selOpt ? selOpt.getAttribute('data-allow-color') : null;
+  const mult = selOpt ? (parseFloat(selOpt.getAttribute('data-mult') || '1') || 1) : 1;
+  const showColor = allowColorAttr !== null ? (allowColorAttr === 'true') : (mult > 0.6);
+  // Extra initial sketch concepts are ALWAYS available regardless of phase!
   const exWrap = document.getElementById('wizExtraSketchesWrap');
   const cvWrap = document.getElementById('wizColorVarWrap');
-  if (exWrap) exWrap.style.display = isSketch ? 'block' : 'none';
-  if (cvWrap) cvWrap.style.display = isSketch ? 'none' : 'grid';
+  if (exWrap) exWrap.style.display = 'block';
+  if (cvWrap) cvWrap.style.display = showColor ? 'grid' : 'none';
   if (typeof window.recalcWizardPrice === 'function') window.recalcWizardPrice();
 };
 
@@ -561,11 +568,25 @@ window.recalcWizardPrice = function() {
     coreHrs = Math.max(2, (scopeBaseHrs + framingHrs + compHrs + ageHrs) * fidelityMult);
   }
 
-  let addonHrs = (extraSketches * 1.0) + (colorVars * 1.25) + bgHrs;
-  let extraDays = (bgHrs >= 3 ? 2 : 0);
+  const catCfg = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+  const exConceptRate = catCfg ? catCfg.extraConceptHrs : 1.0;
+  const colorVarRate = catCfg ? catCfg.addons.colorVarHrs : 1.25;
+  const exprRate = catCfg ? catCfg.addons.expressionHrs : 0.75;
+  const actionRate = catCfg ? catCfg.addons.actionPoseHrs : 1.25;
+  const commMult = catCfg ? catCfg.commercialMult : 1.4;
+  const framingDays = framingOpt ? (parseInt(framingOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
+  const phaseDays = phaseOpt ? (parseInt(phaseOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
+  const phaseRevsAttr = phaseOpt ? parseInt(phaseOpt.getAttribute('data-revs') || '0', 10) : 0;
+  if (phaseRevsAttr > 0) {
+    revRounds = phaseRevsAttr;
+    revLabel = `${revRounds} Round${revRounds > 1 ? 's' : ''} (+1–2d per revision)`;
+  }
+
+  let addonHrs = (extraSketches * exConceptRate) + (colorVars * colorVarRate) + bgHrs;
+  let extraDays = framingDays + phaseDays + (bgHrs >= 3 ? 2 : 0);
   const addonsChosen = [];
 
-  if (extraSketches > 0) addonsChosen.push(`+${extraSketches} Extra Sketch(es)`);
+  if (extraSketches > 0) addonsChosen.push(`+${extraSketches} Extra Initial Concept(s)`);
   if (colorVars > 0) addonsChosen.push(`+${colorVars} Color Variation(s)`);
   if (bgHrs > 0 && bgOpt) addonsChosen.push(`BG: ${bgOpt.text}`);
 
@@ -581,7 +602,7 @@ window.recalcWizardPrice = function() {
   if (document.getElementById('wizWeaponCheck')?.checked) {
     const wType = document.getElementById('wizWeaponType')?.value || 'Weapon';
     const wDepthOpt = document.getElementById('wizWeaponDepth')?.selectedOptions[0];
-    const wHrs = wDepthOpt ? (parseFloat(wDepthOpt.getAttribute('data-hrs') || '1.5') || 1.5) : 1.5;
+    const wHrs = wDepthOpt ? (wDepthOpt.value.includes('Relic') ? (catCfg ? catCfg.addons.relicWeaponHrs : 3) : (catCfg ? catCfg.addons.stdWeaponHrs : 1.5)) : 1.5;
     addonHrs += wHrs;
     addonsChosen.push(`Prop: ${wType} (${wDepthOpt ? wDepthOpt.value : 'Standard'})`);
   }
@@ -589,7 +610,7 @@ window.recalcWizardPrice = function() {
   if (document.getElementById('wizExprCheck')?.checked) {
     const exprs = Array.from(document.querySelectorAll('input[name="wizExprOpt"]:checked')).map(x => x.value);
     if (exprs.length > 0) {
-      addonHrs += exprs.length * 0.75;
+      addonHrs += exprs.length * exprRate;
       addonsChosen.push(`Expressions (${exprs.length}): ${exprs.join(', ')}`);
     }
   }
@@ -597,7 +618,7 @@ window.recalcWizardPrice = function() {
   if (document.getElementById('wizActionCheck')?.checked) {
     const acts = Array.from(document.querySelectorAll('input[name="wizActionOpt"]:checked')).map(x => x.value);
     if (acts.length > 0) {
-      addonHrs += acts.length * 1.25;
+      addonHrs += acts.length * actionRate;
       extraDays += 1;
       addonsChosen.push(`Action Poses (${acts.length}): ${acts.join(', ')}`);
     }
@@ -609,7 +630,7 @@ window.recalcWizardPrice = function() {
   const rawHrs = Math.max(2, coreHrs + addonHrs);
   const totalHours = Math.round(rawHrs * 2) / 2;
   let totalUSD = Math.round(totalHours * hourly);
-  if (isCommPsd) totalUSD = Math.round(totalUSD * 1.4);
+  if (isCommPsd) totalUSD = Math.round(totalUSD * commMult);
 
   const halfUSD = (totalUSD * 0.5).toFixed(2).replace(/\.00$/, '');
   const minD = Math.max(2, Math.ceil(totalHours / 4) + extraDays);
@@ -1381,6 +1402,11 @@ function renderMemberDashboard() {
               <button type="button" onclick="downloadOfficialStudioInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--gold); color:var(--gold);">
                 📄 Invoice
               </button>
+              ${!(o.specs && o.specs.isSupplement) ? `
+                <button type="button" onclick="openOrderSupplementModal(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--cyan-electric); color:var(--cyan-electric);">
+                  + Extra Sketch / Add-on
+                </button>
+              ` : ''}
               ${(!o.paymentVerified && !o.txid) ? `
                 <button type="button" onclick="clientCancelUnpaidOrder(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:rgba(244,63,94,0.45); color:var(--crimson);">
                   🗑️ Cancel Brief
@@ -3260,6 +3286,7 @@ window.WIZARD_CATEGORY_PROFILES = {
 };
 
 window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
+  const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
   const prof = window.WIZARD_CATEGORY_PROFILES[pipeKey] || window.WIZARD_CATEGORY_PROFILES.sketch1;
   const sLbl = document.getElementById('wizScopeLabel');
   const fLbl = document.getElementById('wizFramingLabel');
@@ -3268,7 +3295,10 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
 
   const sEl = document.getElementById('wizCharacterScope');
   const fEl = document.getElementById('wizFraming');
+  const cEl = document.getElementById('wizComplexity');
   const pEl = document.getElementById('orderPhaseSelect');
+  const bgEl = document.getElementById('wizBackgroundType');
+  const commLbl = document.getElementById('wizCommercialLabel');
   const nuancesGrid = document.getElementById('wizCharacterNuancesGrid');
   const lineupWrap = document.getElementById('wizLineupCountWrap');
 
@@ -3309,86 +3339,214 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
   }
 
   if (fEl) {
-    if (isChar) {
-      fEl.innerHTML = `
-        <option value="portrait" data-hrs="2.5">Portrait / Bust</option>
-        <option value="half" data-hrs="4">Half-Body / Waist-Up</option>
-        <option value="full" data-hrs="6.5" selected>Full-Body Character</option>
-        <option value="turnaround" data-hrs="11">Full-Body + 3-View Turnaround</option>
-      `;
-    } else {
-      fEl.innerHTML = prof.framings.map((o, i) => `<option value="f_${i}" data-hrs="${3 + Math.round((o.usd || 0) / 15)}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
+    if (isChar && cat && Array.isArray(cat.framings)) {
+      fEl.innerHTML = cat.framings.filter(f => f.active !== false).map((f, idx) =>
+        `<option value="${f.id}" data-hrs="${f.hrs}" data-days="${f.days || 0}" ${(f.id === 'full' || (idx === 0 && !cat.framings.some(x => x.id === 'full'))) ? 'selected' : ''}>${f.label}</option>`
+      ).join('');
+    } else if (!isChar) {
+      fEl.innerHTML = prof.framings.map((o, i) => `<option value="f_${i}" data-hrs="${3 + Math.round((o.usd || 0) / 15)}" data-days="0" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
     }
   }
 
-  if (pEl) {
-    pEl.innerHTML = `
-      <option value="Phase 1: Sketch & Exploration (2 Concepts)" data-mult="0.55">Phase 1: Sketch &amp; Exploration (2 Concepts)</option>
-      <option value="Phase 2: Clean Lineart & Cel-Shaded" data-mult="0.8">Phase 2: Clean Lineart &amp; Cel-Shaded</option>
-      <option value="Phase 3: Full Master Render (300DPI)" data-mult="1.25" selected>Phase 3: Full Master Render (300DPI)</option>
-    `;
+  if (cEl && cat && Array.isArray(cat.complexities)) {
+    cEl.innerHTML = cat.complexities.filter(c => c.active !== false).map((c, idx) =>
+      `<option value="${c.id}" data-hrs="${c.hrs}" ${(c.id === 'standard' || idx === 1) ? 'selected' : ''}>${c.label}</option>`
+    ).join('');
   }
-  if (typeof window.handleWizardPhaseChange === 'function') window.handleWizardPhaseChange();
 
-  const cEnvLbl = document.getElementById('wizCrossEnv')?.nextElementSibling;
-  const cCharLbl = document.getElementById('wizCrossChar')?.nextElementSibling;
-  if (cEnvLbl) cEnvLbl.textContent = '+ Environment Backdrop';
-  if (cCharLbl) cCharLbl.textContent = '+ Extra Scale / Hero Figure';
+  if (pEl && cat && Array.isArray(cat.phases)) {
+    const activePhases = cat.phases.filter(p => p.active !== false);
+    pEl.innerHTML = activePhases.map((p, idx) =>
+      `<option value="${p.label.replace(/"/g, '&quot;')}" data-phase-id="${p.id}" data-mult="${p.mult}" data-revs="${p.revisions}" data-days="${p.days || 0}" data-allow-color="${p.allowColorVar !== false}" ${idx === activePhases.length - 1 ? 'selected' : ''}>${p.label}</option>`
+    ).join('');
+  }
+
+  if (bgEl && cat && Array.isArray(cat.backgrounds)) {
+    bgEl.innerHTML = cat.backgrounds.filter(b => b.active !== false).map((b, idx) =>
+      `<option value="${b.id}" data-hrs="${b.hrs}" ${idx === 0 ? 'selected' : ''}>${b.label}</option>`
+    ).join('');
+  }
+
+  if (commLbl && cat) {
+    const pct = Math.round(((Number(cat.commercialMult) || 1.4) - 1) * 100);
+    commLbl.textContent = `💎 Commercial Rights & Master Layered PSD (+${pct}%)`;
+  }
+
+  if (typeof window.handleWizardPhaseChange === 'function') window.handleWizardPhaseChange();
 };
 
 // ==============================================================================
-// DYNAMIC WIZARD IMAGE MATCHER (Reads Sheet Pipeline, Subcategory, Stage & Complexity)
+// DYNAMIC WIZARD MULTI-SAMPLE & VARIATION MATCHER (Synced to Gallery Tags)
 // ==============================================================================
 window.updateWizardDynamicPreview = function(pipeKey, framingTxt, fidelityTxt, scopeTxt, compTxt) {
   const imgEl = document.getElementById('modalMediaImg');
+  const stripWrap = document.getElementById('wizSampleStripWrap');
+  const stripEl = document.getElementById('wizSampleStrip');
+  const stripLbl = document.getElementById('wizSampleStripLabel');
   if (!imgEl || !pipeKey || typeof window.getArtworksForPipeline !== 'function') return;
   const candidates = window.getArtworksForPipeline(pipeKey, false);
-  if (!candidates || candidates.length === 0) return;
+  if (!candidates || candidates.length === 0) {
+    if (stripWrap) stripWrap.style.display = 'none';
+    return;
+  }
+
+  const phaseEl = document.getElementById('orderPhaseSelect');
+  const phaseId = phaseEl?.options[phaseEl.selectedIndex]?.getAttribute('data-phase-id') || '';
+  const colorVars = parseInt(document.getElementById('wizColorVariations')?.value || '0', 10) || 0;
+  const hasExpr = !!document.getElementById('wizExprCheck')?.checked;
+  const hasAction = !!document.getElementById('wizActionCheck')?.checked;
+  const hasComp = !!document.getElementById('wizCompCheck')?.checked;
+  const hasWeapon = !!document.getElementById('wizWeaponCheck')?.checked;
 
   const normalizeWords = (str) => String(str || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(' ').filter(w => w.length >= 3);
-  const queryWords = new Set([
-    ...normalizeWords(framingTxt),
-    ...normalizeWords(fidelityTxt),
-    ...normalizeWords(scopeTxt),
-    ...normalizeWords(compTxt)
-  ]);
+  const queryWords = new Set([...normalizeWords(framingTxt), ...normalizeWords(fidelityTxt), ...normalizeWords(scopeTxt), ...normalizeWords(compTxt)]);
 
-  let bestItem = null;
-  let bestScore = 0;
-
+  const scored = [];
   candidates.forEach(item => {
-    const subStr = (item.subcategory || '').toLowerCase();
-    const stgStr = (item.stage || '').toLowerCase();
-    const cmpStr = (item.complexity || '').toLowerCase();
-    const txtStr = ((item.title || '') + ' ' + (item.desc || '')).toLowerCase();
+    const sheets = (Array.isArray(item.phases) && item.phases.length > 0) ? item.phases : [{
+      image: item.image,
+      subcategory: item.subcategory || '',
+      stage: item.stage || 'render',
+      complexity: item.complexity || 'standard',
+      atelierTags: item.atelierTags || [],
+      title: item.title || ''
+    }];
 
-    let score = 0;
-    queryWords.forEach(w => {
-      if (subStr.includes(w)) score += 4;
-      if (stgStr.includes(w)) score += 4;
-      if (cmpStr.includes(w)) score += 2;
-      if (txtStr.includes(w)) score += 1;
+    sheets.forEach(sh => {
+      const shImg = sh.image || sh.img || item.image;
+      if (!shImg) return;
+      const subStr = (sh.subcategory || item.subcategory || '').toLowerCase();
+      const stgStr = (sh.stage || item.stage || '').toLowerCase();
+      const cmpStr = (sh.complexity || item.complexity || '').toLowerCase();
+      const tagsStr = Array.isArray(sh.atelierTags) ? sh.atelierTags.join(' ').toLowerCase() : '';
+      const txtStr = ((item.title || '') + ' ' + (sh.title || '') + ' ' + (item.desc || '')).toLowerCase();
+
+      let score = 0;
+      queryWords.forEach(w => {
+        if (subStr.includes(w)) score += 4;
+        if (stgStr.includes(w)) score += 4;
+        if (cmpStr.includes(w)) score += 2;
+        if (txtStr.includes(w)) score += 1;
+      });
+      if (phaseId && (stgStr === phaseId || (phaseId === 'cel' && stgStr === 'lineart_value'))) score += 8;
+      if (colorVars > 0 && tagsStr.includes('color variation')) score += 10;
+      if (hasExpr && tagsStr.includes('expression')) score += 9;
+      if (hasAction && tagsStr.includes('action')) score += 9;
+      if (hasComp && tagsStr.includes('companion')) score += 7;
+      if (hasWeapon && tagsStr.includes('weapon')) score += 7;
+
+      scored.push({ img: shImg, title: sh.title || item.title || 'Studio Sample', tags: sh.atelierTags || [], score });
     });
-
-    const qAll = ((framingTxt || '') + ' ' + (fidelityTxt || '') + ' ' + (scopeTxt || '')).toLowerCase();
-    if ((qAll.includes('half') || qAll.includes('waist')) && (subStr.includes('half') || subStr.includes('waist') || txtStr.includes('half'))) score += 5;
-    if (qAll.includes('portrait') && (subStr.includes('portrait') || subStr.includes('bust') || txtStr.includes('portrait'))) score += 5;
-    if (qAll.includes('full') && (subStr.includes('full') || txtStr.includes('full'))) score += 5;
-    if (qAll.includes('sketch') && (stgStr.includes('sketch') || stgStr.includes('rough') || txtStr.includes('sketch'))) score += 5;
-    if (qAll.includes('line') && (stgStr.includes('line') || txtStr.includes('line'))) score += 5;
-    if ((qAll.includes('render') || qAll.includes('300dpi')) && (stgStr.includes('render') || stgStr.includes('master'))) score += 4;
-
-    if (score > bestScore) {
-      bestScore = score;
-      bestItem = item;
-    }
   });
 
-  if (bestItem && bestItem.image && imgEl.src !== bestItem.image) {
-    imgEl.style.opacity = '0.35';
-    setTimeout(() => {
-      imgEl.src = bestItem.image;
-      imgEl.style.opacity = '1';
-    }, 120);
+  scored.sort((a, b) => b.score - a.score);
+  const uniqueSamples = [];
+  const seenUrls = new Set();
+  for (const s of scored) {
+    if (!seenUrls.has(s.img)) {
+      seenUrls.add(s.img);
+      uniqueSamples.push(s);
+    }
+    if (uniqueSamples.length >= 6) break;
   }
+
+  if (uniqueSamples.length > 0 && uniqueSamples[0].score > 0) {
+    const topImg = uniqueSamples[0].img;
+    if (imgEl.src !== topImg) {
+      imgEl.style.opacity = '0.35';
+      setTimeout(() => { imgEl.src = topImg; imgEl.style.opacity = '1'; }, 120);
+    }
+  }
+
+  if (stripWrap && stripEl) {
+    if (uniqueSamples.length > 1) {
+      stripWrap.style.display = 'block';
+      if (stripLbl) stripLbl.textContent = colorVars > 0 ? `MATCHING VARIATION SAMPLES (${uniqueSamples.length})` : `MATCHING STUDIO SAMPLES (${uniqueSamples.length})`;
+      stripEl.innerHTML = uniqueSamples.map((s, i) => `
+        <img src="${s.img}" title="${s.title.replace(/"/g, '&quot;')}" onclick="document.getElementById('modalMediaImg').src='${s.img.replace(/'/g, "\'")}';" style="width:58px; height:40px; object-fit:cover; border-radius:6px; cursor:pointer; border:1px solid ${i === 0 ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.18)'}; flex-shrink:0;" />
+      `).join('');
+    } else {
+      stripWrap.style.display = 'none';
+    }
+  }
+};
+
+// ==============================================================================
+// CLIENT PORTAL MID-PROJECT SUPPLEMENT / ADD-ON REQUEST
+// ==============================================================================
+window.openOrderSupplementModal = async function(parentOrderId) {
+  const parent = ordersList.find(o => String(o.id) === String(parentOrderId));
+  if (!parent) return;
+  const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+  const hr = cat ? cat.hourlyRate : 15;
+  const exPrice = Math.round((cat ? cat.extraConceptHrs : 1.0) * hr);
+  const revPrice = Math.round((cat ? cat.extraRevisionHrs : 1.5) * hr);
+  const cvPrice = Math.round((cat ? cat.addons.colorVarHrs : 1.25) * hr);
+  const wpnPrice = Math.round((cat ? cat.addons.stdWeaponHrs : 1.5) * hr);
+  const petPrice = Math.round((cat ? cat.addons.simplePetHrs : 2.0) * hr);
+
+  const choice = prompt(
+    `Request Mid-Project Add-on for CID #${parent.id} (${parent.pkg}):\n` +
+    `1 = +1 Extra Initial Sketch Concept ($${exPrice})\n` +
+    `2 = +1 Extra Revision Round ($${revPrice})\n` +
+    `3 = +1 Color Variation Palette ($${cvPrice})\n` +
+    `4 = +1 Hero Weapon / Prop ($${wpnPrice})\n` +
+    `5 = +1 Companion / Pet ($${petPrice})\n\n` +
+    `Enter 1, 2, 3, 4, or 5:`
+  );
+  if (!choice) return;
+  const map = {
+    '1': { label: '+1 Extra Sketch Concept', usd: exPrice },
+    '2': { label: '+1 Extra Revision Round', usd: revPrice },
+    '3': { label: '+1 Color Variation Palette', usd: cvPrice },
+    '4': { label: '+1 Hero Weapon / Prop', usd: wpnPrice },
+    '5': { label: '+1 Companion / Pet', usd: petPrice }
+  };
+  const picked = map[String(choice).trim()];
+  if (!picked) { showToast('Invalid option selected.', 'error'); return; }
+
+  const supId = Date.now();
+  const supOrder = {
+    id: supId,
+    client: parent.client,
+    clientEmail: parent.clientEmail || (currentMember ? currentMember.email : ''),
+    contact: parent.contact,
+    pkg: `[Supplement for #${parent.id}] ${picked.label}`,
+    phase: parent.phase || 'Supplement Add-on',
+    price: '$' + picked.usd,
+    timeline: '1 to 2 business days',
+    status: 'Brief Received',
+    brief: `Mid-project supplement request linked to parent commission #${parent.id}: ${picked.label}.`,
+    specs: {
+      isSupplement: true,
+      parentOrderId: parent.id,
+      totalUsd: picked.usd,
+      retainerUsd: picked.usd,
+      balanceUsd: 0,
+      createdAt: new Date().toISOString(),
+      addons: [picked.label]
+    }
+  };
+  ordersList.unshift(supOrder);
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+
+  if (window.supabaseClient) {
+    try {
+      await window.supabaseClient.from('orders').insert([{
+        id: supId,
+        client_name: supOrder.client,
+        client_email: supOrder.clientEmail,
+        contact: supOrder.contact,
+        pkg: supOrder.pkg,
+        phase: supOrder.phase,
+        price: supOrder.price,
+        timeline: supOrder.timeline,
+        status: supOrder.status,
+        brief: supOrder.brief,
+        specs: supOrder.specs
+      }]);
+    } catch(e) {}
+  }
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  showToast(`Supplement Invoice #${supId} (${picked.label} — $${picked.usd}) created!`, 'success', 4500);
 };

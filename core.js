@@ -1037,6 +1037,7 @@ window.syncStudioSettingsFromCloud = async function() {
       if (data.value.brandGenre) safeSetStorage('tajinkart_brand_genre', data.value.brandGenre);
       if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
       if (typeof window.updateStudioLiveStatus === 'function') window.updateStudioLiveStatus();
+      if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
       console.log('[Cloud Settings] Restored studio settings from Supabase.');
     }
     // Restore dynamic PIPELINE_DATA edits from Supabase Cloud
@@ -1081,10 +1082,12 @@ window.syncStudioSettingsFromCloud = async function() {
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    if (window.applyAtelierCatalogToSite) window.applyAtelierCatalogToSite();
     setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
   });
 } else {
-  setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
+  if (window.applyAtelierCatalogToSite) window.applyAtelierCatalogToSite();
+    setTimeout(() => { if (window.syncStudioSettingsFromCloud) window.syncStudioSettingsFromCloud(); }, 600);
 }
 
 // همگام‌سازی محصولات فروشگاه از جدول ابری products در سوپابیس
@@ -1128,3 +1131,163 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(() => { if (window.syncProductsFromSupabase) window.syncProductsFromSupabase(); }, 700);
 }
+
+
+// ==============================================================================
+// UNIFIED ATELIER & CHARACTER CATALOG ENGINE (Single Source of Truth -> Supabase)
+// ==============================================================================
+window.DEFAULT_ATELIER_CATALOG = {
+  characterOnlyMode: true,
+  hourlyRate: 15,
+  extraConceptHrs: 1.0,
+  extraRevisionHrs: 1.5,
+  commercialMult: 1.4,
+  serviceCards: [
+    {
+      id: 'custom',
+      subMode: 'custom',
+      title: 'Custom Characters & Portraits',
+      desc: 'Original heroes, D&D characters, portraits, half-body or full-body concepts with age tiers & optional companions.',
+      img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+      timeline: '3 to 7 business days',
+      baseHours: 3.5,
+      active: true
+    },
+    {
+      id: 'lineup',
+      subMode: 'lineup',
+      title: 'Character Lineup & Party Sheet',
+      desc: 'Design a full party from scratch OR assemble your existing characters into a clean height & graphic lineup at a lower rate.',
+      img: 'https://images.unsplash.com/photo-1560972550-aba3456b5564?auto=format&fit=crop&w=800&q=80',
+      timeline: '2 to 8 business days',
+      baseHours: 2.5,
+      active: true
+    },
+    {
+      id: 'creator',
+      subMode: 'creator',
+      title: 'YouTuber, PNGTuber & Mascot',
+      desc: 'Channel avatars, brand mascots & reactive PNGTuber expression packs with transparent PNGs for thumbnails and streams.',
+      img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80',
+      timeline: '3 to 5 business days',
+      baseHours: 4.5,
+      active: true
+    },
+    {
+      id: 'photo',
+      subMode: 'photo',
+      title: 'Transform Yourself (From Photo)',
+      desc: 'Turn your real photo (solo, couple, or friends) into a custom Dark Fantasy or Cyberpunk character portrait.',
+      img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
+      timeline: '3 to 5 business days',
+      baseHours: 3.5,
+      active: true
+    }
+  ],
+  framings: [
+    { id: 'portrait', label: 'Portrait / Bust', hrs: 2.5, days: 0, active: true },
+    { id: 'half', label: 'Half-Body / Waist-Up', hrs: 4.0, days: 0, active: true },
+    { id: 'full', label: 'Full-Body Character', hrs: 6.5, days: 1, active: true },
+    { id: 'turnaround', label: 'Full-Body + 3-View Turnaround', hrs: 11.0, days: 2, active: true }
+  ],
+  complexities: [
+    { id: 'minimal', label: 'Minimal (Clean / Light Gear)', hrs: 0, active: true },
+    { id: 'standard', label: 'Production Standard (Armor & Props)', hrs: 1.5, active: true },
+    { id: 'high', label: 'High Detail (Ornate / Biomechanical)', hrs: 3.5, active: true }
+  ],
+  phases: [
+    { id: 'sketch', label: 'Phase 1: Sketch & Exploration (2 Base Concepts)', mult: 0.55, revisions: 1, days: 0, allowColorVar: false, allowBg: false, active: true },
+    { id: 'cel', label: 'Phase 2: Clean Lineart & Cel-Shaded', mult: 0.8, revisions: 2, days: 1, allowColorVar: true, allowBg: true, active: true },
+    { id: 'render', label: 'Phase 3: Full Master Render (300DPI)', mult: 1.25, revisions: 2, days: 2, allowColorVar: true, allowBg: true, active: true }
+  ],
+  backgrounds: [
+    { id: 'none', label: 'Transparent / Solid Grey (Free)', hrs: 0, days: 0, active: true },
+    { id: 'gradient', label: 'Atmospheric / Gradient Backdrop', hrs: 1.5, days: 0, active: true },
+    { id: 'scene', label: 'Detailed Environment Scene', hrs: 4.0, days: 2, active: true }
+  ],
+  addons: {
+    simplePetHrs: 2.0,
+    subCharHrs: 4.5,
+    stdWeaponHrs: 1.5,
+    relicWeaponHrs: 3.0,
+    colorVarHrs: 1.25,
+    expressionHrs: 0.75,
+    actionPoseHrs: 1.25
+  },
+  galleryTags: [
+    'Color Variation',
+    'Expression Sheet',
+    'Action Sketch',
+    'Companion / Pet',
+    'Weapon / Prop',
+    'Turnaround'
+  ]
+};
+
+window.getAtelierCatalog = function() {
+  const def = JSON.parse(JSON.stringify(window.DEFAULT_ATELIER_CATALOG));
+  const saved = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.atelierCatalog) ? siteSettings.atelierCatalog : {};
+  const cat = {
+    characterOnlyMode: saved.characterOnlyMode !== undefined ? !!saved.characterOnlyMode : def.characterOnlyMode,
+    hourlyRate: Number(saved.hourlyRate) > 0 ? Number(saved.hourlyRate) : (Number(siteSettings?.studioHourlyRate) || def.hourlyRate),
+    extraConceptHrs: Number(saved.extraConceptHrs) >= 0 && saved.extraConceptHrs !== undefined ? Number(saved.extraConceptHrs) : def.extraConceptHrs,
+    extraRevisionHrs: Number(saved.extraRevisionHrs) >= 0 && saved.extraRevisionHrs !== undefined ? Number(saved.extraRevisionHrs) : def.extraRevisionHrs,
+    commercialMult: Number(saved.commercialMult) >= 1 ? Number(saved.commercialMult) : def.commercialMult,
+    serviceCards: (Array.isArray(saved.serviceCards) && saved.serviceCards.length > 0) ? saved.serviceCards : def.serviceCards,
+    framings: (Array.isArray(saved.framings) && saved.framings.length > 0) ? saved.framings : def.framings,
+    complexities: (Array.isArray(saved.complexities) && saved.complexities.length > 0) ? saved.complexities : def.complexities,
+    phases: (Array.isArray(saved.phases) && saved.phases.length > 0) ? saved.phases : def.phases,
+    backgrounds: (Array.isArray(saved.backgrounds) && saved.backgrounds.length > 0) ? saved.backgrounds : def.backgrounds,
+    addons: Object.assign({}, def.addons, saved.addons || {}),
+    galleryTags: (Array.isArray(saved.galleryTags) && saved.galleryTags.length > 0) ? saved.galleryTags : def.galleryTags
+  };
+  return cat;
+};
+
+window.saveAtelierCatalog = async function(newCat) {
+  if (typeof siteSettings === 'undefined') window.siteSettings = {};
+  siteSettings.atelierCatalog = newCat;
+  siteSettings.studioHourlyRate = Number(newCat.hourlyRate) || 15;
+  if (typeof KEYS !== 'undefined' && KEYS.SETTINGS) {
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  }
+  if (window.supabaseClient) {
+    try {
+      await window.supabaseClient.from('studio_settings').upsert([{
+        key: 'site_settings',
+        value: siteSettings,
+        updated_at: new Date().toISOString()
+      }], { onConflict: 'key' });
+    } catch(e) {
+      console.warn('[Atelier Catalog Cloud Save Warning]', e);
+    }
+  }
+  if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
+};
+
+window.applyAtelierCatalogToSite = function() {
+  const cat = window.getAtelierCatalog();
+  // 1. Update Character Shop Cards
+  window.CHARACTER_SHOP_CARDS = cat.serviceCards.filter(c => c.active !== false);
+  // 2. Toggle Character-only vs Multi-pipeline Sidebar
+  const sideTabs = document.getElementById('atelierServiceCards');
+  if (sideTabs) {
+    sideTabs.querySelectorAll('.service-nav-card').forEach(card => {
+      const pKey = card.getAttribute('data-pipeline');
+      if (cat.characterOnlyMode) {
+        card.style.display = (pKey === 'sketch1') ? '' : 'none';
+      } else {
+        card.style.display = '';
+      }
+    });
+  }
+  // 3. Re-render active Atelier workbench
+  if (typeof selectPipeline === 'function') {
+    const targetPipe = cat.characterOnlyMode ? 'sketch1' : (typeof currentSelectedPipeKey !== 'undefined' ? currentSelectedPipeKey : 'sketch1');
+    selectPipeline(targetPipe, null, false);
+  }
+  // 4. Refresh Admin Tab 2 / Tab 1 if open
+  if (typeof window.renderAdminAtelierEngine === 'function' && document.getElementById('adminTabPipelines') && !document.getElementById('adminTabPipelines').classList.contains('hidden')) {
+    window.renderAdminAtelierEngine();
+  }
+};

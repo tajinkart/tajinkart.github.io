@@ -848,28 +848,71 @@ function renderStagingPhasesHtml() {
           </div>
 
           <div>
-            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">📐 Specialized Subcategory:</label>
+            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">📐 Framing / Subcategory (Synced):</label>
             <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:8px; color:#fff;">
-              ${subcats.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('')}
+              ${(() => {
+                const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+                const framings = (cat && Array.isArray(cat.framings)) ? cat.framings.map(f => f.label) : [];
+                const merged = Array.from(new Set([...framings, ...subcats, ...(currentSub ? [currentSub] : [])]));
+                return merged.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('');
+              })()}
             </select>
           </div>
 
           <div>
-            <label style="font-size:10.5px; color:#f43f5e; font-weight:800; display:block; margin-bottom:2px;">🎨 مرحله پرداخت (Rendering Stage):</label>
+            <label style="font-size:10.5px; color:#f43f5e; font-weight:800; display:block; margin-bottom:2px;">🎨 Rendering Phase (Synced):</label>
             <select onchange="stagingProjectPhases[${idx}].stage = this.value" style="font-size:11px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid rgba(244,63,94,0.35); border-radius:8px; color:#fff;">
-              <option value="sketch" ${p.stage === 'sketch' ? 'selected' : ''}>✏️ اسکچ و اتود اولیه (Sketch)</option>
-              <option value="lineart_value" ${p.stage === 'lineart_value' ? 'selected' : ''}>✒️ لاین‌آرت و سایه‌زنی ولیو (Line-art & Values)</option>
-              <option value="render" ${(p.stage === 'render' || (!p.stage && isCover)) ? 'selected' : ''}>👑 رندر نهایی و کامل (Master Render)</option>
+              ${(() => {
+                const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+                const phases = (cat && Array.isArray(cat.phases)) ? cat.phases : [
+                  { id: 'sketch', label: 'Phase 1: Sketch & Exploration' },
+                  { id: 'cel', label: 'Phase 2: Clean Lineart & Cel-Shaded' },
+                  { id: 'render', label: 'Phase 3: Full Master Render (300DPI)' }
+                ];
+                const curStage = p.stage || (isCover ? 'render' : 'sketch');
+                return phases.map(ph => {
+                  const isSel = (curStage === ph.id) || (curStage === 'lineart_value' && ph.id === 'cel');
+                  return `<option value="${ph.id}" ${isSel ? 'selected' : ''}>${ph.label}</option>`;
+                }).join('');
+              })()}
             </select>
           </div>
 
           <div>
-            <label style="font-size:10.5px; color:#a855f7; font-weight:800; display:block; margin-bottom:2px;">⚡ درجه پیچیدگی (Complexity):</label>
+            <label style="font-size:10.5px; color:#a855f7; font-weight:800; display:block; margin-bottom:2px;">⚡ Design Complexity (Synced):</label>
             <select onchange="stagingProjectPhases[${idx}].complexity = this.value" style="font-size:11px; font-weight:700; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid rgba(168,85,247,0.35); border-radius:8px; color:#fff;">
-              <option value="minimal" ${p.complexity === 'minimal' ? 'selected' : ''}>🟢 ساده / مینیمال (Minimal / Clean)</option>
-              <option value="moderate" ${(p.complexity === 'moderate' || !p.complexity) ? 'selected' : ''}>🟡 متوسط / استاندارد (Moderate / Detailed)</option>
-              <option value="complex" ${p.complexity === 'complex' ? 'selected' : ''}>🔴 پیچیده / جزئیات سنگین (Complex / High-Fidelity)</option>
+              ${(() => {
+                const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+                const comps = (cat && Array.isArray(cat.complexities)) ? cat.complexities : [
+                  { id: 'minimal', label: 'Minimal (Clean / Light Gear)' },
+                  { id: 'standard', label: 'Production Standard (Armor & Props)' },
+                  { id: 'high', label: 'High Detail (Ornate / Biomechanical)' }
+                ];
+                const curComp = p.complexity || 'standard';
+                return comps.map(cm => {
+                  const isSel = (curComp === cm.id) || (curComp === 'moderate' && cm.id === 'standard') || (curComp === 'complex' && cm.id === 'high');
+                  return `<option value="${cm.id}" ${isSel ? 'selected' : ''}>${cm.label}</option>`;
+                }).join('');
+              })()}
             </select>
+          </div>
+        </div>
+
+        <div style="background:#070a12; border:1px solid rgba(0,240,255,0.2); border-radius:8px; padding:7px 10px;">
+          <span style="font-size:10px; color:var(--cyan-electric); font-weight:800; display:block; margin-bottom:5px;">🏷️ Atelier Sample &amp; Variation Tags (Shown to Client in Wizard):</span>
+          <div style="display:flex; flex-wrap:wrap; gap:5px;">
+            ${(() => {
+              const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+              const tags = (cat && Array.isArray(cat.galleryTags)) ? cat.galleryTags : ['Color Variation', 'Expression Sheet', 'Action Sketch', 'Companion / Pet', 'Weapon / Prop'];
+              const sheetTags = Array.isArray(p.atelierTags) ? p.atelierTags : [];
+              return tags.map(tg => {
+                const chk = sheetTags.includes(tg);
+                return `<label style="display:inline-flex; align-items:center; gap:4px; font-size:10px; background:${chk ? 'rgba(0,240,255,0.14)' : '#0b101b'}; border:1px solid ${chk ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.12)'}; padding:3px 8px; border-radius:999px; cursor:pointer; color:${chk ? '#fff' : '#94a3b8'};">
+                  <input type="checkbox" ${chk ? 'checked' : ''} onchange="if(!Array.isArray(stagingProjectPhases[${idx}].atelierTags)) stagingProjectPhases[${idx}].atelierTags=[]; if(this.checked){ if(!stagingProjectPhases[${idx}].atelierTags.includes('${tg}')) stagingProjectPhases[${idx}].atelierTags.push('${tg}'); } else { stagingProjectPhases[${idx}].atelierTags = stagingProjectPhases[${idx}].atelierTags.filter(x=>x!=='${tg}'); }" style="width:auto;" />
+                  <span>${tg}</span>
+                </label>`;
+              }).join('');
+            })()}
           </div>
         </div>
 
@@ -1471,7 +1514,7 @@ window.switchAdminTab = function(tabKey, btn) {
   });
 
   if (tabKey === 'artworks') { renderAdminSketch2(); if (typeof renderAdminGalleryCategories === 'function') renderAdminGalleryCategories(); if (typeof renderAdminStudioGenres === 'function') renderAdminStudioGenres(); }
-  if (tabKey === 'pipelines') renderAdminSketch1();
+  if (tabKey === 'pipelines') { if (typeof window.renderAdminAtelierEngine === 'function') window.renderAdminAtelierEngine(); else renderAdminSketch1(); }
   if (tabKey === 'products') renderAdminProductsTab();
   if (tabKey === 'members') { renderAdminSketch3(); if (typeof window.renderAdminLists === 'function') window.renderAdminLists(); }
   if (tabKey === 'orders') { tabKey = 'members'; switchAdminTab('members'); return; }
@@ -4151,4 +4194,231 @@ window.saveStudioHourlyRateDirect = async function() {
   }
   window.renderAdminHourlyBenchmarks();
   showToast(`Studio hourly rate calibrated to $${rate}/hr & synced to cloud! ✓`, 'success', 4000);
+};
+
+
+// ==============================================================================
+// REBUILT ADMIN TAB 2: CHARACTER ATELIER & PRICING ENGINE (Supabase Synced)
+// ==============================================================================
+window._adminAtelierDraft = null;
+
+window.renderAdminAtelierEngine = function() {
+  const root = document.getElementById('adminAtelierEngineRoot');
+  if (!root || typeof window.getAtelierCatalog !== 'function') return;
+  if (!window._adminAtelierDraft) {
+    window._adminAtelierDraft = JSON.parse(JSON.stringify(window.getAtelierCatalog()));
+  }
+  const cat = window._adminAtelierDraft;
+  const hr = Number(cat.hourlyRate) || 15;
+
+  root.innerHTML = `
+    <!-- Top Sticky Command Bar -->
+    <div style="background:#06080d; border:1px solid rgba(250,204,21,0.38); border-radius:14px; padding:16px 20px; display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h4 style="font-size:15px; font-weight:900; color:var(--gold); margin:0 0 4px;">🎨 Character Atelier &amp; Pricing Engine (Supabase Synced)</h4>
+          <p style="font-size:11.5px; color:#94a3b8; margin:0;">Every service card, framing, phase, complexity, and add-on edited here syncs directly to Supabase, the 4-Step Wizard, and Gallery Upload tags.</p>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" onclick="window.adminAtelierResetDefault()" class="btn-secondary" style="font-size:11px; padding:8px 12px; color:#cbd5e1;">↺ Reset Defaults</button>
+          <button type="button" onclick="window.adminAtelierSaveAll()" class="btn-gold" style="padding:10px 18px; font-size:12.5px; font-weight:900;">✓ Save &amp; Sync to Supabase</button>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
+        <label style="display:flex; align-items:center; gap:8px; background:#090d16; border:1px solid ${cat.characterOnlyMode ? 'rgba(16,185,129,0.45)' : 'rgba(255,255,255,0.12)'}; padding:9px 12px; border-radius:10px; cursor:pointer; font-size:11.5px; font-weight:800; color:${cat.characterOnlyMode ? 'var(--emerald)' : '#cbd5e1'};">
+          <input type="checkbox" ${cat.characterOnlyMode ? 'checked' : ''} onchange="window._adminAtelierDraft.characterOnlyMode = this.checked; window.renderAdminAtelierEngine();" style="width:16px; height:16px; accent-color:var(--emerald);" />
+          <span>🎯 Character-Only Focus Mode</span>
+        </label>
+        <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
+          <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:3px;">Hourly Rate ($/hr)</label>
+          <input type="number" min="5" max="250" step="1" value="${hr}" onchange="window._adminAtelierDraft.hourlyRate = Number(this.value)||15; window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff; font-weight:800;" />
+        </div>
+        <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
+          <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:3px;">Extra Concept Sketch (hrs → $${Math.round(cat.extraConceptHrs * hr)})</label>
+          <input type="number" min="0" step="0.25" value="${cat.extraConceptHrs}" onchange="window._adminAtelierDraft.extraConceptHrs = Number(this.value)||0; window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:6px; color:#fff;" />
+        </div>
+        <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
+          <label style="font-size:10.5px; color:var(--emerald); font-weight:700; display:block; margin-bottom:3px;">Extra Revision Round (hrs → $${Math.round(cat.extraRevisionHrs * hr)})</label>
+          <input type="number" min="0" step="0.25" value="${cat.extraRevisionHrs}" onchange="window._adminAtelierDraft.extraRevisionHrs = Number(this.value)||0; window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#fff;" />
+        </div>
+        <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
+          <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:3px;">Commercial + PSD Multiplier (e.g. 1.4 = +40%)</label>
+          <input type="number" min="1" max="3" step="0.05" value="${cat.commercialMult}" onchange="window._adminAtelierDraft.commercialMult = Number(this.value)||1.4;" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Character Atelier Service Cards -->
+    <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h4 style="font-size:14px; font-weight:800; color:#fff; margin:0;">🃏 Atelier Service Cards (Public Shop Cards)</h4>
+          <span style="font-size:11px; color:#94a3b8;">Add, edit, hide, or delete the Character service cards shown to clients.</span>
+        </div>
+        <button type="button" onclick="window.adminAtelierAddServiceCard()" class="btn-gold" style="font-size:11px; padding:7px 14px;">+ Add Service Card</button>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
+        ${cat.serviceCards.map((c, idx) => `
+          <div style="background:#060911; border:1px solid ${c.active !== false ? 'rgba(250,204,21,0.28)' : 'rgba(255,255,255,0.08)'}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; opacity:${c.active !== false ? '1' : '0.6'};">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:${c.active !== false ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
+                <input type="checkbox" ${c.active !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${idx}].active = this.checked; window.renderAdminAtelierEngine();" style="width:auto;" />
+                <span>${c.active !== false ? 'Visible in Shop' : 'Hidden'}</span>
+              </label>
+              <button type="button" onclick="window.adminAtelierDeleteServiceCard(${idx})" style="color:var(--crimson); font-size:11px; font-weight:700; background:none; border:none; cursor:pointer;">✕ Delete</button>
+            </div>
+            <input type="text" value="${(c.title || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].title = this.value" placeholder="Card Title" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+            <textarea rows="2" onchange="window._adminAtelierDraft.serviceCards[${idx}].desc = this.value" placeholder="Short description..." style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${c.desc || ''}</textarea>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+              <div><label style="font-size:9.5px; color:#94a3b8;">Mode Key</label><input type="text" value="${c.subMode || 'custom'}" onchange="window._adminAtelierDraft.serviceCards[${idx}].subMode = this.value" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--cyan-electric);" /></div>
+              <div><label style="font-size:9.5px; color:#94a3b8;">Base Hrs ($${Math.round((Number(c.baseHours)||3)*hr)})</label><input type="number" step="0.5" value="${c.baseHours || 3}" onchange="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
+              <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(c.timeline || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].timeline = this.value" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
+            </div>
+            <input type="url" value="${(c.img || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].img = this.value" placeholder="Cover Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Section 2: Framing Views & Design Complexities -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+      <!-- Framing Views -->
+      <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">📐 Framing Views (Synced to Gallery)</h4>
+          <button type="button" onclick="window.adminAtelierAddItem('framings')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--cyan-electric);">+ Add Framing</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${cat.framings.map((f, idx) => `
+            <div style="display:grid; grid-template-columns:1fr 68px 62px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+              <input type="text" value="${(f.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.framings[${idx}].label = this.value" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+              <input type="number" step="0.5" title="Hours" value="${f.hrs}" onchange="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+              <input type="number" step="1" title="Extra Days" value="${f.days || 0}" onchange="window._adminAtelierDraft.framings[${idx}].days = Number(this.value)||0" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+              <button type="button" onclick="window.adminAtelierDeleteItem('framings', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+            </div>
+          `).join('')}
+          <div style="font-size:10px; color:#64748b;">Columns: Label • Base Hours • Extra Days</div>
+        </div>
+      </div>
+
+      <!-- Design Complexities -->
+      <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:#a855f7; margin:0;">⚡ Design Complexities (Synced to Gallery)</h4>
+          <button type="button" onclick="window.adminAtelierAddItem('complexities')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:#a855f7;">+ Add Tier</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${cat.complexities.map((cm, idx) => `
+            <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+              <input type="text" value="${(cm.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.complexities[${idx}].label = this.value" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+              <input type="number" step="0.5" title="Added Hours" value="${cm.hrs}" onchange="window._adminAtelierDraft.complexities[${idx}].hrs = Number(this.value)||0" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(168,85,247,0.35); border-radius:5px; color:#e9d5ff; text-align:center;" />
+              <button type="button" onclick="window.adminAtelierDeleteItem('complexities', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+            </div>
+          `).join('')}
+          <div style="font-size:10px; color:#64748b;">Columns: Label • Added Hours</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Rendering Phases -->
+    <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+        <h4 style="font-size:13.5px; font-weight:800; color:#f43f5e; margin:0;">🎨 Rendering Phases (Synced to Gallery &amp; Revisions)</h4>
+        <button type="button" onclick="window.adminAtelierAddItem('phases')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:#f43f5e;">+ Add Phase</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${cat.phases.map((ph, idx) => `
+          <div style="display:grid; grid-template-columns:1.5fr 70px 70px 70px auto auto 26px; gap:8px; align-items:center; background:#060911; padding:9px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <input type="text" value="${(ph.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.phases[${idx}].label = this.value" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+            <input type="number" step="0.05" title="Multiplier" value="${ph.mult}" onchange="window._adminAtelierDraft.phases[${idx}].mult = Number(this.value)||1" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+            <input type="number" step="1" title="Revisions" value="${ph.revisions}" onchange="window._adminAtelierDraft.phases[${idx}].revisions = Number(this.value)||1" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:5px; color:var(--emerald); text-align:center;" />
+            <input type="number" step="1" title="Extra Days" value="${ph.days || 0}" onchange="window._adminAtelierDraft.phases[${idx}].days = Number(this.value)||0" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+            <label style="font-size:10.5px; color:#cbd5e1; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" ${ph.allowColorVar ? 'checked' : ''} onchange="window._adminAtelierDraft.phases[${idx}].allowColorVar = this.checked" style="width:auto;" /><span>Color Var</span></label>
+            <label style="font-size:10.5px; color:#cbd5e1; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" ${ph.allowBg ? 'checked' : ''} onchange="window._adminAtelierDraft.phases[${idx}].allowBg = this.checked" style="width:auto;" /><span>BG</span></label>
+            <button type="button" onclick="window.adminAtelierDeleteItem('phases', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+          </div>
+        `).join('')}
+        <div style="font-size:10px; color:#64748b;">Columns: Phase Name • Multiplier (e.g. 1.25) • Revisions • Extra Days • Allow Color Var • Allow BG</div>
+      </div>
+    </div>
+
+    <!-- Section 4: Add-on Effort Hours & Sample Tags -->
+    <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px;">
+      <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0 0 10px;">🧩 Module Add-on Hours &amp; Gallery Tags</h4>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin-bottom:12px;">
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Simple Pet (hrs)</label><input type="number" step="0.5" value="${cat.addons.simplePetHrs}" onchange="window._adminAtelierDraft.addons.simplePetHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Sub-Char w/ Gear (hrs)</label><input type="number" step="0.5" value="${cat.addons.subCharHrs}" onchange="window._adminAtelierDraft.addons.subCharHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Std Weapon/Prop (hrs)</label><input type="number" step="0.5" value="${cat.addons.stdWeaponHrs}" onchange="window._adminAtelierDraft.addons.stdWeaponHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Relic Weapon (hrs)</label><input type="number" step="0.5" value="${cat.addons.relicWeaponHrs}" onchange="window._adminAtelierDraft.addons.relicWeaponHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Color Variation (hrs)</label><input type="number" step="0.25" value="${cat.addons.colorVarHrs}" onchange="window._adminAtelierDraft.addons.colorVarHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Per Expression (hrs)</label><input type="number" step="0.25" value="${cat.addons.expressionHrs}" onchange="window._adminAtelierDraft.addons.expressionHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Per Action Pose (hrs)</label><input type="number" step="0.25" value="${cat.addons.actionPoseHrs}" onchange="window._adminAtelierDraft.addons.actionPoseHrs = Number(this.value)||0" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+      </div>
+      <div>
+        <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">Gallery Sample Tags (comma-separated — synced directly to Tab 1 Art Upload):</label>
+        <input type="text" value="${(cat.galleryTags || []).join(', ')}" onchange="window._adminAtelierDraft.galleryTags = this.value.split(',').map(x=>x.trim()).filter(Boolean)" style="width:100%; font-size:11.5px; padding:7px 10px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:8px; color:#fff;" />
+      </div>
+    </div>
+  `;
+};
+
+window.adminAtelierAddServiceCard = function() {
+  if (!window._adminAtelierDraft) return;
+  window._adminAtelierDraft.serviceCards.push({
+    id: 'card_' + Date.now(),
+    subMode: 'custom',
+    title: 'New Character Service',
+    desc: 'Custom character illustration or concept package.',
+    img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+    timeline: '3 to 6 business days',
+    baseHours: 4.0,
+    active: true
+  });
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierDeleteServiceCard = function(idx) {
+  if (!window._adminAtelierDraft) return;
+  if (window._adminAtelierDraft.serviceCards.length <= 1) {
+    showToast('At least one Character service card is required.', 'error');
+    return;
+  }
+  window._adminAtelierDraft.serviceCards.splice(idx, 1);
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierAddItem = function(listKey) {
+  if (!window._adminAtelierDraft || !Array.isArray(window._adminAtelierDraft[listKey])) return;
+  const uid = listKey.slice(0, 3) + '_' + Date.now().toString(36);
+  if (listKey === 'framings') {
+    window._adminAtelierDraft.framings.push({ id: uid, label: 'New Framing View', hrs: 5.0, days: 0, active: true });
+  } else if (listKey === 'complexities') {
+    window._adminAtelierDraft.complexities.push({ id: uid, label: 'New Complexity Tier', hrs: 2.0, active: true });
+  } else if (listKey === 'phases') {
+    window._adminAtelierDraft.phases.push({ id: uid, label: 'New Rendering Phase', mult: 1.0, revisions: 2, days: 1, allowColorVar: true, allowBg: true, active: true });
+  }
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierDeleteItem = function(listKey, idx) {
+  if (!window._adminAtelierDraft || !Array.isArray(window._adminAtelierDraft[listKey])) return;
+  if (window._adminAtelierDraft[listKey].length <= 1) {
+    showToast('At least one option is required.', 'error');
+    return;
+  }
+  window._adminAtelierDraft[listKey].splice(idx, 1);
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierResetDefault = function() {
+  if (!confirm('Reset Atelier & Pricing Engine to factory Character-Only defaults?')) return;
+  window._adminAtelierDraft = JSON.parse(JSON.stringify(window.DEFAULT_ATELIER_CATALOG));
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierSaveAll = async function() {
+  if (!window._adminAtelierDraft || typeof window.saveAtelierCatalog !== 'function') return;
+  await window.saveAtelierCatalog(window._adminAtelierDraft);
+  if (typeof showToast === 'function') showToast('Character Atelier & Pricing saved and synced to Supabase! ✓', 'success', 4500);
 };
