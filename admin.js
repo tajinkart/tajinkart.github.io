@@ -2338,7 +2338,7 @@ function renderOrderAdminSnippet(o) {
           <div><span style="color:#94a3b8;">Fidelity:</span> <strong>${o.specs?.fidelity || o.phase || '-'}</strong></div>
           <div><span style="color:#94a3b8;">Timeline:</span> <strong>${o.timeline || 'Per Schedule'}</strong></div>
           ${o.specs?.addons && o.specs.addons.length ? `<div style="color:var(--emerald); padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">Add-ons (${o.specs.addons.length}): ${o.specs.addons.join(' • ')}</div>` : ''}
-          ${o.specs?.retainerUsd ? `<div class="font-mono" style="font-size:10.5px; color:#cbd5e1; padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">50% Retainer: <span style="color:var(--gold);">$${o.specs.retainerUsd}</span> • Balance: <span style="color:var(--cyan-electric);">$${o.specs.balanceUsd || o.specs.retainerUsd}</span></div>` : ''}
+          ${(o.specs?.retainerUsd || o.specs?.paidUsd) ? `<div class="font-mono" style="font-size:10.5px; color:#cbd5e1; padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">Paid: <span style="color:var(--emerald);">$${o.specs.paidUsd || 0}</span> • Balance: <span style="color:var(--cyan-electric);">$${o.specs.balanceUsd !== undefined ? o.specs.balanceUsd : (o.specs.retainerUsd || 0)}</span></div>` : ''}
         </div>
         <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); padding:10px 12px; border-radius:8px;">
           <span style="color:var(--cyan-electric); font-size:10.5px; font-weight:700; display:block; margin-bottom:4px;">Client: ${o.client || 'Guest'} (${o.contact || '-'})</span>
@@ -2379,6 +2379,29 @@ function renderOrderAdminSnippet(o) {
           </a>
         </div>
       ` : ''}
+
+      ${(() => {
+        const msgs = Array.isArray(o.specs?.messages) ? o.specs.messages : [];
+        return `
+          <div style="padding:10px 12px; border-radius:8px; background:#050811; border:1px solid rgba(0,240,255,0.24); display:flex; flex-direction:column; gap:7px;">
+            <strong style="font-size:11px; color:var(--cyan-electric);">💬 2-Way Client Chat &amp; Work Drop (${msgs.length})</strong>
+            <div style="max-height:140px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;">
+              ${msgs.length === 0 ? '<span style="font-size:10.5px; color:#64748b;">No messages yet.</span>' : msgs.map(m => `
+                <div style="padding:6px 9px; border-radius:7px; background:${m.sender === 'director' ? 'rgba(250,204,21,0.08)' : 'rgba(0,240,255,0.08)'}; font-size:11px;">
+                  <strong style="color:${m.sender === 'director' ? 'var(--gold)' : 'var(--cyan-electric)'}; font-size:9.5px;">${m.sender === 'director' ? '👑 You (Director)' : '⚔️ ' + (m.senderName || 'Client')}:</strong>
+                  ${m.text ? `<div style="color:#e2e8f0;">${String(m.text).replace(/</g, '&lt;')}</div>` : ''}
+                  ${m.fileUrl ? `<a href="${m.fileUrl}" target="_blank" rel="noopener" style="font-size:10px; color:var(--emerald); text-decoration:underline;">📎 ${m.fileUrl}</a>` : ''}
+                </div>
+              `).join('')}
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 150px auto; gap:6px;">
+              <input type="text" id="orderChatMsg_director_${o.id}" placeholder="Reply to client..." style="font-size:11px; padding:5px 8px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+              <input type="url" id="orderChatFile_director_${o.id}" placeholder="Drop WIP / Final URL" class="font-mono" style="font-size:10px; padding:5px 7px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+              <button type="button" onclick="window.sendOrderChatMessage(${o.id}, 'director')" class="btn-secondary" style="font-size:10.5px; padding:5px 10px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35);">Send →</button>
+            </div>
+          </div>
+        `;
+      })()}
 
       <div style="padding:10px 12px; border-radius:8px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.22); display:grid; grid-template-columns:90px 1fr auto; gap:8px; align-items:end; font-size:10.5px;">
         <div>

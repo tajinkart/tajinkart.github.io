@@ -1320,7 +1320,7 @@ function renderMemberDashboard() {
     oBox.innerHTML = renderList.map(o => {
       let currentStageNum = 1;
       const stLower = (o.status || '').toLowerCase();
-      if (stLower.includes('retainer') || stLower.includes('deposit') || stLower.includes('ودیعه')) currentStageNum = 2;
+      if (stLower.includes('retainer') || stLower.includes('deposit') || stLower.includes('paid') || stLower.includes('ودیعه')) currentStageNum = 2;
       else if (stLower.includes('thumbnail') || stLower.includes('linework') || stLower.includes('silhouette') || stLower.includes('اتود') || stLower.includes('design')) currentStageNum = 3;
       else if (stLower.includes('render') || stLower.includes('master') || stLower.includes('رندر')) currentStageNum = 4;
       else if (stLower.includes('complete') || stLower.includes('delivered') || stLower.includes('settled') || stLower.includes('تحویل')) currentStageNum = 5;
@@ -1379,8 +1379,17 @@ function renderMemberDashboard() {
                   <strong style="color:var(--emerald);">${(sp.addons && sp.addons.length) ? sp.addons.join(' • ') : 'Master Layered 300DPI PSD'}</strong>
                 </div>
                 <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                  <span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${halfNum} USD</strong></span>
-                  <span>50% Final on PSD Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${sp.balanceUsd || halfNum} USD</strong></span>
+                  ${(() => {
+                    const paid = Number(sp.paidUsd || 0);
+                    const bal = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paid > 0 ? Math.max(0, totalNum - paid) : Number(halfNum));
+                    const isFull = o.paymentVerified && bal <= 0;
+                    if (isFull) {
+                      return `<span style="color:var(--emerald); font-weight:800;">✓ 100% Paid in Full: <strong class="font-mono">$${paid || totalNum} USD</strong></span><span style="color:#94a3b8;">Remaining Balance: <strong class="font-mono" style="color:var(--emerald);">$0 USD</strong></span>`;
+                    } else if (o.paymentVerified && paid > 0) {
+                      return `<span>Paid (50% Retainer): <strong class="font-mono" style="color:var(--emerald);">$${paid} USD</strong></span><span>Remaining 50% Balance: <strong class="font-mono" style="color:var(--cyan-electric);">$${bal} USD</strong></span>`;
+                    }
+                    return `<span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${halfNum} USD</strong></span><span>50% Final on PSD Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${bal} USD</strong></span>`;
+                  })()}
                 </div>
               </div>
             `;
@@ -1453,13 +1462,52 @@ function renderMemberDashboard() {
             `;
           })()}
 
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
+          ${(() => {
+            const msgs = Array.isArray(o.specs?.messages) ? o.specs.messages : [];
+            return `
+              <div style="padding:12px 14px; border-radius:10px; background:#060912; border:1px solid rgba(0,240,255,0.22); display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <strong style="font-size:11.5px; color:var(--cyan-electric);">💬 Studio Chat &amp; Work Drop (${msgs.length})</strong>
+                  ${o.paymentVerified ? `<span style="font-size:10px; color:var(--emerald); font-weight:700;">✓ Payment Confirmed • Direct Studio Line Open</span>` : `<span style="font-size:10px; color:#94a3b8;">Direct messages &amp; WIP drops sync to Studio Director</span>`}
+                </div>
+                <div style="max-height:170px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding-right:4px;">
+                  ${msgs.length === 0 ? `<div style="font-size:11px; color:#64748b; padding:8px; text-align:center;">No messages yet. Ask a question or drop a reference link below.</div>` : msgs.map(m => {
+                    const isDirMsg = m.sender === 'director';
+                    const tStr = m.createdAt ? new Date(m.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+                    return `
+                      <div style="align-self:${isDirMsg ? 'flex-start' : 'flex-end'}; max-width:88%; padding:8px 11px; border-radius:10px; background:${isDirMsg ? 'rgba(250,204,21,0.08)' : 'rgba(0,240,255,0.09)'}; border:1px solid ${isDirMsg ? 'rgba(250,204,21,0.28)' : 'rgba(0,240,255,0.28)'}; font-size:11.5px;">
+                        <div style="display:flex; justify-content:space-between; gap:10px; font-size:9.5px; color:${isDirMsg ? 'var(--gold)' : 'var(--cyan-electric)'}; font-weight:800; margin-bottom:2px;">
+                          <span>${isDirMsg ? '👑 Studio Director' : '⚔️ ' + (m.senderName || 'You')}</span>
+                          <span style="color:#64748b; font-weight:500;">${tStr}</span>
+                        </div>
+                        ${m.text ? `<div style="color:#e2e8f0; line-height:1.5;">${String(m.text).replace(/</g, '&lt;').replace(/\n/g, '<br>')}</div>` : ''}
+                        ${m.fileUrl && m.fileUrl.startsWith('http') ? `<a href="${m.fileUrl}" target="_blank" rel="noopener" style="display:inline-block; margin-top:4px; font-size:10.5px; color:var(--emerald); text-decoration:underline;">📎 Open Dropped File / Image ↗</a>` : ''}
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 160px auto; gap:6px; align-items:center;">
+                  <input type="text" id="orderChatMsg_client_${o.id}" placeholder="Write a message to Studio Director..." style="font-size:11px; padding:6px 9px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:#fff;" />
+                  <input type="url" id="orderChatFile_client_${o.id}" placeholder="Optional file/image URL" class="font-mono" style="font-size:10.5px; padding:6px 8px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:#94a3b8;" />
+                  <button type="button" onclick="window.sendOrderChatMessage(${o.id}, 'client')" class="btn-secondary" style="font-size:11px; padding:6px 12px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35);">Send →</button>
+                </div>
+              </div>
+            `;
+          })()}
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
             <span>Current Phase: <strong style="color:#fff;">${o.phase || 'Standard 300DPI'}</strong></span>
             <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'Per Project Schedule'}</strong></span>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button type="button" onclick="openCryptoPayModal(${o.id})" class="btn-gold" style="font-size:11px; padding:6px 12px;">
-                💳 ${o.paymentVerified ? 'Settle Balance' : (o.txid ? 'Update TXID' : 'Pay 50% Retainer')}
-              </button>
+              ${(() => {
+                const sp = o.specs || {};
+                const tot = Number(sp.totalUsd) || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+                const bal = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (sp.paidUsd ? Math.max(0, tot - Number(sp.paidUsd)) : tot * 0.5);
+                if (o.paymentVerified && bal <= 0) {
+                  return `<span style="font-size:11px; padding:6px 12px; border-radius:8px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.4); color:var(--emerald); font-weight:800;">✓ 100% Settled</span>`;
+                }
+                return `<button type="button" onclick="openCryptoPayModal(${o.id})" class="btn-gold" style="font-size:11px; padding:6px 12px;">💳 ${o.paymentVerified ? ('Pay Remaining ($' + bal + ')') : (o.txid ? 'Update TXID' : 'Pay 50% / 100%')}</button>`;
+              })()}
               <button type="button" onclick="downloadOfficialStudioInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:6px 10px; border-color:var(--gold); color:var(--gold);">
                 📄 Invoice
               </button>
@@ -2983,6 +3031,56 @@ window.copyCryptoWalletAddress = function() {
   });
 };
 
+
+window.applyOrderPaymentAccounting = function(order, tierVal) {
+  if (!order) return;
+  if (!order.specs) order.specs = {};
+  const tot = Number(order.specs.totalUsd) || parseFloat(String(order.price || '0').replace(/[^0-9.]/g, '')) || 0;
+  const half = Math.round(tot * 0.5 * 100) / 100;
+  const prevPaid = Number(order.specs.paidUsd) || 0;
+  const prevBal = (order.specs.balanceUsd !== undefined) ? Number(order.specs.balanceUsd) : (tot - prevPaid);
+  if (tierVal === 1.0 || (prevPaid > 0 && prevBal > 0)) {
+    order.specs.paidUsd = tot;
+    order.specs.balanceUsd = 0;
+    order.specs.paymentTier = 1.0;
+    order.status = '100% Paid in Full';
+  } else {
+    order.specs.paidUsd = half;
+    order.specs.balanceUsd = Math.max(0, Math.round((tot - half) * 100) / 100);
+    order.specs.paymentTier = 0.5;
+    order.status = '50% Retainer Settled';
+  }
+};
+
+window.sendOrderChatMessage = async function(orderId, senderRole) {
+  const o = ordersList.find(x => String(x.id) === String(orderId));
+  if (!o) return;
+  const msgEl = document.getElementById(`orderChatMsg_${senderRole}_${orderId}`);
+  const fileEl = document.getElementById(`orderChatFile_${senderRole}_${orderId}`);
+  const text = (msgEl?.value || '').trim();
+  const fileUrl = (fileEl?.value || '').trim();
+  if (!text && !fileUrl) { showToast('Enter a message or file link first.', 'info'); return; }
+  if (!o.specs) o.specs = {};
+  if (!Array.isArray(o.specs.messages)) o.specs.messages = [];
+  o.specs.messages.push({
+    id: Date.now(),
+    sender: senderRole,
+    senderName: senderRole === 'director' ? 'Seyed Soroush Taj' : (o.client || currentMember?.name || 'Client'),
+    text: text,
+    fileUrl: fileUrl,
+    createdAt: new Date().toISOString()
+  });
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (window.supabaseClient) {
+    try { await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id); } catch(e) {}
+  }
+  if (msgEl) msgEl.value = '';
+  if (fileEl) fileEl.value = '';
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  showToast('Message & work drop saved to Supabase! ✓', 'success', 3000);
+};
+
 window.syncOrderPaymentToCloud = async function(order) {
   if (!window.supabaseClient || !order) return;
   try {
@@ -3067,11 +3165,11 @@ window.submitCryptoTransaction = async function() {
     order.paymentNetwork = netKey;
     order.paymentAmountCrypto = exactText;
     order.paymentVerified = verifiedOnChain;
-    if (verifiedOnChain) order.status = '50% Retainer Settled';
+    if (verifiedOnChain) window.applyOrderPaymentAccounting(order, window._activeCryptoTier);
     safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
     await window.syncOrderPaymentToCloud(order);
     if (window.supabaseClient) {
-      window.supabaseClient.from('orders').update({ status: order.status }).eq('id', order.id).then(() => {});
+      window.supabaseClient.from('orders').update({ status: order.status, specs: order.specs }).eq('id', order.id).then(() => {});
     }
   }
 
@@ -3162,10 +3260,17 @@ window.downloadOfficialStudioInvoice = function(orderId) {
       </tbody>
     </table>
 
-    <div class="grid">
-      <div class="box"><span class="muted">50% Non-Refundable Retainer (To Start)</span><strong style="color:#b45309; font-size:18px;">$${halfNum} USD</strong></div>
-      <div class="box"><span class="muted">50% Final Balance (Prior to PSD Handover)</span><strong style="color:#0369a1; font-size:18px;">$${halfNum} USD</strong></div>
-    </div>
+    ${(() => {
+      const paidAmt = Number(sp.paidUsd) || 0;
+      const remAmt = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paidAmt > 0 ? Math.max(0, totalNum - paidAmt) : Number(halfNum));
+      const isFull = o.paymentVerified && remAmt <= 0;
+      return `
+        <div class="grid">
+          <div class="box"><span class="muted">${isFull ? '100% Paid in Full' : (paidAmt > 0 ? 'Amount Paid (50% Retainer)' : '50% Non-Refundable Retainer (To Start)')}</span><strong style="color:${o.paymentVerified ? '#047857' : '#b45309'}; font-size:18px;">$${paidAmt > 0 ? paidAmt : halfNum} USD ${o.paymentVerified ? '✓' : ''}</strong></div>
+          <div class="box"><span class="muted">Remaining Balance Due</span><strong style="color:${remAmt <= 0 ? '#047857' : '#0369a1'}; font-size:18px;">$${remAmt} USD</strong></div>
+        </div>
+      `;
+    })()}
 
     <div class="terms">
       <strong style="color:#92400e; display:block; margin-bottom:6px;">Binding Studio Commission Agreement, Duration &amp; Studio Rules:</strong>
@@ -3700,12 +3805,12 @@ window.qaSimulateOrderPaid = async function() {
   o.txid = 'QA-SANDBOX-TEST-' + Date.now().toString(36).toUpperCase();
   o.paymentNetwork = 'qa_sandbox';
   o.paymentAmountCrypto = '0.00 USD (QA Sandbox)';
-  if (!o.status || o.status === 'Brief Received') o.status = '50% Retainer Settled';
+  window.applyOrderPaymentAccounting(o, window._activeCryptoTier);
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
   if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
   if (window.supabaseClient) {
     try {
-      await window.supabaseClient.from('orders').update({ status: o.status }).eq('id', o.id);
+      await window.supabaseClient.from('orders').update({ status: o.status, specs: o.specs }).eq('id', o.id);
     } catch(e) {}
   }
   window.closeCryptoPayModal();
