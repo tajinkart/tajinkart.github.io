@@ -1483,10 +1483,10 @@ function renderAdminSketch1() {
   const hrEl = document.getElementById('adminStudioHourlyRateInput');
   if (hrEl) hrEl.value = (typeof siteSettings !== 'undefined' && siteSettings && Number(siteSettings.studioHourlyRate)) ? Number(siteSettings.studioHourlyRate) : 15;
   const cfg = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.studioEffortConfig) ? siteSettings.studioEffortConfig : {};
-  if (document.getElementById('adminCalibPortraitHrs')) document.getElementById('adminCalibPortraitHrs').value = cfg.portrait || 3;
-  if (document.getElementById('adminCalibHalfHrs')) document.getElementById('adminCalibHalfHrs').value = cfg.half || 5;
-  if (document.getElementById('adminCalibFullHrs')) document.getElementById('adminCalibFullHrs').value = cfg.full || 8;
-  if (document.getElementById('adminCalibTurnHrs')) document.getElementById('adminCalibTurnHrs').value = cfg.turnaround || 13;
+  if (document.getElementById('adminCalibPortraitHrs')) document.getElementById('adminCalibPortraitHrs').value = cfg.portrait || 2.5;
+  if (document.getElementById('adminCalibHalfHrs')) document.getElementById('adminCalibHalfHrs').value = cfg.half || 4;
+  if (document.getElementById('adminCalibFullHrs')) document.getElementById('adminCalibFullHrs').value = cfg.full || 6.5;
+  if (document.getElementById('adminCalibTurnHrs')) document.getElementById('adminCalibTurnHrs').value = cfg.turnaround || 11;
   if (document.getElementById('adminCalibPetHrs')) document.getElementById('adminCalibPetHrs').value = cfg.pet || 2;
   if (document.getElementById('adminCalibSubCharHrs')) document.getElementById('adminCalibSubCharHrs').value = cfg.subchar || 4.5;
   if (typeof window.renderAdminHourlyBenchmarks === 'function') window.renderAdminHourlyBenchmarks();
@@ -4118,7 +4118,7 @@ window.renderAdminHourlyBenchmarks = function() {
   const inp = document.getElementById('adminStudioHourlyRateInput');
   const rate = inp ? (Number(inp.value) || 15) : 15;
   if (el) {
-    el.textContent = `Lineup Assembly (2.5h): $${Math.round(2.5*rate)} • Portrait Sketch (2h): $${Math.round(2*rate)} • Half-Body (5h): $${Math.round(5*rate)} • Full-Body (8h): $${Math.round(8*rate)}`;
+    el.textContent = `Lineup (2.5h): $${Math.round(2.5*rate)} • Portrait Render: $${Math.round(4*1.25*rate)} • Half-Body Render: $${Math.round(5.5*1.25*rate)} • Full-Body Standard Render: $${Math.round(8*1.25*rate)}`;
   }
 };
 
@@ -4132,10 +4132,10 @@ window.saveStudioHourlyRateDirect = async function() {
   const inp = document.getElementById('adminStudioHourlyRateInput');
   const rate = Math.max(5, Math.min(200, Number(inp ? inp.value : 15) || 15));
   const effCfg = {
-    portrait: Number(document.getElementById('adminCalibPortraitHrs')?.value) || 3,
-    half: Number(document.getElementById('adminCalibHalfHrs')?.value) || 5,
-    full: Number(document.getElementById('adminCalibFullHrs')?.value) || 8,
-    turnaround: Number(document.getElementById('adminCalibTurnHrs')?.value) || 13,
+    portrait: Number(document.getElementById('adminCalibPortraitHrs')?.value) || 2.5,
+    half: Number(document.getElementById('adminCalibHalfHrs')?.value) || 4,
+    full: Number(document.getElementById('adminCalibFullHrs')?.value) || 6.5,
+    turnaround: Number(document.getElementById('adminCalibTurnHrs')?.value) || 11,
     pet: Number(document.getElementById('adminCalibPetHrs')?.value) || 2,
     subchar: Number(document.getElementById('adminCalibSubCharHrs')?.value) || 4.5
   };
