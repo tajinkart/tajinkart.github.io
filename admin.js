@@ -1482,6 +1482,13 @@ window.switchAdminTab = function(tabKey, btn) {
 function renderAdminSketch1() {
   const hrEl = document.getElementById('adminStudioHourlyRateInput');
   if (hrEl) hrEl.value = (typeof siteSettings !== 'undefined' && siteSettings && Number(siteSettings.studioHourlyRate)) ? Number(siteSettings.studioHourlyRate) : 15;
+  const cfg = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.studioEffortConfig) ? siteSettings.studioEffortConfig : {};
+  if (document.getElementById('adminCalibPortraitHrs')) document.getElementById('adminCalibPortraitHrs').value = cfg.portrait || 3;
+  if (document.getElementById('adminCalibHalfHrs')) document.getElementById('adminCalibHalfHrs').value = cfg.half || 5;
+  if (document.getElementById('adminCalibFullHrs')) document.getElementById('adminCalibFullHrs').value = cfg.full || 8;
+  if (document.getElementById('adminCalibTurnHrs')) document.getElementById('adminCalibTurnHrs').value = cfg.turnaround || 13;
+  if (document.getElementById('adminCalibPetHrs')) document.getElementById('adminCalibPetHrs').value = cfg.pet || 2;
+  if (document.getElementById('adminCalibSubCharHrs')) document.getElementById('adminCalibSubCharHrs').value = cfg.subchar || 4.5;
   if (typeof window.renderAdminHourlyBenchmarks === 'function') window.renderAdminHourlyBenchmarks();
   const catList = document.getElementById('adminCategoryListCol');
   if (!catList) return;
@@ -4124,8 +4131,17 @@ window.setAdminHourlyRatePreset = function(val) {
 window.saveStudioHourlyRateDirect = async function() {
   const inp = document.getElementById('adminStudioHourlyRateInput');
   const rate = Math.max(5, Math.min(200, Number(inp ? inp.value : 15) || 15));
+  const effCfg = {
+    portrait: Number(document.getElementById('adminCalibPortraitHrs')?.value) || 3,
+    half: Number(document.getElementById('adminCalibHalfHrs')?.value) || 5,
+    full: Number(document.getElementById('adminCalibFullHrs')?.value) || 8,
+    turnaround: Number(document.getElementById('adminCalibTurnHrs')?.value) || 13,
+    pet: Number(document.getElementById('adminCalibPetHrs')?.value) || 2,
+    subchar: Number(document.getElementById('adminCalibSubCharHrs')?.value) || 4.5
+  };
   if (typeof siteSettings !== 'undefined' && siteSettings) {
     siteSettings.studioHourlyRate = rate;
+    siteSettings.studioEffortConfig = effCfg;
     safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
     if (typeof window.syncStudioSettingsToCloud === 'function') await window.syncStudioSettingsToCloud();
   }

@@ -374,7 +374,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
             <div class="pipeline-tile-footer">
               <div>
                 <span class="font-mono" style="color:${catColor}; font-size:14px; font-weight:800; text-shadow:0 0 10px ${catColor}55;">From ${displayPrice}</span>
-                <span style="color:var(--cyan-electric); font-size:11px; margin-left:8px;">(~${tile.baseHours || 5}h • ${tile.timeline})</span>
+                <span style="color:var(--cyan-electric); font-size:11px; margin-left:8px;">(${tile.timeline})</span>
               </div>
               <span style="font-size:11.5px; color:${catColor}; font-weight:800; display:flex; align-items:center; gap:4px;">
                 Configure &amp; Order →
@@ -398,6 +398,17 @@ window.selectPipeline = function(key, cardEl, userClicked) {
 window.getStudioHourlyRate = function() {
   const r = (typeof siteSettings !== 'undefined' && siteSettings && Number(siteSettings.studioHourlyRate)) ? Number(siteSettings.studioHourlyRate) : 15;
   return r > 0 ? r : 15;
+};
+window.getStudioEffortConfig = function() {
+  const cfg = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.studioEffortConfig) ? siteSettings.studioEffortConfig : {};
+  return {
+    portrait: Number(cfg.portrait) || 3,
+    half: Number(cfg.half) || 5,
+    full: Number(cfg.full) || 8,
+    turnaround: Number(cfg.turnaround) || 13,
+    pet: Number(cfg.pet) || 2,
+    subchar: Number(cfg.subchar) || 4.5
+  };
 };
 
 window.CHARACTER_SHOP_CARDS = [
@@ -486,6 +497,7 @@ window.toggleWizardStep = function(stepNum) {
 
 window.recalcWizardPrice = function() {
   const hourly = window.getStudioHourlyRate();
+  const effCfg = window.getStudioEffortConfig();
   const scopeEl = document.getElementById('wizCharacterScope');
   const framingEl = document.getElementById('wizFraming');
   const compEl = document.getElementById('wizComplexity');
@@ -499,7 +511,12 @@ window.recalcWizardPrice = function() {
   const scopeBaseHrs = scopeOpt ? (parseFloat(scopeOpt.getAttribute('data-hrs') || '0') || 0) : 0;
 
   const framingOpt = framingEl ? framingEl.options[framingEl.selectedIndex] : null;
-  const framingHrs = framingOpt ? (parseFloat(framingOpt.getAttribute('data-hrs') || '3') || 3) : 3;
+  const framingVal = framingOpt ? framingOpt.value : 'half';
+  let framingHrs = framingOpt ? (parseFloat(framingOpt.getAttribute('data-hrs') || '3') || 3) : 3;
+  if (framingVal === 'portrait') framingHrs = effCfg.portrait;
+  else if (framingVal === 'half') framingHrs = effCfg.half;
+  else if (framingVal === 'full') framingHrs = effCfg.full;
+  else if (framingVal === 'turnaround') framingHrs = effCfg.turnaround;
 
   const compOpt = compEl ? compEl.options[compEl.selectedIndex] : null;
   const compHrs = compOpt ? (parseFloat(compOpt.getAttribute('data-hrs') || '1.5') || 1.5) : 1.5;
@@ -508,16 +525,22 @@ window.recalcWizardPrice = function() {
   const ageHrs = (ageEl && ageEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && ageOpt) ? (parseFloat(ageOpt.getAttribute('data-hrs') || '0') || 0) : 0;
 
   const compnOpt = compnEl ? compnEl.options[compnEl.selectedIndex] : null;
-  const compnHrs = (compnEl && compnEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && compnOpt) ? (parseFloat(compnOpt.getAttribute('data-hrs') || '0') || 0) : 0;
+  const compnVal = compnOpt ? compnOpt.value : 'none';
+  let compnHrs = 0;
+  if (compnVal === 'pet') compnHrs = effCfg.pet;
+  else if (compnVal === 'subchar') compnHrs = effCfg.subchar;
 
   const phaseOpt = phaseEl ? phaseEl.options[phaseEl.selectedIndex] : null;
   const fidelityMult = phaseOpt ? (parseFloat(phaseOpt.getAttribute('data-mult') || '1') || 1) : 1;
+  const isSketchOnly = fidelityMult <= 0.6;
+  const revRounds = isSketchOnly ? 1 : 2;
+  const revLabel = isSketchOnly ? '1 Round (+1d per revision)' : '2 Rounds (+1–2d per revision)';
 
   let coreHrs = 0;
   if (activeModalItem && activeModalItem.subMode === 'lineup') {
     const cnt = lineupCountEl ? (parseInt(lineupCountEl.value, 10) || 2) : 2;
     if (scopeVal === 'existing_lineup') {
-      coreHrs = 1.5 + (cnt * 0.5); // Graphic assembly & height scale only (fair low rate!)
+      coreHrs = 1.5 + (cnt * 0.5);
     } else {
       coreHrs = (cnt * (framingHrs + compHrs * 0.8)) * fidelityMult;
     }
@@ -527,31 +550,34 @@ window.recalcWizardPrice = function() {
 
   let addonHrs = compnHrs;
   let extraDays = 0;
-  if (document.getElementById('wizHeroWeapon')?.checked) addonHrs += 2.0;
-  if (document.getElementById('wizExpressions')?.checked) addonHrs += 2.0;
-  if (document.getElementById('wizColorPalette')?.checked) addonHrs += 1.5;
-  if (document.getElementById('wizCommercial')?.checked) addonHrs += 3.0;
-  if (document.getElementById('wizCrossEnv')?.checked) { addonHrs += 3.5; extraDays += 2; }
-  if (document.getElementById('wizCrossChar')?.checked) { addonHrs += 2.5; extraDays += 1; }
+  const addonsChosen = [];
+  if (document.getElementById('wizHeroWeapon')?.checked) { addonHrs += 2.0; addonsChosen.push('Hero Weapon'); }
+  if (document.getElementById('wizExpressions')?.checked) { addonHrs += 2.0; addonsChosen.push('Expressions Sheet'); }
+  if (document.getElementById('wizColorPalette')?.checked) { addonHrs += 1.5; addonsChosen.push('Color Variations'); }
+  if (document.getElementById('wizCommercial')?.checked) { addonHrs += 3.0; addonsChosen.push('Commercial License'); }
+  if (document.getElementById('wizCrossEnv')?.checked) { addonHrs += 3.5; extraDays += 2; addonsChosen.push('Environment Backdrop'); }
+  if (document.getElementById('wizCrossChar')?.checked) { addonHrs += 2.5; extraDays += 1; addonsChosen.push('Extra Scale Figure'); }
 
   const totalHours = Math.max(2, Math.round((coreHrs + addonHrs) * 2) / 2);
   const totalUSD = Math.round(totalHours * hourly);
+  const halfUSD = (totalUSD * 0.5).toFixed(2).replace(/\.00$/, '');
+
+  const minD = Math.max(2, Math.ceil(totalHours / 4) + extraDays);
+  const maxD = Math.max(minD + 2, Math.ceil(totalHours / 2.2) + extraDays);
+  const timelineStr = `${minD} to ${maxD} business days`;
 
   if (activeModalItem) {
     activeModalItem.calculatedPriceUSD = totalUSD;
     activeModalItem.estimatedHours = totalHours;
     activeModalItem.hourlyRate = hourly;
+    activeModalItem.revisionsIncluded = revRounds;
   }
 
-  const effEl = document.getElementById('modalEffortHours');
-  if (effEl) effEl.textContent = `~${totalHours} hrs @ $${hourly}/hr`;
+  const revEl = document.getElementById('modalRevisionsText');
+  if (revEl) revEl.textContent = revLabel;
 
   const tlEl = document.getElementById('modalTimeline');
-  if (tlEl) {
-    const minD = Math.max(2, Math.ceil(totalHours / 4) + extraDays);
-    const maxD = Math.max(minD + 2, Math.ceil(totalHours / 2.2) + extraDays);
-    tlEl.textContent = `${minD} to ${maxD} business days`;
-  }
+  if (tlEl) tlEl.textContent = timelineStr;
 
   const priceEl = document.getElementById('modalPrice');
   if (priceEl) {
@@ -559,6 +585,35 @@ window.recalcWizardPrice = function() {
     priceEl.style.transition = 'color 0.2s';
     priceEl.style.color = 'var(--cyan-electric)';
     setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 250);
+  }
+
+  // Update Step 3 Live Proforma Preview (transparent for client, zero internal hours)
+  const profBox = document.getElementById('wizProformaPreviewBox');
+  if (profBox) {
+    const pkgName = (activeModalItem && activeModalItem.title) ? activeModalItem.title : 'Custom Commission';
+    const phaseTxt = phaseOpt ? phaseOpt.text : 'Standard Render';
+    const scopeTxt = scopeOpt ? scopeOpt.text : 'Single Concept';
+    const framingTxt = framingOpt ? framingOpt.text : 'Half-Body';
+    const compnTxt = compnOpt ? compnOpt.text : 'None';
+    const ageTxt = (ageEl && ageEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && ageOpt) ? ageOpt.text : '';
+    profBox.innerHTML = `
+      <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px; margin-bottom:6px;">
+        <strong style="color:var(--gold);">PROFORMA PREVIEW</strong>
+        <span class="font-mono" style="color:var(--cyan-electric);">${timelineStr}</span>
+      </div>
+      <div><span style="color:#94a3b8;">Package:</span> <strong style="color:#fff;">${pkgName}</strong></div>
+      <div><span style="color:#94a3b8;">Rendering Phase:</span> <strong style="color:#fff;">${phaseTxt}</strong></div>
+      <div><span style="color:#94a3b8;">Scope &amp; Framing:</span> ${scopeTxt} • ${framingTxt}${ageTxt ? (' • ' + ageTxt) : ''}</div>
+      <div><span style="color:#94a3b8;">Companion &amp; Add-ons:</span> ${compnVal !== 'none' ? compnTxt : 'No Companion'}${addonsChosen.length ? (' • ' + addonsChosen.join(', ')) : ' • Layered 300DPI PSD'}</div>
+      <div><span style="color:#94a3b8;">Revisions:</span> <strong style="color:var(--emerald);">${revRounds} Structured Round(s)</strong> (each revision adds 1–2 business days)</div>
+      <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.12);">
+        <span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${halfUSD}</strong></span>
+        <span>50% Final on PSD: <strong class="font-mono" style="color:var(--cyan-electric);">$${halfUSD}</strong></span>
+      </div>
+      <div style="font-size:10.5px; color:#94a3b8; margin-top:6px;">
+        • 50% retainer locks your studio slot; unpaid briefs auto-expire after 24h.
+      </div>
+    `;
   }
 
   if (typeof window.updateWizardDynamicPreview === 'function' && activeModalItem) {
@@ -1575,6 +1630,7 @@ document.addEventListener('DOMContentLoaded', () => {
         companionTier: compnTxt,
         estimatedHours: activeModalItem.estimatedHours || 0,
         hourlyRate: activeModalItem.hourlyRate || window.getStudioHourlyRate(),
+        revisionsIncluded: activeModalItem.revisionsIncluded || 2,
         addons: addons,
         totalUsd: totalUsd,
         retainerUsd: retainerUsd,
@@ -3207,10 +3263,10 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
   if (fEl) {
     if (isChar) {
       fEl.innerHTML = `
-        <option value="portrait" data-hrs="3">Portrait / Bust (~3 hrs base)</option>
-        <option value="half" data-hrs="5" selected>Half-Body / Waist-Up (~5 hrs base)</option>
-        <option value="full" data-hrs="8">Full-Body Character (~8 hrs base)</option>
-        <option value="turnaround" data-hrs="13">Full-Body + 3-View Turnaround (~13 hrs base)</option>
+        <option value="portrait" data-hrs="3">Portrait / Bust</option>
+        <option value="half" data-hrs="5" selected>Half-Body / Waist-Up</option>
+        <option value="full" data-hrs="8">Full-Body Character</option>
+        <option value="turnaround" data-hrs="13">Full-Body + 3-View Turnaround</option>
       `;
     } else {
       fEl.innerHTML = prof.framings.map((o, i) => `<option value="f_${i}" data-hrs="${3 + Math.round((o.usd || 0) / 15)}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
@@ -3219,17 +3275,17 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
 
   if (pEl) {
     pEl.innerHTML = `
-      <option value="Phase 1: Clean Sketch & Silhouette" data-mult="0.55">Phase 1: Clean Sketch &amp; Silhouette (0.55× Effort)</option>
-      <option value="Phase 2: Inked Linework & Flat Color" data-mult="0.75">Phase 2: Inked Linework &amp; Flat Color (0.75× Effort)</option>
-      <option value="Phase 3: Cel-Shaded / Value & Lighting" data-mult="1.0" selected>Phase 3: Cel-Shaded / Value &amp; Lighting (1.0× Effort)</option>
-      <option value="Phase 4: Master 300DPI Render + Layered PSD" data-mult="1.35">Phase 4: Master 300DPI Render + Layered PSD (1.35× Effort)</option>
+      <option value="Phase 1: Clean Sketch & Silhouette" data-mult="0.55">Phase 1: Clean Sketch &amp; Silhouette</option>
+      <option value="Phase 2: Inked Linework & Flat Color" data-mult="0.75">Phase 2: Inked Linework &amp; Flat Color</option>
+      <option value="Phase 3: Cel-Shaded / Value & Lighting" data-mult="1.0" selected>Phase 3: Cel-Shaded / Value &amp; Lighting</option>
+      <option value="Phase 4: Master 300DPI Render + Layered PSD" data-mult="1.35">Phase 4: Master 300DPI Render + Layered PSD</option>
     `;
   }
 
   const cEnvLbl = document.getElementById('wizCrossEnv')?.nextElementSibling;
   const cCharLbl = document.getElementById('wizCrossChar')?.nextElementSibling;
-  if (cEnvLbl) cEnvLbl.textContent = '+ Environment Backdrop (+3.5h • +2d)';
-  if (cCharLbl) cCharLbl.textContent = '+ Extra Scale / Hero Figure (+2.5h • +1d)';
+  if (cEnvLbl) cEnvLbl.textContent = '+ Environment Backdrop';
+  if (cCharLbl) cCharLbl.textContent = '+ Extra Scale / Hero Figure';
 };
 
 // ==============================================================================
