@@ -4393,6 +4393,64 @@ window.refreshAdminUsdBadges = function() {
     const sign = (isSigned && usd >= 0) ? '+' : '';
     el.textContent = sign + '$' + usd;
   });
+  if (typeof window.updateAdminPriceSimulator === 'function') window.updateAdminPriceSimulator();
+};
+
+window.updateAdminPriceSimulator = function() {
+  const cat = window._adminAtelierDraft;
+  const outEl = document.getElementById('adminSimResultBox');
+  if (!cat || !outEl) return;
+  const hr = Number(cat.hourlyRate) || 15;
+
+  const scSel = document.getElementById('simScopeSel');
+  const frSel = document.getElementById('simFramingSel');
+  const cmSel = document.getElementById('simCompSel');
+  const agSel = document.getElementById('simAgeSel');
+  const phSel = document.getElementById('simPhaseSel');
+
+  const cardIdx = Number(window._adminSelectedCharCardIdx) || 0;
+  const card = (cat.serviceCards && cat.serviceCards[cardIdx]) || (cat.serviceCards && cat.serviceCards[0]);
+  const scopes = (card && Array.isArray(card.scopes) && card.scopes.length) ? card.scopes : [{ label: 'Single', hrs: 0, days: 0 }];
+
+  const sc = scopes[scSel ? (scSel.selectedIndex >= 0 ? scSel.selectedIndex : 0) : 0] || scopes[0];
+  const fr = (cat.framings || [])[frSel ? (frSel.selectedIndex >= 0 ? frSel.selectedIndex : 0) : 0] || (cat.framings || [])[0] || { hrs: 6.5, days: 0 };
+  const cm = (cat.complexities || [])[cmSel ? (cmSel.selectedIndex >= 0 ? cmSel.selectedIndex : 0) : 0] || (cat.complexities || [])[0] || { hrs: 1.5, days: 0 };
+  const ag = (cat.ages || [])[agSel ? (agSel.selectedIndex >= 0 ? agSel.selectedIndex : 0) : 0] || (cat.ages || [])[0] || { hrs: 0, days: 0 };
+  const ph = (cat.phases || [])[phSel ? (phSel.selectedIndex >= 0 ? phSel.selectedIndex : 0) : 0] || (cat.phases || [])[0] || { mult: 1.25, days: 0 };
+
+  const rawCore = Math.max(2, ((Number(sc.hrs)||0) + (Number(fr.hrs)||0) + (Number(cm.hrs)||0) + (Number(ag.hrs)||0)) * (Number(ph.mult)||1));
+  const totalHrs = Math.round(rawCore * 2) / 2;
+  const totalUsd = Math.round(totalHrs * hr);
+  const extraD = (Number(sc.days)||0) + (Number(fr.days)||0) + (Number(cm.days)||0) + (Number(ag.days)||0) + (Number(ph.days)||0);
+  const minD = Math.max(2, Math.ceil(totalHrs / 4) + extraD);
+  const maxD = Math.max(minD + 2, Math.ceil(totalHrs / 2.2) + extraD);
+
+  // Compute absolute minimum floor across current settings
+  const minFr = Math.min(...(cat.framings||[{hrs:2.5}]).map(x=>Number(x.hrs)||0));
+  const minCm = Math.min(...(cat.complexities||[{hrs:0}]).map(x=>Number(x.hrs)||0));
+  const minAg = Math.min(...(cat.ages||[{hrs:0}]).map(x=>Number(x.hrs)||0));
+  const minPh = Math.min(...(cat.phases||[{mult:0.55}]).map(x=>Number(x.mult)||1));
+  const minSc = Math.min(...scopes.map(x=>Number(x.hrs)||0));
+  const minHrs = Math.round(Math.max(2, (minSc + minFr + minCm + minAg) * minPh) * 2) / 2;
+  const minUsd = Math.round(minHrs * hr);
+
+  outEl.innerHTML = `
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <div>
+        <span style="font-size:10px; color:#94a3b8; display:block;">CLIENT FINAL QUOTE</span>
+        <strong class="font-mono" style="font-size:22px; color:var(--gold);">$${totalUsd}</strong>
+        <span class="font-mono" style="font-size:11px; color:#cbd5e1; margin-left:4px;">(${totalHrs}h)</span>
+      </div>
+      <div style="border-left:1px solid rgba(255,255,255,0.1); padding-left:14px;">
+        <span style="font-size:10px; color:#94a3b8; display:block;">TIMELINE</span>
+        <strong class="font-mono" style="font-size:13px; color:var(--cyan-electric);">${minD}–${maxD} days</strong>
+      </div>
+      <div style="border-left:1px solid rgba(255,255,255,0.1); padding-left:14px;">
+        <span style="font-size:10px; color:#94a3b8; display:block;">LOWEST POSSIBLE</span>
+        <strong class="font-mono" style="font-size:13px; color:var(--emerald);">$${minUsd}</strong>
+      </div>
+    </div>
+  `;
 };
 
 window.adminAtelierDeleteCategory = function(key) {
@@ -4456,6 +4514,49 @@ window.renderAdminAtelierEngine = function() {
         <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
           <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:3px;">Commercial + PSD Multiplier (+${Math.round((cat.commercialMult-1)*100)}%)</label>
           <input type="number" min="1" max="3" step="0.05" value="${cat.commercialMult}" oninput="window._adminAtelierDraft.commercialMult = Number(this.value)||1.4; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Price & Timeline Simulator Bar -->
+    <div style="background:#070b14; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:14px 18px; display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h4 style="font-size:13.5px; font-weight:900; color:var(--cyan-electric); margin:0;">🧮 Live Client Price Simulator (Instant Check)</h4>
+          <span style="font-size:10.5px; color:#94a3b8;">Test any combination below — updates live as you edit hours, multipliers, or days.</span>
+        </div>
+        <div id="adminSimResultBox"></div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px;">
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Scope (${activeCharCard ? activeCharCard.title : 'Card'})</label>
+          <select id="simScopeSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            ${((activeCharCard && activeCharCard.scopes) || []).map(sc => `<option>${sc.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Framing</label>
+          <select id="simFramingSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            ${(cat.framings || []).map((f, i) => `<option ${f.id === 'full' ? 'selected' : ''}>${f.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Complexity</label>
+          <select id="simCompSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            ${(cat.complexities || []).map((cm, i) => `<option ${i === 1 ? 'selected' : ''}>${cm.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Age Tier</label>
+          <select id="simAgeSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            ${(cat.ages || []).map(ag => `<option ${ag.id === 'adult' ? 'selected' : ''}>${ag.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Rendering Phase</label>
+          <select id="simPhaseSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            ${(cat.phases || []).map((ph, i) => `<option ${i === (cat.phases.length - 1) ? 'selected' : ''}>${ph.label}</option>`).join('')}
+          </select>
         </div>
       </div>
     </div>
@@ -4566,7 +4667,7 @@ window.renderAdminAtelierEngine = function() {
                   <div style="display:grid; grid-template-columns:1fr 120px 64px 28px; gap:8px; align-items:center; background:#04060a; padding:7px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
                     <input type="text" value="${(sc.label || '').replace(/"/g, '&quot;')}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#080c16; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
                     <div style="display:flex; align-items:center; gap:5px;">
-                      <input type="number" step="0.5" value="${sc.hrs}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:62px; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+                      <input type="number" step="0.5" value="${sc.hrs}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].hrs = Number(this.value)||0; window.refreshAdminUsdBadges(); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:62px; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
                       <span class="font-mono" style="font-size:10.5px; color:${deltaUsd < 0 ? 'var(--emerald)' : '#94a3b8'};">${sign}$${deltaUsd}</span>
                     </div>
                     <input type="number" step="1" title="Extra Days" value="${sc.days || 0}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
@@ -4613,7 +4714,7 @@ window.renderAdminAtelierEngine = function() {
     `}
 
     <!-- Section 2: Framing Views, Design Complexities & Character Ages -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(420px, 1fr)); gap:16px;">
       <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">📐 Framing Views (Synced to Gallery)</h4>
@@ -4692,7 +4793,7 @@ window.renderAdminAtelierEngine = function() {
         ${cat.phases.map((ph, idx) => `
           <div style="display:grid; grid-template-columns:1.5fr 70px 70px 70px auto auto 26px; gap:8px; align-items:center; background:#060911; padding:9px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
             <input type="text" value="${(ph.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.phases[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-            <input type="number" step="0.05" title="Price Multiplier" value="${ph.mult}" oninput="window._adminAtelierDraft.phases[${idx}].mult = Number(this.value)||1; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+            <input type="number" step="0.05" title="Price Multiplier" value="${ph.mult}" oninput="window._adminAtelierDraft.phases[${idx}].mult = Number(this.value)||1; window.refreshAdminUsdBadges(); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
             <input type="number" step="1" title="Included Revisions" value="${ph.revisions}" oninput="window._adminAtelierDraft.phases[${idx}].revisions = Number(this.value)||1; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:5px; color:var(--emerald); text-align:center;" />
             <input type="number" step="1" title="Extra Days" value="${ph.days || 0}" oninput="window._adminAtelierDraft.phases[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
             <label style="font-size:10.5px; color:#cbd5e1; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" ${ph.allowColorVar ? 'checked' : ''} onchange="window._adminAtelierDraft.phases[${idx}].allowColorVar = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Color Var</span></label>
@@ -4791,6 +4892,7 @@ window.renderAdminAtelierEngine = function() {
       </div>
     </div>
   `;
+  if (typeof window.updateAdminPriceSimulator === 'function') window.updateAdminPriceSimulator();
 };
 
 window.adminAtelierAddServiceCard = function() {
