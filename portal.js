@@ -1391,7 +1391,7 @@ function renderMemberDashboard() {
             const totalRevs = (Number(sp.revisionsIncluded) || 2) + extraRevPaid;
             const usedRevs = Number(sp.revisionsUsed) || 0;
             const delivUrl = sp.deliverableUrl || '';
-            const hasDeliv = delivUrl && delivUrl.startsWith('http');
+            const hasDeliv = Boolean(delivUrl && String(delivUrl).trim().length > 0);
             const isImgDeliv = hasDeliv && (/\.(png|jpe?g|webp|gif)(\?|$)/i.test(delivUrl) || delivUrl.includes('cloudinary.com'));
             return `
               <div style="padding:14px 16px; border-radius:12px; background:${hasDeliv ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.02)'}; border:1.5px solid ${hasDeliv ? 'rgba(16,185,129,0.45)' : 'rgba(255,255,255,0.08)'}; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
@@ -1404,7 +1404,7 @@ function renderMemberDashboard() {
                   </div>
                 </div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                  ${hasDeliv ? `<a href="${delivUrl}" target="_blank" rel="noopener" class="btn-gold" style="font-size:11px; padding:7px 13px; text-decoration:none;">📥 View / Download Work ↗</a>` : ''}
+                  ${hasDeliv ? (delivUrl.startsWith('http') ? `<a href="${delivUrl}" target="_blank" rel="noopener" class="btn-gold" style="font-size:11px; padding:7px 13px; text-decoration:none;">📥 View / Download Work ↗</a>` : `<span class="font-mono" style="font-size:11px; padding:6px 10px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); border-radius:6px; color:#fff;">📦 ${delivUrl}</span>`) : ''}
                   ${o.paymentVerified && currentStageNum < 5 ? `
                     <button type="button" onclick="window.clientApproveCurrentStage(${o.id})" class="btn-secondary" style="font-size:11px; padding:7px 12px; color:var(--emerald); border-color:rgba(16,185,129,0.5);">✓ Approve &amp; Advance</button>
                     ${usedRevs < totalRevs
@@ -3096,7 +3096,13 @@ window.sendOrderChatMessage = async function(orderId, senderRole) {
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
   if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
   if (window.supabaseClient) {
-    try { await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id); } catch(e) {}
+    try {
+      const { error } = await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id);
+      if (error) {
+        console.warn('[Orders Update Error]', error);
+        showToast('Cloud sync needs SQL policy on orders: ' + error.message, 'error', 5500);
+      }
+    } catch(e) {}
   }
   if (msgEl) msgEl.value = '';
   if (fileEl) fileEl.value = '';
