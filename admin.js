@@ -1480,6 +1480,9 @@ window.switchAdminTab = function(tabKey, btn) {
 };
 
 function renderAdminSketch1() {
+  const hrEl = document.getElementById('adminStudioHourlyRateInput');
+  if (hrEl) hrEl.value = (typeof siteSettings !== 'undefined' && siteSettings && Number(siteSettings.studioHourlyRate)) ? Number(siteSettings.studioHourlyRate) : 15;
+  if (typeof window.renderAdminHourlyBenchmarks === 'function') window.renderAdminHourlyBenchmarks();
   const catList = document.getElementById('adminCategoryListCol');
   if (!catList) return;
   catList.innerHTML = Object.keys(PIPELINE_DATA).map(key => `
@@ -4098,4 +4101,38 @@ window.syncPipelinesToCloud = async function() {
       updated_at: new Date().toISOString()
     }], { onConflict: 'key' });
   } catch(e) { console.warn('[Pipeline Cloud Sync]', e); }
+};
+
+// ==============================================================================
+// STUDIO HOURLY RATE CALIBRATOR (Admin Tab 2)
+// ==============================================================================
+window.renderAdminHourlyBenchmarks = function() {
+  const el = document.getElementById('adminHourlyBenchmarks');
+  const inp = document.getElementById('adminStudioHourlyRateInput');
+  const rate = inp ? (Number(inp.value) || 15) : 15;
+  if (el) {
+    el.textContent = `Lineup Assembly (2.5h): $${Math.round(2.5*rate)} • Portrait Sketch (2h): $${Math.round(2*rate)} • Half-Body (5h): $${Math.round(5*rate)} • Full-Body (8h): $${Math.round(8*rate)}`;
+  }
+};
+
+window.setAdminHourlyRatePreset = function(val) {
+  const inp = document.getElementById('adminStudioHourlyRateInput');
+  if (inp) inp.value = String(val);
+  window.renderAdminHourlyBenchmarks();
+};
+
+window.saveStudioHourlyRateDirect = async function() {
+  const inp = document.getElementById('adminStudioHourlyRateInput');
+  const rate = Math.max(5, Math.min(200, Number(inp ? inp.value : 15) || 15));
+  if (typeof siteSettings !== 'undefined' && siteSettings) {
+    siteSettings.studioHourlyRate = rate;
+    safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+    if (typeof window.syncStudioSettingsToCloud === 'function') await window.syncStudioSettingsToCloud();
+  }
+  if (typeof selectPipeline === 'function' && typeof currentSelectedPipeKey !== 'undefined') {
+    const activeCard = document.querySelector(`#atelierServiceCards .service-nav-card[data-pipeline="${currentSelectedPipeKey}"]`);
+    selectPipeline(currentSelectedPipeKey, activeCard, false);
+  }
+  window.renderAdminHourlyBenchmarks();
+  showToast(`Studio hourly rate calibrated to $${rate}/hr & synced to cloud! ✓`, 'success', 4000);
 };

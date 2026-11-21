@@ -328,25 +328,62 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   // واکشی کارهای واقعی گالری مربوط به این پایپلاین برای تایل‌های مراحل
   const matchingArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline(key) : [];
 
-  // ۳. بارگذاری مستقیم فرم سفارش و محاسبه‌گر قیمت درون پنل سمت راست (بدون پاپ‌آپ لایتباکس)
-  const mainTile = (Array.isArray(data.tiles) && data.tiles[0]) ? data.tiles[0] : { title: data.topSub || 'Commission', desc: data.note || '', price: '90', timeline: '5 to 7 business days', usdVal: 90 };
-  const displayPrice = formatPrice(mainTile.price);
-  let heroImg = mainTile.img || '';
-  if (matchingArts.length > 0 && matchingArts[0]) {
-    heroImg = matchingArts[0].image || heroImg;
-  }
-  const optHeroImg = (typeof getOptimizedImageUrl === 'function' && heroImg && !heroImg.startsWith('data:')) ? getOptimizedImageUrl(heroImg, 960) : heroImg;
+  // ۳. رندر کارت‌های نمای شاپ (۴ کارت متمرکز کاراکتر برای sketch1 + کارت‌های پایپلاین برای بقیه)
+  const container = document.getElementById('mosaicStageContainer');
+  const hourly = window.getStudioHourlyRate();
+  const cardsToRender = (key === 'sketch1' && Array.isArray(window.CHARACTER_SHOP_CARDS))
+    ? window.CHARACTER_SHOP_CARDS.map(c => ({
+        title: c.title,
+        desc: c.desc,
+        img: c.img,
+        timeline: c.timeline,
+        baseHours: c.baseHours,
+        usdVal: Math.round(c.baseHours * hourly),
+        price: String(Math.round(c.baseHours * hourly)),
+        subMode: c.subMode,
+        span: 'span-1'
+      }))
+    : (Array.isArray(data.tiles) ? data.tiles.map(t => ({ ...t, baseHours: t.baseHours || Math.max(2, Math.round((t.usdVal || 90) / 15)) })) : []);
 
-  if (typeof window.populateInlineCommissionWizard === 'function') {
-    window.populateInlineCommissionWizard(
-      mainTile.title || data.topSub || 'Commission',
-      data.note || mainTile.desc || '',
-      displayPrice,
-      optHeroImg,
-      mainTile.timeline || '5 to 7 business days',
-      mainTile.usdVal || 90,
-      key
-    );
+  if (container) {
+    container.innerHTML = cardsToRender.map((tile, idx) => {
+      const estUsd = Math.round((tile.baseHours || 5) * hourly);
+      const displayPrice = formatPrice(String(estUsd));
+      let tileImg = tile.img;
+      if (matchingArts.length > 0) {
+        const matchedArt = matchingArts[idx % matchingArts.length];
+        if (matchedArt) {
+          if (Array.isArray(matchedArt.phases) && matchedArt.phases[idx] && (matchedArt.phases[idx].image || matchedArt.phases[idx].img)) {
+            tileImg = matchedArt.phases[idx].image || matchedArt.phases[idx].img;
+          } else if (matchedArt.image) {
+            tileImg = matchedArt.image;
+          }
+        }
+      }
+      const optTileImg = (typeof getOptimizedImageUrl === 'function' && tileImg && !tileImg.startsWith('data:')) ? getOptimizedImageUrl(tileImg, 720) : tileImg;
+      const escapedTitle = (tile.title || '').replace(/'/g, "\\'");
+      const escapedDesc = (tile.desc || '').replace(/'/g, "\\'");
+      const subMode = tile.subMode || '';
+
+      return `
+        <div class="pipeline-tile ${tile.span || ''}" style="--tile-accent:${catColor};" onclick="openModal('${escapedTitle}', '${escapedDesc}', '${displayPrice}', '${optTileImg}', '${tile.timeline}', ${estUsd}, '${key}', '${subMode}')">
+          <img src="${optTileImg}" class="pipeline-tile-img" alt="${escapedTitle}" loading="lazy" decoding="async" />
+          <div class="pipeline-tile-overlay">
+            <h4 class="pipeline-tile-title">${tile.title}</h4>
+            <p class="pipeline-tile-desc">${tile.desc}</p>
+            <div class="pipeline-tile-footer">
+              <div>
+                <span class="font-mono" style="color:${catColor}; font-size:14px; font-weight:800; text-shadow:0 0 10px ${catColor}55;">From ${displayPrice}</span>
+                <span style="color:var(--cyan-electric); font-size:11px; margin-left:8px;">(~${tile.baseHours || 5}h • ${tile.timeline})</span>
+              </div>
+              <span style="font-size:11.5px; color:${catColor}; font-weight:800; display:flex; align-items:center; gap:4px;">
+                Configure &amp; Order →
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   if (userClicked && window.innerWidth <= 1024) {
@@ -358,8 +395,47 @@ window.selectPipeline = function(key, cardEl, userClicked) {
   }
 };
 
-// پرکردن مستقیم میزکار سفارش در ستون راست شاپ (بدون لایتباکس)
-window.populateInlineCommissionWizard = function(title, desc, price, img, timeline, usdVal, pipeKey) {
+window.getStudioHourlyRate = function() {
+  const r = (typeof siteSettings !== 'undefined' && siteSettings && Number(siteSettings.studioHourlyRate)) ? Number(siteSettings.studioHourlyRate) : 15;
+  return r > 0 ? r : 15;
+};
+
+window.CHARACTER_SHOP_CARDS = [
+  {
+    subMode: 'custom',
+    title: 'Custom Characters & Portraits',
+    desc: 'Original heroes, D&D characters, portraits, half-body or full-body concepts with age tiers & optional companions.',
+    img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+    timeline: '3 to 7 business days',
+    baseHours: 3.5
+  },
+  {
+    subMode: 'lineup',
+    title: 'Character Lineup & Party Sheet',
+    desc: 'Design a full party from scratch OR assemble your existing characters into a clean height & graphic lineup at a lower rate.',
+    img: 'https://images.unsplash.com/photo-1560972550-aba3456b5564?auto=format&fit=crop&w=800&q=80',
+    timeline: '2 to 8 business days',
+    baseHours: 2.5
+  },
+  {
+    subMode: 'creator',
+    title: 'YouTuber, PNGTuber & Mascot',
+    desc: 'Channel avatars, brand mascots & reactive PNGTuber expression packs with transparent PNGs for thumbnails and streams.',
+    img: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80',
+    timeline: '3 to 5 business days',
+    baseHours: 4.5
+  },
+  {
+    subMode: 'photo',
+    title: 'Transform Yourself (From Photo)',
+    desc: 'Turn your real photo (solo, couple, or friends) into a custom Dark Fantasy or Cyberpunk character portrait.',
+    img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
+    timeline: '3 to 5 business days',
+    baseHours: 3.5
+  }
+];
+
+function openModal(title, desc, price, img, timeline, usdVal, pipeKey, subMode) {
   activeModalItem = {
     title: title,
     titleFa: document.getElementById("editArtTitleFa") ? document.getElementById("editArtTitleFa").value.trim() : "",
@@ -368,18 +444,15 @@ window.populateInlineCommissionWizard = function(title, desc, price, img, timeli
     price: price,
     img: img,
     timeline: timeline || '5 to 7 business days',
-    usdVal: usdVal || 90,
-    pipeKey: pipeKey || currentSelectedPipeKey
+    usdVal: usdVal || 60,
+    pipeKey: pipeKey || currentSelectedPipeKey,
+    subMode: subMode || ''
   };
 
-  const tEl = document.getElementById('modalTitle');
-  const dEl = document.getElementById('modalDesc');
-  const tlEl = document.getElementById('modalTimeline');
-  const imgEl = document.getElementById('modalMediaImg');
-  if (tEl) tEl.textContent = title;
-  if (dEl) dEl.textContent = desc;
-  if (tlEl) tlEl.textContent = activeModalItem.timeline;
-  if (imgEl && img) imgEl.src = img;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('modalTimeline').textContent = activeModalItem.timeline;
+  document.getElementById('modalMediaImg').src = img;
 
   const badgeEl = document.getElementById('wizardPipeBadge');
   if (badgeEl) {
@@ -387,33 +460,23 @@ window.populateInlineCommissionWizard = function(title, desc, price, img, timeli
     badgeEl.textContent = pData ? pData.topSub : 'ATELIER PIPELINE';
   }
   if (typeof window.populateDynamicWizardForCategory === 'function') {
-    window.populateDynamicWizardForCategory(activeModalItem.pipeKey);
+    window.populateDynamicWizardForCategory(activeModalItem.pipeKey, activeModalItem.subMode);
   }
 
   if (currentMember) {
     const nameInput = document.getElementById('orderClientName');
     const contactInput = document.getElementById('orderClientContact');
-    if (nameInput && !nameInput.value) nameInput.value = currentMember.name;
-    if (contactInput && !contactInput.value) contactInput.value = currentMember.contact || currentMember.email;
+    if (nameInput) nameInput.value = currentMember.name;
+    if (contactInput) contactInput.value = currentMember.contact || currentMember.email;
   }
 
   recalcWizardPrice();
-};
-
-// هدایت از گالری یا بخش‌های دیگر به میزکار آنلاین سفارش
-function openModal(title, desc, price, img, timeline, usdVal, pipeKey) {
-  const targetPipe = pipeKey || currentSelectedPipeKey || 'sketch1';
-  if (typeof switchView === 'function') switchView('store');
-  if (typeof switchStoreTab === 'function') switchStoreTab('commissions');
-  const navCard = document.querySelector(`#atelierServiceCards .service-nav-card[data-pipeline="${targetPipe}"]`);
-  selectPipeline(targetPipe, navCard, false);
-  window.populateInlineCommissionWizard(title, desc, price, img, timeline, usdVal, targetPipe);
-  const wb = document.getElementById('sketchWorkbenchArea');
-  if (wb) wb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const zm = document.getElementById('zoomModal');
+  if (zm) zm.classList.add('active');
 }
 
-function closeModal(e) {}
-function closeModalDirect() {}
+function closeModal(e) { if (e && e.target && e.target.id === 'zoomModal') closeModalDirect(); }
+function closeModalDirect() { const zm = document.getElementById('zoomModal'); if (zm) zm.classList.remove('active'); }
 
 // موتور محاسبه‌گر لحظه‌ای قیمت و اسکوپ سفارش (Live Calculator Engine)
 window.toggleWizardStep = function(stepNum) {
@@ -422,63 +485,88 @@ window.toggleWizardStep = function(stepNum) {
 };
 
 window.recalcWizardPrice = function() {
-  let baseUSD = 90;
-  if (activeModalItem && typeof activeModalItem.usdVal === 'number' && activeModalItem.usdVal > 0) {
-    baseUSD = activeModalItem.usdVal;
-  }
-
+  const hourly = window.getStudioHourlyRate();
   const scopeEl = document.getElementById('wizCharacterScope');
   const framingEl = document.getElementById('wizFraming');
   const compEl = document.getElementById('wizComplexity');
   const phaseEl = document.getElementById('orderPhaseSelect');
-  const weaponEl = document.getElementById('wizHeroWeapon');
-  const expEl = document.getElementById('wizExpressions');
-  const paletteEl = document.getElementById('wizColorPalette');
-  const commEl = document.getElementById('wizCommercial');
+  const ageEl = document.getElementById('wizAgeTier');
+  const compnEl = document.getElementById('wizCompanionTier');
+  const lineupCountEl = document.getElementById('wizLineupCount');
 
-  let extra = 0;
-  if (scopeEl) extra += parseInt(scopeEl.options[scopeEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (framingEl) extra += parseInt(framingEl.options[framingEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (compEl) extra += parseInt(compEl.options[compEl.selectedIndex].getAttribute('data-usd') || 0, 10);
-  if (phaseEl) extra += parseInt(phaseEl.options[phaseEl.selectedIndex].getAttribute('data-usd') || 0, 10);
+  const scopeOpt = scopeEl ? scopeEl.options[scopeEl.selectedIndex] : null;
+  const scopeVal = scopeOpt ? scopeOpt.value : 'single';
+  const scopeBaseHrs = scopeOpt ? (parseFloat(scopeOpt.getAttribute('data-hrs') || '0') || 0) : 0;
+
+  const framingOpt = framingEl ? framingEl.options[framingEl.selectedIndex] : null;
+  const framingHrs = framingOpt ? (parseFloat(framingOpt.getAttribute('data-hrs') || '3') || 3) : 3;
+
+  const compOpt = compEl ? compEl.options[compEl.selectedIndex] : null;
+  const compHrs = compOpt ? (parseFloat(compOpt.getAttribute('data-hrs') || '1.5') || 1.5) : 1.5;
+
+  const ageOpt = ageEl ? ageEl.options[ageEl.selectedIndex] : null;
+  const ageHrs = (ageEl && ageEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && ageOpt) ? (parseFloat(ageOpt.getAttribute('data-hrs') || '0') || 0) : 0;
+
+  const compnOpt = compnEl ? compnEl.options[compnEl.selectedIndex] : null;
+  const compnHrs = (compnEl && compnEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && compnOpt) ? (parseFloat(compnOpt.getAttribute('data-hrs') || '0') || 0) : 0;
+
+  const phaseOpt = phaseEl ? phaseEl.options[phaseEl.selectedIndex] : null;
+  const fidelityMult = phaseOpt ? (parseFloat(phaseOpt.getAttribute('data-mult') || '1') || 1) : 1;
+
+  let coreHrs = 0;
+  if (activeModalItem && activeModalItem.subMode === 'lineup') {
+    const cnt = lineupCountEl ? (parseInt(lineupCountEl.value, 10) || 2) : 2;
+    if (scopeVal === 'existing_lineup') {
+      coreHrs = 1.5 + (cnt * 0.5); // Graphic assembly & height scale only (fair low rate!)
+    } else {
+      coreHrs = (cnt * (framingHrs + compHrs * 0.8)) * fidelityMult;
+    }
+  } else {
+    coreHrs = Math.max(2, (scopeBaseHrs + framingHrs + compHrs + ageHrs) * fidelityMult);
+  }
+
+  let addonHrs = compnHrs;
   let extraDays = 0;
-  if (weaponEl && weaponEl.checked) extra += 35;
-  if (expEl && expEl.checked) extra += 30;
-  if (paletteEl && paletteEl.checked) extra += 20;
-  if (commEl && commEl.checked) extra += 45;
+  if (document.getElementById('wizHeroWeapon')?.checked) addonHrs += 2.0;
+  if (document.getElementById('wizExpressions')?.checked) addonHrs += 2.0;
+  if (document.getElementById('wizColorPalette')?.checked) addonHrs += 1.5;
+  if (document.getElementById('wizCommercial')?.checked) addonHrs += 3.0;
+  if (document.getElementById('wizCrossEnv')?.checked) { addonHrs += 3.5; extraDays += 2; }
+  if (document.getElementById('wizCrossChar')?.checked) { addonHrs += 2.5; extraDays += 1; }
 
-  const crossEnvEl = document.getElementById('wizCrossEnv');
-  const crossCharEl = document.getElementById('wizCrossChar');
-  if (crossEnvEl && crossEnvEl.checked) { extra += 55; extraDays += 2; }
-  if (crossCharEl && crossCharEl.checked) { extra += 40; extraDays += 1; }
+  const totalHours = Math.max(2, Math.round((coreHrs + addonHrs) * 2) / 2);
+  const totalUSD = Math.round(totalHours * hourly);
 
-  const totalUSD = Math.max(60, baseUSD + extra);
-  activeModalItem.calculatedPriceUSD = totalUSD;
+  if (activeModalItem) {
+    activeModalItem.calculatedPriceUSD = totalUSD;
+    activeModalItem.estimatedHours = totalHours;
+    activeModalItem.hourlyRate = hourly;
+  }
+
+  const effEl = document.getElementById('modalEffortHours');
+  if (effEl) effEl.textContent = `~${totalHours} hrs @ $${hourly}/hr`;
 
   const tlEl = document.getElementById('modalTimeline');
-  if (tlEl && activeModalItem) {
-    tlEl.textContent = extraDays > 0
-      ? `${activeModalItem.timeline} (+${extraDays}d cross-discipline)`
-      : activeModalItem.timeline;
+  if (tlEl) {
+    const minD = Math.max(2, Math.ceil(totalHours / 4) + extraDays);
+    const maxD = Math.max(minD + 2, Math.ceil(totalHours / 2.2) + extraDays);
+    tlEl.textContent = `${minD} to ${maxD} business days`;
   }
 
-  // آپدیت هوشمند تصویر پیش‌نمایش ویزارد بر اساس گزینه‌های انتخابی و آثار آتلیه
-  if (typeof window.updateWizardDynamicPreview === 'function' && activeModalItem) {
-    const sTxt = scopeEl ? scopeEl.options[scopeEl.selectedIndex].text : '';
-    const fTxt = framingEl ? framingEl.options[framingEl.selectedIndex].text : '';
-    const cTxt = compEl ? compEl.options[compEl.selectedIndex].text : '';
-    const pTxt = phaseEl ? phaseEl.options[phaseEl.selectedIndex].text : '';
-    window.updateWizardDynamicPreview(activeModalItem.pipeKey, fTxt, pTxt, sTxt, cTxt);
-  }
-
-  // آپدیت آنی و زنده قیمت روی صفحه
   const priceEl = document.getElementById('modalPrice');
   if (priceEl) {
     priceEl.textContent = formatPrice(totalUSD);
-    // افکت فلش ظریف هنگام تغییر عدد
     priceEl.style.transition = 'color 0.2s';
     priceEl.style.color = 'var(--cyan-electric)';
     setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 250);
+  }
+
+  if (typeof window.updateWizardDynamicPreview === 'function' && activeModalItem) {
+    const sTxt = scopeOpt ? scopeOpt.text : '';
+    const fTxt = framingOpt ? framingOpt.text : '';
+    const cTxt = compOpt ? compOpt.text : '';
+    const pTxt = phaseOpt ? phaseOpt.text : '';
+    window.updateWizardDynamicPreview(activeModalItem.pipeKey, fTxt, pTxt, sTxt, cTxt);
   }
 };
 
@@ -1476,11 +1564,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const retainerUsd = (totalUsd * 0.5).toFixed(2).replace(/\.00$/, '');
       const clientEmail = (window.currentMember && window.currentMember.email) ? window.currentMember.email : (contact.includes('@') ? contact : '');
 
+      const ageTxt = document.getElementById('wizAgeTier')?.selectedOptions[0]?.text || 'Standard';
+      const compnTxt = document.getElementById('wizCompanionTier')?.selectedOptions[0]?.text || 'None';
       const specs = {
         scope: scopeText,
         framing: framingText,
         complexity: complexityText,
         fidelity: fidelityText,
+        ageTier: ageTxt,
+        companionTier: compnTxt,
+        estimatedHours: activeModalItem.estimatedHours || 0,
+        hourlyRate: activeModalItem.hourlyRate || window.getStudioHourlyRate(),
         addons: addons,
         totalUsd: totalUsd,
         retainerUsd: retainerUsd,
@@ -3061,7 +3155,7 @@ window.WIZARD_CATEGORY_PROFILES = {
   }
 };
 
-window.populateDynamicWizardForCategory = function(pipeKey) {
+window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
   const prof = window.WIZARD_CATEGORY_PROFILES[pipeKey] || window.WIZARD_CATEGORY_PROFILES.sketch1;
   const sLbl = document.getElementById('wizScopeLabel');
   const fLbl = document.getElementById('wizFramingLabel');
@@ -3069,50 +3163,74 @@ window.populateDynamicWizardForCategory = function(pipeKey) {
   if (fLbl) fLbl.textContent = prof.framingLabel;
 
   const sEl = document.getElementById('wizCharacterScope');
-  if (sEl) {
-    sEl.innerHTML = prof.scopes.map((item, idx) =>
-      `<option value="opt_${idx}" data-usd="${item[1]}" ${idx === 0 ? 'selected' : ''}>${item[0]}</option>`
-    ).join('');
-  }
   const fEl = document.getElementById('wizFraming');
-  if (fEl) {
-    fEl.innerHTML = prof.framings.map((item, idx) =>
-      `<option value="frm_${idx}" data-usd="${item[1]}" ${idx === 0 ? 'selected' : ''}>${item[0]}</option>`
-    ).join('');
-  }
-};
+  const pEl = document.getElementById('orderPhaseSelect');
+  const nuancesGrid = document.getElementById('wizCharacterNuancesGrid');
+  const lineupWrap = document.getElementById('wizLineupCountWrap');
 
-// ==============================================================================
-// LIVE 24H UNPAID BRIEF COUNTDOWN TICKER (HH:MM:SS)
-// ==============================================================================
-if (!window._unpaidCountdownInterval) {
-  window._unpaidCountdownInterval = setInterval(() => {
-    const els = document.querySelectorAll('.unpaid-countdown-timer[data-created-ms]');
-    if (!els.length) return;
-    let expiredFound = false;
-    const now = Date.now();
-    const DAY_MS = 24 * 60 * 60 * 1000;
-    els.forEach(el => {
-      const cMs = Number(el.getAttribute('data-created-ms'));
-      if (!cMs || Number.isNaN(cMs)) return;
-      const remMs = Math.max(0, DAY_MS - (now - cMs));
-      if (remMs === 0) {
-        expiredFound = true;
-        el.textContent = '00:00:00';
-        return;
-      }
-      const h = String(Math.floor(remMs / 3600000)).padStart(2, '0');
-      const m = String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0');
-      const s = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
-      el.textContent = `${h}:${m}:${s}`;
-    });
-    if (expiredFound && typeof window.purgeExpiredUnpaidOrders === 'function') {
-      if (window.purgeExpiredUnpaidOrders() && typeof renderMemberDashboard === 'function') {
-        renderMemberDashboard();
-      }
+  const isChar = !pipeKey || pipeKey === 'sketch1';
+  if (nuancesGrid) nuancesGrid.style.display = (isChar && subMode !== 'lineup') ? 'grid' : 'none';
+  if (lineupWrap) lineupWrap.style.display = (subMode === 'lineup') ? 'block' : 'none';
+
+  if (sEl) {
+    if (subMode === 'lineup') {
+      if (sLbl) sLbl.textContent = 'Lineup Mode:';
+      sEl.innerHTML = `
+        <option value="existing_lineup" data-hrs="2.5" selected>📐 Existing Characters Graphic Lineup (Assembly &amp; Height Chart — Lower Cost)</option>
+        <option value="new_party" data-hrs="5">⚔️ Design New Party Characters From Scratch (Per-Character Rate)</option>
+      `;
+    } else if (subMode === 'creator') {
+      if (sLbl) sLbl.textContent = 'Creator / Mascot Format:';
+      sEl.innerHTML = `
+        <option value="yt_avatar" data-hrs="1.5" selected>🎬 Channel Avatar + Transparent PNG</option>
+        <option value="pngtuber" data-hrs="3">🎙️ Reactive PNGTuber Pack (Mouth/Eye Open-Closed + 2 Emotions)</option>
+        <option value="mascot_brand" data-hrs="3.5">🛡️ Full Brand Mascot + Thumbnail Pose Kit</option>
+      `;
+    } else if (subMode === 'photo') {
+      if (sLbl) sLbl.textContent = 'Photo Transformation Scope:';
+      sEl.innerHTML = `
+        <option value="solo_photo" data-hrs="1" selected>🧑 Solo Dark Fantasy / Cyberpunk Transformation</option>
+        <option value="couple_photo" data-hrs="4">👥 Couple / Duo Fantasy Portrait</option>
+        <option value="pet_photo" data-hrs="2.5">🐾 Hero + Real Pet Companion</option>
+      `;
+    } else if (isChar) {
+      sEl.innerHTML = `
+        <option value="single" data-hrs="0" selected>👤 Single Character / Portrait Concept</option>
+        <option value="redesign" data-hrs="1">🔄 Existing Character Redesign &amp; Upgrade</option>
+        <option value="dnd_pack" data-hrs="1.5">🎲 D&amp;D Campaign Pack (+ VTT Token Included)</option>
+      `;
+    } else {
+      sEl.innerHTML = prof.scopes.map((o, i) => `<option value="opt_${i}" data-hrs="${Math.max(0, Math.round((o.usd || 0) / 15))}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
     }
-  }, 1000);
-}
+  }
+
+  if (fEl) {
+    if (isChar) {
+      fEl.innerHTML = `
+        <option value="portrait" data-hrs="3">Portrait / Bust (~3 hrs base)</option>
+        <option value="half" data-hrs="5" selected>Half-Body / Waist-Up (~5 hrs base)</option>
+        <option value="full" data-hrs="8">Full-Body Character (~8 hrs base)</option>
+        <option value="turnaround" data-hrs="13">Full-Body + 3-View Turnaround (~13 hrs base)</option>
+      `;
+    } else {
+      fEl.innerHTML = prof.framings.map((o, i) => `<option value="f_${i}" data-hrs="${3 + Math.round((o.usd || 0) / 15)}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
+    }
+  }
+
+  if (pEl) {
+    pEl.innerHTML = `
+      <option value="Phase 1: Clean Sketch & Silhouette" data-mult="0.55">Phase 1: Clean Sketch &amp; Silhouette (0.55× Effort)</option>
+      <option value="Phase 2: Inked Linework & Flat Color" data-mult="0.75">Phase 2: Inked Linework &amp; Flat Color (0.75× Effort)</option>
+      <option value="Phase 3: Cel-Shaded / Value & Lighting" data-mult="1.0" selected>Phase 3: Cel-Shaded / Value &amp; Lighting (1.0× Effort)</option>
+      <option value="Phase 4: Master 300DPI Render + Layered PSD" data-mult="1.35">Phase 4: Master 300DPI Render + Layered PSD (1.35× Effort)</option>
+    `;
+  }
+
+  const cEnvLbl = document.getElementById('wizCrossEnv')?.nextElementSibling;
+  const cCharLbl = document.getElementById('wizCrossChar')?.nextElementSibling;
+  if (cEnvLbl) cEnvLbl.textContent = '+ Environment Backdrop (+3.5h • +2d)';
+  if (cCharLbl) cCharLbl.textContent = '+ Extra Scale / Hero Figure (+2.5h • +1d)';
+};
 
 // ==============================================================================
 // DYNAMIC WIZARD IMAGE MATCHER (Reads Sheet Pipeline, Subcategory, Stage & Complexity)
