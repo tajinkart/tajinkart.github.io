@@ -402,13 +402,28 @@ window.getStudioHourlyRate = function() {
 window.getStudioEffortConfig = function() {
   const cfg = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.studioEffortConfig) ? siteSettings.studioEffortConfig : {};
   return {
-    portrait: Number(cfg.portrait) || 3,
-    half: Number(cfg.half) || 5,
-    full: Number(cfg.full) || 8,
-    turnaround: Number(cfg.turnaround) || 13,
+    portrait: Number(cfg.portrait) || 2.5,
+    half: Number(cfg.half) || 4,
+    full: Number(cfg.full) || 6.5,
+    turnaround: Number(cfg.turnaround) || 11,
     pet: Number(cfg.pet) || 2,
     subchar: Number(cfg.subchar) || 4.5
   };
+};
+window.toggleWizardModuleDrawer = function(drawerId, isOpen, disp = 'grid') {
+  const el = document.getElementById(drawerId);
+  if (el) el.style.display = isOpen ? disp : 'none';
+  if (typeof window.recalcWizardPrice === 'function') window.recalcWizardPrice();
+};
+window.handleWizardPhaseChange = function() {
+  const pEl = document.getElementById('orderPhaseSelect');
+  const mult = pEl ? (parseFloat(pEl.options[pEl.selectedIndex]?.getAttribute('data-mult') || '1') || 1) : 1;
+  const isSketch = mult <= 0.6;
+  const exWrap = document.getElementById('wizExtraSketchesWrap');
+  const cvWrap = document.getElementById('wizColorVarWrap');
+  if (exWrap) exWrap.style.display = isSketch ? 'block' : 'none';
+  if (cvWrap) cvWrap.style.display = isSketch ? 'none' : 'grid';
+  if (typeof window.recalcWizardPrice === 'function') window.recalcWizardPrice();
 };
 
 window.CHARACTER_SHOP_CARDS = [
@@ -502,8 +517,6 @@ window.recalcWizardPrice = function() {
   const framingEl = document.getElementById('wizFraming');
   const compEl = document.getElementById('wizComplexity');
   const phaseEl = document.getElementById('orderPhaseSelect');
-  const ageEl = document.getElementById('wizAgeTier');
-  const compnEl = document.getElementById('wizCompanionTier');
   const lineupCountEl = document.getElementById('wizLineupCount');
 
   const scopeOpt = scopeEl ? scopeEl.options[scopeEl.selectedIndex] : null;
@@ -511,8 +524,8 @@ window.recalcWizardPrice = function() {
   const scopeBaseHrs = scopeOpt ? (parseFloat(scopeOpt.getAttribute('data-hrs') || '0') || 0) : 0;
 
   const framingOpt = framingEl ? framingEl.options[framingEl.selectedIndex] : null;
-  const framingVal = framingOpt ? framingOpt.value : 'half';
-  let framingHrs = framingOpt ? (parseFloat(framingOpt.getAttribute('data-hrs') || '3') || 3) : 3;
+  const framingVal = framingOpt ? framingOpt.value : 'full';
+  let framingHrs = framingOpt ? (parseFloat(framingOpt.getAttribute('data-hrs') || '4') || 4) : 4;
   if (framingVal === 'portrait') framingHrs = effCfg.portrait;
   else if (framingVal === 'half') framingHrs = effCfg.half;
   else if (framingVal === 'full') framingHrs = effCfg.full;
@@ -521,47 +534,84 @@ window.recalcWizardPrice = function() {
   const compOpt = compEl ? compEl.options[compEl.selectedIndex] : null;
   const compHrs = compOpt ? (parseFloat(compOpt.getAttribute('data-hrs') || '1.5') || 1.5) : 1.5;
 
-  const ageOpt = ageEl ? ageEl.options[ageEl.selectedIndex] : null;
-  const ageHrs = (ageEl && ageEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && ageOpt) ? (parseFloat(ageOpt.getAttribute('data-hrs') || '0') || 0) : 0;
-
-  const compnOpt = compnEl ? compnEl.options[compnEl.selectedIndex] : null;
-  const compnVal = compnOpt ? compnOpt.value : 'none';
-  let compnHrs = 0;
-  if (compnVal === 'pet') compnHrs = effCfg.pet;
-  else if (compnVal === 'subchar') compnHrs = effCfg.subchar;
+  const ageBoxes = Array.from(document.querySelectorAll('input[name="wizAgeOpt"]:checked'));
+  const agesChosen = ageBoxes.map(b => b.value);
+  let ageHrs = 0;
+  if (document.getElementById('wizCharacterNuancesGrid')?.style.display !== 'none' && ageBoxes.length > 0) {
+    const firstDelta = parseFloat(ageBoxes[0].getAttribute('data-delta') || '0') || 0;
+    ageHrs = firstDelta + (ageBoxes.length > 1 ? (ageBoxes.length - 1) * 3.5 : 0);
+  }
 
   const phaseOpt = phaseEl ? phaseEl.options[phaseEl.selectedIndex] : null;
-  const fidelityMult = phaseOpt ? (parseFloat(phaseOpt.getAttribute('data-mult') || '1') || 1) : 1;
+  const fidelityMult = phaseOpt ? (parseFloat(phaseOpt.getAttribute('data-mult') || '1.25') || 1.25) : 1.25;
   const isSketchOnly = fidelityMult <= 0.6;
   const revRounds = isSketchOnly ? 1 : 2;
   const revLabel = isSketchOnly ? '1 Round (+1d per revision)' : '2 Rounds (+1–2d per revision)';
 
+  const extraSketches = isSketchOnly ? (parseInt(document.getElementById('wizExtraSketches')?.value || '0', 10) || 0) : 0;
+  const colorVars = !isSketchOnly ? (parseInt(document.getElementById('wizColorVariations')?.value || '0', 10) || 0) : 0;
+  const bgOpt = !isSketchOnly ? document.getElementById('wizBackgroundType')?.selectedOptions[0] : null;
+  const bgHrs = bgOpt ? (parseFloat(bgOpt.getAttribute('data-hrs') || '0') || 0) : 0;
+
   let coreHrs = 0;
   if (activeModalItem && activeModalItem.subMode === 'lineup') {
     const cnt = lineupCountEl ? (parseInt(lineupCountEl.value, 10) || 2) : 2;
-    if (scopeVal === 'existing_lineup') {
-      coreHrs = 1.5 + (cnt * 0.5);
-    } else {
-      coreHrs = (cnt * (framingHrs + compHrs * 0.8)) * fidelityMult;
-    }
+    coreHrs = (scopeVal === 'existing_lineup') ? (1.5 + cnt * 0.5) : ((cnt * (framingHrs + compHrs * 0.8)) * fidelityMult);
   } else {
     coreHrs = Math.max(2, (scopeBaseHrs + framingHrs + compHrs + ageHrs) * fidelityMult);
   }
 
-  let addonHrs = compnHrs;
-  let extraDays = 0;
+  let addonHrs = (extraSketches * 1.0) + (colorVars * 1.25) + bgHrs;
+  let extraDays = (bgHrs >= 3 ? 2 : 0);
   const addonsChosen = [];
-  if (document.getElementById('wizHeroWeapon')?.checked) { addonHrs += 2.0; addonsChosen.push('Hero Weapon'); }
-  if (document.getElementById('wizExpressions')?.checked) { addonHrs += 2.0; addonsChosen.push('Expressions Sheet'); }
-  if (document.getElementById('wizColorPalette')?.checked) { addonHrs += 1.5; addonsChosen.push('Color Variations'); }
-  if (document.getElementById('wizCommercial')?.checked) { addonHrs += 3.0; addonsChosen.push('Commercial License'); }
-  if (document.getElementById('wizCrossEnv')?.checked) { addonHrs += 3.5; extraDays += 2; addonsChosen.push('Environment Backdrop'); }
-  if (document.getElementById('wizCrossChar')?.checked) { addonHrs += 2.5; extraDays += 1; addonsChosen.push('Extra Scale Figure'); }
 
-  const totalHours = Math.max(2, Math.round((coreHrs + addonHrs) * 2) / 2);
-  const totalUSD = Math.round(totalHours * hourly);
+  if (extraSketches > 0) addonsChosen.push(`+${extraSketches} Extra Sketch(es)`);
+  if (colorVars > 0) addonsChosen.push(`+${colorVars} Color Variation(s)`);
+  if (bgHrs > 0 && bgOpt) addonsChosen.push(`BG: ${bgOpt.text}`);
+
+  if (document.getElementById('wizCompCheck')?.checked) {
+    const cType = document.getElementById('wizCompArchetype')?.value || 'Companion';
+    const cDepthOpt = document.getElementById('wizCompDepth')?.selectedOptions[0];
+    const cDepthVal = cDepthOpt ? cDepthOpt.value : 'Simple Companion';
+    const cHrs = cDepthVal.includes('Designed') ? effCfg.subchar : effCfg.pet;
+    addonHrs += cHrs;
+    addonsChosen.push(`Companion: ${cType} (${cDepthVal})`);
+  }
+
+  if (document.getElementById('wizWeaponCheck')?.checked) {
+    const wType = document.getElementById('wizWeaponType')?.value || 'Weapon';
+    const wDepthOpt = document.getElementById('wizWeaponDepth')?.selectedOptions[0];
+    const wHrs = wDepthOpt ? (parseFloat(wDepthOpt.getAttribute('data-hrs') || '1.5') || 1.5) : 1.5;
+    addonHrs += wHrs;
+    addonsChosen.push(`Prop: ${wType} (${wDepthOpt ? wDepthOpt.value : 'Standard'})`);
+  }
+
+  if (document.getElementById('wizExprCheck')?.checked) {
+    const exprs = Array.from(document.querySelectorAll('input[name="wizExprOpt"]:checked')).map(x => x.value);
+    if (exprs.length > 0) {
+      addonHrs += exprs.length * 0.75;
+      addonsChosen.push(`Expressions (${exprs.length}): ${exprs.join(', ')}`);
+    }
+  }
+
+  if (document.getElementById('wizActionCheck')?.checked) {
+    const acts = Array.from(document.querySelectorAll('input[name="wizActionOpt"]:checked')).map(x => x.value);
+    if (acts.length > 0) {
+      addonHrs += acts.length * 1.25;
+      extraDays += 1;
+      addonsChosen.push(`Action Poses (${acts.length}): ${acts.join(', ')}`);
+    }
+  }
+
+  const isCommPsd = !!document.getElementById('wizCommercial')?.checked;
+  if (isCommPsd) addonsChosen.push('Commercial Rights + Master Layered PSD');
+
+  const rawHrs = Math.max(2, coreHrs + addonHrs);
+  const totalHours = Math.round(rawHrs * 2) / 2;
+  let totalUSD = Math.round(totalHours * hourly);
+  if (isCommPsd) totalUSD = Math.round(totalUSD * 1.4);
+
   const halfUSD = (totalUSD * 0.5).toFixed(2).replace(/\.00$/, '');
-
   const minD = Math.max(2, Math.ceil(totalHours / 4) + extraDays);
   const maxD = Math.max(minD + 2, Math.ceil(totalHours / 2.2) + extraDays);
   const timelineStr = `${minD} to ${maxD} business days`;
@@ -571,6 +621,9 @@ window.recalcWizardPrice = function() {
     activeModalItem.estimatedHours = totalHours;
     activeModalItem.hourlyRate = hourly;
     activeModalItem.revisionsIncluded = revRounds;
+    activeModalItem.agesChosen = agesChosen;
+    activeModalItem.addonsChosen = addonsChosen;
+    activeModalItem.deliverableFormat = isCommPsd ? '300DPI Master Layered PSD + PNG/JPG (Commercial)' : 'High-Res 300DPI PNG / JPG';
   }
 
   const revEl = document.getElementById('modalRevisionsText');
@@ -587,15 +640,13 @@ window.recalcWizardPrice = function() {
     setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 250);
   }
 
-  // Update Step 3 Live Proforma Preview (transparent for client, zero internal hours)
   const profBox = document.getElementById('wizProformaPreviewBox');
   if (profBox) {
     const pkgName = (activeModalItem && activeModalItem.title) ? activeModalItem.title : 'Custom Commission';
-    const phaseTxt = phaseOpt ? phaseOpt.text : 'Standard Render';
+    const phaseTxt = phaseOpt ? phaseOpt.text : 'Full Master Render';
     const scopeTxt = scopeOpt ? scopeOpt.text : 'Single Concept';
-    const framingTxt = framingOpt ? framingOpt.text : 'Half-Body';
-    const compnTxt = compnOpt ? compnOpt.text : 'None';
-    const ageTxt = (ageEl && ageEl.closest('#wizCharacterNuancesGrid')?.style.display !== 'none' && ageOpt) ? ageOpt.text : '';
+    const framingTxt = framingOpt ? framingOpt.text : 'Full-Body';
+    const ageLabel = agesChosen.length ? agesChosen.join(', ') : 'Adult';
     profBox.innerHTML = `
       <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px; margin-bottom:6px;">
         <strong style="color:var(--gold);">PROFORMA PREVIEW</strong>
@@ -603,12 +654,13 @@ window.recalcWizardPrice = function() {
       </div>
       <div><span style="color:#94a3b8;">Package:</span> <strong style="color:#fff;">${pkgName}</strong></div>
       <div><span style="color:#94a3b8;">Rendering Phase:</span> <strong style="color:#fff;">${phaseTxt}</strong></div>
-      <div><span style="color:#94a3b8;">Scope &amp; Framing:</span> ${scopeTxt} • ${framingTxt}${ageTxt ? (' • ' + ageTxt) : ''}</div>
-      <div><span style="color:#94a3b8;">Companion &amp; Add-ons:</span> ${compnVal !== 'none' ? compnTxt : 'No Companion'}${addonsChosen.length ? (' • ' + addonsChosen.join(', ')) : ' • Layered 300DPI PSD'}</div>
+      <div><span style="color:#94a3b8;">Scope, Framing &amp; Age:</span> ${scopeTxt} • ${framingTxt} • Age: ${ageLabel}</div>
+      <div><span style="color:#94a3b8;">Deliverables:</span> <strong style="color:${isCommPsd ? 'var(--gold)' : 'var(--emerald)'};">${activeModalItem ? activeModalItem.deliverableFormat : '300DPI PNG / JPG'}</strong></div>
+      <div><span style="color:#94a3b8;">Selected Modules:</span> ${addonsChosen.length ? addonsChosen.join(' • ') : 'Core Package Only'}</div>
       <div><span style="color:#94a3b8;">Revisions:</span> <strong style="color:var(--emerald);">${revRounds} Structured Round(s)</strong> (each revision adds 1–2 business days)</div>
       <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.12);">
         <span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${halfUSD}</strong></span>
-        <span>50% Final on PSD: <strong class="font-mono" style="color:var(--cyan-electric);">$${halfUSD}</strong></span>
+        <span>50% Final on Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${halfUSD}</strong></span>
       </div>
       <div style="font-size:10.5px; color:#94a3b8; margin-top:6px;">
         • 50% retainer locks your studio slot; unpaid briefs auto-expire after 24h.
@@ -1604,14 +1656,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const compEl = document.getElementById('wizComplexity');
       const complexityText = (compEl && compEl.selectedOptions[0]) ? compEl.selectedOptions[0].text.trim() : 'Production Standard';
 
-      const addons = [];
-      if (document.getElementById('wizHeroWeapon')?.checked) addons.push('Hero Weapon Design (+$35)');
-      if (document.getElementById('wizExpressions')?.checked) addons.push('Facial Expressions Sheet (+$30)');
-      if (document.getElementById('wizColorPalette')?.checked) addons.push('Color Variations (+$20)');
-      if (document.getElementById('wizCommercial')?.checked) addons.push('Commercial AAA License (+$45)');
-      if (document.getElementById('wizCrossEnv')?.checked) addons.push('Cross-Module: Environment Backdrop (+$55)');
-      if (document.getElementById('wizCrossChar')?.checked) addons.push('Cross-Module: Character / Scale Figure (+$40)');
-      if (document.getElementById('wizPSD')?.checked) addons.push('Master Layered 300DPI PSD (Included)');
+      const addons = (activeModalItem && Array.isArray(activeModalItem.addonsChosen) && activeModalItem.addonsChosen.length)
+        ? [...activeModalItem.addonsChosen]
+        : ['High-Res 300DPI PNG / JPG'];
+      if (activeModalItem && activeModalItem.deliverableFormat) addons.push(activeModalItem.deliverableFormat);
 
       const brief = document.getElementById('orderClientBrief').value.trim();
       const priceText = document.getElementById('modalPrice').textContent;
@@ -1619,7 +1667,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const retainerUsd = (totalUsd * 0.5).toFixed(2).replace(/\.00$/, '');
       const clientEmail = (window.currentMember && window.currentMember.email) ? window.currentMember.email : (contact.includes('@') ? contact : '');
 
-      const ageTxt = document.getElementById('wizAgeTier')?.selectedOptions[0]?.text || 'Standard';
+      const ageTxt = (activeModalItem && Array.isArray(activeModalItem.agesChosen) && activeModalItem.agesChosen.length) ? activeModalItem.agesChosen.join(', ') : 'Adult';
       const compnTxt = document.getElementById('wizCompanionTier')?.selectedOptions[0]?.text || 'None';
       const specs = {
         scope: scopeText,
@@ -3263,10 +3311,10 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
   if (fEl) {
     if (isChar) {
       fEl.innerHTML = `
-        <option value="portrait" data-hrs="3">Portrait / Bust</option>
-        <option value="half" data-hrs="5" selected>Half-Body / Waist-Up</option>
-        <option value="full" data-hrs="8">Full-Body Character</option>
-        <option value="turnaround" data-hrs="13">Full-Body + 3-View Turnaround</option>
+        <option value="portrait" data-hrs="2.5">Portrait / Bust</option>
+        <option value="half" data-hrs="4">Half-Body / Waist-Up</option>
+        <option value="full" data-hrs="6.5" selected>Full-Body Character</option>
+        <option value="turnaround" data-hrs="11">Full-Body + 3-View Turnaround</option>
       `;
     } else {
       fEl.innerHTML = prof.framings.map((o, i) => `<option value="f_${i}" data-hrs="${3 + Math.round((o.usd || 0) / 15)}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
@@ -3275,12 +3323,12 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
 
   if (pEl) {
     pEl.innerHTML = `
-      <option value="Phase 1: Clean Sketch & Silhouette" data-mult="0.55">Phase 1: Clean Sketch &amp; Silhouette</option>
-      <option value="Phase 2: Inked Linework & Flat Color" data-mult="0.75">Phase 2: Inked Linework &amp; Flat Color</option>
-      <option value="Phase 3: Cel-Shaded / Value & Lighting" data-mult="1.0" selected>Phase 3: Cel-Shaded / Value &amp; Lighting</option>
-      <option value="Phase 4: Master 300DPI Render + Layered PSD" data-mult="1.35">Phase 4: Master 300DPI Render + Layered PSD</option>
+      <option value="Phase 1: Sketch & Exploration (2 Concepts)" data-mult="0.55">Phase 1: Sketch &amp; Exploration (2 Concepts)</option>
+      <option value="Phase 2: Clean Lineart & Cel-Shaded" data-mult="0.8">Phase 2: Clean Lineart &amp; Cel-Shaded</option>
+      <option value="Phase 3: Full Master Render (300DPI)" data-mult="1.25" selected>Phase 3: Full Master Render (300DPI)</option>
     `;
   }
+  if (typeof window.handleWizardPhaseChange === 'function') window.handleWizardPhaseChange();
 
   const cEnvLbl = document.getElementById('wizCrossEnv')?.nextElementSibling;
   const cCharLbl = document.getElementById('wizCrossChar')?.nextElementSibling;

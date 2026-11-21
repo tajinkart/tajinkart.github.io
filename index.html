@@ -47,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap"></noscript>
   <link id="siteFavicon" rel="icon" type="image/png" href="">
-  <link rel="stylesheet" href="style.css?v=26.6.40">
+  <link rel="stylesheet" href="style.css?v=26.6.41">
     <!-- Telegram WebApp Integration (Non-blocking / Fail-Safe in Iran network) -->
   <script>
     window.addEventListener('load', function() {
@@ -1087,10 +1087,10 @@
               </div>
             </div>
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(145px, 1fr)); gap:8px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:11px;">
-              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Portrait (hrs)</label><input type="number" id="adminCalibPortraitHrs" step="0.5" value="3" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
-              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Half-Body (hrs)</label><input type="number" id="adminCalibHalfHrs" step="0.5" value="5" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
-              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Full-Body (hrs)</label><input type="number" id="adminCalibFullHrs" step="0.5" value="8" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
-              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Turnaround (hrs)</label><input type="number" id="adminCalibTurnHrs" step="0.5" value="13" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
+              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Portrait (hrs)</label><input type="number" id="adminCalibPortraitHrs" step="0.5" value="2.5" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
+              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Half-Body (hrs)</label><input type="number" id="adminCalibHalfHrs" step="0.5" value="4" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
+              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Full-Body (hrs)</label><input type="number" id="adminCalibFullHrs" step="0.5" value="6.5" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
+              <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Turnaround (hrs)</label><input type="number" id="adminCalibTurnHrs" step="0.5" value="11" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
               <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Simple Pet (hrs)</label><input type="number" id="adminCalibPetHrs" step="0.5" value="2" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
               <div><label style="color:#94a3b8; display:block; margin-bottom:3px;">Designed Sub-Char (hrs)</label><input type="number" id="adminCalibSubCharHrs" step="0.5" value="4.5" class="font-mono" oninput="renderAdminHourlyBenchmarks()" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff;" /></div>
             </div>
@@ -2069,22 +2069,53 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                 </div>
                 <div>
                   <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px; font-weight:800;">Rendering Phase:</label>
-                  <select id="orderPhaseSelect" onchange="recalcWizardPrice()" style="width:100%; font-size:12px;">
-                    <option value="Phase 1: Clean Sketch & Silhouette" data-mult="0.55">Phase 1: Clean Sketch &amp; Silhouette</option>
-                    <option value="Phase 2: Inked Linework & Flat Color" data-mult="0.75">Phase 2: Inked Linework &amp; Flat Color</option>
-                    <option value="Phase 3: Cel-Shaded / Value & Lighting" data-mult="1.0" selected>Phase 3: Cel-Shaded / Value &amp; Lighting</option>
-                    <option value="Phase 4: Master 300DPI Render + Layered PSD" data-mult="1.35">Phase 4: Master 300DPI Render + Layered PSD</option>
+                  <select id="orderPhaseSelect" onchange="handleWizardPhaseChange()" style="width:100%; font-size:12px;">
+                    <option value="Phase 1: Sketch & Exploration (2 Concepts)" data-mult="0.55">Phase 1: Sketch &amp; Exploration (2 Concepts)</option>
+                    <option value="Phase 2: Clean Lineart & Cel-Shaded" data-mult="0.8">Phase 2: Clean Lineart &amp; Cel-Shaded</option>
+                    <option value="Phase 3: Full Master Render (300DPI)" data-mult="1.25" selected>Phase 3: Full Master Render (300DPI)</option>
                   </select>
                 </div>
               </div>
+
+              <!-- Contextual Phase Add-ons (revealed dynamically by Phase) -->
+              <div id="wizExtraSketchesWrap" style="display:none; margin-bottom:10px; padding:8px 10px; border-radius:8px; background:rgba(0,240,255,0.05); border:1px solid rgba(0,240,255,0.22);">
+                <label style="font-size:11px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">2 Base Sketches Included — Add Extra Sketch Concepts?</label>
+                <select id="wizExtraSketches" onchange="recalcWizardPrice()" style="width:100%; font-size:11.5px;">
+                  <option value="0" selected>Base 2 Sketches Only</option>
+                  <option value="1">+1 Extra Sketch Concept (3 Total)</option>
+                  <option value="2">+2 Extra Sketch Concepts (4 Total)</option>
+                  <option value="3">+3 Extra Sketch Concepts (5 Total)</option>
+                </select>
+              </div>
+
+              <div id="wizColorVarWrap" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; padding:8px 10px; border-radius:8px; background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.2);">
+                <div>
+                  <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">Color Variations:</label>
+                  <select id="wizColorVariations" onchange="recalcWizardPrice()" style="width:100%; font-size:11.5px;">
+                    <option value="0" selected>Primary Palette Only</option>
+                    <option value="1">+1 Alternate Color Palette</option>
+                    <option value="2">+2 Alternate Color Palettes</option>
+                    <option value="3">+3 Alternate Color Palettes</option>
+                  </select>
+                </div>
+                <div id="wizBgWrap">
+                  <label style="font-size:11px; color:var(--gold); font-weight:700; display:block; margin-bottom:4px;">Background Type:</label>
+                  <select id="wizBackgroundType" onchange="recalcWizardPrice()" style="width:100%; font-size:11.5px;">
+                    <option value="none" data-hrs="0" selected>Transparent / Solid Grey (Free)</option>
+                    <option value="gradient" data-hrs="1.5">Atmospheric / Gradient Backdrop</option>
+                    <option value="scene" data-hrs="4">Detailed Environment Scene</option>
+                  </select>
+                </div>
+              </div>
+
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <div>
                   <label id="wizFramingLabel" style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Framing &amp; View</label>
                   <select id="wizFraming" onchange="recalcWizardPrice()">
-                    <option value="portrait" data-hrs="3">Portrait / Bust</option>
-                    <option value="half" data-hrs="5" selected>Half-Body / Waist-Up</option>
-                    <option value="full" data-hrs="8">Full-Body Character</option>
-                    <option value="turnaround" data-hrs="13">Full-Body + 3-View Turnaround</option>
+                    <option value="portrait" data-hrs="2.5">Portrait / Bust</option>
+                    <option value="half" data-hrs="4">Half-Body / Waist-Up</option>
+                    <option value="full" data-hrs="6.5" selected>Full-Body Character</option>
+                    <option value="turnaround" data-hrs="11">Full-Body + 3-View Turnaround</option>
                   </select>
                 </div>
                 <div>
@@ -2096,16 +2127,33 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
                   </select>
                 </div>
               </div>
+
               <div id="wizCharacterNuancesGrid" style="margin-top:10px;">
-                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Character Age / Life Stage</label>
-                <select id="wizAgeTier" onchange="recalcWizardPrice()" style="width:100%;">
-                  <option value="infant" data-hrs="-1">Infant / Toddler (Simplified Form)</option>
-                  <option value="child" data-hrs="-0.5">Child / Young Teen (Light Gear)</option>
-                  <option value="adult" data-hrs="0" selected>Teen / Adult Hero (Standard)</option>
-                  <option value="elder" data-hrs="1">Elder / Intricate Garb</option>
-                  <option value="progression" data-hrs="4">Multi-Age Timeline (2–3 Stages)</option>
-                </select>
+                <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:5px;">Character Age / Life Stage (select one or multiple):</label>
+                <div id="wizAgeCheckboxes" style="display:flex; flex-wrap:wrap; gap:6px;">
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
+                    <input type="checkbox" name="wizAgeOpt" value="Infant / Toddler" data-delta="-0.5" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Infant / Toddler</span>
+                  </label>
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
+                    <input type="checkbox" name="wizAgeOpt" value="Child" data-delta="-0.5" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Child</span>
+                  </label>
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
+                    <input type="checkbox" name="wizAgeOpt" value="Teen" data-delta="0" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Teen</span>
+                  </label>
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
+                    <input type="checkbox" name="wizAgeOpt" value="Adult" data-delta="0" checked onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Adult</span>
+                  </label>
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
+                    <input type="checkbox" name="wizAgeOpt" value="Elder" data-delta="0.5" onchange="recalcWizardPrice()" style="width:auto;" />
+                    <span>Elder</span>
+                  </label>
+                </div>
               </div>
+
               <div id="wizLineupCountWrap" style="display:none; margin-top:10px;">
                 <label style="font-size:11px; color:var(--cyan-electric); display:block; margin-bottom:4px; font-weight:700;">Number of Characters in Lineup:</label>
                 <select id="wizLineupCount" onchange="recalcWizardPrice()">
@@ -2119,54 +2167,112 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
             </div>
           </div>
 
-          <!-- Step 2: Companion & Add-ons -->
+          <!-- Step 2: Companion, Weapons, Expressions, Action Sketches & License -->
           <div class="wizard-step-card active" id="wizardStep2">
             <div class="wizard-step-header" onclick="toggleWizardStep(2)">
-              <span class="wizard-step-title"><span style="color:var(--gold);">2.</span> Companion &amp; Add-ons</span>
+              <span class="wizard-step-title"><span style="color:var(--gold);">2.</span> Companion, Weapons, Expressions &amp; Action</span>
               <span style="font-size:11px; color:var(--text-muted);">▼</span>
             </div>
-            <div class="wizard-step-body">
-              <div id="wizCompanionWrap" style="margin-bottom:10px;">
-                <label style="font-size:11px; color:var(--gold); font-weight:800; display:block; margin-bottom:4px;">Companion / Sub-Character:</label>
-                <select id="wizCompanionTier" onchange="recalcWizardPrice()" style="width:100%;">
-                  <option value="none" data-hrs="0" selected>None (Main Subject Only)</option>
-                  <option value="pet" data-hrs="2">Simple Pet / Familiar</option>
-                  <option value="subchar" data-hrs="4.5">Designed Sub-Character (With Personality &amp; Gear)</option>
-                </select>
-              </div>
-              <div>
-                <span id="wizAddonsLabel" style="font-size:11px; font-weight:800; color:var(--cyan-electric); display:block; margin-bottom:6px;">📦 Optional Add-ons &amp; Modules:</span>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizHeroWeapon" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Hero Weapon Design</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizExpressions" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Facial Expressions Sheet</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizColorPalette" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Color Variations</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>Commercial AAA License</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizCrossEnv" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>+ Environment Backdrop</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(255,255,255,0.08); padding:6px 8px; border-radius:8px;">
-                    <input type="checkbox" id="wizCrossChar" onchange="recalcWizardPrice()" style="width:auto;" />
-                    <span>+ Extra Scale Figure</span>
-                  </label>
-                  <label style="font-size:11px; display:flex; align-items:center; gap:6px; cursor:pointer; background:#04060b; border:1px solid rgba(16,185,129,0.2); padding:6px 8px; border-radius:8px; grid-column:1 / -1;">
-                    <input type="checkbox" id="wizPSD" onchange="recalcWizardPrice()" checked disabled style="width:auto;" />
-                    <span style="color:#10b981; font-weight:700;">✓ Master Layered 300DPI PSD (Included &amp; Guaranteed)</span>
-                  </label>
+            <div class="wizard-step-body" style="display:flex; flex-direction:column; gap:8px;">
+
+              <!-- 1. Companion / Pet -->
+              <div style="background:#04060b; border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:9px 11px;">
+                <label style="font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:7px; cursor:pointer; color:#f8fafc;">
+                  <input type="checkbox" id="wizCompCheck" onchange="toggleWizardModuleDrawer('wizCompDrawer', this.checked)" style="width:auto;" />
+                  <span>🐾 Add Companion / Pet</span>
+                </label>
+                <div id="wizCompDrawer" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.07); grid-template-columns:1fr 1fr; gap:8px;">
+                  <div>
+                    <label style="font-size:10.5px; color:#94a3b8; display:block; margin-bottom:3px;">Companion Type</label>
+                    <select id="wizCompArchetype" onchange="recalcWizardPrice()" style="width:100%; font-size:11px;">
+                      <option value="Animal / Beast (Wolf, Raven, Crocodile...)">Animal / Beast (Wolf, Raven, Crocodile...)</option>
+                      <option value="Mythical / Spirit (Dragonet, Imp...)">Mythical / Spirit (Dragonet, Imp...)</option>
+                      <option value="Mecha / Automaton Drone">Mecha / Automaton Drone</option>
+                      <option value="Humanoid Sidekick">Humanoid Sidekick</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:10.5px; color:#94a3b8; display:block; margin-bottom:3px;">Design Depth</label>
+                    <select id="wizCompDepth" onchange="recalcWizardPrice()" style="width:100%; font-size:11px;">
+                      <option value="Simple Companion" data-hrs="2">Simple Companion</option>
+                      <option value="Designed Sub-Character w/ Gear" data-hrs="4.5">Designed Sub-Character w/ Gear</option>
+                    </select>
+                  </div>
                 </div>
               </div>
+
+              <!-- 2. Hero Weapon / Prop -->
+              <div style="background:#04060b; border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:9px 11px;">
+                <label style="font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:7px; cursor:pointer; color:#f8fafc;">
+                  <input type="checkbox" id="wizWeaponCheck" onchange="toggleWizardModuleDrawer('wizWeaponDrawer', this.checked)" style="width:auto;" />
+                  <span>⚔️ Add Hero Weapon / Prop</span>
+                </label>
+                <div id="wizWeaponDrawer" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.07); grid-template-columns:1fr 1fr; gap:8px;">
+                  <div>
+                    <label style="font-size:10.5px; color:#94a3b8; display:block; margin-bottom:3px;">Prop Category</label>
+                    <select id="wizWeaponType" onchange="recalcWizardPrice()" style="width:100%; font-size:11px;">
+                      <option value="Melee (Sword, Axe, Spear...)">Melee (Sword, Axe, Spear...)</option>
+                      <option value="Ranged / Sci-Fi Firearm">Ranged / Sci-Fi Firearm</option>
+                      <option value="Arcane Staff / Relic / Grimoire">Arcane Staff / Relic / Grimoire</option>
+                      <option value="Shield &amp; Tactical Gear">Shield &amp; Tactical Gear</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:10.5px; color:#94a3b8; display:block; margin-bottom:3px;">Detail Level</label>
+                    <select id="wizWeaponDepth" onchange="recalcWizardPrice()" style="width:100%; font-size:11px;">
+                      <option value="Standard Prop" data-hrs="1.5">Standard Prop</option>
+                      <option value="Ornate / Legendary Relic" data-hrs="3">Ornate / Legendary Relic</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Facial Expressions Sheet -->
+              <div style="background:#04060b; border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:9px 11px;">
+                <label style="font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:7px; cursor:pointer; color:#f8fafc;">
+                  <input type="checkbox" id="wizExprCheck" onchange="toggleWizardModuleDrawer('wizExprDrawer', this.checked, 'block')" style="width:auto;" />
+                  <span>🎭 Add Facial Expressions Sheet</span>
+                </label>
+                <div id="wizExprDrawer" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.07);">
+                  <span style="font-size:10.5px; color:#94a3b8; display:block; margin-bottom:5px;">Select exact emotions to include:</span>
+                  <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Neutral / Calm" checked onchange="recalcWizardPrice()" style="width:auto;" /><span>Neutral</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Happy / Smirk" checked onchange="recalcWizardPrice()" style="width:auto;" /><span>Smirk / Happy</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Angry / Rage" checked onchange="recalcWizardPrice()" style="width:auto;" /><span>Angry / Rage</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Sad / Grief" onchange="recalcWizardPrice()" style="width:auto;" /><span>Sad / Grief</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Shocked / Fear" onchange="recalcWizardPrice()" style="width:auto;" /><span>Shocked</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Battle Cry" onchange="recalcWizardPrice()" style="width:auto;" /><span>Battle Cry</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizExprOpt" value="Suspicious / Thinking" onchange="recalcWizardPrice()" style="width:auto;" /><span>Thinking</span></label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Action Sketches (Dynamic Poses) -->
+              <div style="background:#04060b; border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:9px 11px;">
+                <label style="font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:7px; cursor:pointer; color:#f8fafc;">
+                  <input type="checkbox" id="wizActionCheck" onchange="toggleWizardModuleDrawer('wizActionDrawer', this.checked, 'block')" style="width:auto;" />
+                  <span>🏃 Add Action Sketches (Dynamic Poses)</span>
+                </label>
+                <div id="wizActionDrawer" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.07);">
+                  <span style="font-size:10.5px; color:#94a3b8; display:block; margin-bottom:5px;">Select dynamic movement/combat poses:</span>
+                  <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizActionOpt" value="Combat / Attack Pose" checked onchange="recalcWizardPrice()" style="width:auto;" /><span>Combat / Attack</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizActionOpt" value="Run / Leap / Movement" checked onchange="recalcWizardPrice()" style="width:auto;" /><span>Run / Leap</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizActionOpt" value="Spellcasting / Ability" onchange="recalcWizardPrice()" style="width:auto;" /><span>Spellcasting / Ability</span></label>
+                    <label style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; background:#080c14; border:1px solid rgba(255,255,255,0.12); padding:4px 8px; border-radius:999px; cursor:pointer;"><input type="checkbox" name="wizActionOpt" value="Stealth / Idle Stance" onchange="recalcWizardPrice()" style="width:auto;" /><span>Stealth / Stance</span></label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Commercial & Source PSD License -->
+              <div style="background:rgba(250,204,21,0.05); border:1px solid rgba(250,204,21,0.28); border-radius:10px; padding:9px 11px;">
+                <label style="font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:7px; cursor:pointer; color:var(--gold);">
+                  <input type="checkbox" id="wizCommercial" onchange="recalcWizardPrice()" style="width:auto;" />
+                  <span>💎 Commercial Rights &amp; Master Layered PSD (+40%)</span>
+                </label>
+                <span style="font-size:10.5px; color:#94a3b8; display:block; margin-top:3px;">Standard delivery includes flattened 300DPI PNG/JPG. Check this for full commercial usage &amp; layered Photoshop PSD source files.</span>
+              </div>
+
             </div>
           </div>
 
@@ -2705,12 +2811,12 @@ Studio channels maintain professional artistic standards, zero spam, and mutual 
   <!-- معماری ماژولار استودیو با لود زنجیره‌ای و ایمن -->
   <!-- Supabase SDK loaded at bottom of page to prevent render blocking -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="data.js?v=26.6.40"></script>
-  <script src="core.js?v=26.6.40"></script>
-  <script src="gallery.js?v=26.6.40"></script>
-  <script src="portal.js?v=26.6.40"></script>
-  <script src="admin.js?v=26.6.40"></script>
-  <script src="translate.js?v=26.6.40"></script>
+  <script src="data.js?v=26.6.41"></script>
+  <script src="core.js?v=26.6.41"></script>
+  <script src="gallery.js?v=26.6.41"></script>
+  <script src="portal.js?v=26.6.41"></script>
+  <script src="admin.js?v=26.6.41"></script>
+  <script src="translate.js?v=26.6.41"></script>
 
   <!-- ناوبری واکنش‌گرا و بهینه‌شده موبایل طبق Master Spec v2.1 -->
   
