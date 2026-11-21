@@ -544,9 +544,11 @@ window.recalcWizardPrice = function() {
   const ageBoxes = Array.from(document.querySelectorAll('input[name="wizAgeOpt"]:checked'));
   const agesChosen = ageBoxes.map(b => b.value);
   let ageHrs = 0;
+  const _catForAge = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+  const _extraAgeH = _catForAge ? (Number(_catForAge.extraAgeHrs) || 3.5) : 3.5;
   if (document.getElementById('wizCharacterNuancesGrid')?.style.display !== 'none' && ageBoxes.length > 0) {
     const firstDelta = parseFloat(ageBoxes[0].getAttribute('data-delta') || '0') || 0;
-    ageHrs = firstDelta + (ageBoxes.length > 1 ? (ageBoxes.length - 1) * 3.5 : 0);
+    ageHrs = firstDelta + (ageBoxes.length > 1 ? (ageBoxes.length - 1) * _extraAgeH : 0);
   }
 
   const phaseOpt = phaseEl ? phaseEl.options[phaseEl.selectedIndex] : null;
@@ -3353,6 +3355,17 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
     bgEl.innerHTML = cat.backgrounds.filter(b => b.active !== false).map((b, idx) =>
       `<option value="${b.id}" data-hrs="${b.hrs}" ${idx === 0 ? 'selected' : ''}>${b.label}</option>`
     ).join('');
+  }
+
+  const ageBoxWrap = document.getElementById('wizAgeCheckboxes');
+  if (ageBoxWrap && cat && Array.isArray(cat.ages)) {
+    const activeAges = cat.ages.filter(a => a.active !== false);
+    ageBoxWrap.innerHTML = activeAges.map((a, idx) => `
+      <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
+        <input type="checkbox" name="wizAgeOpt" value="${a.label.replace(/"/g, '&quot;')}" data-delta="${Number(a.hrs) || 0}" ${(a.id === 'adult' || idx === 0 && !activeAges.some(x => x.id === 'adult')) ? 'checked' : ''} onchange="recalcWizardPrice()" style="width:auto;" />
+        <span>${a.label}</span>
+      </label>
+    `).join('');
   }
 
   if (commLbl && cat) {

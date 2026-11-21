@@ -1236,6 +1236,14 @@ window.DEFAULT_ATELIER_CATALOG = {
     { id: 'gradient', label: 'Atmospheric / Gradient Backdrop', hrs: 1.5, days: 0, active: true },
     { id: 'scene', label: 'Detailed Environment Scene', hrs: 4.0, days: 2, active: true }
   ],
+  ages: [
+    { id: 'infant', label: 'Infant / Toddler', hrs: -0.5, active: true },
+    { id: 'child', label: 'Child', hrs: -0.5, active: true },
+    { id: 'teen', label: 'Teen', hrs: 0, active: true },
+    { id: 'adult', label: 'Adult', hrs: 0, active: true },
+    { id: 'elder', label: 'Elder', hrs: 0.5, active: true }
+  ],
+  extraAgeHrs: 3.5,
   addons: {
     simplePetHrs: 2.0,
     subCharHrs: 4.5,
@@ -1269,6 +1277,8 @@ window.getAtelierCatalog = function() {
     complexities: (Array.isArray(saved.complexities) && saved.complexities.length > 0) ? saved.complexities : def.complexities,
     phases: (Array.isArray(saved.phases) && saved.phases.length > 0) ? saved.phases : def.phases,
     backgrounds: (Array.isArray(saved.backgrounds) && saved.backgrounds.length > 0) ? saved.backgrounds : def.backgrounds,
+    ages: (Array.isArray(saved.ages) && saved.ages.length > 0) ? saved.ages : def.ages,
+    extraAgeHrs: Number(saved.extraAgeHrs) >= 0 && saved.extraAgeHrs !== undefined ? Number(saved.extraAgeHrs) : def.extraAgeHrs,
     addons: Object.assign({}, def.addons, saved.addons || {}),
     galleryTags: (Array.isArray(saved.galleryTags) && saved.galleryTags.length > 0) ? saved.galleryTags : def.galleryTags
   };
@@ -1286,23 +1296,38 @@ window.getAtelierCatalog = function() {
 
 window.saveAtelierCatalog = async function(newCat) {
   if (typeof siteSettings === 'undefined') window.siteSettings = {};
-  siteSettings.atelierCatalog = newCat;
+  siteSettings.atelierCatalog = JSON.parse(JSON.stringify(newCat));
   siteSettings.studioHourlyRate = Number(newCat.hourlyRate) || 15;
+  window.siteSettings = siteSettings;
   if (typeof KEYS !== 'undefined' && KEYS.SETTINGS) {
     safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
   }
+  if (!window.supabaseClient && typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+  let cloudOk = true;
+  let cloudErr = '';
   if (window.supabaseClient) {
     try {
-      await window.supabaseClient.from('studio_settings').upsert([{
+      const { error } = await window.supabaseClient.from('studio_settings').upsert([{
         key: 'site_settings',
         value: siteSettings,
         updated_at: new Date().toISOString()
       }], { onConflict: 'key' });
+      if (error) {
+        cloudOk = false;
+        cloudErr = error.message || JSON.stringify(error);
+        console.error('[Atelier Catalog Cloud Save Error]', error);
+      }
     } catch(e) {
+      cloudOk = false;
+      cloudErr = e.message || String(e);
       console.warn('[Atelier Catalog Cloud Save Warning]', e);
     }
+  } else {
+    cloudOk = false;
+    cloudErr = 'Supabase client not initialized';
   }
   if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
+  return { ok: cloudOk, error: cloudErr };
 };
 
 window.applyAtelierCatalogToSite = function() {

@@ -4532,10 +4532,10 @@ window.renderAdminAtelierEngine = function() {
               </div>
               <button type="button" onclick="window.adminAtelierAddScopeToCard(${selCardIdx})" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--cyan-electric);">+ Add Scope Option</button>
             </div>
-            <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:12px; padding:8px 10px; background:#04060a; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
-              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#fff; cursor:pointer;"><input type="checkbox" ${activeCharCard.showAges !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].showAges = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Show Age / Life Stage Checkboxes</span></label>
-              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#fff; cursor:pointer;"><input type="checkbox" ${activeCharCard.showTurnaround !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].showTurnaround = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Allow 3-View Turnaround Option</span></label>
-              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#fff; cursor:pointer;"><input type="checkbox" ${activeCharCard.showLineupCount ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].showLineupCount = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Show Lineup Character Counter</span></label>
+            <div style="display:grid; grid-template-columns:1fr 120px 28px; gap:8px; padding:0 10px 4px; font-size:10px; font-weight:800; color:var(--cyan-electric); text-transform:uppercase;">
+              <span>Scope Option Name</span>
+              <span>Hours (+ / -)</span>
+              <span></span>
             </div>
             <div style="display:flex; flex-direction:column; gap:7px;">
               ${(activeCharCard.scopes || []).map((sc, sIdx) => {
@@ -4590,23 +4590,25 @@ window.renderAdminAtelierEngine = function() {
       </div>
     `}
 
-    <!-- Section 2: Framing Views & Design Complexities -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+    <!-- Section 2: Framing Views, Design Complexities & Character Ages -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
       <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">📐 Framing Views (Synced to Gallery)</h4>
           <button type="button" onclick="window.adminAtelierAddItem('framings')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--cyan-electric);">+ Add Framing</button>
         </div>
+        <div style="display:grid; grid-template-columns:1fr 68px 62px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+          <span>Framing Name</span><span>Hours</span><span>+Days</span><span></span>
+        </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${cat.framings.map((f, idx) => `
             <div style="display:grid; grid-template-columns:1fr 68px 62px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
-              <input type="text" value="${(f.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.framings[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-              <input type="number" step="0.5" title="Hours" value="${f.hrs}" onchange="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
-              <input type="number" step="1" title="Extra Days" value="${f.days || 0}" onchange="window._adminAtelierDraft.framings[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+              <input type="text" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.framings[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+              <input type="number" step="0.5" title="Base Hours" value="${f.hrs}" oninput="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+              <input type="number" step="1" title="Extra Days" value="${f.days || 0}" oninput="window._adminAtelierDraft.framings[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('framings', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
           `).join('')}
-          <div style="font-size:10px; color:#64748b;">Columns: Label • Base Hours • Extra Days</div>
         </div>
       </div>
 
@@ -4615,15 +4617,40 @@ window.renderAdminAtelierEngine = function() {
           <h4 style="font-size:13.5px; font-weight:800; color:#a855f7; margin:0;">⚡ Design Complexities (Synced to Gallery)</h4>
           <button type="button" onclick="window.adminAtelierAddItem('complexities')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:#a855f7;">+ Add Tier</button>
         </div>
+        <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+          <span>Complexity Tier</span><span>+Hours</span><span></span>
+        </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${cat.complexities.map((cm, idx) => `
             <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
-              <input type="text" value="${(cm.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.complexities[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-              <input type="number" step="0.5" title="Added Hours" value="${cm.hrs}" onchange="window._adminAtelierDraft.complexities[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(168,85,247,0.35); border-radius:5px; color:#e9d5ff; text-align:center;" />
+              <input type="text" value="${(cm.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.complexities[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+              <input type="number" step="0.5" title="Added Hours" value="${cm.hrs}" oninput="window._adminAtelierDraft.complexities[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(168,85,247,0.35); border-radius:5px; color:#e9d5ff; text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('complexities', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
           `).join('')}
-          <div style="font-size:10px; color:#64748b;">Columns: Label • Added Hours</div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:13.5px; font-weight:800; color:var(--emerald); margin:0;">🧬 Character Age Tiers</h4>
+          <button type="button" onclick="window.adminAtelierAddItem('ages')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--emerald);">+ Add Age</button>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; padding:6px 8px; background:#060911; border-radius:6px; border:1px solid rgba(16,185,129,0.25);">
+          <span style="font-size:10.5px; color:#cbd5e1;">Added Hours Per Extra Age Selected:</span>
+          <input type="number" step="0.5" value="${cat.extraAgeHrs !== undefined ? cat.extraAgeHrs : 3.5}" oninput="window._adminAtelierDraft.extraAgeHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:65px; font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+          <span>Age Stage Name</span><span>Hrs (+/-)</span><span></span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${(cat.ages || []).map((ag, idx) => `
+            <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+              <input type="text" value="${(ag.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.ages[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+              <input type="number" step="0.5" title="Hours Delta" value="${ag.hrs}" oninput="window._adminAtelierDraft.ages[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" />
+              <button type="button" onclick="window.adminAtelierDeleteItem('ages', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+            </div>
+          `).join('')}
         </div>
       </div>
     </div>
@@ -4634,19 +4661,21 @@ window.renderAdminAtelierEngine = function() {
         <h4 style="font-size:13.5px; font-weight:800; color:#f43f5e; margin:0;">🎨 Rendering Phases (Synced to Gallery &amp; Revisions)</h4>
         <button type="button" onclick="window.adminAtelierAddItem('phases')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:#f43f5e;">+ Add Phase</button>
       </div>
+      <div style="display:grid; grid-template-columns:1.5fr 70px 70px 70px auto auto 26px; gap:8px; padding:0 10px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+        <span>Phase Name</span><span>Mult</span><span>Revs</span><span>+Days</span><span>Color</span><span>BG</span><span></span>
+      </div>
       <div style="display:flex; flex-direction:column; gap:8px;">
         ${cat.phases.map((ph, idx) => `
           <div style="display:grid; grid-template-columns:1.5fr 70px 70px 70px auto auto 26px; gap:8px; align-items:center; background:#060911; padding:9px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
-            <input type="text" value="${(ph.label||'').replace(/"/g,'&quot;')}" onchange="window._adminAtelierDraft.phases[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-            <input type="number" step="0.05" title="Multiplier" value="${ph.mult}" onchange="window._adminAtelierDraft.phases[${idx}].mult = Number(this.value)||1; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
-            <input type="number" step="1" title="Revisions" value="${ph.revisions}" onchange="window._adminAtelierDraft.phases[${idx}].revisions = Number(this.value)||1; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:5px; color:var(--emerald); text-align:center;" />
-            <input type="number" step="1" title="Extra Days" value="${ph.days || 0}" onchange="window._adminAtelierDraft.phases[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+            <input type="text" value="${(ph.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.phases[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+            <input type="number" step="0.05" title="Price Multiplier" value="${ph.mult}" oninput="window._adminAtelierDraft.phases[${idx}].mult = Number(this.value)||1; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+            <input type="number" step="1" title="Included Revisions" value="${ph.revisions}" oninput="window._adminAtelierDraft.phases[${idx}].revisions = Number(this.value)||1; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:5px; color:var(--emerald); text-align:center;" />
+            <input type="number" step="1" title="Extra Days" value="${ph.days || 0}" oninput="window._adminAtelierDraft.phases[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
             <label style="font-size:10.5px; color:#cbd5e1; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" ${ph.allowColorVar ? 'checked' : ''} onchange="window._adminAtelierDraft.phases[${idx}].allowColorVar = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>Color Var</span></label>
             <label style="font-size:10.5px; color:#cbd5e1; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" ${ph.allowBg ? 'checked' : ''} onchange="window._adminAtelierDraft.phases[${idx}].allowBg = this.checked; window.scheduleAdminAtelierAutoSave();" style="width:auto;" /><span>BG</span></label>
             <button type="button" onclick="window.adminAtelierDeleteItem('phases', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
           </div>
         `).join('')}
-        <div style="font-size:10px; color:#64748b;">Columns: Phase Name • Multiplier (e.g. 1.25) • Revisions • Extra Days • Allow Color Var • Allow BG</div>
       </div>
     </div>
 
@@ -4712,6 +4741,9 @@ window.adminAtelierAddItem = function(listKey) {
     window._adminAtelierDraft.complexities.push({ id: uid, label: 'New Complexity Tier', hrs: 2.0, active: true });
   } else if (listKey === 'phases') {
     window._adminAtelierDraft.phases.push({ id: uid, label: 'New Rendering Phase', mult: 1.0, revisions: 2, days: 1, allowColorVar: true, allowBg: true, active: true });
+  } else if (listKey === 'ages') {
+    if (!Array.isArray(window._adminAtelierDraft.ages)) window._adminAtelierDraft.ages = [];
+    window._adminAtelierDraft.ages.push({ id: uid, label: 'New Age Tier', hrs: 0, active: true });
   }
   window.scheduleAdminAtelierAutoSave();
   window.renderAdminAtelierEngine();
@@ -4737,7 +4769,11 @@ window.adminAtelierResetDefault = function() {
 
 window.adminAtelierSaveAll = async function() {
   if (!window._adminAtelierDraft || typeof window.saveAtelierCatalog !== 'function') return;
-  await window.saveAtelierCatalog(window._adminAtelierDraft);
+  const res = await window.saveAtelierCatalog(window._adminAtelierDraft);
   if (typeof window.savePipelinesToSupabaseCloud === 'function') await window.savePipelinesToSupabaseCloud();
-  if (typeof showToast === 'function') showToast('Atelier Categories & Pricing saved and synced to Supabase! ✓', 'success', 4500);
+  if (res && !res.ok) {
+    if (typeof showToast === 'function') showToast('Saved locally, but Supabase sync failed: ' + res.error, 'error', 6000);
+  } else {
+    if (typeof showToast === 'function') showToast('Atelier Categories, Ages & Pricing saved and synced to Supabase! ✓', 'success', 4500);
+  }
 };
