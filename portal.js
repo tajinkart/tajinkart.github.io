@@ -576,8 +576,14 @@ window.recalcWizardPrice = function() {
   const exprRate = catCfg ? catCfg.addons.expressionHrs : 0.75;
   const actionRate = catCfg ? catCfg.addons.actionPoseHrs : 1.25;
   const commMult = catCfg ? catCfg.commercialMult : 1.4;
+  const scopeDays = scopeOpt ? (parseInt(scopeOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
   const framingDays = framingOpt ? (parseInt(framingOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
+  const compDays = compOpt ? (parseInt(compOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
   const phaseDays = phaseOpt ? (parseInt(phaseOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
+  let ageDays = 0;
+  if (document.getElementById('wizCharacterNuancesGrid')?.style.display !== 'none' && ageBoxes.length > 0) {
+    ageBoxes.forEach(ab => { ageDays += (parseInt(ab.getAttribute('data-days') || '0', 10) || 0); });
+  }
   const phaseRevsAttr = phaseOpt ? parseInt(phaseOpt.getAttribute('data-revs') || '0', 10) : 0;
   if (phaseRevsAttr > 0) {
     revRounds = phaseRevsAttr;
@@ -585,7 +591,8 @@ window.recalcWizardPrice = function() {
   }
 
   let addonHrs = (extraSketches * exConceptRate) + (colorVars * colorVarRate) + bgHrs;
-  let extraDays = framingDays + phaseDays + (bgHrs >= 3 ? 2 : 0);
+  const bgDays = bgOpt ? (parseInt(bgOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
+  let extraDays = scopeDays + framingDays + compDays + phaseDays + ageDays + bgDays;
   const addonsChosen = [];
 
   if (extraSketches > 0) addonsChosen.push(`+${extraSketches} Extra Initial Concept(s)`);
@@ -596,16 +603,20 @@ window.recalcWizardPrice = function() {
     const cType = document.getElementById('wizCompArchetype')?.value || 'Companion';
     const cDepthOpt = document.getElementById('wizCompDepth')?.selectedOptions[0];
     const cDepthVal = cDepthOpt ? cDepthOpt.value : 'Simple Companion';
-    const cHrs = cDepthVal.includes('Designed') ? effCfg.subchar : effCfg.pet;
+    const cHrs = cDepthOpt ? (parseFloat(cDepthOpt.getAttribute('data-hrs') || '2') || 2) : effCfg.pet;
+    const cDays = cDepthOpt ? (parseInt(cDepthOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
     addonHrs += cHrs;
+    extraDays += cDays;
     addonsChosen.push(`Companion: ${cType} (${cDepthVal})`);
   }
 
   if (document.getElementById('wizWeaponCheck')?.checked) {
     const wType = document.getElementById('wizWeaponType')?.value || 'Weapon';
     const wDepthOpt = document.getElementById('wizWeaponDepth')?.selectedOptions[0];
-    const wHrs = wDepthOpt ? (wDepthOpt.value.includes('Relic') ? (catCfg ? catCfg.addons.relicWeaponHrs : 3) : (catCfg ? catCfg.addons.stdWeaponHrs : 1.5)) : 1.5;
+    const wHrs = wDepthOpt ? (parseFloat(wDepthOpt.getAttribute('data-hrs') || '1.5') || 1.5) : 1.5;
+    const wDays = wDepthOpt ? (parseInt(wDepthOpt.getAttribute('data-days') || '0', 10) || 0) : 0;
     addonHrs += wHrs;
+    extraDays += wDays;
     addonsChosen.push(`Prop: ${wType} (${wDepthOpt ? wDepthOpt.value : 'Standard'})`);
   }
 
@@ -3320,7 +3331,7 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
     if (matchedCard && Array.isArray(matchedCard.scopes) && matchedCard.scopes.length > 0) {
       if (sLbl) sLbl.textContent = matchedCard.title + ' — Scope:';
       sEl.innerHTML = matchedCard.scopes.map((sc, i) =>
-        `<option value="${sc.id || ('sc_' + i)}" data-hrs="${Number(sc.hrs) || 0}" ${i === 0 ? 'selected' : ''}>${sc.label}</option>`
+        `<option value="${sc.id || ('sc_' + i)}" data-hrs="${Number(sc.hrs) || 0}" data-days="${Number(sc.days) || 0}" ${i === 0 ? 'selected' : ''}>${sc.label}</option>`
       ).join('');
     } else if (!isChar) {
       sEl.innerHTML = prof.scopes.map((o, i) => `<option value="opt_${i}" data-hrs="${Math.max(0, Math.round((o.usd || 0) / 15))}" ${i === 0 ? 'selected' : ''}>${o.label.replace(/\s*\(\+?\$\d+\)/g, '')}</option>`).join('');
@@ -3340,7 +3351,7 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
 
   if (cEl && cat && Array.isArray(cat.complexities)) {
     cEl.innerHTML = cat.complexities.filter(c => c.active !== false).map((c, idx) =>
-      `<option value="${c.id}" data-hrs="${c.hrs}" ${(c.id === 'standard' || idx === 1) ? 'selected' : ''}>${c.label}</option>`
+      `<option value="${c.id}" data-hrs="${c.hrs}" data-days="${c.days || 0}" ${(c.id === 'standard' || idx === 1) ? 'selected' : ''}>${c.label}</option>`
     ).join('');
   }
 
@@ -3351,9 +3362,22 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
     ).join('');
   }
 
+  const compDepthEl = document.getElementById('wizCompDepth');
+  if (compDepthEl && cat && Array.isArray(cat.companionTiers)) {
+    compDepthEl.innerHTML = cat.companionTiers.filter(t => t.active !== false).map(t =>
+      `<option value="${t.label.replace(/"/g, '&quot;')}" data-hrs="${t.hrs}" data-days="${t.days || 0}">${t.label}</option>`
+    ).join('');
+  }
+  const wpnDepthEl = document.getElementById('wizWeaponDepth');
+  if (wpnDepthEl && cat && Array.isArray(cat.weaponTiers)) {
+    wpnDepthEl.innerHTML = cat.weaponTiers.filter(t => t.active !== false).map(t =>
+      `<option value="${t.label.replace(/"/g, '&quot;')}" data-hrs="${t.hrs}" data-days="${t.days || 0}">${t.label}</option>`
+    ).join('');
+  }
+
   if (bgEl && cat && Array.isArray(cat.backgrounds)) {
     bgEl.innerHTML = cat.backgrounds.filter(b => b.active !== false).map((b, idx) =>
-      `<option value="${b.id}" data-hrs="${b.hrs}" ${idx === 0 ? 'selected' : ''}>${b.label}</option>`
+      `<option value="${b.id}" data-hrs="${b.hrs}" data-days="${b.days || 0}" ${idx === 0 ? 'selected' : ''}>${b.label}</option>`
     ).join('');
   }
 
@@ -3362,7 +3386,7 @@ window.populateDynamicWizardForCategory = function(pipeKey, subMode) {
     const activeAges = cat.ages.filter(a => a.active !== false);
     ageBoxWrap.innerHTML = activeAges.map((a, idx) => `
       <label style="display:inline-flex; align-items:center; gap:5px; font-size:11px; background:#04060b; border:1px solid rgba(255,255,255,0.12); padding:5px 9px; border-radius:999px; cursor:pointer;">
-        <input type="checkbox" name="wizAgeOpt" value="${a.label.replace(/"/g, '&quot;')}" data-delta="${Number(a.hrs) || 0}" ${(a.id === 'adult' || idx === 0 && !activeAges.some(x => x.id === 'adult')) ? 'checked' : ''} onchange="recalcWizardPrice()" style="width:auto;" />
+        <input type="checkbox" name="wizAgeOpt" value="${a.label.replace(/"/g, '&quot;')}" data-delta="${Number(a.hrs) || 0}" data-days="${Number(a.days) || 0}" ${(a.id === 'adult' || idx === 0 && !activeAges.some(x => x.id === 'adult')) ? 'checked' : ''} onchange="recalcWizardPrice()" style="width:auto;" />
         <span>${a.label}</span>
       </label>
     `).join('');

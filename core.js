@@ -1037,6 +1037,7 @@ window.syncStudioSettingsFromCloud = async function() {
       if (data.value.brandGenre) safeSetStorage('tajinkart_brand_genre', data.value.brandGenre);
       if (typeof window.updateStudioLogoDisplay === 'function') window.updateStudioLogoDisplay();
       if (typeof window.updateStudioLiveStatus === 'function') window.updateStudioLiveStatus();
+      window._adminAtelierDraft = null;
       if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
       console.log('[Cloud Settings] Restored studio settings from Supabase.');
     }
@@ -1244,14 +1245,25 @@ window.DEFAULT_ATELIER_CATALOG = {
     { id: 'elder', label: 'Elder', hrs: 0.5, active: true }
   ],
   extraAgeHrs: 3.5,
+  companionTiers: [
+    { id: 'simple_pet', label: 'Simple Companion / Pet', hrs: 2.0, days: 1, active: true },
+    { id: 'subchar', label: 'Designed Sub-Character w/ Gear', hrs: 4.5, days: 2, active: true }
+  ],
+  weaponTiers: [
+    { id: 'std_prop', label: 'Standard Prop / Weapon', hrs: 1.5, days: 0, active: true },
+    { id: 'relic', label: 'Ornate / Legendary Relic', hrs: 3.0, days: 1, active: true }
+  ],
   addons: {
     simplePetHrs: 2.0,
     subCharHrs: 4.5,
     stdWeaponHrs: 1.5,
     relicWeaponHrs: 3.0,
     colorVarHrs: 1.25,
+    colorVarDays: 0,
     expressionHrs: 0.75,
-    actionPoseHrs: 1.25
+    expressionDays: 0,
+    actionPoseHrs: 1.25,
+    actionPoseDays: 1
   },
   galleryTags: [
     'Color Variation',
@@ -1279,6 +1291,8 @@ window.getAtelierCatalog = function() {
     backgrounds: (Array.isArray(saved.backgrounds) && saved.backgrounds.length > 0) ? saved.backgrounds : def.backgrounds,
     ages: (Array.isArray(saved.ages) && saved.ages.length > 0) ? saved.ages : def.ages,
     extraAgeHrs: Number(saved.extraAgeHrs) >= 0 && saved.extraAgeHrs !== undefined ? Number(saved.extraAgeHrs) : def.extraAgeHrs,
+    companionTiers: (Array.isArray(saved.companionTiers) && saved.companionTiers.length > 0) ? saved.companionTiers : def.companionTiers,
+    weaponTiers: (Array.isArray(saved.weaponTiers) && saved.weaponTiers.length > 0) ? saved.weaponTiers : def.weaponTiers,
     addons: Object.assign({}, def.addons, saved.addons || {}),
     galleryTags: (Array.isArray(saved.galleryTags) && saved.galleryTags.length > 0) ? saved.galleryTags : def.galleryTags
   };

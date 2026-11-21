@@ -4415,7 +4415,7 @@ window.renderAdminAtelierEngine = function() {
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
           <button type="button" onclick="window.adminAtelierResetDefault()" class="btn-secondary" style="font-size:11px; padding:8px 12px; color:#cbd5e1;">↺ Reset Defaults</button>
-          <button type="button" onclick="window.adminAtelierSaveAll()" class="btn-gold" style="padding:10px 18px; font-size:12.5px; font-weight:900;">✓ Save &amp; Sync Now</button>
+          <button type="button" onclick="window.adminAtelierSaveAll(this)" class="btn-gold" style="padding:10px 18px; font-size:12.5px; font-weight:900;">✓ Save &amp; Sync Now</button>
         </div>
       </div>
 
@@ -4426,19 +4426,19 @@ window.renderAdminAtelierEngine = function() {
         </label>
         <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
           <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:3px;">Hourly Rate ($/hr)</label>
-          <input type="number" min="5" max="250" step="1" value="${hr}" onchange="window._adminAtelierDraft.hourlyRate = Number(this.value)||15; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff; font-weight:800;" />
+          <input type="number" min="5" max="250" step="1" value="${hr}" oninput="window._adminAtelierDraft.hourlyRate = Number(this.value)||15; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff; font-weight:800;" />
         </div>
         <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
           <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:3px;">Extra Sketch ($${Math.round(cat.extraConceptHrs * hr)} = ${cat.extraConceptHrs}h)</label>
-          <input type="number" min="0" step="0.25" value="${cat.extraConceptHrs}" onchange="window._adminAtelierDraft.extraConceptHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:6px; color:#fff;" />
+          <input type="number" min="0" step="0.25" value="${cat.extraConceptHrs}" oninput="window._adminAtelierDraft.extraConceptHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:6px; color:#fff;" />
         </div>
         <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
           <label style="font-size:10.5px; color:var(--emerald); font-weight:700; display:block; margin-bottom:3px;">Extra Revision ($${Math.round(cat.extraRevisionHrs * hr)} = ${cat.extraRevisionHrs}h)</label>
-          <input type="number" min="0" step="0.25" value="${cat.extraRevisionHrs}" onchange="window._adminAtelierDraft.extraRevisionHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#fff;" />
+          <input type="number" min="0" step="0.25" value="${cat.extraRevisionHrs}" oninput="window._adminAtelierDraft.extraRevisionHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:6px; color:#fff;" />
         </div>
         <div style="background:#090d16; border:1px solid rgba(255,255,255,0.1); padding:8px 12px; border-radius:10px;">
           <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:3px;">Commercial + PSD Multiplier (+${Math.round((cat.commercialMult-1)*100)}%)</label>
-          <input type="number" min="1" max="3" step="0.05" value="${cat.commercialMult}" onchange="window._adminAtelierDraft.commercialMult = Number(this.value)||1.4; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff;" />
+          <input type="number" min="1" max="3" step="0.05" value="${cat.commercialMult}" oninput="window._adminAtelierDraft.commercialMult = Number(this.value)||1.4; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:6px; color:#fff;" />
         </div>
       </div>
     </div>
@@ -4462,7 +4462,7 @@ window.renderAdminAtelierEngine = function() {
             <div onclick="window.adminSelectCategory('${k}')" style="cursor:pointer; background:${isSelected ? 'rgba(250,204,21,0.09)' : '#060911'}; border:2px solid ${isSelected ? 'var(--gold)' : (isVisible ? 'rgba(0,240,255,0.22)' : 'rgba(255,255,255,0.08)')}; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; opacity:${isVisible ? '1' : '0.6'}; transition:all 0.15s;">
               <div style="display:flex; gap:8px; align-items:center;">
                 <img src="${cImg}" style="width:46px; height:36px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.15); flex-shrink:0;" alt="" />
-                <input type="text" value="${(p.topSub || k).replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" onchange="PIPELINE_DATA['${k}'].topSub = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; font-weight:800; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff; width:100%;" />
+                <input type="text" value="${(p.topSub || k).replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" oninput="PIPELINE_DATA['${k}'].topSub = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; font-weight:800; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff; width:100%;" />
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
                 <label onclick="event.stopPropagation();" style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:${isVisible ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
@@ -4503,20 +4503,20 @@ window.renderAdminAtelierEngine = function() {
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                 <label onclick="event.stopPropagation();" style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:${c.active !== false ? 'var(--emerald)' : '#94a3b8'}; cursor:pointer;">
-                  <input type="checkbox" ${c.active !== false ? 'checked' : ''} onchange="window._adminAtelierDraft.serviceCards[${idx}].active = this.checked; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" style="width:auto;" />
+                  <input type="checkbox" ${c.active !== false ? 'checked' : ''} oninput="window._adminAtelierDraft.serviceCards[${idx}].active = this.checked; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" style="width:auto;" />
                   <span>${c.active !== false ? 'Visible' : 'Hidden'}</span>
                 </label>
                 <span style="font-size:10px; color:var(--cyan-electric); font-weight:800;">${isCardSel ? '✓ EDITING SCOPES' : 'Click to Edit Scopes'}</span>
                 <button type="button" onclick="event.stopPropagation(); window.adminAtelierDeleteServiceCard(${idx})" style="color:var(--crimson); font-size:11px; font-weight:700; background:none; border:none; cursor:pointer;">✕</button>
               </div>
-              <input type="text" value="${(c.title || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" onchange="window._adminAtelierDraft.serviceCards[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Card Title" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-              <textarea rows="2" onclick="event.stopPropagation();" onchange="window._adminAtelierDraft.serviceCards[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Short description..." style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${c.desc || ''}</textarea>
+              <input type="text" value="${(c.title || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" oninput="window._adminAtelierDraft.serviceCards[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Card Title" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+              <textarea rows="2" onclick="event.stopPropagation();" oninput="window._adminAtelierDraft.serviceCards[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Short description..." style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${c.desc || ''}</textarea>
               <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;" onclick="event.stopPropagation();">
-                <div><label style="font-size:9.5px; color:#94a3b8;">Mode Key</label><input type="text" value="${c.subMode || 'custom'}" onchange="window._adminAtelierDraft.serviceCards[${idx}].subMode = this.value; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--cyan-electric);" /></div>
-                <div><label style="font-size:9.5px; color:#94a3b8;">Base Hrs ($${usd})</label><input type="number" step="0.5" value="${c.baseHours || 3}" onchange="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
-                <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(c.timeline || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Mode Key</label><input type="text" value="${c.subMode || 'custom'}" oninput="window._adminAtelierDraft.serviceCards[${idx}].subMode = this.value; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--cyan-electric);" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Base Hrs ($${usd})</label><input type="number" step="0.5" value="${c.baseHours || 3}" oninput="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(c.timeline || '').replace(/"/g, '&quot;')}" oninput="window._adminAtelierDraft.serviceCards[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
               </div>
-              <input type="url" value="${(c.img || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" onchange="window._adminAtelierDraft.serviceCards[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" placeholder="Cover Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+              <input type="url" value="${(c.img || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" oninput="window._adminAtelierDraft.serviceCards[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Cover Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
             </div>
           `;
           }).join('')}
@@ -4532,9 +4532,10 @@ window.renderAdminAtelierEngine = function() {
               </div>
               <button type="button" onclick="window.adminAtelierAddScopeToCard(${selCardIdx})" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--cyan-electric);">+ Add Scope Option</button>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 120px 28px; gap:8px; padding:0 10px 4px; font-size:10px; font-weight:800; color:var(--cyan-electric); text-transform:uppercase;">
+            <div style="display:grid; grid-template-columns:1fr 120px 64px 28px; gap:8px; padding:0 10px 4px; font-size:10px; font-weight:800; color:var(--cyan-electric); text-transform:uppercase;">
               <span>Scope Option Name</span>
               <span>Hours (+ / -)</span>
+              <span>+Days</span>
               <span></span>
             </div>
             <div style="display:flex; flex-direction:column; gap:7px;">
@@ -4542,12 +4543,13 @@ window.renderAdminAtelierEngine = function() {
                 const deltaUsd = Math.round((Number(sc.hrs) || 0) * hr);
                 const sign = deltaUsd >= 0 ? '+' : '';
                 return `
-                  <div style="display:grid; grid-template-columns:1fr 120px 28px; gap:8px; align-items:center; background:#04060a; padding:7px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
-                    <input type="text" value="${(sc.label || '').replace(/"/g, '&quot;')}" onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#080c16; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+                  <div style="display:grid; grid-template-columns:1fr 120px 64px 28px; gap:8px; align-items:center; background:#04060a; padding:7px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                    <input type="text" value="${(sc.label || '').replace(/"/g, '&quot;')}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#080c16; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
                     <div style="display:flex; align-items:center; gap:5px;">
-                      <input type="number" step="0.5" value="${sc.hrs}" onchange="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:62px; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+                      <input type="number" step="0.5" value="${sc.hrs}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:62px; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
                       <span class="font-mono" style="font-size:10.5px; color:${deltaUsd < 0 ? 'var(--emerald)' : '#94a3b8'};">${sign}$${deltaUsd}</span>
                     </div>
+                    <input type="number" step="1" title="Extra Days" value="${sc.days || 0}" oninput="window._adminAtelierDraft.serviceCards[${selCardIdx}].scopes[${sIdx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:11px; padding:5px; background:#080c16; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
                     <button type="button" onclick="window.adminAtelierDeleteScopeFromCard(${selCardIdx}, ${sIdx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
                   </div>
                 `;
@@ -4577,13 +4579,13 @@ window.renderAdminAtelierEngine = function() {
                 <span class="font-mono" style="font-size:10.5px; color:var(--gold);">${t.badge || 'Stage'}</span>
                 <button type="button" onclick="window.adminAtelierDeletePipelineTile('${selPipe}', ${idx})" style="color:var(--crimson); font-size:11px; background:none; border:none; cursor:pointer; font-weight:700;">✕ Delete</button>
               </div>
-              <input type="text" value="${(t.title || '').replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
-              <textarea rows="2" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${t.desc || ''}</textarea>
+              <input type="text" value="${(t.title || '').replace(/"/g, '&quot;')}" oninput="PIPELINE_DATA['${selPipe}'].tiles[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
+              <textarea rows="2" oninput="PIPELINE_DATA['${selPipe}'].tiles[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${t.desc || ''}</textarea>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                <div><label style="font-size:9.5px; color:#94a3b8;">Base Price ($USD)</label><input type="number" value="${t.usdVal || 90}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].usdVal = Number(this.value)||90; PIPELINE_DATA['${selPipe}'].tiles[${idx}].price = String(this.value); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
-                <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(t.timeline || '').replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Base Price ($USD)</label><input type="number" value="${t.usdVal || 90}" oninput="PIPELINE_DATA['${selPipe}'].tiles[${idx}].usdVal = Number(this.value)||90; PIPELINE_DATA['${selPipe}'].tiles[${idx}].price = String(this.value); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
+                <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(t.timeline || '').replace(/"/g, '&quot;')}" oninput="PIPELINE_DATA['${selPipe}'].tiles[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
               </div>
-              <input type="url" value="${(t.img || '').replace(/"/g, '&quot;')}" onchange="PIPELINE_DATA['${selPipe}'].tiles[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" placeholder="Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
+              <input type="url" value="${(t.img || '').replace(/"/g, '&quot;')}" oninput="PIPELINE_DATA['${selPipe}'].tiles[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" placeholder="Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
             </div>
           `).join('')}
         </div>
@@ -4617,14 +4619,15 @@ window.renderAdminAtelierEngine = function() {
           <h4 style="font-size:13.5px; font-weight:800; color:#a855f7; margin:0;">⚡ Design Complexities (Synced to Gallery)</h4>
           <button type="button" onclick="window.adminAtelierAddItem('complexities')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:#a855f7;">+ Add Tier</button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
-          <span>Complexity Tier</span><span>+Hours</span><span></span>
+        <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+          <span>Complexity Tier</span><span>+Hrs</span><span>+Days</span><span></span>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${cat.complexities.map((cm, idx) => `
-            <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
               <input type="text" value="${(cm.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.complexities[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
               <input type="number" step="0.5" title="Added Hours" value="${cm.hrs}" oninput="window._adminAtelierDraft.complexities[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(168,85,247,0.35); border-radius:5px; color:#e9d5ff; text-align:center;" />
+              <input type="number" step="1" title="Extra Days" value="${cm.days || 0}" oninput="window._adminAtelierDraft.complexities[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('complexities', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
           `).join('')}
@@ -4640,14 +4643,15 @@ window.renderAdminAtelierEngine = function() {
           <span style="font-size:10.5px; color:#cbd5e1;">Added Hours Per Extra Age Selected:</span>
           <input type="number" step="0.5" value="${cat.extraAgeHrs !== undefined ? cat.extraAgeHrs : 3.5}" oninput="window._adminAtelierDraft.extraAgeHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:65px; font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" />
         </div>
-        <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
-          <span>Age Stage Name</span><span>Hrs (+/-)</span><span></span>
+        <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+          <span>Age Stage Name</span><span>Hrs</span><span>+Days</span><span></span>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${(cat.ages || []).map((ag, idx) => `
-            <div style="display:grid; grid-template-columns:1fr 78px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
               <input type="text" value="${(ag.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.ages[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
               <input type="number" step="0.5" title="Hours Delta" value="${ag.hrs}" oninput="window._adminAtelierDraft.ages[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" />
+              <input type="number" step="1" title="Extra Days" value="${ag.days || 0}" oninput="window._adminAtelierDraft.ages[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('ages', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
           `).join('')}
@@ -4679,21 +4683,91 @@ window.renderAdminAtelierEngine = function() {
       </div>
     </div>
 
-    <!-- Section 4: Add-on Effort Hours & Sample Tags -->
-    <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px;">
-      <h4 style="font-size:13.5px; font-weight:800; color:var(--gold); margin:0 0 10px;">🧩 Module Add-on Hours ($${hr}/hr) &amp; Gallery Tags</h4>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin-bottom:12px;">
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Simple Pet ($${Math.round(cat.addons.simplePetHrs*hr)})</label><input type="number" step="0.5" value="${cat.addons.simplePetHrs}" onchange="window._adminAtelierDraft.addons.simplePetHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Sub-Char ($${Math.round(cat.addons.subCharHrs*hr)})</label><input type="number" step="0.5" value="${cat.addons.subCharHrs}" onchange="window._adminAtelierDraft.addons.subCharHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Std Weapon ($${Math.round(cat.addons.stdWeaponHrs*hr)})</label><input type="number" step="0.5" value="${cat.addons.stdWeaponHrs}" onchange="window._adminAtelierDraft.addons.stdWeaponHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Relic Weapon ($${Math.round(cat.addons.relicWeaponHrs*hr)})</label><input type="number" step="0.5" value="${cat.addons.relicWeaponHrs}" onchange="window._adminAtelierDraft.addons.relicWeaponHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Color Var ($${Math.round(cat.addons.colorVarHrs*hr)})</label><input type="number" step="0.25" value="${cat.addons.colorVarHrs}" onchange="window._adminAtelierDraft.addons.colorVarHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Per Expr ($${Math.round(cat.addons.expressionHrs*hr)})</label><input type="number" step="0.25" value="${cat.addons.expressionHrs}" onchange="window._adminAtelierDraft.addons.expressionHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
-        <div><label style="font-size:10px; color:#94a3b8; display:block;">Per Action ($${Math.round(cat.addons.actionPoseHrs*hr)})</label><input type="number" step="0.25" value="${cat.addons.actionPoseHrs}" onchange="window._adminAtelierDraft.addons.actionPoseHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave(); window.renderAdminAtelierEngine();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+    <!-- Section 4: Expanded Add-ons Engine (Backgrounds, Companions, Weapons, Variations & Tags) -->
+    <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px; padding:16px 20px; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h4 style="font-size:14px; font-weight:800; color:var(--gold); margin:0;">🧩 Expanded Add-ons &amp; Module Pricing ($${hr}/hr)</h4>
+          <span style="font-size:11px; color:#94a3b8;">Add, rename, or adjust Hours and Extra Days for Backgrounds, Companions, Weapons, Variations, Expressions &amp; Action Poses.</span>
+        </div>
       </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+        <!-- Backgrounds -->
+        <div style="background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:12px; color:var(--cyan-electric);">🖼️ Background Options</strong>
+            <button type="button" onclick="window.adminAtelierAddItem('backgrounds')" class="btn-secondary" style="font-size:10px; padding:4px 8px; color:var(--cyan-electric);">+ Add BG</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 56px 52px 22px; gap:5px; font-size:9.5px; color:#94a3b8; font-weight:800; text-transform:uppercase; padding-bottom:4px;">
+            <span>Background Name</span><span>Hrs</span><span>+Days</span><span></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${(cat.backgrounds || []).map((bg, idx) => `
+              <div style="display:grid; grid-template-columns:1fr 56px 52px 22px; gap:5px; align-items:center;">
+                <input type="text" value="${(bg.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.backgrounds[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+                <input type="number" step="0.5" value="${bg.hrs}" oninput="window._adminAtelierDraft.backgrounds[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+                <input type="number" step="1" value="${bg.days || 0}" oninput="window._adminAtelierDraft.backgrounds[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+                <button type="button" onclick="window.adminAtelierDeleteItem('backgrounds', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Companion Tiers -->
+        <div style="background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:12px; color:var(--emerald);">🐾 Companion / Pet Tiers</strong>
+            <button type="button" onclick="window.adminAtelierAddItem('companionTiers')" class="btn-secondary" style="font-size:10px; padding:4px 8px; color:var(--emerald);">+ Add Pet Tier</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 56px 52px 22px; gap:5px; font-size:9.5px; color:#94a3b8; font-weight:800; text-transform:uppercase; padding-bottom:4px;">
+            <span>Companion Depth</span><span>Hrs</span><span>+Days</span><span></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${(cat.companionTiers || []).map((cp, idx) => `
+              <div style="display:grid; grid-template-columns:1fr 56px 52px 22px; gap:5px; align-items:center;">
+                <input type="text" value="${(cp.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.companionTiers[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+                <input type="number" step="0.5" value="${cp.hrs}" oninput="window._adminAtelierDraft.companionTiers[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+                <input type="number" step="1" value="${cp.days || 0}" oninput="window._adminAtelierDraft.companionTiers[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+                <button type="button" onclick="window.adminAtelierDeleteItem('companionTiers', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Weapon Tiers -->
+        <div style="background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:12px; color:#f43f5e;">⚔️ Hero Weapon / Prop Tiers</strong>
+            <button type="button" onclick="window.adminAtelierAddItem('weaponTiers')" class="btn-secondary" style="font-size:10px; padding:4px 8px; color:#f43f5e;">+ Add Weapon Tier</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 56px 52px 22px; gap:5px; font-size:9.5px; color:#94a3b8; font-weight:800; text-transform:uppercase; padding-bottom:4px;">
+            <span>Weapon Detail Tier</span><span>Hrs</span><span>+Days</span><span></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${(cat.weaponTiers || []).map((wp, idx) => `
+              <div style="display:grid; grid-template-columns:1fr 56px 52px 22px; gap:5px; align-items:center;">
+                <input type="text" value="${(wp.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.weaponTiers[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
+                <input type="number" step="0.5" value="${wp.hrs}" oninput="window._adminAtelierDraft.weaponTiers[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+                <input type="number" step="1" value="${wp.days || 0}" oninput="window._adminAtelierDraft.weaponTiers[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
+                <button type="button" onclick="window.adminAtelierDeleteItem('weaponTiers', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Color Variations, Expressions, Action Poses -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px;">
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Color Var Hrs ($${Math.round(cat.addons.colorVarHrs*hr)})</label><input type="number" step="0.25" value="${cat.addons.colorVarHrs}" oninput="window._adminAtelierDraft.addons.colorVarHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Per Expression Hrs ($${Math.round(cat.addons.expressionHrs*hr)})</label><input type="number" step="0.25" value="${cat.addons.expressionHrs}" oninput="window._adminAtelierDraft.addons.expressionHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Per Action Pose Hrs ($${Math.round(cat.addons.actionPoseHrs*hr)})</label><input type="number" step="0.25" value="${cat.addons.actionPoseHrs}" oninput="window._adminAtelierDraft.addons.actionPoseHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        <div><label style="font-size:10px; color:#94a3b8; display:block;">Action Sheet +Days</label><input type="number" step="1" value="${cat.addons.actionPoseDays !== undefined ? cat.addons.actionPoseDays : 1}" oninput="window._adminAtelierDraft.addons.actionPoseDays = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; padding:5px 8px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:6px; color:var(--cyan-electric);" /></div>
+      </div>
+
       <div>
         <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:4px;">Gallery Sample Tags (comma-separated — synced directly to Tab 1 Art Upload):</label>
-        <input type="text" value="${(cat.galleryTags || []).join(', ')}" onchange="window._adminAtelierDraft.galleryTags = this.value.split(',').map(x=>x.trim()).filter(Boolean); window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:11.5px; padding:7px 10px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:8px; color:#fff;" />
+        <input type="text" value="${(cat.galleryTags || []).join(', ')}" oninput="window._adminAtelierDraft.galleryTags = this.value.split(',').map(x=>x.trim()).filter(Boolean); window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:11.5px; padding:7px 10px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:8px; color:#fff;" />
       </div>
     </div>
   `;
@@ -4743,7 +4817,13 @@ window.adminAtelierAddItem = function(listKey) {
     window._adminAtelierDraft.phases.push({ id: uid, label: 'New Rendering Phase', mult: 1.0, revisions: 2, days: 1, allowColorVar: true, allowBg: true, active: true });
   } else if (listKey === 'ages') {
     if (!Array.isArray(window._adminAtelierDraft.ages)) window._adminAtelierDraft.ages = [];
-    window._adminAtelierDraft.ages.push({ id: uid, label: 'New Age Tier', hrs: 0, active: true });
+    window._adminAtelierDraft.ages.push({ id: uid, label: 'New Age Tier', hrs: 0, days: 0, active: true });
+  } else if (listKey === 'backgrounds') {
+    window._adminAtelierDraft.backgrounds.push({ id: uid, label: 'New Background Tier', hrs: 2.0, days: 1, active: true });
+  } else if (listKey === 'companionTiers') {
+    window._adminAtelierDraft.companionTiers.push({ id: uid, label: 'New Companion Tier', hrs: 3.0, days: 1, active: true });
+  } else if (listKey === 'weaponTiers') {
+    window._adminAtelierDraft.weaponTiers.push({ id: uid, label: 'New Weapon Tier', hrs: 2.0, days: 0, active: true });
   }
   window.scheduleAdminAtelierAutoSave();
   window.renderAdminAtelierEngine();
@@ -4767,13 +4847,26 @@ window.adminAtelierResetDefault = function() {
   window.renderAdminAtelierEngine();
 };
 
-window.adminAtelierSaveAll = async function() {
-  if (!window._adminAtelierDraft || typeof window.saveAtelierCatalog !== 'function') return;
-  const res = await window.saveAtelierCatalog(window._adminAtelierDraft);
-  if (typeof window.savePipelinesToSupabaseCloud === 'function') await window.savePipelinesToSupabaseCloud();
-  if (res && !res.ok) {
-    if (typeof showToast === 'function') showToast('Saved locally, but Supabase sync failed: ' + res.error, 'error', 6000);
-  } else {
-    if (typeof showToast === 'function') showToast('Atelier Categories, Ages & Pricing saved and synced to Supabase! ✓', 'success', 4500);
+window.adminAtelierSaveAll = async function(btnEl) {
+  if (!window._adminAtelierDraft || typeof window.saveAtelierCatalog !== 'function') {
+    if (typeof showToast === 'function') showToast('Nothing to save yet.', 'info');
+    return;
+  }
+  const origTxt = btnEl ? btnEl.textContent : '';
+  if (btnEl) { btnEl.textContent = '⏳ Saving...'; btnEl.disabled = true; }
+  try {
+    const res = await window.saveAtelierCatalog(window._adminAtelierDraft);
+    if (typeof window.savePipelinesToSupabaseCloud === 'function') {
+      try { await window.savePipelinesToSupabaseCloud(); } catch(e) { console.warn(e); }
+    }
+    if (res && !res.ok) {
+      if (typeof showToast === 'function') showToast('Saved locally, Supabase sync error: ' + res.error, 'error', 6500);
+    } else {
+      if (typeof showToast === 'function') showToast('Saved & synced to Supabase successfully! ✓', 'success', 4000);
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') showToast('Save error: ' + (err.message || err), 'error', 6000);
+  } finally {
+    if (btnEl) { btnEl.textContent = origTxt || '✓ Save & Sync Now'; btnEl.disabled = false; }
   }
 };
