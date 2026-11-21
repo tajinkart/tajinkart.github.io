@@ -341,7 +341,7 @@ window.selectPipeline = function(key, cardEl, userClicked) {
         usdVal: Math.round(c.baseHours * hourly),
         price: String(Math.round(c.baseHours * hourly)),
         subMode: c.subMode,
-        span: 'span-1'
+        span: 'span-6'
       }))
     : (Array.isArray(data.tiles) ? data.tiles.map(t => ({ ...t, baseHours: t.baseHours || Math.max(2, Math.round((t.usdVal || 90) / 15)) })) : []);
 
