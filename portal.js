@@ -3440,7 +3440,7 @@ window.updateWizardDynamicPreview = function(pipeKey, framingTxt, fidelityTxt, s
     sheets.forEach(sh => {
       const shImg = sh.image || sh.img || item.image;
       if (!shImg) return;
-      const subStr = (sh.subcategory || item.subcategory || '').toLowerCase();
+      const subStr = ((sh.framing || '') + ' ' + (sh.subcategory || item.subcategory || '') + ' ' + (sh.bgType || '')).toLowerCase();
       const stgStr = (sh.stage || item.stage || '').toLowerCase();
       const cmpStr = (sh.complexity || item.complexity || '').toLowerCase();
       const tagsStr = Array.isArray(sh.atelierTags) ? sh.atelierTags.join(' ').toLowerCase() : '';

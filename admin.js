@@ -848,13 +848,32 @@ function renderStagingPhasesHtml() {
           </div>
 
           <div>
-            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">📐 Framing / Subcategory (Synced):</label>
+            <label style="font-size:10.5px; color:var(--cyan-electric); font-weight:700; display:block; margin-bottom:2px;">📁 Specialized Subcategory:</label>
             <select onchange="stagingProjectPhases[${idx}].subcategory = this.value" style="font-size:11px; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid var(--border-subtle); border-radius:8px; color:#fff;">
+              ${subcats.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:10.5px; color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">📐 Framing (Synced):</label>
+            <select onchange="stagingProjectPhases[${idx}].framing = this.value" style="font-size:11px; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid rgba(250,204,21,0.3); border-radius:8px; color:#fff;">
+              <option value="">Auto / Any Framing</option>
               ${(() => {
                 const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
-                const framings = (cat && Array.isArray(cat.framings)) ? cat.framings.map(f => f.label) : [];
-                const merged = Array.from(new Set([...framings, ...subcats, ...(currentSub ? [currentSub] : [])]));
-                return merged.map(s => `<option value="${s}" ${currentSub === s ? 'selected' : ''}>${s}</option>`).join('');
+                const framings = (cat && Array.isArray(cat.framings)) ? cat.framings : [];
+                return framings.map(f => `<option value="${f.id}" ${(p.framing === f.id || p.framing === f.label) ? 'selected' : ''}>${f.label}</option>`).join('');
+              })()}
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:10.5px; color:var(--emerald); font-weight:700; display:block; margin-bottom:2px;">🖼️ Background (Synced):</label>
+            <select onchange="stagingProjectPhases[${idx}].bgType = this.value" style="font-size:11px; padding:7px 10px; margin:0; width:100%; background:#090d16; border:1px solid rgba(16,185,129,0.3); border-radius:8px; color:#fff;">
+              <option value="">Any Background</option>
+              ${(() => {
+                const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
+                const bgs = (cat && Array.isArray(cat.backgrounds)) ? cat.backgrounds : [];
+                return bgs.map(b => `<option value="${b.id}" ${p.bgType === b.id ? 'selected' : ''}>${b.label}</option>`).join('');
               })()}
             </select>
           </div>
@@ -4399,6 +4418,304 @@ window.refreshAdminUsdBadges = function() {
 window.updateAdminPriceSimulator = function() {
   const cat = window._adminAtelierDraft;
   const outEl = document.getElementById('adminSimResultBox');
+  const imgEl = document.getElementById('adminSimPreviewImg');
+  const imgLbl = document.getElementById('adminSimPreviewLabel');
+  if (!cat || !outEl) return;
+  const hr = Number(cat.hourlyRate) || 15;
+
+  const scSel = document.getElementById('simScopeSel');
+  const frSel = document.getElementById('simFramingSel');
+  const cmSel = document.getElementById('simCompSel');
+  const agSel = document.getElementById('simAgeSel');
+  const phSel = document.getElementById('simPhaseSel');
+  const bgSel = document.getElementById('simBgSel');
+  const petSel = document.getElementById('simPetSel');
+  const wpnSel = document.getElementById('simWeaponSel');
+  const cvSel = document.getElementById('simColorVarSel');
+  const exChk = document.getElementById('simExprChk')?.checked;
+  const actChk = document.getElementById('simActionChk')?.checked;
+  const commChk = document.getElementById('simCommChk')?.checked;
+
+  const cardIdx = Number(window._adminSelectedCharCardIdx) || 0;
+  const card = (cat.serviceCards && cat.serviceCards[cardIdx]) || (cat.serviceCards && cat.serviceCards[0]);
+  const scopes = (card && Array.isArray(card.scopes) && card.scopes.length) ? card.scopes : [{ label: 'Single', hrs: 0, days: 0 }];
+
+  const sc = scopes[scSel ? (scSel.selectedIndex >= 0 ? scSel.selectedIndex : 0) : 0] || scopes[0];
+  const fr = (cat.framings || [])[frSel ? (frSel.selectedIndex >= 0 ? frSel.selectedIndex : 0) : 0] || (cat.framings || [])[0] || { id: 'full', label: 'Full-Body', hrs: 6.5, days: 0 };
+  const cm = (cat.complexities || [])[cmSel ? (cmSel.selectedIndex >= 0 ? cmSel.selectedIndex : 0) : 0] || (cat.complexities || [])[0] || { id: 'standard', label: 'Standard', hrs: 1.5, days: 0 };
+  const ag = (cat.ages || [])[agSel ? (agSel.selectedIndex >= 0 ? agSel.selectedIndex : 0) : 0] || (cat.ages || [])[0] || { hrs: 0, days: 0 };
+  const ph = (cat.phases || [])[phSel ? (phSel.selectedIndex >= 0 ? phSel.selectedIndex : 0) : 0] || (cat.phases || [])[0] || { id: 'render', mult: 1.25, days: 0 };
+  const bg = (cat.backgrounds || [])[bgSel ? (bgSel.selectedIndex >= 0 ? bgSel.selectedIndex : 0) : 0] || { id: 'none', hrs: 0, days: 0 };
+
+  const petIdx = petSel ? petSel.selectedIndex - 1 : -1;
+  const petObj = (petIdx >= 0 && cat.companionTiers) ? cat.companionTiers[petIdx] : null;
+  const wpnIdx = wpnSel ? wpnSel.selectedIndex - 1 : -1;
+  const wpnObj = (wpnIdx >= 0 && cat.weaponTiers) ? cat.weaponTiers[wpnIdx] : null;
+  const cvCnt = cvSel ? (parseInt(cvSel.value || '0', 10) || 0) : 0;
+
+  const rawCore = Math.max(2, ((Number(sc.hrs)||0) + (Number(fr.hrs)||0) + (Number(cm.hrs)||0) + (Number(ag.hrs)||0)) * (Number(ph.mult)||1));
+  let addonH = (Number(bg.hrs)||0) + (petObj ? (Number(petObj.hrs)||0) : 0) + (wpnObj ? (Number(wpnObj.hrs)||0) : 0) + (cvCnt * (Number(cat.addons?.colorVarHrs)||1.25));
+  if (exChk) addonH += (Number(cat.addons?.expressionHrs)||0.75) * 3;
+  if (actChk) addonH += (Number(cat.addons?.actionPoseHrs)||1.25) * 2;
+
+  const totalHrs = Math.round((rawCore + addonH) * 2) / 2;
+  let totalUsd = Math.round(totalHrs * hr);
+  if (commChk) totalUsd = Math.round(totalUsd * (Number(cat.commercialMult)||1.4));
+
+  let extraD = (Number(sc.days)||0) + (Number(fr.days)||0) + (Number(cm.days)||0) + (Number(ag.days)||0) + (Number(ph.days)||0) + (Number(bg.days)||0);
+  if (petObj) extraD += (Number(petObj.days)||0);
+  if (wpnObj) extraD += (Number(wpnObj.days)||0);
+  if (actChk) extraD += (Number(cat.addons?.actionPoseDays)||1);
+
+  const minD = Math.max(2, Math.ceil(totalHrs / 4) + extraD);
+  const maxD = Math.max(minD + 2, Math.ceil(totalHrs / 2.2) + extraD);
+
+  const minFr = Math.min(...(cat.framings||[{hrs:2.5}]).map(x=>Number(x.hrs)||0));
+  const minCm = Math.min(...(cat.complexities||[{hrs:0}]).map(x=>Number(x.hrs)||0));
+  const minAg = Math.min(...(cat.ages||[{hrs:0}]).map(x=>Number(x.hrs)||0));
+  const minPh = Math.min(...(cat.phases||[{mult:0.55}]).map(x=>Number(x.mult)||1));
+  const minSc = Math.min(...scopes.map(x=>Number(x.hrs)||0));
+  const minHrs = Math.round(Math.max(2, (minSc + minFr + minCm + minAg) * minPh) * 2) / 2;
+  const minUsd = Math.round(minHrs * hr);
+
+  outEl.innerHTML = `
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <div>
+        <span style="font-size:10px; color:#94a3b8; display:block;">CLIENT FINAL QUOTE</span>
+        <strong class="font-mono" style="font-size:22px; color:var(--gold);">$${totalUsd}</strong>
+        <span class="font-mono" style="font-size:11px; color:#cbd5e1; margin-left:4px;">(${totalHrs}h)</span>
+      </div>
+      <div style="border-left:1px solid rgba(255,255,255,0.1); padding-left:14px;">
+        <span style="font-size:10px; color:#94a3b8; display:block;">TIMELINE</span>
+        <strong class="font-mono" style="font-size:13px; color:var(--cyan-electric);">${minD}–${maxD} days</strong>
+      </div>
+      <div style="border-left:1px solid rgba(255,255,255,0.1); padding-left:14px;">
+        <span style="font-size:10px; color:#94a3b8; display:block;">LOWEST POSSIBLE</span>
+        <strong class="font-mono" style="font-size:13px; color:var(--emerald);">$${minUsd}</strong>
+      </div>
+    </div>
+  `;
+
+  // Find best-matching Gallery image for this exact Simulator combination
+  if (imgEl && typeof window.getArtworksForPipeline === 'function') {
+    const arts = window.getArtworksForPipeline('sketch1', false) || [];
+    let bestImg = (card && card.img) || '';
+    let bestTitle = 'Default Card Cover';
+    let bestScore = -1;
+    arts.forEach(a => {
+      const sheets = (Array.isArray(a.phases) && a.phases.length) ? a.phases : [{ image: a.image, subcategory: a.subcategory, framing: a.framing, stage: a.stage, complexity: a.complexity, bgType: a.bgType, atelierTags: a.atelierTags }];
+      sheets.forEach(sh => {
+        const u = sh.image || sh.img || a.image;
+        if (!u) return;
+        let scScore = 0;
+        const fStr = (sh.framing || sh.subcategory || '').toLowerCase();
+        const stgStr = (sh.stage || '').toLowerCase();
+        const cmpStr = (sh.complexity || '').toLowerCase();
+        const bgStr = (sh.bgType || '').toLowerCase();
+        const tStr = Array.isArray(sh.atelierTags) ? sh.atelierTags.join(' ').toLowerCase() : '';
+        if (fr.id && (fStr === fr.id.toLowerCase() || fStr.includes(fr.label.split(' ')[0].toLowerCase()))) scScore += 6;
+        if (ph.id && (stgStr === ph.id.toLowerCase() || (ph.id === 'cel' && stgStr === 'lineart_value'))) scScore += 6;
+        if (cm.id && cmpStr === cm.id.toLowerCase()) scScore += 3;
+        if (bg.id && bgStr === bg.id.toLowerCase()) scScore += 5;
+        if (cvCnt > 0 && tStr.includes('color variation')) scScore += 8;
+        if (exChk && tStr.includes('expression')) scScore += 8;
+        if (actChk && tStr.includes('action')) scScore += 8;
+        if (petObj && tStr.includes('companion')) scScore += 7;
+        if (wpnObj && tStr.includes('weapon')) scScore += 7;
+        if (scScore > bestScore) {
+          bestScore = scScore;
+          bestImg = u;
+          bestTitle = (a.title || 'Sample') + (bestScore > 0 ? ' (Matched ✓)' : '');
+        }
+      });
+    });
+    if (bestImg) imgEl.src = bestImg;
+    if (imgLbl) imgLbl.textContent = bestTitle;
+  }
+};
+
+// Clean Image-Only Preview Lightbox inside Admin (NO Wizard!)
+window.adminOpenImagePreviewModal = function(title, imagesList) {
+  let modal = document.getElementById('adminImgPreviewModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'adminImgPreviewModal';
+    modal.style.cssText = 'position:fixed; inset:0; z-index:99999; background:rgba(2,4,9,0.92); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:24px;';
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.body.appendChild(modal);
+  }
+  const imgs = (Array.isArray(imagesList) ? imagesList : []).filter(Boolean);
+  modal.innerHTML = `
+    <div style="background:#080c16; border:1px solid rgba(0,240,255,0.35); border-radius:16px; max-width:920px; width:100%; max-height:86vh; overflow-y:auto; padding:20px; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+        <div>
+          <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">VISUAL SAMPLE PREVIEW</span>
+          <h3 style="font-size:16px; font-weight:900; color:#fff; margin:2px 0 0;">${title} (${imgs.length} images)</h3>
+        </div>
+        <button type="button" onclick="document.getElementById('adminImgPreviewModal').style.display='none'" style="background:rgba(244,63,94,0.18); color:#fda4af; border:1px solid rgba(244,63,94,0.4); border-radius:8px; padding:6px 12px; font-weight:800; cursor:pointer;">✕ Close</button>
+      </div>
+      ${imgs.length === 0 ? '<p style="color:#94a3b8; text-align:center; padding:30px;">No images found for this category yet.</p>' : `
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px;">
+          ${imgs.map((u, i) => `
+            <div style="background:#03050a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
+              <img src="${u}" style="width:100%; aspect-ratio:16/10; object-fit:cover; display:block;" alt="" />
+              <div style="padding:6px 10px; font-size:10px; color:#94a3b8;" class="font-mono">Sample #${i + 1}</div>
+            </div>
+          `).join('')}
+        </div>
+      `}
+    </div>
+  `;
+  modal.style.display = 'flex';
+};
+
+window.adminPreviewPipelineImages = function(pipeKey) {
+  const p = (typeof PIPELINE_DATA !== 'undefined') ? PIPELINE_DATA[pipeKey] : null;
+  if (!p) return;
+  const imgs = new Set();
+  if (p.coverImg) imgs.add(p.coverImg);
+  if (Array.isArray(p.tiles)) p.tiles.forEach(t => { if (t.img) imgs.add(t.img); });
+  if (typeof window.getArtworksForPipeline === 'function') {
+    window.getArtworksForPipeline(pipeKey, false).forEach(a => {
+      if (a.image) imgs.add(a.image);
+      if (Array.isArray(a.phases)) a.phases.forEach(ph => { if (ph.image || ph.img) imgs.add(ph.image || ph.img); });
+    });
+  }
+  window.adminOpenImagePreviewModal(p.topSub || pipeKey, Array.from(imgs));
+};
+
+window.adminPreviewCharacterCardImages = function(idx) {
+  const cat = window._adminAtelierDraft || (typeof window.getAtelierCatalog === 'function' ? window.getAtelierCatalog() : null);
+  if (!cat || !cat.serviceCards || !cat.serviceCards[idx]) return;
+  const c = cat.serviceCards[idx];
+  const imgs = new Set();
+  if (c.img) imgs.add(c.img);
+  if (typeof window.getArtworksForPipeline === 'function') {
+    window.getArtworksForPipeline('sketch1', false).forEach(a => {
+      if (a.image) imgs.add(a.image);
+      if (Array.isArray(a.phases)) a.phases.forEach(ph => { if (ph.image || ph.img) imgs.add(ph.image || ph.img); });
+    });
+  }
+  window.adminOpenImagePreviewModal(c.title || 'Character Samples', Array.from(imgs));
+};
+
+window.adminSelectCategory = function(pipeKey) {
+  window._adminSelectedPipeKey = pipeKey;
+  window.renderAdminAtelierEngine();
+};
+
+window.adminSelectCharSubCard = function(idx) {
+  window._adminSelectedCharCardIdx = idx;
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierAddScopeToCard = function(cardIdx) {
+  const card = window._adminAtelierDraft?.serviceCards?.[cardIdx];
+  if (!card) return;
+  if (!Array.isArray(card.scopes)) card.scopes = [];
+  card.scopes.push({ id: 'sc_' + Date.now().toString(36), label: 'New Scope Option', hrs: 0 });
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierDeleteScopeFromCard = function(cardIdx, scopeIdx) {
+  const card = window._adminAtelierDraft?.serviceCards?.[cardIdx];
+  if (!card || !Array.isArray(card.scopes) || card.scopes.length <= 1) {
+    showToast('At least one scope option is required.', 'error');
+    return;
+  }
+  card.scopes.splice(scopeIdx, 1);
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierAddPipelineTile = function(pipeKey) {
+  if (typeof PIPELINE_DATA === 'undefined' || !PIPELINE_DATA[pipeKey]) return;
+  if (!Array.isArray(PIPELINE_DATA[pipeKey].tiles)) PIPELINE_DATA[pipeKey].tiles = [];
+  PIPELINE_DATA[pipeKey].tiles.push({
+    badge: 'Stage ' + (PIPELINE_DATA[pipeKey].tiles.length + 1),
+    title: 'New ' + (PIPELINE_DATA[pipeKey].topSub || 'Pipeline') + ' Tier',
+    desc: 'Custom concept or production stage.',
+    img: PIPELINE_DATA[pipeKey].coverImg || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+    timeline: '3 to 6 business days',
+    usdVal: 90,
+    price: '90',
+    span: 'span-6'
+  });
+  if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierDeletePipelineTile = function(pipeKey, idx) {
+  if (typeof PIPELINE_DATA === 'undefined' || !PIPELINE_DATA[pipeKey] || PIPELINE_DATA[pipeKey].tiles.length <= 1) {
+    showToast('Each category requires at least one sub-card.', 'error');
+    return;
+  }
+  PIPELINE_DATA[pipeKey].tiles.splice(idx, 1);
+  if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierAddCategory = function() {
+  if (typeof PIPELINE_DATA === 'undefined') return;
+  const name = prompt('New Atelier Category Name (e.g. Props & Relics, Vehicles, UI Icons):');
+  if (!name || !name.trim()) return;
+  const key = 'cat_' + Date.now().toString(36);
+  PIPELINE_DATA[key] = {
+    topSub: name.trim(),
+    note: 'Custom studio pipeline for ' + name.trim(),
+    coverImg: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+    hidden: false,
+    tiles: [{
+      badge: 'Stage 1',
+      title: name.trim() + ' Concept',
+      desc: 'Full visual development and production concept.',
+      img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+      timeline: '3 to 6 business days',
+      usdVal: 90,
+      price: '90',
+      span: 'span-6'
+    }]
+  };
+  window._adminSelectedPipeKey = key;
+  if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.adminAtelierToggleCategory = function(key, show) {
+  if (typeof PIPELINE_DATA === 'undefined' || !PIPELINE_DATA[key]) return;
+  PIPELINE_DATA[key].hidden = !show;
+  if (window._adminAtelierDraft) {
+    if (!window._adminAtelierDraft.categoryVisibility) window._adminAtelierDraft.categoryVisibility = {};
+    window._adminAtelierDraft.categoryVisibility[key] = !!show;
+  }
+  if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
+  if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
+  window.scheduleAdminAtelierAutoSave();
+  window.renderAdminAtelierEngine();
+};
+
+window.refreshAdminUsdBadges = function() {
+  const hr = Number(window._adminAtelierDraft?.hourlyRate) || 15;
+  document.querySelectorAll('.admin-usd-live').forEach(el => {
+    const inpId = el.getAttribute('data-for-input');
+    const isSigned = el.getAttribute('data-signed') === '1';
+    const inp = inpId ? document.getElementById(inpId) : el.previousElementSibling;
+    const hrs = inp ? (parseFloat(inp.value) || 0) : 0;
+    const usd = Math.round(hrs * hr);
+    const sign = (isSigned && usd >= 0) ? '+' : '';
+    el.textContent = sign + '$' + usd;
+  });
+  if (typeof window.updateAdminPriceSimulator === 'function') window.updateAdminPriceSimulator();
+};
+
+window.updateAdminPriceSimulator = function() {
+  const cat = window._adminAtelierDraft;
+  const outEl = document.getElementById('adminSimResultBox');
   if (!cat || !outEl) return;
   const hr = Number(cat.hourlyRate) || 15;
 
@@ -4518,16 +4835,23 @@ window.renderAdminAtelierEngine = function() {
       </div>
     </div>
 
-    <!-- Live Price & Timeline Simulator Bar -->
-    <div style="background:#070b14; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:14px 18px; display:flex; flex-direction:column; gap:10px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div>
-          <h4 style="font-size:13.5px; font-weight:900; color:var(--cyan-electric); margin:0;">🧮 Live Client Price Simulator (Instant Check)</h4>
-          <span style="font-size:10.5px; color:#94a3b8;">Test any combination below — updates live as you edit hours, multipliers, or days.</span>
+    <!-- Live Price, Add-on & Visual Sample Simulator Bar -->
+    <div style="background:#070b14; border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:14px 18px; display:grid; grid-template-columns:180px 1fr; gap:14px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="aspect-ratio:16/10; border-radius:10px; overflow:hidden; background:#020305; border:1px solid rgba(0,240,255,0.3);">
+          <img id="adminSimPreviewImg" src="" style="width:100%; height:100%; object-fit:cover;" alt="Live Sample" />
         </div>
-        <div id="adminSimResultBox"></div>
+        <span id="adminSimPreviewLabel" class="font-mono" style="font-size:9.5px; color:var(--cyan-electric); text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Matching Sample...</span>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h4 style="font-size:13.5px; font-weight:900; color:var(--cyan-electric); margin:0;">🧮 Live Client Price &amp; Sample Simulator</h4>
+            <span style="font-size:10.5px; color:#94a3b8;">Test Scope, Framing, Phase &amp; Add-ons — updates quote, days &amp; matched Gallery image live.</span>
+          </div>
+          <div id="adminSimResultBox"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:7px;">
         <div>
           <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Scope (${activeCharCard ? activeCharCard.title : 'Card'})</label>
           <select id="simScopeSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
@@ -4558,6 +4882,40 @@ window.renderAdminAtelierEngine = function() {
             ${(cat.phases || []).map((ph, i) => `<option ${i === (cat.phases.length - 1) ? 'selected' : ''}>${ph.label}</option>`).join('')}
           </select>
         </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Background</label>
+          <select id="simBgSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            ${(cat.backgrounds || []).map(bg => `<option>${bg.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Companion / Pet</label>
+          <select id="simPetSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            <option value="">None</option>
+            ${(cat.companionTiers || []).map(cp => `<option>${cp.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Weapon / Prop</label>
+          <select id="simWeaponSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            <option value="">None</option>
+            ${(cat.weaponTiers || []).map(wp => `<option>${wp.label}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9.5px; color:#94a3b8; display:block; margin-bottom:2px;">Color Variations</label>
+          <select id="simColorVarSel" onchange="window.updateAdminPriceSimulator()" style="width:100%; font-size:11px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#fff;">
+            <option value="0">Primary Only</option>
+            <option value="1">+1 Palette</option>
+            <option value="2">+2 Palettes</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:#cbd5e1;">
+        <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="simExprChk" onchange="window.updateAdminPriceSimulator()" style="width:auto;" /><span>🎭 Expressions (3)</span></label>
+        <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="simActionChk" onchange="window.updateAdminPriceSimulator()" style="width:auto;" /><span>🏃 Action Poses (2)</span></label>
+        <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:var(--gold);"><input type="checkbox" id="simCommChk" onchange="window.updateAdminPriceSimulator()" style="width:auto;" /><span>💎 Commercial + PSD</span></label>
+      </div>
       </div>
     </div>
 
