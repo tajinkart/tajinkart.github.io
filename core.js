@@ -1139,6 +1139,7 @@ if (document.readyState === 'loading') {
 // ==============================================================================
 window.DEFAULT_ATELIER_CATALOG = {
   characterOnlyMode: false,
+  categoryVisibility: {},
   hourlyRate: 15,
   extraConceptHrs: 1.0,
   extraRevisionHrs: 1.5,
@@ -1280,6 +1281,7 @@ window.getAtelierCatalog = function() {
   const saved = (typeof siteSettings !== 'undefined' && siteSettings && siteSettings.atelierCatalog) ? siteSettings.atelierCatalog : {};
   const cat = {
     characterOnlyMode: saved.characterOnlyMode !== undefined ? !!saved.characterOnlyMode : def.characterOnlyMode,
+    categoryVisibility: (saved.categoryVisibility && typeof saved.categoryVisibility === 'object') ? saved.categoryVisibility : {},
     hourlyRate: Number(saved.hourlyRate) > 0 ? Number(saved.hourlyRate) : (Number(siteSettings?.studioHourlyRate) || def.hourlyRate),
     extraConceptHrs: Number(saved.extraConceptHrs) >= 0 && saved.extraConceptHrs !== undefined ? Number(saved.extraConceptHrs) : def.extraConceptHrs,
     extraRevisionHrs: Number(saved.extraRevisionHrs) >= 0 && saved.extraRevisionHrs !== undefined ? Number(saved.extraRevisionHrs) : def.extraRevisionHrs,
@@ -1344,8 +1346,27 @@ window.saveAtelierCatalog = async function(newCat) {
   return { ok: cloudOk, error: cloudErr };
 };
 
+window.savePipelinesToSupabaseCloud = async function() {
+  if (!window.supabaseClient && typeof ensureSupabaseClient === 'function') ensureSupabaseClient();
+  if (!window.supabaseClient || typeof PIPELINE_DATA === 'undefined') return;
+  try {
+    await window.supabaseClient.from('studio_settings').upsert([{
+      key: 'pipeline_data',
+      value: PIPELINE_DATA,
+      updated_at: new Date().toISOString()
+    }], { onConflict: 'key' });
+  } catch(e) {
+    console.warn('[Pipelines Cloud Save Warning]', e);
+  }
+};
+
 window.applyAtelierCatalogToSite = function() {
   const cat = window.getAtelierCatalog();
+  if (typeof PIPELINE_DATA !== 'undefined' && cat.categoryVisibility) {
+    Object.keys(cat.categoryVisibility).forEach(k => {
+      if (PIPELINE_DATA[k]) PIPELINE_DATA[k].hidden = (cat.categoryVisibility[k] === false);
+    });
+  }
   // 1. Update Character Shop Cards
   window.CHARACTER_SHOP_CARDS = cat.serviceCards.filter(c => c.active !== false);
   // 2. Dynamically render Sidebar Categories from PIPELINE_DATA (supports Add/Delete/Hide!)

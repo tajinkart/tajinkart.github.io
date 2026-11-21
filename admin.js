@@ -4372,10 +4372,27 @@ window.adminAtelierAddCategory = function() {
 window.adminAtelierToggleCategory = function(key, show) {
   if (typeof PIPELINE_DATA === 'undefined' || !PIPELINE_DATA[key]) return;
   PIPELINE_DATA[key].hidden = !show;
+  if (window._adminAtelierDraft) {
+    if (!window._adminAtelierDraft.categoryVisibility) window._adminAtelierDraft.categoryVisibility = {};
+    window._adminAtelierDraft.categoryVisibility[key] = !!show;
+  }
   if (typeof KEYS !== 'undefined' && KEYS.PIPELINES) safeSetStorage(KEYS.PIPELINES, JSON.stringify(PIPELINE_DATA));
   if (typeof window.applyAtelierCatalogToSite === 'function') window.applyAtelierCatalogToSite();
   window.scheduleAdminAtelierAutoSave();
   window.renderAdminAtelierEngine();
+};
+
+window.refreshAdminUsdBadges = function() {
+  const hr = Number(window._adminAtelierDraft?.hourlyRate) || 15;
+  document.querySelectorAll('.admin-usd-live').forEach(el => {
+    const inpId = el.getAttribute('data-for-input');
+    const isSigned = el.getAttribute('data-signed') === '1';
+    const inp = inpId ? document.getElementById(inpId) : el.previousElementSibling;
+    const hrs = inp ? (parseFloat(inp.value) || 0) : 0;
+    const usd = Math.round(hrs * hr);
+    const sign = (isSigned && usd >= 0) ? '+' : '';
+    el.textContent = sign + '$' + usd;
+  });
 };
 
 window.adminAtelierDeleteCategory = function(key) {
@@ -4457,7 +4474,8 @@ window.renderAdminAtelierEngine = function() {
           const p = PIPELINE_DATA[k] || {};
           const isSelected = (k === selPipe);
           const isVisible = p.hidden !== true;
-          const cImg = p.coverImg || (p.tiles && p.tiles[0] && p.tiles[0].img) || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80';
+          const _catArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline(k, false) : [];
+          const cImg = (_catArts[0] && (_catArts[0].image || (_catArts[0].phases && _catArts[0].phases[0]?.image))) || p.coverImg || (p.tiles && p.tiles[0] && p.tiles[0].img) || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80';
           return `
             <div onclick="window.adminSelectCategory('${k}')" style="cursor:pointer; background:${isSelected ? 'rgba(250,204,21,0.09)' : '#060911'}; border:2px solid ${isSelected ? 'var(--gold)' : (isVisible ? 'rgba(0,240,255,0.22)' : 'rgba(255,255,255,0.08)')}; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; opacity:${isVisible ? '1' : '0.6'}; transition:all 0.15s;">
               <div style="display:flex; gap:8px; align-items:center;">
@@ -4494,10 +4512,13 @@ window.renderAdminAtelierEngine = function() {
           ${cat.serviceCards.map((c, idx) => {
             const usd = Math.round((Number(c.baseHours) || 3) * hr);
             const isCardSel = (idx === selCardIdx);
+            const _charArts = (typeof getArtworksForPipeline === 'function') ? getArtworksForPipeline('sketch1', false) : [];
+            const _matchedCharArt = _charArts.length > 0 ? _charArts[idx % _charArts.length] : null;
+            const liveCardImg = (_matchedCharArt && (_matchedCharArt.image || (_matchedCharArt.phases && _matchedCharArt.phases[0]?.image))) || c.img || '';
             return `
             <div onclick="window.adminSelectCharSubCard(${idx})" style="cursor:pointer; background:${isCardSel ? 'rgba(0,240,255,0.07)' : '#060911'}; border:2px solid ${isCardSel ? 'var(--cyan-electric)' : (c.active !== false ? 'rgba(250,204,21,0.22)' : 'rgba(255,255,255,0.08)')}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; opacity:${c.active !== false ? '1' : '0.6'};">
               <div style="position:relative; aspect-ratio:16/8; border-radius:8px; overflow:hidden; background:#020305; border:1px solid rgba(255,255,255,0.1);">
-                <img src="${c.img || ''}" style="width:100%; height:100%; object-fit:cover;" alt="" />
+                <img src="${liveCardImg}" style="width:100%; height:100%; object-fit:cover;" alt="" />
                 <span class="font-mono" style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.82); color:var(--gold); font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid rgba(250,204,21,0.35);">From $${usd}</span>
                 <button type="button" onclick="event.stopPropagation(); window.adminPreviewCharacterCardImages(${idx})" style="position:absolute; bottom:6px; right:6px; background:rgba(0,240,255,0.92); color:#000; font-size:10.5px; font-weight:900; padding:4px 9px; border-radius:6px; border:none; cursor:pointer;">👁️ Images</button>
               </div>
@@ -4511,9 +4532,8 @@ window.renderAdminAtelierEngine = function() {
               </div>
               <input type="text" value="${(c.title || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" oninput="window._adminAtelierDraft.serviceCards[${idx}].title = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Card Title" style="font-size:12px; font-weight:800; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" />
               <textarea rows="2" onclick="event.stopPropagation();" oninput="window._adminAtelierDraft.serviceCards[${idx}].desc = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Short description..." style="font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5e1;">${c.desc || ''}</textarea>
-              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;" onclick="event.stopPropagation();">
-                <div><label style="font-size:9.5px; color:#94a3b8;">Mode Key</label><input type="text" value="${c.subMode || 'custom'}" oninput="window._adminAtelierDraft.serviceCards[${idx}].subMode = this.value; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--cyan-electric);" /></div>
-                <div><label style="font-size:9.5px; color:#94a3b8;">Base Hrs ($${usd})</label><input type="number" step="0.5" value="${c.baseHours || 3}" oninput="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /></div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;" onclick="event.stopPropagation();">
+                <div><label style="font-size:9.5px; color:#94a3b8;">Base Hours</label><div style="display:flex; align-items:center; gap:5px;"><input type="number" step="0.5" value="${c.baseHours || 3}" oninput="window._adminAtelierDraft.serviceCards[${idx}].baseHours = Number(this.value)||3; window.refreshAdminUsdBadges(); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:var(--gold);" /><span class="font-mono admin-usd-live" style="font-size:10.5px; color:var(--emerald); font-weight:800; white-space:nowrap;">$${usd}</span></div></div>
                 <div><label style="font-size:9.5px; color:#94a3b8;">Timeline</label><input type="text" value="${(c.timeline || '').replace(/"/g, '&quot;')}" oninput="window._adminAtelierDraft.serviceCards[${idx}].timeline = this.value; window.scheduleAdminAtelierAutoSave();" style="width:100%; font-size:10.5px; padding:4px 6px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" /></div>
               </div>
               <input type="url" value="${(c.img || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation();" oninput="window._adminAtelierDraft.serviceCards[${idx}].img = this.value; window.scheduleAdminAtelierAutoSave();" placeholder="Cover Image URL" class="font-mono" style="font-size:10.5px; padding:5px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#94a3b8;" />
@@ -4599,14 +4619,14 @@ window.renderAdminAtelierEngine = function() {
           <h4 style="font-size:13.5px; font-weight:800; color:var(--cyan-electric); margin:0;">📐 Framing Views (Synced to Gallery)</h4>
           <button type="button" onclick="window.adminAtelierAddItem('framings')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:var(--cyan-electric);">+ Add Framing</button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 68px 62px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+        <div style="display:grid; grid-template-columns:1fr 105px 54px 24px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
           <span>Framing Name</span><span>Hours</span><span>+Days</span><span></span>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${cat.framings.map((f, idx) => `
-            <div style="display:grid; grid-template-columns:1fr 68px 62px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <div style="display:grid; grid-template-columns:1fr 105px 54px 24px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
               <input type="text" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.framings[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-              <input type="number" step="0.5" title="Base Hours" value="${f.hrs}" oninput="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" />
+              <div style="display:flex; align-items:center; gap:4px;"><input type="number" step="0.5" title="Base Hours" value="${f.hrs}" oninput="window._adminAtelierDraft.framings[${idx}].hrs = Number(this.value)||0; window.refreshAdminUsdBadges(); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:54px; font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(250,204,21,0.3); border-radius:5px; color:var(--gold); text-align:center;" /><span class="font-mono admin-usd-live" style="font-size:10px; color:var(--emerald);">$${Math.round((Number(f.hrs)||0)*hr)}</span></div>
               <input type="number" step="1" title="Extra Days" value="${f.days || 0}" oninput="window._adminAtelierDraft.framings[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('framings', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
@@ -4619,14 +4639,14 @@ window.renderAdminAtelierEngine = function() {
           <h4 style="font-size:13.5px; font-weight:800; color:#a855f7; margin:0;">⚡ Design Complexities (Synced to Gallery)</h4>
           <button type="button" onclick="window.adminAtelierAddItem('complexities')" class="btn-secondary" style="font-size:11px; padding:5px 10px; color:#a855f7;">+ Add Tier</button>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+        <div style="display:grid; grid-template-columns:1fr 105px 54px 24px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
           <span>Complexity Tier</span><span>+Hrs</span><span>+Days</span><span></span>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${cat.complexities.map((cm, idx) => `
-            <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <div style="display:grid; grid-template-columns:1fr 105px 54px 24px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
               <input type="text" value="${(cm.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.complexities[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-              <input type="number" step="0.5" title="Added Hours" value="${cm.hrs}" oninput="window._adminAtelierDraft.complexities[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(168,85,247,0.35); border-radius:5px; color:#e9d5ff; text-align:center;" />
+              <div style="display:flex; align-items:center; gap:4px;"><input type="number" step="0.5" title="Added Hours" value="${cm.hrs}" oninput="window._adminAtelierDraft.complexities[${idx}].hrs = Number(this.value)||0; window.refreshAdminUsdBadges(); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:54px; font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(168,85,247,0.35); border-radius:5px; color:#e9d5ff; text-align:center;" /><span class="font-mono admin-usd-live" data-signed="1" style="font-size:10px; color:var(--emerald);">+$${Math.round((Number(cm.hrs)||0)*hr)}</span></div>
               <input type="number" step="1" title="Extra Days" value="${cm.days || 0}" oninput="window._adminAtelierDraft.complexities[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('complexities', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
@@ -4643,14 +4663,14 @@ window.renderAdminAtelierEngine = function() {
           <span style="font-size:10.5px; color:#cbd5e1;">Added Hours Per Extra Age Selected:</span>
           <input type="number" step="0.5" value="${cat.extraAgeHrs !== undefined ? cat.extraAgeHrs : 3.5}" oninput="window._adminAtelierDraft.extraAgeHrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:65px; font-size:11px; padding:4px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" />
         </div>
-        <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
+        <div style="display:grid; grid-template-columns:1fr 105px 54px 24px; gap:6px; padding:0 8px 4px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">
           <span>Age Stage Name</span><span>Hrs</span><span>+Days</span><span></span>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${(cat.ages || []).map((ag, idx) => `
-            <div style="display:grid; grid-template-columns:1fr 64px 58px 26px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <div style="display:grid; grid-template-columns:1fr 105px 54px 24px; gap:6px; align-items:center; background:#060911; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
               <input type="text" value="${(ag.label||'').replace(/"/g,'&quot;')}" oninput="window._adminAtelierDraft.ages[${idx}].label = this.value; window.scheduleAdminAtelierAutoSave();" style="font-size:11.5px; padding:5px 7px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:5px; color:#fff;" />
-              <input type="number" step="0.5" title="Hours Delta" value="${ag.hrs}" oninput="window._adminAtelierDraft.ages[${idx}].hrs = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" />
+              <div style="display:flex; align-items:center; gap:4px;"><input type="number" step="0.5" title="Hours Delta" value="${ag.hrs}" oninput="window._adminAtelierDraft.ages[${idx}].hrs = Number(this.value)||0; window.refreshAdminUsdBadges(); window.scheduleAdminAtelierAutoSave();" class="font-mono" style="width:54px; font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(16,185,129,0.35); border-radius:5px; color:var(--emerald); text-align:center;" /><span class="font-mono admin-usd-live" data-signed="1" style="font-size:10px; color:var(--emerald);">${(Number(ag.hrs)||0)>=0?'+':''}$${Math.round((Number(ag.hrs)||0)*hr)}</span></div>
               <input type="number" step="1" title="Extra Days" value="${ag.days || 0}" oninput="window._adminAtelierDraft.ages[${idx}].days = Number(this.value)||0; window.scheduleAdminAtelierAutoSave();" class="font-mono" style="font-size:11px; padding:5px; background:#04060a; border:1px solid rgba(0,240,255,0.3); border-radius:5px; color:var(--cyan-electric); text-align:center;" />
               <button type="button" onclick="window.adminAtelierDeleteItem('ages', ${idx})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-weight:800;">✕</button>
             </div>
