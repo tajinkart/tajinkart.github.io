@@ -1313,7 +1313,10 @@ function renderMemberDashboard() {
       </div>
     `;
   } else if (oBox) {
-    oBox.innerHTML = userOrders.map(o => {
+    const parentOrders = userOrders.filter(o => !(o.specs && o.specs.isSupplement && o.specs.parentOrderId));
+    const orphanSups = userOrders.filter(o => o.specs && o.specs.isSupplement && o.specs.parentOrderId && !parentOrders.some(po => String(po.id) === String(o.specs.parentOrderId)));
+    const renderList = [...parentOrders, ...orphanSups];
+    oBox.innerHTML = renderList.map(o => {
       let currentStageNum = 1;
       const stLower = (o.status || '').toLowerCase();
       if (stLower.includes('retainer') || stLower.includes('deposit') || stLower.includes('ودیعه')) currentStageNum = 2;
@@ -1405,6 +1408,50 @@ function renderMemberDashboard() {
               <span style="color:#e2e8f0; font-size:11px;">Auto-deletes when timer hits 00:00:00 if 50% retainer is unpaid.</span>
             </div>`;
           })() : ''}
+          ${(() => {
+            const sp = o.specs || {};
+            const extraRevPaid = userOrders.filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id) && String(s.pkg || '').toLowerCase().includes('revision') && s.paymentVerified).length;
+            const totalRevs = (Number(sp.revisionsIncluded) || 2) + extraRevPaid;
+            const usedRevs = Number(sp.revisionsUsed) || 0;
+            const delivUrl = sp.deliverableUrl || '';
+            const childSups = userOrders.filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id));
+            return `
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; padding:12px 14px; border-radius:10px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.22); font-size:11.5px;">
+                <div>
+                  <span style="color:#94a3b8; font-size:10px; display:block;">REVISION ROUNDS</span>
+                  <strong class="font-mono" style="color:${usedRevs >= totalRevs ? 'var(--gold)' : 'var(--emerald)'};">${usedRevs} / ${totalRevs} Used</strong>
+                  <span style="color:#94a3b8; font-size:10.5px; display:block; margin-top:2px;">${Math.max(0, totalRevs - usedRevs)} structured round(s) remaining</span>
+                </div>
+                <div>
+                  <span style="color:#94a3b8; font-size:10px; display:block;">STUDIO DELIVERABLES &amp; WIP FILES</span>
+                  ${delivUrl && delivUrl.startsWith('http')
+                    ? `<a href="${delivUrl}" target="_blank" rel="noopener" class="btn-secondary" style="display:inline-flex; align-items:center; gap:5px; margin-top:4px; padding:5px 10px; font-size:11px; color:var(--emerald); border-color:rgba(16,185,129,0.45); text-decoration:none;">📥 Open / Download Studio Files ↗</a>`
+                    : `<span style="color:#cbd5e1; font-size:11px; display:block; margin-top:2px;">In Production — Sketch &amp; final file links will appear here once uploaded.</span>`
+                  }
+                </div>
+              </div>
+              ${childSups.length > 0 ? `
+                <div style="display:flex; flex-direction:column; gap:7px; padding:10px 12px; border-radius:10px; background:rgba(0,240,255,0.04); border:1px solid rgba(0,240,255,0.22);">
+                  <span class="font-mono" style="font-size:10px; font-weight:800; color:var(--cyan-electric);">MID-PROJECT SUPPLEMENTS (${childSups.length})</span>
+                  ${childSups.map(cs => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:8px 10px; border-radius:8px; background:#050811; border:1px solid rgba(255,255,255,0.08);">
+                      <div>
+                        <strong style="color:#fff; font-size:11.5px;">${(cs.pkg || '').replace(/^\[Supplement for #\d+\]\s*/, '')}</strong>
+                        <span class="font-mono" style="font-size:10.5px; color:var(--gold); margin-left:8px;">${cs.price || ''}</span>
+                        <span style="font-size:10px; color:${cs.paymentVerified ? 'var(--emerald)' : '#fbbf24'}; margin-left:8px;">• ${cs.paymentVerified ? '✓ Paid' : (cs.txid ? '⏳ Pending Review' : 'Unpaid')}</span>
+                      </div>
+                      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        ${!cs.paymentVerified ? `<button type="button" onclick="openCryptoPayModal(${cs.id})" class="btn-gold" style="font-size:10px; padding:4px 10px;">💳 Pay ${cs.price || ''}</button>` : ''}
+                        <button type="button" onclick="downloadOfficialStudioInvoice(${cs.id})" class="btn-secondary" style="font-size:10px; padding:4px 8px; border-color:var(--gold); color:var(--gold);">📄 Invoice</button>
+                        ${(!cs.paymentVerified && !cs.txid) ? `<button type="button" onclick="clientCancelUnpaidOrder(${cs.id})" class="btn-secondary" style="font-size:10px; padding:4px 8px; border-color:rgba(244,63,94,0.4); color:var(--crimson);">✕ Cancel</button>` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            `;
+          })()}
+
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
             <span>Current Phase: <strong style="color:#fff;">${o.phase || 'Standard 300DPI'}</strong></span>
             <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'Per Project Schedule'}</strong></span>
@@ -3499,7 +3546,7 @@ window.updateWizardDynamicPreview = function(pipeKey, framingTxt, fidelityTxt, s
 // ==============================================================================
 // CLIENT PORTAL MID-PROJECT SUPPLEMENT / ADD-ON REQUEST
 // ==============================================================================
-window.openOrderSupplementModal = async function(parentOrderId) {
+window.openOrderSupplementModal = function(parentOrderId) {
   const parent = ordersList.find(o => String(o.id) === String(parentOrderId));
   if (!parent) return;
   const cat = (typeof window.getAtelierCatalog === 'function') ? window.getAtelierCatalog() : null;
@@ -3509,26 +3556,73 @@ window.openOrderSupplementModal = async function(parentOrderId) {
   const cvPrice = Math.round((cat ? cat.addons.colorVarHrs : 1.25) * hr);
   const wpnPrice = Math.round((cat ? cat.addons.stdWeaponHrs : 1.5) * hr);
   const petPrice = Math.round((cat ? cat.addons.simplePetHrs : 2.0) * hr);
+  const parentTotal = Number(parent.specs?.totalUsd) || parseFloat(String(parent.price || '150').replace(/[^0-9.]/g, '')) || 150;
+  const psdPrice = Math.max(25, Math.round(parentTotal * ((cat ? cat.commercialMult : 1.4) - 1)));
 
-  const choice = prompt(
-    `Request Mid-Project Add-on for CID #${parent.id} (${parent.pkg}):\n` +
-    `1 = +1 Extra Initial Sketch Concept ($${exPrice})\n` +
-    `2 = +1 Extra Revision Round ($${revPrice})\n` +
-    `3 = +1 Color Variation Palette ($${cvPrice})\n` +
-    `4 = +1 Hero Weapon / Prop ($${wpnPrice})\n` +
-    `5 = +1 Companion / Pet ($${petPrice})\n\n` +
-    `Enter 1, 2, 3, 4, or 5:`
-  );
-  if (!choice) return;
-  const map = {
-    '1': { label: '+1 Extra Sketch Concept', usd: exPrice },
-    '2': { label: '+1 Extra Revision Round', usd: revPrice },
-    '3': { label: '+1 Color Variation Palette', usd: cvPrice },
-    '4': { label: '+1 Hero Weapon / Prop', usd: wpnPrice },
-    '5': { label: '+1 Companion / Pet', usd: petPrice }
-  };
-  const picked = map[String(choice).trim()];
-  if (!picked) { showToast('Invalid option selected.', 'error'); return; }
+  const options = [
+    { id: 'sketch', label: '+1 Extra Initial Sketch Concept', usd: exPrice, days: '1 business day', desc: 'Explore an additional pose or silhouette direction.' },
+    { id: 'revision', label: '+1 Extra Revision Round', usd: revPrice, days: '1 to 2 business days', desc: 'Adds 1 extra structured feedback round to your project.' },
+    { id: 'color', label: '+1 Color Variation Palette', usd: cvPrice, days: '1 business day', desc: 'Alternate outfit/hair/armor palette test.' },
+    { id: 'weapon', label: '+1 Hero Weapon / Prop', usd: wpnPrice, days: '1 to 2 business days', desc: 'Add a custom designed weapon or prop to your character.' },
+    { id: 'pet', label: '+1 Companion / Pet', usd: petPrice, days: '2 business days', desc: 'Add a beast, familiar, or drone companion.' },
+    { id: 'psd', label: 'Commercial Rights & Master Layered PSD', usd: psdPrice, days: 'Included at handover', desc: 'Unlock full commercial rights + layered Photoshop PSD.' }
+  ];
+
+  let modal = document.getElementById('orderSupplementModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'orderSupplementModal';
+    modal.style.cssText = 'position:fixed; inset:0; z-index:99999; background:rgba(2,4,9,0.9); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px;';
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.body.appendChild(modal);
+  }
+  window._supSelectedOption = options[0];
+  window._supOptionsList = options;
+  window._supParentOrderId = parent.id;
+
+  modal.innerHTML = `
+    <div style="background:#070b14; border:1px solid rgba(0,240,255,0.35); border-radius:16px; max-width:540px; width:100%; padding:22px; display:flex; flex-direction:column; gap:14px; max-height:88vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+        <div>
+          <span class="font-mono" style="font-size:10px; color:var(--cyan-electric);">MID-PROJECT SUPPLEMENT • CID #${parent.id}</span>
+          <h3 style="font-size:16px; font-weight:900; color:#fff; margin:2px 0 0;">Request Extra Sketch or Add-on</h3>
+        </div>
+        <button type="button" onclick="document.getElementById('orderSupplementModal').style.display='none'" style="background:rgba(244,63,94,0.16); color:#fda4af; border:1px solid rgba(244,63,94,0.4); border-radius:8px; padding:5px 10px; font-weight:800; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${options.map((opt, idx) => `
+          <label onclick="window._supSelectedOption = window._supOptionsList[${idx}]; document.querySelectorAll('.sup-opt-card').forEach((el,i)=>el.style.borderColor=(i===${idx}?'var(--cyan-electric)':'rgba(255,255,255,0.1)'));" class="sup-opt-card" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; background:#04060b; border:1.5px solid ${idx === 0 ? 'var(--cyan-electric)' : 'rgba(255,255,255,0.1)'};">
+            <div style="display:flex; align-items:flex-start; gap:8px;">
+              <input type="radio" name="supOptRadio" ${idx === 0 ? 'checked' : ''} style="width:auto; margin-top:3px; accent-color:var(--cyan-electric);" />
+              <div>
+                <strong style="font-size:12.5px; color:#fff; display:block;">${opt.label}</strong>
+                <span style="font-size:10.5px; color:#94a3b8;">${opt.desc} • +${opt.days}</span>
+              </div>
+            </div>
+            <span class="font-mono" style="font-size:14px; font-weight:900; color:var(--gold); white-space:nowrap;">$${opt.usd}</span>
+          </label>
+        `).join('')}
+      </div>
+
+      <div>
+        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px;">Notes for Studio Director (Optional):</label>
+        <textarea id="supNoteInput" rows="2" placeholder="Describe the extra pose, weapon detail, or revision notes..." style="width:100%; font-size:11.5px; padding:8px 10px; background:#04060b; border:1px solid rgba(255,255,255,0.14); border-radius:8px; color:#fff;"></textarea>
+      </div>
+
+      <button type="button" onclick="window.submitOrderSupplementModal()" class="btn-gold" style="width:100%; padding:12px; font-size:12.5px; font-weight:900;">
+        Create Linked Supplement Invoice →
+      </button>
+    </div>
+  `;
+  modal.style.display = 'flex';
+};
+
+window.submitOrderSupplementModal = async function() {
+  const parent = ordersList.find(o => String(o.id) === String(window._supParentOrderId));
+  const picked = window._supSelectedOption;
+  if (!parent || !picked) return;
+  const note = (document.getElementById('supNoteInput')?.value || '').trim();
 
   const supId = Date.now();
   const supOrder = {
@@ -3539,9 +3633,9 @@ window.openOrderSupplementModal = async function(parentOrderId) {
     pkg: `[Supplement for #${parent.id}] ${picked.label}`,
     phase: parent.phase || 'Supplement Add-on',
     price: '$' + picked.usd,
-    timeline: '1 to 2 business days',
+    timeline: picked.days,
     status: 'Brief Received',
-    brief: `Mid-project supplement request linked to parent commission #${parent.id}: ${picked.label}.`,
+    brief: `Mid-project supplement linked to #${parent.id}: ${picked.label}` + (note ? `\nClient Note: ${note}` : ''),
     specs: {
       isSupplement: true,
       parentOrderId: parent.id,
@@ -3572,6 +3666,8 @@ window.openOrderSupplementModal = async function(parentOrderId) {
       }]);
     } catch(e) {}
   }
+  const modal = document.getElementById('orderSupplementModal');
+  if (modal) modal.style.display = 'none';
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
-  showToast(`Supplement Invoice #${supId} (${picked.label} — $${picked.usd}) created!`, 'success', 4500);
+  showToast(`Supplement Invoice #${supId} ($${picked.usd}) added under CID #${parent.id}! ✓`, 'success', 4500);
 };

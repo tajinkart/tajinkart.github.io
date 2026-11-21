@@ -2380,6 +2380,18 @@ function renderOrderAdminSnippet(o) {
         </div>
       ` : ''}
 
+      <div style="padding:10px 12px; border-radius:8px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.22); display:grid; grid-template-columns:90px 1fr auto; gap:8px; align-items:end; font-size:10.5px;">
+        <div>
+          <label style="color:#94a3b8; display:block; margin-bottom:2px;">Revs Used</label>
+          <input type="number" id="adminRevUsed_${o.id}" min="0" value="${Number(o.specs?.revisionsUsed) || 0}" class="font-mono" style="width:100%; padding:4px 6px; background:#04060a; border:1px solid rgba(16,185,129,0.3); border-radius:5px; color:var(--emerald); text-align:center;" />
+        </div>
+        <div>
+          <label style="color:#94a3b8; display:block; margin-bottom:2px;">Client Portal Deliverable / WIP Link</label>
+          <input type="url" id="adminDelivUrl_${o.id}" value="${(o.specs?.deliverableUrl || '').replace(/"/g, '&quot;')}" placeholder="https://drive.google.com/... or Dropbox/Mega link" class="font-mono" style="width:100%; padding:4px 8px; background:#04060a; border:1px solid rgba(0,240,255,0.25); border-radius:5px; color:#fff;" />
+        </div>
+        <button type="button" onclick="window.adminUpdateOrderPortalMeta(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:5px 10px; color:var(--emerald); border-color:rgba(16,185,129,0.4);">✓ Update Portal</button>
+      </div>
+
       <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05); font-size:11px;">
         <button type="button" onclick="downloadOfficialStudioInvoice(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:3px 8px; border-color:var(--gold); color:var(--gold);">
           📄 Invoice
@@ -5349,4 +5361,22 @@ window.adminAtelierSaveAll = async function(btnEl) {
   } finally {
     if (btnEl) { btnEl.textContent = origTxt || '✓ Save & Sync Now'; btnEl.disabled = false; }
   }
+};
+
+window.adminUpdateOrderPortalMeta = async function(orderId) {
+  const o = ordersList.find(x => String(x.id) === String(orderId));
+  if (!o) return;
+  if (!o.specs) o.specs = {};
+  const revVal = parseInt(document.getElementById('adminRevUsed_' + orderId)?.value || '0', 10) || 0;
+  const delivVal = (document.getElementById('adminDelivUrl_' + orderId)?.value || '').trim();
+  o.specs.revisionsUsed = revVal;
+  o.specs.deliverableUrl = delivVal;
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (window.supabaseClient) {
+    try {
+      await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id);
+    } catch(e) {}
+  }
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  showToast('Client Portal revisions & deliverable link updated! ✓', 'success', 3500);
 };
