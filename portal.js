@@ -1428,9 +1428,20 @@ function renderMemberDashboard() {
             return `
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; padding:12px 14px; border-radius:10px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.22); font-size:11.5px;">
                 <div>
-                  <span style="color:#94a3b8; font-size:10px; display:block;">REVISION ROUNDS</span>
+                  <span style="color:#94a3b8; font-size:10px; display:block;">REVISION ROUNDS &amp; STAGE APPROVAL</span>
                   <strong class="font-mono" style="color:${usedRevs >= totalRevs ? 'var(--gold)' : 'var(--emerald)'};">${usedRevs} / ${totalRevs} Used</strong>
                   <span style="color:#94a3b8; font-size:10.5px; display:block; margin-top:2px;">${Math.max(0, totalRevs - usedRevs)} structured round(s) remaining</span>
+                  ${o.paymentVerified && currentStageNum < 5 ? `
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+                      <button type="button" onclick="window.clientApproveCurrentStage(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:4px 9px; color:var(--emerald); border-color:rgba(16,185,129,0.45);">
+                        ✓ Approve Stage &amp; Advance
+                      </button>
+                      ${usedRevs < totalRevs
+                        ? `<button type="button" onclick="window.clientRequestIncludedRevision(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:4px 9px; color:var(--gold); border-color:rgba(250,204,21,0.4);">🔄 Use 1 Revision</button>`
+                        : `<button type="button" onclick="openOrderSupplementModal(${o.id}, 'revision')" class="btn-gold" style="font-size:10.5px; padding:4px 9px;">💳 Buy +1 Extra Revision</button>`
+                      }
+                    </div>
+                  ` : ''}
                 </div>
                 <div>
                   <span style="color:#94a3b8; font-size:10px; display:block;">STUDIO DELIVERABLES &amp; WIP FILES</span>
@@ -3071,6 +3082,7 @@ window.sendOrderChatMessage = async function(orderId, senderRole) {
     createdAt: new Date().toISOString()
   });
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
   if (window.supabaseClient) {
     try { await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id); } catch(e) {}
   }
@@ -3096,6 +3108,12 @@ window.syncOrderPaymentToCloud = async function(order) {
       paymentAmountCrypto: order.paymentAmountCrypto || '',
       paymentVerified: !!order.paymentVerified,
       status: order.status || '',
+      paidUsd: order.specs?.paidUsd,
+      balanceUsd: order.specs?.balanceUsd,
+      revisionsUsed: order.specs?.revisionsUsed || 0,
+      deliverableUrl: order.specs?.deliverableUrl || '',
+      approvedStages: order.specs?.approvedStages || [],
+      messages: order.specs?.messages || [],
       updatedAt: new Date().toISOString()
     };
     await window.supabaseClient.from('studio_settings').upsert([{
@@ -3325,12 +3343,41 @@ window.syncOrdersFromSupabase = async function() {
       const cloudIds = new Set(data.map(r => String(r.id)));
       const nowMs = Date.now();
       const nextList = [];
+      let cloudLedger = {};
+      try {
+        const { data: ledData } = await window.supabaseClient.from('studio_settings').select('value').eq('key', 'order_payments_ledger').single();
+        if (ledData && ledData.value) cloudLedger = ledData.value;
+      } catch(e) {}
+
       data.forEach(row => {
         const existing = localMap[String(row.id)];
+        const rec = cloudLedger[String(row.id)] || {};
+        const rowSpecs = (row.specs && typeof row.specs === 'object') ? row.specs : {};
         if (existing) {
           if (row.status) existing.status = row.status;
+          if (rec.status) existing.status = rec.status;
+          if (rec.txid) existing.txid = rec.txid;
+          if (rec.paymentNetwork) existing.paymentNetwork = rec.paymentNetwork;
+          if (rec.paymentAmountCrypto) existing.paymentAmountCrypto = rec.paymentAmountCrypto;
+          if (rec.paymentVerified !== undefined) existing.paymentVerified = !!rec.paymentVerified;
+          existing.specs = Object.assign({}, existing.specs || {}, rowSpecs);
+          if (rec.paidUsd !== undefined) existing.specs.paidUsd = rec.paidUsd;
+          if (rec.balanceUsd !== undefined) existing.specs.balanceUsd = rec.balanceUsd;
+          if (rec.revisionsUsed !== undefined) existing.specs.revisionsUsed = rec.revisionsUsed;
+          if (rec.deliverableUrl !== undefined) existing.specs.deliverableUrl = rec.deliverableUrl;
+          if (Array.isArray(rec.approvedStages)) existing.specs.approvedStages = rec.approvedStages;
+          if (Array.isArray(rec.messages) && rec.messages.length >= (existing.specs.messages ? existing.specs.messages.length : 0)) {
+            existing.specs.messages = rec.messages;
+          }
           nextList.push(existing);
         } else {
+          const mergedSpecs = Object.assign({}, rowSpecs);
+          if (rec.paidUsd !== undefined) mergedSpecs.paidUsd = rec.paidUsd;
+          if (rec.balanceUsd !== undefined) mergedSpecs.balanceUsd = rec.balanceUsd;
+          if (rec.revisionsUsed !== undefined) mergedSpecs.revisionsUsed = rec.revisionsUsed;
+          if (rec.deliverableUrl !== undefined) mergedSpecs.deliverableUrl = rec.deliverableUrl;
+          if (Array.isArray(rec.approvedStages)) mergedSpecs.approvedStages = rec.approvedStages;
+          if (Array.isArray(rec.messages)) mergedSpecs.messages = rec.messages;
           nextList.push({
             id: row.id,
             client: row.client_name || 'Client',
@@ -3342,7 +3389,12 @@ window.syncOrdersFromSupabase = async function() {
             timeline: row.timeline || '',
             phase: row.phase || '',
             brief: row.brief_text || '',
-            status: row.status || 'Brief Received'
+            status: rec.status || row.status || 'Brief Received',
+            txid: rec.txid || '',
+            paymentNetwork: rec.paymentNetwork || '',
+            paymentAmountCrypto: rec.paymentAmountCrypto || '',
+            paymentVerified: !!rec.paymentVerified,
+            specs: mergedSpecs
           });
         }
       });
@@ -3817,3 +3869,72 @@ window.qaSimulateOrderPaid = async function() {
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   showToast('QA Test Payment simulated! Order moved to ' + o.status + ' ✓', 'success', 4500);
 };
+
+
+window.clientApproveCurrentStage = async function(orderId) {
+  const o = ordersList.find(x => String(x.id) === String(orderId));
+  if (!o) return;
+  const STAGES_ORDER = ['Brief Received', '50% Retainer Settled', 'Thumbnails & Linework', 'Master 300DPI Render', 'Final PSD Handover'];
+  const curIdx = STAGES_ORDER.findIndex(s => s.toLowerCase() === String(o.status || '').toLowerCase());
+  const nextStage = (curIdx >= 1 && curIdx < STAGES_ORDER.length - 1) ? STAGES_ORDER[curIdx + 1] : 'Thumbnails & Linework';
+  if (!confirm(`Approve current stage (${o.status}) and advance project to "${nextStage}"?`)) return;
+
+  if (!o.specs) o.specs = {};
+  if (!Array.isArray(o.specs.approvedStages)) o.specs.approvedStages = [];
+  o.specs.approvedStages.push({ stage: o.status, approvedAt: new Date().toISOString() });
+  if (!Array.isArray(o.specs.messages)) o.specs.messages = [];
+  o.specs.messages.push({
+    id: Date.now(),
+    sender: 'client',
+    senderName: o.client || 'Client',
+    text: `✓ Approved stage "${o.status}" — proceeding to "${nextStage}".`,
+    fileUrl: '',
+    createdAt: new Date().toISOString()
+  });
+  o.status = nextStage;
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
+  if (window.supabaseClient) {
+    try { await window.supabaseClient.from('orders').update({ status: o.status, specs: o.specs }).eq('id', o.id); } catch(e) {}
+  }
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  showToast(`Stage approved! Project moved to "${nextStage}" ✓`, 'success', 4500);
+};
+
+window.clientRequestIncludedRevision = async function(orderId) {
+  const o = ordersList.find(x => String(x.id) === String(orderId));
+  if (!o) return;
+  const note = prompt('What changes would you like in this revision round?');
+  if (!note || !note.trim()) return;
+  if (!o.specs) o.specs = {};
+  o.specs.revisionsUsed = (Number(o.specs.revisionsUsed) || 0) + 1;
+  if (!Array.isArray(o.specs.messages)) o.specs.messages = [];
+  o.specs.messages.push({
+    id: Date.now(),
+    sender: 'client',
+    senderName: o.client || 'Client',
+    text: `🔄 Revision Round #${o.specs.revisionsUsed} Requested: ${note.trim()}`,
+    fileUrl: '',
+    createdAt: new Date().toISOString()
+  });
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
+  if (window.supabaseClient) {
+    try { await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id); } catch(e) {}
+  }
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  showToast(`Revision #${o.specs.revisionsUsed} sent to Studio Director!`, 'success', 4000);
+};
+
+// Auto-sync live messages & stage updates every 10 seconds when Portal or Admin Orders is open
+setInterval(() => {
+  const portalVis = document.getElementById('view-member-dashboard') && !document.getElementById('view-member-dashboard').classList.contains('hidden');
+  const adminVis = document.getElementById('view-admin') && !document.getElementById('view-admin').classList.contains('hidden');
+  if ((portalVis || adminVis) && typeof window.syncOrdersFromSupabase === 'function') {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) return;
+    window.syncOrdersFromSupabase();
+  }
+}, 10000);

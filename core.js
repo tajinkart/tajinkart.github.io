@@ -1070,11 +1070,20 @@ window.syncStudioSettingsFromCloud = async function() {
       ordersList.forEach(o => {
         const rec = ledger[String(o.id)];
         if (rec) {
-          o.txid = rec.txid || '';
-          o.paymentNetwork = rec.paymentNetwork || '';
-          o.paymentAmountCrypto = rec.paymentAmountCrypto || '';
-          o.paymentVerified = !!rec.paymentVerified;
+          if (rec.txid) o.txid = rec.txid;
+          if (rec.paymentNetwork) o.paymentNetwork = rec.paymentNetwork;
+          if (rec.paymentAmountCrypto) o.paymentAmountCrypto = rec.paymentAmountCrypto;
+          if (rec.paymentVerified !== undefined) o.paymentVerified = !!rec.paymentVerified;
           if (rec.status) o.status = rec.status;
+          if (!o.specs) o.specs = {};
+          if (rec.paidUsd !== undefined) o.specs.paidUsd = rec.paidUsd;
+          if (rec.balanceUsd !== undefined) o.specs.balanceUsd = rec.balanceUsd;
+          if (rec.revisionsUsed !== undefined) o.specs.revisionsUsed = rec.revisionsUsed;
+          if (rec.deliverableUrl !== undefined) o.specs.deliverableUrl = rec.deliverableUrl;
+          if (Array.isArray(rec.approvedStages)) o.specs.approvedStages = rec.approvedStages;
+          if (Array.isArray(rec.messages) && rec.messages.length >= (o.specs.messages ? o.specs.messages.length : 0)) {
+            o.specs.messages = rec.messages;
+          }
           changed = true;
         }
       });

@@ -5395,6 +5395,7 @@ window.adminUpdateOrderPortalMeta = async function(orderId) {
   o.specs.revisionsUsed = revVal;
   o.specs.deliverableUrl = delivVal;
   safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
   if (window.supabaseClient) {
     try {
       await window.supabaseClient.from('orders').update({ specs: o.specs }).eq('id', o.id);
