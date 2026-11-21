@@ -1412,6 +1412,27 @@ window.renderAdminSettingsTab = function() {
     if (typeof window.switchSettingsSubTab === 'function') {
       window.switchSettingsSubTab('operations');
     }
+    const tgSub = document.getElementById('adminSettingsSub_telegram') || document.getElementById('adminTabSettings');
+    if (tgSub && !document.getElementById('adminEmailJsConfigCard')) {
+      const card = document.createElement('div');
+      card.id = 'adminEmailJsConfigCard';
+      card.style.cssText = 'margin-top:16px; background:#06080d; border:1px solid rgba(0,240,255,0.3); border-radius:14px; padding:16px 20px; display:flex; flex-direction:column; gap:10px;';
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h4 style="font-size:14px; font-weight:900; color:var(--cyan-electric); margin:0;">📧 Two-Way Email Automation (EmailJS)</h4>
+            <span style="font-size:11px; color:#94a3b8;">Auto-emails clients on replies/deliverables &amp; emails you on client messages/approvals (free 200 emails/mo on emailjs.com).</span>
+          </div>
+          <button type="button" onclick="window.saveEmailJsSettings()" class="btn-gold" style="font-size:11.5px; padding:7px 14px;">✓ Save Email Automation</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+          <div><label style="font-size:10px; color:#94a3b8; display:block;">Service ID</label><input type="text" id="setEmailJsServiceId" value="${(s.emailjsServiceId || '').replace(/"/g, '&quot;')}" placeholder="service_xxxxxxx" class="font-mono" style="width:100%; font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+          <div><label style="font-size:10px; color:#94a3b8; display:block;">Template ID</label><input type="text" id="setEmailJsTemplateId" value="${(s.emailjsTemplateId || '').replace(/"/g, '&quot;')}" placeholder="template_xxxxxxx" class="font-mono" style="width:100%; font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+          <div><label style="font-size:10px; color:#94a3b8; display:block;">Public Key</label><input type="text" id="setEmailJsPublicKey" value="${(s.emailjsPublicKey || '').replace(/"/g, '&quot;')}" placeholder="Public Key" class="font-mono" style="width:100%; font-size:11px; padding:6px 8px; background:#04060a; border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#fff;" /></div>
+        </div>
+      `;
+      tgSub.appendChild(card);
+    }
   } catch(e) {
     console.warn('renderAdminSettingsTab error:', e);
   }
@@ -2432,6 +2453,10 @@ window.updateOrderStatusFromAdmin = function(orderId, newStatus) {
   const o = ordersList.find(x => x.id === orderId);
   if (o) {
     o.status = newStatus;
+    const cMail = (o.clientEmail && o.clientEmail.includes('@')) ? o.clientEmail : ((o.contact && o.contact.includes('@')) ? o.contact : '');
+    if (cMail && typeof window.sendStudioEmailNotification === 'function') {
+      window.sendStudioEmailNotification(cMail, o.client, `Production Update on #${o.id}: ${newStatus}`, `Your commission (${o.pkg}) has moved to "${newStatus}". Open your Client Portal to review progress.`, o.id);
+    }
     safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
     if (window.supabaseClient) {
       window.supabaseClient.from('orders').update({ status: newStatus }).eq('id', orderId).then(() => {
@@ -5402,5 +5427,19 @@ window.adminUpdateOrderPortalMeta = async function(orderId) {
     } catch(e) {}
   }
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  const _cMail = (o.clientEmail && o.clientEmail.includes('@')) ? o.clientEmail : ((o.contact && o.contact.includes('@')) ? o.contact : '');
+  if (_cMail && delivVal && typeof window.sendStudioEmailNotification === 'function') {
+    window.sendStudioEmailNotification(_cMail, o.client, `New Deliverable Uploaded on #${o.id} (${o.pkg})`, `Your updated artwork/files are ready in the Client Portal: ${delivVal}`, o.id);
+  }
   showToast('Client Portal revisions & deliverable link updated! ✓', 'success', 3500);
+};
+
+window.saveEmailJsSettings = async function() {
+  if (typeof siteSettings === 'undefined') return;
+  siteSettings.emailjsServiceId = (document.getElementById('setEmailJsServiceId')?.value || '').trim();
+  siteSettings.emailjsTemplateId = (document.getElementById('setEmailJsTemplateId')?.value || '').trim();
+  siteSettings.emailjsPublicKey = (document.getElementById('setEmailJsPublicKey')?.value || '').trim();
+  safeSetStorage(KEYS.SETTINGS, JSON.stringify(siteSettings));
+  if (typeof window.syncStudioSettingsToCloud === 'function') await window.syncStudioSettingsToCloud();
+  showToast('Two-Way Email Automation settings saved to Supabase! ✓', 'success', 4000);
 };

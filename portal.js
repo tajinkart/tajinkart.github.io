@@ -1338,28 +1338,43 @@ function renderMemberDashboard() {
             </span>
           </div>
 
-          <!-- 5-Step Conduit Production Progress Stepper -->
-          <div style="background:#080c16; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px 12px; position:relative;">
-            <div style="display:flex; justify-content:space-between; position:relative;">
-              ${STAGES.map(s => {
-                const isPassed = s.id <= currentStageNum;
-                const isCurrent = s.id === currentStageNum;
-                const dotColor = isCurrent ? 'var(--gold)' : (isPassed ? '#10b981' : '#334155');
-                const dotGlow = isCurrent ? '0 0 12px var(--gold)' : (isPassed ? '0 0 10px #10b981' : 'none');
-                return `
-                  <div style="display:flex; flex-direction:column; align-items:center; flex:1; text-align:center; z-index:2;">
-                    <div style="width:24px; height:24px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#000; margin-bottom:6px;">
-                      ${isPassed ? '✓' : s.id}
-                    </div>
-                    <span style="font-size:10.5px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.4;">
-                      ${s.label}
-                    </span>
-                    <span style="font-size:9px; color:#475569; margin-top:2px;">${s.hint}</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
+          <!-- 5-Step Conduit Production Progress Stepper + Animated Bar -->
+          ${(() => {
+            const pct = Math.min(100, Math.round(((currentStageNum - 1) / 4) * 100));
+            const appList = Array.isArray(o.specs?.approvedStages) ? o.specs.approvedStages : [];
+            return `
+              <div style="background:#080c16; border:1px solid rgba(0,240,255,0.18); border-radius:12px; padding:16px 14px; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:10.5px;">
+                  <span class="font-mono" style="color:var(--cyan-electric); font-weight:800;">PRODUCTION PROGRESSION: ${pct}% COMPLETE</span>
+                  <span style="color:#94a3b8;">Stage ${currentStageNum} of 5</span>
+                </div>
+                <div style="height:5px; background:#0f172a; border-radius:999px; overflow:hidden; margin-bottom:14px;">
+                  <div style="height:100%; width:${Math.max(10, pct)}%; background:linear-gradient(90deg, var(--emerald), var(--cyan-electric), var(--gold)); border-radius:999px; transition:width 0.4s ease;"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; position:relative; gap:4px;">
+                  ${STAGES.map(s => {
+                    const isPassed = s.id <= currentStageNum;
+                    const isCurrent = s.id === currentStageNum;
+                    const dotColor = isCurrent ? 'var(--gold)' : (isPassed ? '#10b981' : '#334155');
+                    const dotGlow = isCurrent ? '0 0 12px var(--gold)' : (isPassed ? '0 0 10px #10b981' : 'none');
+                    const matchedApp = appList.find(a => String(a.stage || '').toLowerCase().includes(s.label.split(' ')[0].toLowerCase()));
+                    const appDate = matchedApp && matchedApp.approvedAt ? new Date(matchedApp.approvedAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '';
+                    return `
+                      <div style="display:flex; flex-direction:column; align-items:center; flex:1; text-align:center; z-index:2;">
+                        <div style="width:24px; height:24px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#000; margin-bottom:6px;">
+                          ${isPassed ? '✓' : s.id}
+                        </div>
+                        <span style="font-size:10.5px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.4;">
+                          ${s.label}
+                        </span>
+                        <span style="font-size:9px; color:${appDate ? 'var(--emerald)' : '#475569'}; margin-top:2px;">${appDate ? ('Approved ' + appDate) : s.hint}</span>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          })()}
 
           ${(() => {
             const sp = o.specs || {};
@@ -3090,6 +3105,17 @@ window.sendOrderChatMessage = async function(orderId, senderRole) {
   if (fileEl) fileEl.value = '';
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  if (senderRole === 'client') {
+    if (typeof window.sendTelegramDirectorAlert === 'function') {
+      window.sendTelegramDirectorAlert(`💬 New Client Message on #${o.id} (${o.client}): ${text || fileUrl}`);
+    }
+    if (typeof window.sendStudioEmailNotification === 'function') {
+      window.sendStudioEmailNotification('studio@tajinkart.space', 'Studio Director', `Client Message on #${o.id}`, `${o.client} sent: ${text}${fileUrl ? '\nFile: ' + fileUrl : ''}`, o.id);
+    }
+  } else if (senderRole === 'director' && typeof window.sendStudioEmailNotification === 'function') {
+    const _cMail = (o.clientEmail && o.clientEmail.includes('@')) ? o.clientEmail : ((o.contact && o.contact.includes('@')) ? o.contact : '');
+    if (_cMail) window.sendStudioEmailNotification(_cMail, o.client, `New Studio Update on #${o.id} (${o.pkg})`, `Seyed Soroush Taj replied: ${text}${fileUrl ? '\nWork Drop: ' + fileUrl : ''}`, o.id);
+  }
   showToast('Message & work drop saved to Supabase! ✓', 'success', 3000);
 };
 
@@ -3273,19 +3299,31 @@ window.downloadOfficialStudioInvoice = function(orderId) {
         <tr><td>Design Complexity</td><td>${sp.complexity || 'Production Standard'}</td></tr>
         <tr><td>Rendering Fidelity</td><td>${sp.fidelity || o.phase || '300DPI Master Render'}</td></tr>
         <tr><td>Included Add-ons</td><td>${(sp.addons && sp.addons.length) ? sp.addons.join(', ') : 'Master Layered 300DPI PSD'}</td></tr>
+        ${(() => {
+          const linkedSups = (ordersList || []).filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id));
+          if (!linkedSups.length) return '';
+          return linkedSups.map(ls => `<tr><td>Mid-Project Supplement (#${ls.id})</td><td>${(ls.pkg||'').replace(/^\[Supplement for #\d+\]\s*/, '')} — <strong>${ls.price || ''}</strong> (${ls.paymentVerified ? 'Paid ✓' : 'Pending'})</td></tr>`).join('');
+        })()}
+        ${Array.isArray(sp.approvedStages) && sp.approvedStages.length ? `<tr><td>Client Milestone Approvals</td><td>${sp.approvedStages.map(a => `✓ ${a.stage} (${new Date(a.approvedAt).toLocaleDateString('en-US')})`).join('<br/>')}</td></tr>` : ''}
+        ${sp.deliverableUrl ? `<tr><td>Studio Deliverable Link</td><td>${sp.deliverableUrl}</td></tr>` : ''}
         <tr><td>Creative Brief</td><td>${String(o.brief || '').replace(/\n/g, '<br>')}</td></tr>
         <tr><td>Reference Link</td><td>${o.refLink || 'None'}</td></tr>
       </tbody>
     </table>
 
     ${(() => {
-      const paidAmt = Number(sp.paidUsd) || 0;
-      const remAmt = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paidAmt > 0 ? Math.max(0, totalNum - paidAmt) : Number(halfNum));
+      const linkedSups = (ordersList || []).filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id));
+      const supTotal = linkedSups.reduce((acc, s) => acc + (Number(s.specs?.totalUsd) || parseFloat(String(s.price||'0').replace(/[^0-9.]/g,'')) || 0), 0);
+      const supPaid = linkedSups.filter(s => s.paymentVerified).reduce((acc, s) => acc + (Number(s.specs?.totalUsd) || parseFloat(String(s.price||'0').replace(/[^0-9.]/g,'')) || 0), 0);
+      const grandTotal = totalNum + supTotal;
+      const basePaid = Number(sp.paidUsd) || 0;
+      const totalPaid = basePaid + supPaid;
+      const remAmt = Math.max(0, grandTotal - totalPaid);
       const isFull = o.paymentVerified && remAmt <= 0;
       return `
         <div class="grid">
-          <div class="box"><span class="muted">${isFull ? '100% Paid in Full' : (paidAmt > 0 ? 'Amount Paid (50% Retainer)' : '50% Non-Refundable Retainer (To Start)')}</span><strong style="color:${o.paymentVerified ? '#047857' : '#b45309'}; font-size:18px;">$${paidAmt > 0 ? paidAmt : halfNum} USD ${o.paymentVerified ? '✓' : ''}</strong></div>
-          <div class="box"><span class="muted">Remaining Balance Due</span><strong style="color:${remAmt <= 0 ? '#047857' : '#0369a1'}; font-size:18px;">$${remAmt} USD</strong></div>
+          <div class="box"><span class="muted">${isFull ? '100% Paid in Full (Incl. Supplements)' : (totalPaid > 0 ? 'Cumulative Amount Paid' : '50% Non-Refundable Retainer (To Start)')}</span><strong style="color:${o.paymentVerified ? '#047857' : '#b45309'}; font-size:18px;">$${totalPaid > 0 ? totalPaid : halfNum} USD ${o.paymentVerified ? '✓' : ''}</strong></div>
+          <div class="box"><span class="muted">Grand Total: $${grandTotal} USD • Remaining Due</span><strong style="color:${remAmt <= 0 ? '#047857' : '#0369a1'}; font-size:18px;">$${remAmt} USD</strong></div>
         </div>
       `;
     })()}
@@ -3899,6 +3937,12 @@ window.clientApproveCurrentStage = async function(orderId) {
   }
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  if (typeof window.sendTelegramDirectorAlert === 'function') {
+    window.sendTelegramDirectorAlert(`✅ Client approved stage on #${o.id} (${o.client}) -> Advanced to ${nextStage}`);
+  }
+  if (typeof window.sendStudioEmailNotification === 'function') {
+    window.sendStudioEmailNotification('studio@tajinkart.space', 'Studio Director', `Stage Approved on #${o.id}`, `${o.client} approved the stage and advanced to ${nextStage}.`, o.id);
+  }
   showToast(`Stage approved! Project moved to "${nextStage}" ✓`, 'success', 4500);
 };
 
@@ -3925,6 +3969,12 @@ window.clientRequestIncludedRevision = async function(orderId) {
   }
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   if (typeof renderAdminSketch3 === 'function') renderAdminSketch3();
+  if (typeof window.sendTelegramDirectorAlert === 'function') {
+    window.sendTelegramDirectorAlert(`🔄 Revision #${o.specs.revisionsUsed} requested on #${o.id} (${o.client}): ${note.trim()}`);
+  }
+  if (typeof window.sendStudioEmailNotification === 'function') {
+    window.sendStudioEmailNotification('studio@tajinkart.space', 'Studio Director', `Revision #${o.specs.revisionsUsed} Requested on #${o.id}`, `${o.client} requested revision: ${note.trim()}`, o.id);
+  }
   showToast(`Revision #${o.specs.revisionsUsed} sent to Studio Director!`, 'success', 4000);
 };
 

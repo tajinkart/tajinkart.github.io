@@ -1421,3 +1421,66 @@ window.applyAtelierCatalogToSite = function() {
     window.renderAdminAtelierEngine();
   }
 };
+
+
+// ==============================================================================
+// TWO-WAY EMAIL AUTOMATION (EmailJS REST API) & TELEGRAM DIRECTOR ALERTS
+// ==============================================================================
+window.sendTelegramDirectorAlert = function(text) {
+  try {
+    const s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+    if (s.tgToken && s.tgChat) {
+      fetch(`https://api.telegram.org/bot${s.tgToken}/sendMessage?chat_id=${encodeURIComponent(s.tgChat)}&text=${encodeURIComponent(text)}`).catch(() => {});
+    }
+  } catch(e) {}
+};
+
+window.sendStudioEmailNotification = async function(toEmail, toName, subject, messageBody, orderId) {
+  try {
+    if (!toEmail || !String(toEmail).includes('@')) return false;
+    // 1. Primary Professional Route: Supabase Edge Function ('send-studio-email' via Resend -> studio@tajinkart.space)
+    if (window.supabaseClient && window.supabaseClient.functions && typeof window.supabaseClient.functions.invoke === 'function') {
+      try {
+        const { data, error } = await window.supabaseClient.functions.invoke('send-studio-email', {
+          body: {
+            toEmail: toEmail,
+            toName: toName || 'Client',
+            subject: subject,
+            message: messageBody,
+            orderId: String(orderId || ''),
+            portalUrl: 'https://tajinkart.space/#portal'
+          }
+        });
+        if (!error && data && data.ok) return true;
+      } catch(edgeErr) {}
+    }
+    // 2. Fallback Route: EmailJS if configured in Admin Settings
+    const s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {};
+    const svc = (s.emailjsServiceId || '').trim();
+    const tpl = (s.emailjsTemplateId || '').trim();
+    const pub = (s.emailjsPublicKey || '').trim();
+    if (!svc || !tpl || !pub || !toEmail || !String(toEmail).includes('@')) return false;
+    const resp = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: svc,
+        template_id: tpl,
+        user_id: pub,
+        template_params: {
+          to_email: toEmail,
+          to_name: toName || 'Client',
+          subject: subject,
+          message: messageBody,
+          order_id: String(orderId || ''),
+          portal_url: 'https://tajinkart.space/#portal',
+          reply_to: 'studio@tajinkart.space'
+        }
+      })
+    });
+    return resp.ok;
+  } catch(e) {
+    console.warn('[EmailJS Notification Warning]', e);
+    return false;
+  }
+};
