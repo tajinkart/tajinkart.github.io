@@ -1218,7 +1218,8 @@ function renderMemberDashboard() {
     if (!currentMember) {
       emailEl.textContent = 'guest@tajinkart.space';
     } else {
-      const googleBadge = currentMember.isGoogleUser ? ' <span style="color:var(--emerald); font-size:11px; font-weight:700;">(Google Verified ✓)</span>' : '';
+      const isQaAcc = (typeof window.isQaTestClientEmail === 'function' && window.isQaTestClientEmail(currentMember.email) && !isDirector);
+      const googleBadge = (currentMember.isGoogleUser ? ' <span style="color:var(--emerald); font-size:11px; font-weight:700;">(Google Verified ✓)</span>' : '') + (isQaAcc ? ' <span style="color:var(--gold); font-size:10.5px; font-weight:800;">• 🧪 QA Test Client</span>' : '');
       emailEl.innerHTML = currentMember.email + googleBadge;
     }
   }
@@ -2807,8 +2808,23 @@ window.openCryptoPayModal = async function(orderId) {
   }
 
   const isDir = typeof window.isStudioDirectorAuthenticated === 'function' && window.isStudioDirectorAuthenticated();
+  const isQa = isDir || (typeof window.isQaTestClientEmail === 'function' && currentMember && window.isQaTestClientEmail(currentMember.email));
   const testBtn = document.getElementById('payTierTestBtn');
-  if (testBtn) testBtn.classList.toggle('hidden', !isDir);
+  if (testBtn) testBtn.classList.toggle('hidden', !isQa);
+
+  // Inject QA Simulate Paid button for QA Test Client (reaperi.s.s.t@gmail.com) & Director
+  let qaSimBtn = document.getElementById('qaSimulatePayBtn');
+  if (!qaSimBtn && testBtn && testBtn.parentElement) {
+    qaSimBtn = document.createElement('button');
+    qaSimBtn.id = 'qaSimulatePayBtn';
+    qaSimBtn.type = 'button';
+    qaSimBtn.className = 'btn-secondary';
+    qaSimBtn.style.cssText = 'font-size:10.5px; padding:6px 10px; border-color:rgba(16,185,129,0.5); color:var(--emerald); margin-top:6px; width:100%;';
+    qaSimBtn.textContent = '🧪 QA Simulate Paid (No Crypto Needed)';
+    qaSimBtn.onclick = window.qaSimulateOrderPaid;
+    testBtn.parentElement.parentElement.appendChild(qaSimBtn);
+  }
+  if (qaSimBtn) qaSimBtn.style.display = (isQa && order) ? 'block' : 'none';
 
   window._activeCryptoTier = order ? 0.5 : 'test';
   const txInput = document.getElementById('cryptoTxidInput');
@@ -3670,4 +3686,29 @@ window.submitOrderSupplementModal = async function() {
   if (modal) modal.style.display = 'none';
   if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
   showToast(`Supplement Invoice #${supId} ($${picked.usd}) added under CID #${parent.id}! ✓`, 'success', 4500);
+};
+
+
+window.qaSimulateOrderPaid = async function() {
+  const orderId = window._activeCryptoPayOrderId;
+  const o = orderId ? ordersList.find(x => String(x.id) === String(orderId)) : null;
+  if (!o) return;
+  const isQa = (typeof window.isQaTestClientEmail === 'function' && currentMember && window.isQaTestClientEmail(currentMember.email)) || (typeof window.isStudioDirectorAuthenticated === 'function' && window.isStudioDirectorAuthenticated());
+  if (!isQa) return;
+
+  o.paymentVerified = true;
+  o.txid = 'QA-SANDBOX-TEST-' + Date.now().toString(36).toUpperCase();
+  o.paymentNetwork = 'qa_sandbox';
+  o.paymentAmountCrypto = '0.00 USD (QA Sandbox)';
+  if (!o.status || o.status === 'Brief Received') o.status = '50% Retainer Settled';
+  safeSetStorage(KEYS.ORDERS, JSON.stringify(ordersList));
+  if (typeof window.syncOrderPaymentToCloud === 'function') await window.syncOrderPaymentToCloud(o);
+  if (window.supabaseClient) {
+    try {
+      await window.supabaseClient.from('orders').update({ status: o.status }).eq('id', o.id);
+    } catch(e) {}
+  }
+  window.closeCryptoPayModal();
+  if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+  showToast('QA Test Payment simulated! Order moved to ' + o.status + ' ✓', 'success', 4500);
 };

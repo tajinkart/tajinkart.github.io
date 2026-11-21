@@ -182,6 +182,11 @@ if (!window.supabaseClient) {
 // =========================================================
 // سیستم یکپارچه احراز هویت ابری SUPABASE AUTH
 // =========================================================
+window.isQaTestClientEmail = function(email) {
+  const e = String(email || '').trim().toLowerCase();
+  return e === 'reaperi.s.s.t@gmail.com' || (typeof window.isDirectorEmail === 'function' && window.isDirectorEmail(e));
+};
+
 window.isDirectorEmail = function(email) {
   if (!email || typeof email !== 'string') return false;
   return email.toLowerCase().trim() === 'tajinkart@gmail.com';
