@@ -2359,7 +2359,23 @@ function renderOrderAdminSnippet(o) {
           <div><span style="color:#94a3b8;">Fidelity:</span> <strong>${o.specs?.fidelity || o.phase || '-'}</strong></div>
           <div><span style="color:#94a3b8;">Timeline:</span> <strong>${o.timeline || 'Per Schedule'}</strong></div>
           ${o.specs?.addons && o.specs.addons.length ? `<div style="color:var(--emerald); padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">Add-ons (${o.specs.addons.length}): ${o.specs.addons.join(' • ')}</div>` : ''}
-          ${(o.specs?.retainerUsd || o.specs?.paidUsd) ? `<div class="font-mono" style="font-size:10.5px; color:#cbd5e1; padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">Paid: <span style="color:var(--emerald);">$${o.specs.paidUsd || 0}</span> • Balance: <span style="color:var(--cyan-electric);">$${o.specs.balanceUsd !== undefined ? o.specs.balanceUsd : (o.specs.retainerUsd || 0)}</span></div>` : ''}
+          ${(() => {
+            const sp = o.specs || {};
+            const tot = Number(sp.totalUsd) || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+            const paid = Number(sp.paidUsd || 0);
+            const bal = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paid > 0 ? Math.max(0, tot - paid) : (sp.retainerUsd || tot * 0.5));
+            const pctPaid = tot > 0 ? Math.min(100, Math.round((paid / tot) * 100)) : 0;
+            const createdMs = sp.createdAt ? Date.parse(sp.createdAt) : (typeof o.id === 'number' && o.id > 1700000000000 ? o.id : Date.now());
+            const daysElapsed = Math.max(0, Math.floor((Date.now() - createdMs) / 86400000));
+            return `
+              <div class="font-mono" style="font-size:10.5px; color:#cbd5e1; padding-top:4px; border-top:1px solid rgba(255,255,255,0.06);">
+                Paid (${pctPaid}%): <span style="color:var(--emerald);">$${paid}</span> • Balance: <span style="color:var(--cyan-electric);">$${bal}</span>
+              </div>
+              <div class="font-mono" style="font-size:10px; color:var(--gold); padding-top:2px;">
+                ⏱ Internal Effort: ${sp.estimatedHours || '-'}h • Elapsed: ${daysElapsed}d
+              </div>
+            `;
+          })()}
         </div>
         <div style="font-size:11.5px; color:#cbd5e1; line-height:1.7; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); padding:10px 12px; border-radius:8px;">
           <span style="color:var(--cyan-electric); font-size:10.5px; font-weight:700; display:block; margin-bottom:4px;">Client: ${o.client || 'Guest'} (${o.contact || '-'})</span>
@@ -2405,7 +2421,7 @@ function renderOrderAdminSnippet(o) {
         const msgs = Array.isArray(o.specs?.messages) ? o.specs.messages : [];
         return `
           <div style="padding:10px 12px; border-radius:8px; background:#050811; border:1px solid rgba(0,240,255,0.24); display:flex; flex-direction:column; gap:7px;">
-            <strong style="font-size:11px; color:var(--cyan-electric);">💬 2-Way Client Chat &amp; Work Drop (${msgs.length})</strong>
+            <div style="display:flex; justify-content:space-between; align-items:center;"><strong style="font-size:11px; color:var(--cyan-electric);">💬 2-Way Client Chat &amp; Work Drop (${msgs.length})</strong><button type="button" onclick="if(window.syncOrdersFromSupabase) window.syncOrdersFromSupabase();" style="font-size:10px; padding:2px 8px; border-radius:5px; background:rgba(0,240,255,0.1); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.28); cursor:pointer;">🔄 Sync</button></div>
             <div style="max-height:140px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;">
               ${msgs.length === 0 ? '<span style="font-size:10.5px; color:#64748b;">No messages yet.</span>' : msgs.map(m => `
                 <div style="padding:6px 9px; border-radius:7px; background:${m.sender === 'director' ? 'rgba(250,204,21,0.08)' : 'rgba(0,240,255,0.08)'}; font-size:11px;">

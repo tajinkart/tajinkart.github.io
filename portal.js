@@ -1338,21 +1338,31 @@ function renderMemberDashboard() {
             </span>
           </div>
 
-          <!-- 5-Step Conduit Production Progress Stepper + Animated Bar -->
+          <!-- 1. 5-Step Conduit Production Progress Stepper + Animated Bar -->
           ${(() => {
+            const sp = o.specs || {};
+            const totalNum = Number(sp.totalUsd) || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+            const paidAmt = Number(sp.paidUsd || 0);
+            const remAmt = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paidAmt > 0 ? Math.max(0, totalNum - paidAmt) : Math.round(totalNum * 0.5));
+            const isFullPaid = o.paymentVerified && remAmt <= 0;
             const pct = Math.min(100, Math.round(((currentStageNum - 1) / 4) * 100));
-            const appList = Array.isArray(o.specs?.approvedStages) ? o.specs.approvedStages : [];
+            const appList = Array.isArray(sp.approvedStages) ? sp.approvedStages : [];
+            const dynStages = STAGES.map(s => s.id === 2 ? {
+              id: 2,
+              label: isFullPaid ? '100% Paid in Full' : '50% Retainer',
+              hint: isFullPaid ? `$${paidAmt || totalNum} Settled ✓` : 'Artist Calendar Reserved'
+            } : s);
             return `
-              <div style="background:#080c16; border:1px solid rgba(0,240,255,0.18); border-radius:12px; padding:16px 14px; position:relative;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:10.5px;">
+              <div style="background:#080c16; border:1px solid rgba(0,240,255,0.18); border-radius:12px; padding:14px; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:10.5px;">
                   <span class="font-mono" style="color:var(--cyan-electric); font-weight:800;">PRODUCTION PROGRESSION: ${pct}% COMPLETE</span>
                   <span style="color:#94a3b8;">Stage ${currentStageNum} of 5</span>
                 </div>
-                <div style="height:5px; background:#0f172a; border-radius:999px; overflow:hidden; margin-bottom:14px;">
+                <div style="height:5px; background:#0f172a; border-radius:999px; overflow:hidden; margin-bottom:12px;">
                   <div style="height:100%; width:${Math.max(10, pct)}%; background:linear-gradient(90deg, var(--emerald), var(--cyan-electric), var(--gold)); border-radius:999px; transition:width 0.4s ease;"></div>
                 </div>
                 <div style="display:flex; justify-content:space-between; position:relative; gap:4px;">
-                  ${STAGES.map(s => {
+                  ${dynStages.map(s => {
                     const isPassed = s.id <= currentStageNum;
                     const isCurrent = s.id === currentStageNum;
                     const dotColor = isCurrent ? 'var(--gold)' : (isPassed ? '#10b981' : '#334155');
@@ -1361,13 +1371,11 @@ function renderMemberDashboard() {
                     const appDate = matchedApp && matchedApp.approvedAt ? new Date(matchedApp.approvedAt).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '';
                     return `
                       <div style="display:flex; flex-direction:column; align-items:center; flex:1; text-align:center; z-index:2;">
-                        <div style="width:24px; height:24px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#000; margin-bottom:6px;">
+                        <div style="width:22px; height:22px; border-radius:50%; background:${dotColor}; box-shadow:${dotGlow}; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:900; color:#000; margin-bottom:5px;">
                           ${isPassed ? '✓' : s.id}
                         </div>
-                        <span style="font-size:10.5px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.4;">
-                          ${s.label}
-                        </span>
-                        <span style="font-size:9px; color:${appDate ? 'var(--emerald)' : '#475569'}; margin-top:2px;">${appDate ? ('Approved ' + appDate) : s.hint}</span>
+                        <span style="font-size:10px; font-weight:${isCurrent ? '800' : '600'}; color:${isCurrent ? 'var(--gold)' : (isPassed ? '#fff' : '#64748b')}; line-height:1.3;">${s.label}</span>
+                        <span style="font-size:8.5px; color:${appDate ? 'var(--emerald)' : '#475569'}; margin-top:2px;">${appDate ? ('Approved ' + appDate) : s.hint}</span>
                       </div>
                     `;
                   }).join('')}
@@ -1376,152 +1384,141 @@ function renderMemberDashboard() {
             `;
           })()}
 
-          ${(() => {
-            const sp = o.specs || {};
-            const totalNum = sp.totalUsd || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
-            const halfNum = sp.retainerUsd || (totalNum ? (totalNum * 0.5).toFixed(2).replace(/\.00$/, '') : '--');
-            const issuedStr = sp.createdAt ? new Date(sp.createdAt).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : (typeof o.id === 'number' && o.id > 1700000000000 ? new Date(o.id).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : 'Recorded');
-            return `
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap:10px; padding:14px; border-radius:10px; background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.22); font-size:11.5px;">
-                <div><span style="color:#94a3b8; display:block; font-size:10px;">CLIENT &amp; CONTACT</span><strong style="color:#f8fafc;">${o.client || 'Valued Client'}</strong><span style="color:#94a3b8; display:block; font-size:10.5px;">${o.contact || '-'}</span></div>
-                <div><span style="color:#94a3b8; display:block; font-size:10px;">ISSUED &amp; TIMELINE</span><strong style="color:#f8fafc;">${issuedStr}</strong><span style="color:#94a3b8; display:block; font-size:10.5px;">Est. Delivery: ${o.timeline || 'Per Schedule'}</span></div>
-                <div><span style="color:#94a3b8; display:block; font-size:10px;">SCOPE &amp; ARCHETYPE</span><strong style="color:#f8fafc;">${sp.scope || o.pkg || 'Custom Scope'}</strong></div>
-                <div><span style="color:#94a3b8; display:block; font-size:10px;">FRAMING &amp; VIEW</span><strong style="color:#f8fafc;">${sp.framing || 'Standard View'}</strong></div>
-                <div><span style="color:#94a3b8; display:block; font-size:10px;">COMPLEXITY</span><strong style="color:#f8fafc;">${sp.complexity || 'Production Standard'}</strong></div>
-                <div><span style="color:#94a3b8; display:block; font-size:10px;">RENDERING FIDELITY</span><strong style="color:#f8fafc;">${sp.fidelity || o.phase || '300DPI Master Render'}</strong></div>
-                <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06);">
-                  <span style="color:#94a3b8; font-size:10px; display:block; margin-bottom:3px;">INCLUDED ADD-ONS &amp; DELIVERABLES</span>
-                  <strong style="color:var(--emerald);">${(sp.addons && sp.addons.length) ? sp.addons.join(' • ') : 'Master Layered 300DPI PSD'}</strong>
-                </div>
-                <div style="grid-column: 1 / -1; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                  ${(() => {
-                    const paid = Number(sp.paidUsd || 0);
-                    const bal = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paid > 0 ? Math.max(0, totalNum - paid) : Number(halfNum));
-                    const isFull = o.paymentVerified && bal <= 0;
-                    if (isFull) {
-                      return `<span style="color:var(--emerald); font-weight:800;">✓ 100% Paid in Full: <strong class="font-mono">$${paid || totalNum} USD</strong></span><span style="color:#94a3b8;">Remaining Balance: <strong class="font-mono" style="color:var(--emerald);">$0 USD</strong></span>`;
-                    } else if (o.paymentVerified && paid > 0) {
-                      return `<span>Paid (50% Retainer): <strong class="font-mono" style="color:var(--emerald);">$${paid} USD</strong></span><span>Remaining 50% Balance: <strong class="font-mono" style="color:var(--cyan-electric);">$${bal} USD</strong></span>`;
-                    }
-                    return `<span>50% Retainer to Start: <strong class="font-mono" style="color:var(--gold);">$${halfNum} USD</strong></span><span>50% Final on PSD Handover: <strong class="font-mono" style="color:var(--cyan-electric);">$${bal} USD</strong></span>`;
-                  })()}
-                </div>
-              </div>
-            `;
-          })()}
-
-          <div style="color:#cbd5e1; font-size:12px; line-height:1.8; background:rgba(255,255,255,0.02); padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
-            <strong style="color:var(--cyan-electric); font-size:12px; display:block; margin-bottom:4px;">Official Creative Brief &amp; Contractual Scope:</strong>
-            ${String(o.brief || 'Bespoke concept art and visual development executed to international industry standards by TAJINKART Studio.').replace(/\n/g, '<br>')}
-            ${o.refLink && o.refLink.startsWith('http') ? `<div style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);"><a href="${o.refLink}" target="_blank" rel="noopener" style="color:var(--cyan-electric); text-decoration:underline; font-size:11.5px;">🔗 Reference / Moodboard Link</a></div>` : ''}
-          </div>
-
-          ${o.txid ? `
-            <div class="font-mono" style="font-size:11px; padding:8px 12px; border-radius:8px; background:rgba(0,240,255,0.06); border:1px solid ${o.paymentVerified ? 'rgba(16,185,129,0.4)' : 'rgba(250,204,21,0.35)'}; color:${o.paymentVerified ? 'var(--emerald)' : 'var(--gold)'}; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
-              <span>${o.paymentVerified ? '✓ Payment Verified' : '⏳ TXID Pending Review'} (${(o.paymentNetwork || '').toUpperCase()} ${o.paymentAmountCrypto || ''})</span>
-              <span style="color:#94a3b8;">${String(o.txid).slice(0, 14)}...</span>
-            </div>
-          ` : ''}
-          ${(!o.paymentVerified && !o.txid && (!o.status || o.status === 'Brief Received')) ? (() => {
-            const cMs = (o.specs && o.specs.createdAt) ? Date.parse(o.specs.createdAt) : (typeof o.id === 'number' && o.id > 1700000000000 ? o.id : Date.now());
-            const remMs = Math.max(0, (24 * 60 * 60 * 1000) - (Date.now() - cMs));
-            const remH = String(Math.floor(remMs / 3600000)).padStart(2, '0');
-            const remM = String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0');
-            const remS = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
-            return `<div style="font-size:11.5px; padding:9px 14px; border-radius:8px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.35); color:#fbbf24; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-              <span>⏳ 24h Unpaid Brief Hold: <strong class="font-mono unpaid-countdown-timer" data-created-ms="${cMs}" style="font-size:13px; color:#fff; background:rgba(0,0,0,0.35); padding:2px 8px; border-radius:6px; border:1px solid rgba(245,158,11,0.4);">${remH}:${remM}:${remS}</strong></span>
-              <span style="color:#e2e8f0; font-size:11px;">Auto-deletes when timer hits 00:00:00 if 50% retainer is unpaid.</span>
-            </div>`;
-          })() : ''}
+          <!-- 2. Dedicated Work Delivery & Client Review Gate -->
           ${(() => {
             const sp = o.specs || {};
             const extraRevPaid = userOrders.filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id) && String(s.pkg || '').toLowerCase().includes('revision') && s.paymentVerified).length;
             const totalRevs = (Number(sp.revisionsIncluded) || 2) + extraRevPaid;
             const usedRevs = Number(sp.revisionsUsed) || 0;
             const delivUrl = sp.deliverableUrl || '';
-            const childSups = userOrders.filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id));
+            const hasDeliv = delivUrl && delivUrl.startsWith('http');
+            const isImgDeliv = hasDeliv && (/\.(png|jpe?g|webp|gif)(\?|$)/i.test(delivUrl) || delivUrl.includes('cloudinary.com'));
             return `
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; padding:12px 14px; border-radius:10px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.22); font-size:11.5px;">
-                <div>
-                  <span style="color:#94a3b8; font-size:10px; display:block;">REVISION ROUNDS &amp; STAGE APPROVAL</span>
-                  <strong class="font-mono" style="color:${usedRevs >= totalRevs ? 'var(--gold)' : 'var(--emerald)'};">${usedRevs} / ${totalRevs} Used</strong>
-                  <span style="color:#94a3b8; font-size:10.5px; display:block; margin-top:2px;">${Math.max(0, totalRevs - usedRevs)} structured round(s) remaining</span>
+              <div style="padding:14px 16px; border-radius:12px; background:${hasDeliv ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.02)'}; border:1.5px solid ${hasDeliv ? 'rgba(16,185,129,0.45)' : 'rgba(255,255,255,0.08)'}; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:220px;">
+                  ${isImgDeliv ? `<img src="${delivUrl}" style="width:76px; height:54px; object-fit:cover; border-radius:8px; border:1px solid rgba(16,185,129,0.4); cursor:pointer;" onclick="window.open('${delivUrl}','_blank')" alt="Delivered Work" />` : `<div style="width:44px; height:44px; border-radius:10px; background:rgba(16,185,129,0.14); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">📦</div>`}
+                  <div>
+                    <span class="font-mono" style="font-size:10px; font-weight:800; color:${hasDeliv ? 'var(--emerald)' : '#94a3b8'}; display:block;">${hasDeliv ? 'WORK DELIVERED FOR YOUR REVIEW ✓' : 'STUDIO WORK DELIVERY &amp; REVIEW'}</span>
+                    <strong style="font-size:12.5px; color:#fff; display:block; margin-top:2px;">${hasDeliv ? 'New sketch / render files ready to inspect' : 'Waiting for Studio Director upload for this stage'}</strong>
+                    <span class="font-mono" style="font-size:10.5px; color:var(--gold);">Revisions: ${usedRevs} / ${totalRevs} Used (${Math.max(0, totalRevs - usedRevs)} left)</span>
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                  ${hasDeliv ? `<a href="${delivUrl}" target="_blank" rel="noopener" class="btn-gold" style="font-size:11px; padding:7px 13px; text-decoration:none;">📥 View / Download Work ↗</a>` : ''}
                   ${o.paymentVerified && currentStageNum < 5 ? `
-                    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-                      <button type="button" onclick="window.clientApproveCurrentStage(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:4px 9px; color:var(--emerald); border-color:rgba(16,185,129,0.45);">
-                        ✓ Approve Stage &amp; Advance
-                      </button>
-                      ${usedRevs < totalRevs
-                        ? `<button type="button" onclick="window.clientRequestIncludedRevision(${o.id})" class="btn-secondary" style="font-size:10.5px; padding:4px 9px; color:var(--gold); border-color:rgba(250,204,21,0.4);">🔄 Use 1 Revision</button>`
-                        : `<button type="button" onclick="openOrderSupplementModal(${o.id}, 'revision')" class="btn-gold" style="font-size:10.5px; padding:4px 9px;">💳 Buy +1 Extra Revision</button>`
-                      }
-                    </div>
+                    <button type="button" onclick="window.clientApproveCurrentStage(${o.id})" class="btn-secondary" style="font-size:11px; padding:7px 12px; color:var(--emerald); border-color:rgba(16,185,129,0.5);">✓ Approve &amp; Advance</button>
+                    ${usedRevs < totalRevs
+                      ? `<button type="button" onclick="window.clientRequestIncludedRevision(${o.id})" class="btn-secondary" style="font-size:11px; padding:7px 12px; color:var(--gold); border-color:rgba(250,204,21,0.45);">🔄 Request Revision</button>`
+                      : `<button type="button" onclick="openOrderSupplementModal(${o.id}, 'revision')" class="btn-gold" style="font-size:11px; padding:7px 12px;">💳 Buy +1 Revision</button>`
+                    }
                   ` : ''}
                 </div>
-                <div>
-                  <span style="color:#94a3b8; font-size:10px; display:block;">STUDIO DELIVERABLES &amp; WIP FILES</span>
-                  ${delivUrl && delivUrl.startsWith('http')
-                    ? `<a href="${delivUrl}" target="_blank" rel="noopener" class="btn-secondary" style="display:inline-flex; align-items:center; gap:5px; margin-top:4px; padding:5px 10px; font-size:11px; color:var(--emerald); border-color:rgba(16,185,129,0.45); text-decoration:none;">📥 Open / Download Studio Files ↗</a>`
-                    : `<span style="color:#cbd5e1; font-size:11px; display:block; margin-top:2px;">In Production — Sketch &amp; final file links will appear here once uploaded.</span>`
-                  }
-                </div>
               </div>
-              ${childSups.length > 0 ? `
-                <div style="display:flex; flex-direction:column; gap:7px; padding:10px 12px; border-radius:10px; background:rgba(0,240,255,0.04); border:1px solid rgba(0,240,255,0.22);">
-                  <span class="font-mono" style="font-size:10px; font-weight:800; color:var(--cyan-electric);">MID-PROJECT SUPPLEMENTS (${childSups.length})</span>
-                  ${childSups.map(cs => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:8px 10px; border-radius:8px; background:#050811; border:1px solid rgba(255,255,255,0.08);">
-                      <div>
-                        <strong style="color:#fff; font-size:11.5px;">${(cs.pkg || '').replace(/^\[Supplement for #\d+\]\s*/, '')}</strong>
-                        <span class="font-mono" style="font-size:10.5px; color:var(--gold); margin-left:8px;">${cs.price || ''}</span>
-                        <span style="font-size:10px; color:${cs.paymentVerified ? 'var(--emerald)' : '#fbbf24'}; margin-left:8px;">• ${cs.paymentVerified ? '✓ Paid' : (cs.txid ? '⏳ Pending Review' : 'Unpaid')}</span>
-                      </div>
-                      <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                        ${!cs.paymentVerified ? `<button type="button" onclick="openCryptoPayModal(${cs.id})" class="btn-gold" style="font-size:10px; padding:4px 10px;">💳 Pay ${cs.price || ''}</button>` : ''}
-                        <button type="button" onclick="downloadOfficialStudioInvoice(${cs.id})" class="btn-secondary" style="font-size:10px; padding:4px 8px; border-color:var(--gold); color:var(--gold);">📄 Invoice</button>
-                        ${(!cs.paymentVerified && !cs.txid) ? `<button type="button" onclick="clientCancelUnpaidOrder(${cs.id})" class="btn-secondary" style="font-size:10px; padding:4px 8px; border-color:rgba(244,63,94,0.4); color:var(--crimson);">✕ Cancel</button>` : ''}
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
-              ` : ''}
             `;
           })()}
 
-          ${(() => {
-            const msgs = Array.isArray(o.specs?.messages) ? o.specs.messages : [];
-            return `
-              <div style="padding:12px 14px; border-radius:10px; background:#060912; border:1px solid rgba(0,240,255,0.22); display:flex; flex-direction:column; gap:8px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <strong style="font-size:11.5px; color:var(--cyan-electric);">💬 Studio Chat &amp; Work Drop (${msgs.length})</strong>
-                  ${o.paymentVerified ? `<span style="font-size:10px; color:var(--emerald); font-weight:700;">✓ Payment Confirmed • Direct Studio Line Open</span>` : `<span style="font-size:10px; color:#94a3b8;">Direct messages &amp; WIP drops sync to Studio Director</span>`}
-                </div>
-                <div style="max-height:170px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding-right:4px;">
-                  ${msgs.length === 0 ? `<div style="font-size:11px; color:#64748b; padding:8px; text-align:center;">No messages yet. Ask a question or drop a reference link below.</div>` : msgs.map(m => {
-                    const isDirMsg = m.sender === 'director';
-                    const tStr = m.createdAt ? new Date(m.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
-                    return `
-                      <div style="align-self:${isDirMsg ? 'flex-start' : 'flex-end'}; max-width:88%; padding:8px 11px; border-radius:10px; background:${isDirMsg ? 'rgba(250,204,21,0.08)' : 'rgba(0,240,255,0.09)'}; border:1px solid ${isDirMsg ? 'rgba(250,204,21,0.28)' : 'rgba(0,240,255,0.28)'}; font-size:11.5px;">
-                        <div style="display:flex; justify-content:space-between; gap:10px; font-size:9.5px; color:${isDirMsg ? 'var(--gold)' : 'var(--cyan-electric)'}; font-weight:800; margin-bottom:2px;">
-                          <span>${isDirMsg ? '👑 Studio Director' : '⚔️ ' + (m.senderName || 'You')}</span>
-                          <span style="color:#64748b; font-weight:500;">${tStr}</span>
+          <!-- 3. Clean 2-Column Workspace: Left (Specs, Finance & Supplements) | Right (2-Way Chat) -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:14px; align-items:stretch;">
+            <!-- Left Column: Specs, Payment & Supplements -->
+            ${(() => {
+              const sp = o.specs || {};
+              const totalNum = sp.totalUsd || parseFloat(String(o.price || '0').replace(/[^0-9.]/g, '')) || 0;
+              const halfNum = sp.retainerUsd || (totalNum ? (totalNum * 0.5).toFixed(2).replace(/\.00$/, '') : '--');
+              const paid = Number(sp.paidUsd || 0);
+              const bal = (sp.balanceUsd !== undefined) ? Number(sp.balanceUsd) : (paid > 0 ? Math.max(0, totalNum - paid) : Number(halfNum));
+              const isFull = o.paymentVerified && bal <= 0;
+              const issuedStr = sp.createdAt ? new Date(sp.createdAt).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : 'Recorded';
+              const childSups = userOrders.filter(s => s.specs && s.specs.isSupplement && String(s.specs.parentOrderId) === String(o.id));
+              return `
+                <div style="background:#060912; border:1px solid rgba(250,204,21,0.2); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px; font-size:11.5px;">
+                  <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.07); padding-bottom:7px;">
+                    <strong style="color:var(--gold); font-size:11px; letter-spacing:0.04em;">📋 SPECIFICATIONS &amp; BILLING</strong>
+                    <span style="color:#94a3b8; font-size:10.5px;">${issuedStr}</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 10px;">
+                    <div><span style="color:#64748b; font-size:10px; display:block;">SCOPE</span><strong style="color:#f8fafc;">${sp.scope || o.pkg || '-'}</strong></div>
+                    <div><span style="color:#64748b; font-size:10px; display:block;">FRAMING</span><strong style="color:#f8fafc;">${sp.framing || '-'}</strong></div>
+                    <div><span style="color:#64748b; font-size:10px; display:block;">COMPLEXITY</span><strong style="color:#f8fafc;">${sp.complexity || '-'}</strong></div>
+                    <div><span style="color:#64748b; font-size:10px; display:block;">FIDELITY</span><strong style="color:#f8fafc;">${sp.fidelity || o.phase || '-'}</strong></div>
+                  </div>
+                  <div style="font-size:11px; color:#cbd5e1; border-top:1px solid rgba(255,255,255,0.06); padding-top:7px;">
+                    <span style="color:#64748b; font-size:10px; display:block;">MODULES &amp; DELIVERABLES</span>
+                    <span style="color:var(--emerald);">${(sp.addons && sp.addons.length) ? sp.addons.join(' • ') : '300DPI Master Files'}</span>
+                  </div>
+                  <div style="font-size:11px; color:#cbd5e1; border-top:1px solid rgba(255,255,255,0.06); padding-top:7px;">
+                    <span style="color:#64748b; font-size:10px; display:block;">CREATIVE BRIEF</span>
+                    <div style="color:#94a3b8; max-height:60px; overflow-y:auto;">${String(o.brief || '-').replace(/\n/g, '<br>')}</div>
+                  </div>
+                  <div style="margin-top:auto; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.12); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                    ${isFull
+                      ? `<span style="color:var(--emerald); font-weight:800;">✓ 100% Paid: <strong class="font-mono">$${paid || totalNum}</strong></span><span style="color:#94a3b8;">Balance: <strong class="font-mono" style="color:var(--emerald);">$0</strong></span>`
+                      : `<span>Paid: <strong class="font-mono" style="color:${paid>0?'var(--emerald)':'var(--gold)'};">$${paid || 0}</strong></span><span>Remaining: <strong class="font-mono" style="color:var(--cyan-electric);">$${bal}</strong></span>`
+                    }
+                  </div>
+                  ${childSups.length > 0 ? `
+                    <div style="border-top:1px solid rgba(0,240,255,0.18); padding-top:8px; display:flex; flex-direction:column; gap:5px;">
+                      <span class="font-mono" style="font-size:9.5px; color:var(--cyan-electric); font-weight:800;">SUPPLEMENTS (${childSups.length})</span>
+                      ${childSups.map(cs => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; background:#03050a; padding:5px 8px; border-radius:6px; font-size:10.5px;">
+                          <span style="color:#e2e8f0;">${(cs.pkg || '').replace(/^\[Supplement for #\d+\]\s*/, '')} (${cs.price})</span>
+                          <div style="display:flex; gap:5px;">
+                            ${!cs.paymentVerified ? `<button type="button" onclick="openCryptoPayModal(${cs.id})" class="btn-gold" style="font-size:9.5px; padding:2px 7px;">Pay</button>` : `<span style="color:var(--emerald); font-weight:700;">Paid ✓</span>`}
+                            ${(!cs.paymentVerified && !cs.txid) ? `<button type="button" onclick="clientCancelUnpaidOrder(${cs.id})" style="color:var(--crimson); background:none; border:none; cursor:pointer; font-size:10px;">✕</button>` : ''}
+                          </div>
                         </div>
-                        ${m.text ? `<div style="color:#e2e8f0; line-height:1.5;">${String(m.text).replace(/</g, '&lt;').replace(/\n/g, '<br>')}</div>` : ''}
-                        ${m.fileUrl && m.fileUrl.startsWith('http') ? `<a href="${m.fileUrl}" target="_blank" rel="noopener" style="display:inline-block; margin-top:4px; font-size:10.5px; color:var(--emerald); text-decoration:underline;">📎 Open Dropped File / Image ↗</a>` : ''}
-                      </div>
-                    `;
-                  }).join('')}
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  ${(!o.paymentVerified && !o.txid && (!o.status || o.status === 'Brief Received')) ? (() => {
+                    const cMs = (sp.createdAt) ? Date.parse(sp.createdAt) : (typeof o.id === 'number' && o.id > 1700000000000 ? o.id : Date.now());
+                    const remMs = Math.max(0, (24 * 60 * 60 * 1000) - (Date.now() - cMs));
+                    const remH = String(Math.floor(remMs / 3600000)).padStart(2, '0');
+                    const remM = String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0');
+                    const remS = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
+                    return `<div style="font-size:10.5px; padding:6px 9px; border-radius:7px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); color:#fbbf24;">⏳ 24h Hold: <strong class="font-mono unpaid-countdown-timer" data-created-ms="${cMs}">${remH}:${remM}:${remS}</strong></div>`;
+                  })() : ''}
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 160px auto; gap:6px; align-items:center;">
-                  <input type="text" id="orderChatMsg_client_${o.id}" placeholder="Write a message to Studio Director..." style="font-size:11px; padding:6px 9px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:#fff;" />
-                  <input type="url" id="orderChatFile_client_${o.id}" placeholder="Optional file/image URL" class="font-mono" style="font-size:10.5px; padding:6px 8px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:#94a3b8;" />
-                  <button type="button" onclick="window.sendOrderChatMessage(${o.id}, 'client')" class="btn-secondary" style="font-size:11px; padding:6px 12px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35);">Send →</button>
-                </div>
-              </div>
-            `;
-          })()}
+              `;
+            })()}
 
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
+            <!-- Right Column: 2-Way Studio Chat & Work Drop -->
+            ${(() => {
+              const msgs = Array.isArray(o.specs?.messages) ? o.specs.messages : [];
+              return `
+                <div style="padding:14px; border-radius:12px; background:#060912; border:1px solid rgba(0,240,255,0.22); display:flex; flex-direction:column; gap:8px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.07); padding-bottom:7px;">
+                    <strong style="font-size:11px; color:var(--cyan-electric);">💬 STUDIO CHAT &amp; UPDATES (${msgs.length})</strong>
+                    <button type="button" onclick="if(window.syncOrdersFromSupabase) window.syncOrdersFromSupabase();" style="font-size:10px; padding:2px 8px; border-radius:5px; background:rgba(0,240,255,0.1); color:var(--cyan-electric); border:1px solid rgba(0,240,255,0.28); cursor:pointer;">🔄 Sync</button>
+                  </div>
+                  <div style="flex:1; min-height:130px; max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding-right:4px;">
+                    ${msgs.length === 0 ? `<div style="font-size:11px; color:#64748b; padding:18px 8px; text-align:center;">No messages yet. Ask a question or drop a reference link below.</div>` : msgs.map(m => {
+                      const isDirMsg = m.sender === 'director';
+                      const tStr = m.createdAt ? new Date(m.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+                      return `
+                        <div style="align-self:${isDirMsg ? 'flex-start' : 'flex-end'}; max-width:90%; padding:8px 10px; border-radius:9px; background:${isDirMsg ? 'rgba(250,204,21,0.08)' : 'rgba(0,240,255,0.09)'}; border:1px solid ${isDirMsg ? 'rgba(250,204,21,0.28)' : 'rgba(0,240,255,0.28)'}; font-size:11px;">
+                          <div style="display:flex; justify-content:space-between; gap:8px; font-size:9.5px; color:${isDirMsg ? 'var(--gold)' : 'var(--cyan-electric)'}; font-weight:800; margin-bottom:2px;">
+                            <span>${isDirMsg ? '👑 Studio Director' : '⚔️ ' + (m.senderName || 'You')}</span>
+                            <span style="color:#64748b; font-weight:500;">${tStr}</span>
+                          </div>
+                          ${m.text ? `<div style="color:#e2e8f0; line-height:1.45;">${String(m.text).replace(/</g, '&lt;').replace(/\n/g, '<br>')}</div>` : ''}
+                          ${m.fileUrl && m.fileUrl.startsWith('http') ? `<a href="${m.fileUrl}" target="_blank" rel="noopener" style="display:inline-block; margin-top:4px; font-size:10px; color:var(--emerald); text-decoration:underline;">📎 Open Dropped File ↗</a>` : ''}
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:5px; margin-top:auto;">
+                    <input type="text" id="orderChatMsg_client_${o.id}" placeholder="Write a message to Studio Director..." style="font-size:11px; padding:6px 9px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:#fff;" />
+                    <div style="display:flex; gap:6px;">
+                      <input type="url" id="orderChatFile_client_${o.id}" placeholder="Optional file/image URL" class="font-mono" style="flex:1; font-size:10.5px; padding:5px 8px; background:#03050a; border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:#94a3b8;" />
+                      <button type="button" onclick="window.sendOrderChatMessage(${o.id}, 'client')" class="btn-secondary" style="font-size:11px; padding:5px 12px; color:var(--cyan-electric); border-color:rgba(0,240,255,0.35);">Send →</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            })()}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px;">
             <span>Current Phase: <strong style="color:#fff;">${o.phase || 'Standard 300DPI'}</strong></span>
             <span>Estimated Handover: <strong style="color:#fff;">${o.timeline || 'Per Project Schedule'}</strong></span>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
